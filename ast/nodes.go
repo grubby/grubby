@@ -17,3 +17,12 @@ type SimpleString struct {
 type ConstantFloat struct {
 	Value float64
 }
+
+type BareReference struct {
+	Name string
+}
+
+type CallExpression struct {
+	Func string
+	Args []Node
+}

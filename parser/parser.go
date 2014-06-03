@@ -9,9 +9,11 @@ import (
 )
 
 var (
-	integerRegexp = regexp.MustCompile("^[0-9]+$")
-	floatRegexp   = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
-	stringRegexp  = regexp.MustCompile("^'[^']+'$")
+	integerRegexp  = regexp.MustCompile("^[0-9]+$")
+	floatRegexp    = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
+	stringRegexp   = regexp.MustCompile("^'[^']+'$")
+	bareRefRegexp  = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
+	callExprRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*(.*)$")
 )
 
 func Parse(input string) ast.Block {
@@ -35,8 +37,13 @@ func Parse(input string) ast.Block {
 			}
 
 			block.Statement = ast.ConstantFloat{Value: val}
+		} else if bareRefRegexp.MatchString(line) {
+			block.Statement = ast.BareReference{Name: line}
+		} else if callExprRegexp.MatchString(line) {
+			name := strings.SplitAfterN(line, "(", 1)
+			block.Statement = ast.CallExpression{Func: name[0]}
 		} else {
-			println("unknown type:", line)
+			panic("unknown type: " + line)
 		}
 	}
 
