@@ -13,3 +13,7 @@ type ConstantInt struct {
 type SimpleString struct {
 	Value string
 }
+
+type ConstantFloat struct {
+	Value float64
+}
