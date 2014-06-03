@@ -42,8 +42,20 @@ var _ = Describe("babby's first parser", func() {
 	Describe("call expressions", func() {
 		It("parses a simple call expression", func() {
 			statement := parser.Parse("puts()").Statement
-			_, ok := statement.(ast.CallExpression)
+			callExpr, ok := statement.(ast.CallExpression)
 			Expect(ok).To(BeTrue(), "expected to receive a call expression")
+			Expect(callExpr.Func).To(Equal("puts"))
+		})
+
+		It("parses an arg", func() {
+			statement := parser.Parse(`puts('hai')`).Statement
+			callExpr, ok := statement.(ast.CallExpression)
+			Expect(ok).To(BeTrue(), "expected to receive a call expression")
+			Expect(len(callExpr.Args)).To(Equal(1), "expected a single arg")
+
+			asString, ok := callExpr.Args[0].(ast.SimpleString)
+			Expect(ok).To(BeTrue(), "expected first arg to be a simple string")
+			Expect(asString.Value).To(Equal("hai"))
 		})
 	})
 })

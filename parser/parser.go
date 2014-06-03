@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -13,7 +14,7 @@ var (
 	floatRegexp    = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
 	stringRegexp   = regexp.MustCompile("^'[^']+'$")
 	bareRefRegexp  = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
-	callExprRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*(.*)$")
+	callExprRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
 )
 
 func Parse(input string) ast.Block {
@@ -40,10 +41,20 @@ func Parse(input string) ast.Block {
 		} else if bareRefRegexp.MatchString(line) {
 			block.Statement = ast.BareReference{Name: line}
 		} else if callExprRegexp.MatchString(line) {
-			name := strings.SplitAfterN(line, "(", 1)
-			block.Statement = ast.CallExpression{Func: name[0]}
+			index := strings.Index(line, "(")
+			remainingArgs := line[index+1 : len(line)-1]
+
+			args := make([]ast.Node, 0)
+			if remainingArgs != "" {
+				args = append(args, Parse(remainingArgs).Statement)
+			}
+
+			block.Statement = ast.CallExpression{
+				Func: line[0:index],
+				Args: args,
+			}
 		} else {
-			panic("unknown type: " + line)
+			panic(fmt.Sprintf("unknown type %T, (%#v)", line, line))
 		}
 	}
 
