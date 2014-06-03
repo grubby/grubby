@@ -3,7 +3,7 @@ package ast
 type Node interface{}
 
 type Block struct {
-	Declaration Node
+	Statement Node
 }
 
 type ConstantInt struct {

@@ -9,10 +9,10 @@ import (
 )
 
 var _ = Describe("babby's first parser", func() {
-	It("parses the string `1`", func() {
+	It(`parses the string "9001"`, func() {
 		node := parser.Parse("9001")
 		Expect(node).To(Equal(ast.Block{
-			Declaration: ast.ConstantInt{Value: 9001},
+			Statement: ast.ConstantInt{Value: 9001},
 		}))
 	})
 })
