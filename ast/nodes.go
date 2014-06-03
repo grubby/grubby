@@ -9,3 +9,7 @@ type Block struct {
 type ConstantInt struct {
 	Value int
 }
+
+type SimpleString struct {
+	Value string
+}

@@ -15,4 +15,11 @@ var _ = Describe("babby's first parser", func() {
 			Statement: ast.ConstantInt{Value: 9001},
 		}))
 	})
+
+	It(`parses the string "hello world"`, func() {
+		node := parser.Parse("'hello world'")
+		Expect(node).To(Equal(ast.Block{
+			Statement: ast.SimpleString{Value: "hello world"},
+		}))
+	})
 })
