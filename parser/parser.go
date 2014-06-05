@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	integerRegexp  = regexp.MustCompile("^[0-9]+$")
-	floatRegexp    = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
-	stringRegexp   = regexp.MustCompile("^'[^']+'$")
-	bareRefRegexp  = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
-	callExprRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
+	integerRegexp  = regexp.MustCompile("^\\s*[0-9]+$")
+	floatRegexp    = regexp.MustCompile("^\\s*[0-9]+\\.[0-9]+$")
+	stringRegexp   = regexp.MustCompile("^\\s*'[^']+'$")
+	bareRefRegexp  = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*$")
+	callExprRegexp = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
 )
 
 func Parse(input string) ast.Block {
@@ -46,7 +46,10 @@ func Parse(input string) ast.Block {
 
 			args := make([]ast.Node, 0)
 			if remainingArgs != "" {
-				args = append(args, Parse(remainingArgs).Statement)
+				for _, piece := range strings.Split(remainingArgs, ",") {
+
+					args = append(args, Parse(piece).Statement)
+				}
 			}
 
 			block.Statement = ast.CallExpression{
