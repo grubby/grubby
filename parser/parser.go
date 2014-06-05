@@ -10,9 +10,11 @@ import (
 )
 
 var (
+	whitespace     = regexp.MustCompile("^\\s*$")
 	integerRegexp  = regexp.MustCompile("^\\s*[0-9]+$")
 	floatRegexp    = regexp.MustCompile("^\\s*[0-9]+\\.[0-9]+$")
 	stringRegexp   = regexp.MustCompile("^\\s*'[^']+'$")
+	openingString  = regexp.MustCompile("^\\s*'[^']*$")
 	bareRefRegexp  = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*$")
 	callExprRegexp = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
 )
@@ -20,8 +22,15 @@ var (
 func Parse(input string) ast.Block {
 	block := ast.Block{}
 
+	var line string
 	lines := strings.Split(input, "\n")
-	for _, line := range lines {
+	for index := 0; index < len(lines); index++ {
+		line = lines[index]
+
+		if whitespace.MatchString(line) {
+			continue
+		}
+
 		if integerRegexp.MatchString(line) {
 			val, err := strconv.Atoi(line)
 			if err != nil {
@@ -56,6 +65,14 @@ func Parse(input string) ast.Block {
 				Func: line[0:index],
 				Args: args,
 			}
+		} else if openingString.MatchString(line) {
+			linesRead, stringBlock, err := ParseMultilineString(lines[index:])
+			index += linesRead
+			block.Statement = stringBlock
+			if err != nil {
+				panic(err)
+			}
+
 		} else {
 			panic(fmt.Sprintf("unknown type %T, (%#v)", line, line))
 		}

@@ -25,11 +25,21 @@ var _ = Describe("parsing ruby files", func() {
 		})
 	})
 
-	It(`parses the string "hello world"`, func() {
-		node := parser.Parse("'hello world'")
-		Expect(node).To(Equal(ast.Block{
-			Statement: ast.SimpleString{Value: "hello world"},
-		}))
+	Describe("parsing strings", func() {
+		It(`parses the string "hello world"`, func() {
+			node := parser.Parse("'hello world'")
+			Expect(node).To(Equal(ast.Block{
+				Statement: ast.SimpleString{Value: "hello world"},
+			}))
+		})
+
+		It("can parse multiline strings", func() {
+			node := parser.Parse(`'hello
+world'`)
+			Expect(node.Statement).To(Equal(
+				ast.SimpleString{Value: "hello\nworld"},
+			))
+		})
 	})
 
 	It("parses the bare reference `foo`", func() {
