@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("babby's first parser", func() {
+var _ = Describe("parsing ruby files", func() {
 	Describe("parsing Fixnums", func() {
 		It(`parses the integer "9001"`, func() {
 			node := parser.Parse("9001")
