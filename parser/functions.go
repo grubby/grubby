@@ -4,12 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/grubby/grubby/ast"
 )
 
 var (
-	funcNameRegexp = regexp.MustCompile("^\\s*def (.+)$")
+	funcNameRegexp = regexp.MustCompile("^\\s*def ([a-zA-Z_][a-zA-Z_0-9]*)(\\(.*\\))?$")
 	funcEndRegexp  = regexp.MustCompile("^\\s*end\\s*$")
 )
 
@@ -20,7 +21,7 @@ func ParseFunctionDefinition(lines []string) (int, ast.Node, error) {
 	)
 
 	matches := funcNameRegexp.FindStringSubmatch(lines[0])
-	if len(matches) != 2 {
+	if len(matches) < 2 {
 		err := errors.New(fmt.Sprintf("Could not match function name in line '%s'", lines[0]))
 		return 0, nil, err
 	}
@@ -31,7 +32,16 @@ func ParseFunctionDefinition(lines []string) (int, ast.Node, error) {
 		return 0, nil, err
 	}
 
-	node := ast.FuncDecl{Name: name}
+	parsedArgs := []ast.Node{}
+	if len(matches) == 3 && len(matches[2]) > 0 {
+		argMatch := matches[2]
+		argMatch = argMatch[1 : len(argMatch)-1]
+		for _, arg := range strings.Split(argMatch, ",") {
+			parsedArgs = append(parsedArgs, Parse(arg).Statement)
+		}
+	}
+
+	node := ast.FuncDecl{Name: name, Args: parsedArgs}
 	for i, line := range lines[1:] {
 		if funcEndRegexp.MatchString(line) {
 			index = i + 1

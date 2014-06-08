@@ -29,5 +29,6 @@ type CallExpression struct {
 
 type FuncDecl struct {
 	Name string
+	Args []Node
 	Body []Node
 }

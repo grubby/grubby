@@ -86,10 +86,30 @@ end
 
 			Expect(statement).To(Equal(ast.FuncDecl{
 				Name: "foo",
+				Args: []ast.Node{},
 				Body: []ast.Node{
 					ast.CallExpression{
 						Func: "puts",
 						Args: []ast.Node{ast.SimpleString{Value: "HAI"}},
+					},
+				},
+			}))
+		})
+
+		It("parses a method with args", func() {
+			statement := parser.Parse(`
+def foo_2(bar)
+  puts(bar)
+end
+`).Statement
+
+			Expect(statement).To(Equal(ast.FuncDecl{
+				Name: "foo_2",
+				Args: []ast.Node{ast.BareReference{Name: "bar"}},
+				Body: []ast.Node{
+					ast.CallExpression{
+						Func: "puts",
+						Args: []ast.Node{ast.BareReference{Name: "bar"}},
 					},
 				},
 			}))
