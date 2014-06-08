@@ -75,4 +75,24 @@ world'`)
 			Expect(len(callExpr.Args)).To(Equal(3), "expected three arguments")
 		})
 	})
+
+	Describe("method definitions", func() {
+		It("parses a simple method with no args", func() {
+			statement := parser.Parse(`
+def foo
+  puts('HAI')
+end
+`).Statement
+
+			Expect(statement).To(Equal(ast.FuncDecl{
+				Name: "foo",
+				Body: []ast.Node{
+					ast.CallExpression{
+						Func: "puts",
+						Args: []ast.Node{ast.SimpleString{Value: "HAI"}},
+					},
+				},
+			}))
+		})
+	})
 })

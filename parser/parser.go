@@ -10,13 +10,14 @@ import (
 )
 
 var (
-	whitespace     = regexp.MustCompile("^\\s*$")
-	integerRegexp  = regexp.MustCompile("^\\s*[0-9]+$")
-	floatRegexp    = regexp.MustCompile("^\\s*[0-9]+\\.[0-9]+$")
-	stringRegexp   = regexp.MustCompile("^\\s*'[^']+'$")
-	openingString  = regexp.MustCompile("^\\s*'[^']*$")
-	bareRefRegexp  = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*$")
-	callExprRegexp = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
+	whitespace       = regexp.MustCompile("^\\s*$")
+	integerRegexp    = regexp.MustCompile("^\\s*[0-9]+$")
+	floatRegexp      = regexp.MustCompile("^\\s*[0-9]+\\.[0-9]+$")
+	stringRegexp     = regexp.MustCompile("^\\s*'[^']+'$")
+	openingString    = regexp.MustCompile("^\\s*'[^']*$")
+	bareRefRegexp    = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*$")
+	callExprRegexp   = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
+	methodDefnRegexp = regexp.MustCompile("^\\s*def [a-zA-Z_][a-zA-Z_0-9]*")
 )
 
 func Parse(input string) ast.Block {
@@ -62,17 +63,25 @@ func Parse(input string) ast.Block {
 			}
 
 			block.Statement = ast.CallExpression{
-				Func: line[0:index],
+				Func: strings.TrimSpace(line[0:index]),
 				Args: args,
 			}
 		} else if openingString.MatchString(line) {
 			linesRead, stringBlock, err := ParseMultilineString(lines[index:])
-			index += linesRead
-			block.Statement = stringBlock
 			if err != nil {
 				panic(err)
 			}
 
+			index += linesRead
+			block.Statement = stringBlock
+		} else if methodDefnRegexp.MatchString(line) {
+			linesRead, method, err := ParseFunctionDefinition(lines[index:])
+			if err != nil {
+				panic(err)
+			}
+
+			index += linesRead
+			block.Statement = method
 		} else {
 			panic(fmt.Sprintf("unknown type %T, (%#v)", line, line))
 		}

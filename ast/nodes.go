@@ -26,3 +26,8 @@ type CallExpression struct {
 	Func string
 	Args []Node
 }
+
+type FuncDecl struct {
+	Name string
+	Body []Node
+}
