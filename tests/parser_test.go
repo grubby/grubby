@@ -49,6 +49,13 @@ world'`)
 		Expect(ref.Name).To(Equal("foo"))
 	})
 
+	It("parses symbols", func() {
+		node := parser.Parse(":bar")
+		Expect(node.Statement).To(Equal(ast.Symbol{
+			Name: "bar",
+		}))
+	})
+
 	Describe("call expressions", func() {
 		It("parses a simple call expression", func() {
 			statement := parser.Parse("puts()").Statement

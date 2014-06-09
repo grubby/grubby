@@ -14,6 +14,7 @@ var (
 	integerRegexp    = regexp.MustCompile("^\\s*[0-9]+$")
 	floatRegexp      = regexp.MustCompile("^\\s*[0-9]+\\.[0-9]+$")
 	stringRegexp     = regexp.MustCompile("^\\s*'[^']+'$")
+	symbolRegexp     = regexp.MustCompile("^\\s*:[a-zA-Z-][a-zA-Z_0-9]*$")
 	openingString    = regexp.MustCompile("^\\s*'[^']*$")
 	bareRefRegexp    = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*$")
 	callExprRegexp   = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
@@ -50,6 +51,9 @@ func Parse(input string) ast.Block {
 			block.Statement = ast.ConstantFloat{Value: val}
 		} else if bareRefRegexp.MatchString(line) {
 			block.Statement = ast.BareReference{Name: line}
+		} else if symbolRegexp.MatchString(line) {
+			index := strings.Index(line, ":")
+			block.Statement = ast.Symbol{Name: strings.TrimSpace(line[index+1:])}
 		} else if callExprRegexp.MatchString(line) {
 			index := strings.Index(line, "(")
 			remainingArgs := line[index+1 : len(line)-1]
