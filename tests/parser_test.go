@@ -122,4 +122,16 @@ end
 			}))
 		})
 	})
+
+	Describe("classes", func() {
+		It("parses a simple class definition", func() {
+			statement := parser.Parse(`
+class MyClass
+end
+`).Statement
+			Expect(statement).To(Equal(ast.ClassDefn{
+				Name: "MyClass",
+			}))
+		})
+	})
 })

@@ -36,3 +36,7 @@ type FuncDecl struct {
 	Args []Node
 	Body []Node
 }
+
+type ClassDefn struct {
+	Name string
+}

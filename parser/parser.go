@@ -19,6 +19,7 @@ var (
 	bareRefRegexp    = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*$")
 	callExprRegexp   = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
 	methodDefnRegexp = regexp.MustCompile("^\\s*def [a-zA-Z_][a-zA-Z_0-9]*(\\(.*\\))?")
+	classRegexp      = regexp.MustCompile("^\\s*class [A-Z][a-zA-Z_0-9]*$")
 )
 
 func Parse(input string) ast.Block {
@@ -86,6 +87,14 @@ func Parse(input string) ast.Block {
 
 			index += linesRead
 			block.Statement = method
+		} else if classRegexp.MatchString(line) {
+			linesRead, class, err := ParseClassDefinition(lines[index:])
+			if err != nil {
+				panic(err)
+			}
+
+			index += linesRead
+			block.Statement = class
 		} else {
 			panic(fmt.Sprintf("unknown type %T, (%#v)", line, line))
 		}
