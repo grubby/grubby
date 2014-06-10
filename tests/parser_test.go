@@ -133,5 +133,17 @@ end
 				Name: "MyClass",
 			}))
 		})
+
+		It("parses a class that inherits from another class", func() {
+			statement := parser.Parse(`
+class MyClass < Object
+end
+`).Statement
+
+			Expect(statement).To(Equal(ast.ClassDefn{
+				Name:       "MyClass",
+				SuperClass: "Object",
+			}))
+		})
 	})
 })

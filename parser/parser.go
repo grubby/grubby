@@ -19,7 +19,7 @@ var (
 	bareRefRegexp    = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*$")
 	callExprRegexp   = regexp.MustCompile("^\\s*[a-zA-Z_][a-zA-Z_0-9]*\\((.*)\\)$")
 	methodDefnRegexp = regexp.MustCompile("^\\s*def [a-zA-Z_][a-zA-Z_0-9]*(\\(.*\\))?")
-	classRegexp      = regexp.MustCompile("^\\s*class [A-Z][a-zA-Z_0-9]*$")
+	classRegexp      = regexp.MustCompile("^\\s*class [A-Z][a-zA-Z_0-9]*")
 )
 
 func Parse(input string) ast.Block {
