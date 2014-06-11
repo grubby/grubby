@@ -44,4 +44,24 @@ end
 			"end",
 		}))
 	})
+
+	It("splits arguments inside parens", func() {
+		input := `
+def foo
+  puts('HAI', 'AND', 'BAI')
+end
+`
+
+		Expect(Tokenize(input)).To(Equal([]string{
+			"def",
+			"foo",
+			"puts",
+			"(",
+			"'HAI',",
+			"'AND',",
+			"'BAI'",
+			")",
+			"end",
+		}))
+	})
 })
