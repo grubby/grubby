@@ -37,7 +37,7 @@ func ParseFunctionDefinition(lines []string) (int, ast.Node, error) {
 		argMatch := matches[2]
 		argMatch = argMatch[1 : len(argMatch)-1]
 		for _, arg := range strings.Split(argMatch, ",") {
-			parsedArgs = append(parsedArgs, Parse(arg).Statement)
+			parsedArgs = append(parsedArgs, Parse(arg).Statements...)
 		}
 	}
 
@@ -49,7 +49,7 @@ func ParseFunctionDefinition(lines []string) (int, ast.Node, error) {
 			break
 		}
 
-		node.Body = append(node.Body, Parse(line).Statement)
+		node.Body = append(node.Body, Parse(line).Statements...)
 	}
 
 	if !closed {

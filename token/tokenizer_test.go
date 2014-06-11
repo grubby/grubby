@@ -7,6 +7,10 @@ import (
 )
 
 var _ = Describe("tokenizing", func() {
+	It("returns a single string back", func() {
+		Expect(Tokenize("'hello world'")).To(Equal([]string{"'hello world'"}))
+	})
+
 	It("returns a chunk of ruby code split on delimiters", func() {
 		input := `
 require 'foo'

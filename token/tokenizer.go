@@ -6,14 +6,26 @@ import (
 )
 
 func Tokenize(input string) []string {
-	tokens := []string{}
-	currentToken := ""
+	var (
+		tokens        = []string{}
+		currentToken  = ""
+		parsingString = false
+	)
 
 	for _, char := range input {
-		if isSeparator(char) && strings.TrimSpace(currentToken) != "" {
+		switch {
+		case char == '\'':
+			if parsingString {
+				parsingString = false
+				currentToken += string(char)
+			} else {
+				parsingString = true
+				currentToken += string(char)
+			}
+		case !parsingString && isSeparator(char) && strings.TrimSpace(currentToken) != "":
 			tokens = append(tokens, strings.TrimSpace(currentToken))
 			currentToken = ""
-		} else {
+		default:
 			currentToken += string(char)
 		}
 	}
