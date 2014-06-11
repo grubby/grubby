@@ -15,6 +15,8 @@ class Whatever < Foo
   def self.something
     puts 'HAI'
   end
+
+  def something; puts 'BAI'; end;
 end
 `
 
@@ -29,6 +31,11 @@ end
 			"self.something",
 			"puts",
 			"'HAI'",
+			"end",
+			"def",
+			"something",
+			"puts",
+			"'BAI'",
 			"end",
 			"end",
 		}))

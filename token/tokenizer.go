@@ -10,7 +10,7 @@ func Tokenize(input string) []string {
 	currentToken := ""
 
 	for _, char := range input {
-		if unicode.IsSpace(char) && strings.TrimSpace(currentToken) != "" {
+		if isSeparator(char) && strings.TrimSpace(currentToken) != "" {
 			tokens = append(tokens, strings.TrimSpace(currentToken))
 			currentToken = ""
 		} else {
@@ -23,4 +23,8 @@ func Tokenize(input string) []string {
 	}
 
 	return tokens
+}
+
+func isSeparator(r rune) bool {
+	return unicode.IsSpace(r) || r == ';'
 }
