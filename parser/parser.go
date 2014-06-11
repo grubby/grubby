@@ -11,24 +11,22 @@ import (
 )
 
 var (
-	whitespace       = regexp.MustCompile("^\\s*$")
-	integerRegexp    = regexp.MustCompile("^[0-9]+$")
-	floatRegexp      = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
-	stringRegexp     = regexp.MustCompile("^'[^']+'$")
-	symbolRegexp     = regexp.MustCompile("^:[a-zA-Z-][a-zA-Z_0-9]*$")
-	openingString    = regexp.MustCompile("^\\s*'[^']*$")
-	bareRefRegexp    = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
-	callExprRegexp   = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*\\(")
-	methodDefnRegexp = regexp.MustCompile("^\\s*def [a-zA-Z_][a-zA-Z_0-9]*(\\(.*\\))?")
-	classRegexp      = regexp.MustCompile("^\\s*class [A-Z][a-zA-Z_0-9]*")
+	whitespace     = regexp.MustCompile("^\\s*$")
+	integerRegexp  = regexp.MustCompile("^[0-9]+$")
+	floatRegexp    = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
+	stringRegexp   = regexp.MustCompile("^'[^']+'$")
+	symbolRegexp   = regexp.MustCompile("^:[a-zA-Z-][a-zA-Z_0-9]*$")
+	openingString  = regexp.MustCompile("^\\s*'[^']*$")
+	bareRefRegexp  = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
+	callExprRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*\\(")
+	classRegexp    = regexp.MustCompile("^\\s*class [A-Z][a-zA-Z_0-9]*")
 )
 
-func parseNextTokens(t string, block *ast.Block, index *int, tokens *[]string) {
+func parseNextTokens(block *ast.Block, index *int, tokens *[]string) error {
+	t := (*tokens)[*index]
 	defer func() { *index += 1 }()
 
 	switch {
-	case bareRefRegexp.MatchString(t):
-		block.Statements = append(block.Statements, ast.BareReference{Name: t})
 	case integerRegexp.MatchString(t):
 		val, err := strconv.Atoi(t)
 		if err != nil {
@@ -48,45 +46,57 @@ func parseNextTokens(t string, block *ast.Block, index *int, tokens *[]string) {
 	case symbolRegexp.MatchString(t):
 		i := strings.Index(t, ":")
 		block.Statements = append(block.Statements, ast.Symbol{Name: t[i+1:]})
-	case callExprRegexp.MatchString(t):
-		i := strings.Index(t, "(")
-		remainingArgs := t[i+1 : len(t)-1]
+	case t == "def":
+		defn := ParseFunctionDefinition(t, block, index, tokens)
+		block.Statements = append(block.Statements, defn)
+	case callExprRegexp.MatchString(t) || peek(tokens, index) == "(":
+		// find first and last parens
+		firstParen := -1
+		lastParen := -1
+
+		for i := *index; i < len(*tokens); i++ {
+			if (*tokens)[i] == "(" {
+				firstParen = i
+				break
+			}
+		}
+
+		if firstParen == -1 {
+			panic("could not find an opening paren")
+		}
+
+		for i := firstParen + 1; i < len(*tokens); i++ {
+			if (*tokens)[i] == ")" {
+				lastParen = i
+				break
+			}
+		}
+
+		if lastParen == -1 {
+			panic("could not find a closing paren")
+		}
 
 		args := make([]ast.Node, 0)
-		if remainingArgs != "" {
-			for _, piece := range strings.Split(remainingArgs, ",") {
-
-				args = append(args, Parse(piece).Statements...)
-			}
+		for i := firstParen + 1; i < lastParen; i++ {
+			piece := (*tokens)[i]
+			args = append(args, Parse(piece).Statements...)
 		}
 
-		// continue to read tokens until we read a matching close paren
-		if !strings.HasSuffix(t, ")") {
-			j := *index + 1
-			for ; j < len(*tokens); j++ {
-				nextToken := strings.TrimSpace((*tokens)[j])
-				if strings.HasSuffix(nextToken, ",") || strings.HasSuffix(nextToken, ")") {
-					nextToken = nextToken[:len(nextToken)-1]
-				}
-
-				args = append(args, Parse(nextToken).Statements...)
-
-				if strings.HasSuffix((*tokens)[j], ")") {
-					*index = j
-					break
-				}
-			}
-		}
+		(*index) = lastParen // move index past last paren of call expr
 
 		block.Statements = append(block.Statements, ast.CallExpression{
-			Func: t[0:i],
+			Func: t,
 			Args: args,
 		})
-
+	case bareRefRegexp.MatchString(t) && !isKeyword(t):
+		block.Statements = append(block.Statements, ast.BareReference{Name: t})
+	case t == "end":
+		return NewUnexpectedEnd()
 	default:
 		panic(fmt.Sprintf("unknown token (%#v)", t))
 	}
 
+	return nil
 }
 
 func Parse(input string) ast.Block {
@@ -95,10 +105,33 @@ func Parse(input string) ast.Block {
 	index := 0
 	tokens := token.Tokenize(input)
 	for index < len(tokens) {
-		parseNextTokens(tokens[index], &block, &index, &tokens)
+		err := parseNextTokens(&block, &index, &tokens)
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	return block
+}
+
+func isKeyword(t string) bool {
+	switch t {
+	case "def":
+		return true
+	case "end":
+		return true
+	case "class":
+		return true
+	default:
+		return false
+	}
+}
+
+func peek(tokens *[]string, index *int) string {
+	if (*index) >= len(*tokens)-1 {
+		return ""
+	}
+	return (*tokens)[*index+1]
 }
 
 // func Parse(input string) ast.Block {

@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("parsing ruby files", func() {
-	FDescribe("parsing Fixnums", func() {
+	Describe("parsing Fixnums", func() {
 		It(`parses the integer "9001"`, func() {
 			node := parser.Parse("9001")
 			Expect(node).To(Equal(ast.Block{
@@ -25,7 +25,7 @@ var _ = Describe("parsing ruby files", func() {
 		})
 	})
 
-	FDescribe("parsing strings", func() {
+	Describe("parsing strings", func() {
 		It(`parses the string "hello world"`, func() {
 			node := parser.Parse("'hello world'")
 			Expect(node).To(Equal(ast.Block{
@@ -45,7 +45,7 @@ world'
 		})
 	})
 
-	FIt("parses the bare reference `foo`", func() {
+	It("parses the bare reference `foo`", func() {
 		statements := parser.Parse("foo").Statements
 		Expect(len(statements)).To(Equal(1))
 
@@ -54,14 +54,14 @@ world'
 		Expect(ref.Name).To(Equal("foo"))
 	})
 
-	FIt("parses symbols", func() {
+	It("parses symbols", func() {
 		node := parser.Parse(":bar")
 		Expect(node.Statements).To(Equal([]ast.Node{
 			ast.Symbol{Name: "bar"},
 		}))
 	})
 
-	FDescribe("call expressions", func() {
+	Describe("call expressions", func() {
 		It("parses a simple call expression", func() {
 			statements := parser.Parse("puts()").Statements
 			Expect(len(statements)).To(Equal(1))
@@ -99,7 +99,7 @@ world'
 	})
 
 	Describe("method definitions", func() {
-		It("parses a simple method with no args", func() {
+		FIt("parses a simple method with no args", func() {
 			statements := parser.Parse(`
 def foo
   puts('HAI')
@@ -120,9 +120,9 @@ end
 			}))
 		})
 
-		It("parses a method with args", func() {
+		FIt("parses a method with args", func() {
 			statements := parser.Parse(`
-def foo_2(bar)
+def foo_2(bar, baz, biz)
   puts(bar)
 end
 `).Statements
@@ -130,7 +130,11 @@ end
 			Expect(statements).To(Equal([]ast.Node{
 				ast.FuncDecl{
 					Name: "foo_2",
-					Args: []ast.Node{ast.BareReference{Name: "bar"}},
+					Args: []ast.Node{
+						ast.BareReference{Name: "bar"},
+						ast.BareReference{Name: "baz"},
+						ast.BareReference{Name: "biz"},
+					},
 					Body: []ast.Node{
 						ast.CallExpression{
 							Func: "puts",
