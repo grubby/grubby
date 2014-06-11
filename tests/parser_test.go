@@ -145,5 +145,17 @@ end
 				SuperClass: "Object",
 			}))
 		})
+
+		FIt("parses a class with a namespace", func() {
+			statement := parser.Parse(`
+class MyNamespace::MyClass
+end
+`).Statement
+
+			Expect(statement).To(Equal(ast.ClassDefn{
+				Name:      "MyClass",
+				Namespace: "MyNamespace",
+			}))
+		})
 	})
 })

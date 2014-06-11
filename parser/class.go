@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	classDefnRegex = regexp.MustCompile("^\\s*class ([A-Z][a-zA-Z_0-9]*)\\s*(<\\s[A-Z][a-zA-Z_0-9]*)?")
+	namespaceRegexp = regexp.MustCompile("^\\s*class ([A-Z][a-zA-Z_0-9]*::)+")
+	classDefnRegex  = regexp.MustCompile("^\\s*class (?:(?:[A-Z][a-zA-Z_0-9]*::))*([A-Z][a-zA-Z_0-9]*)\\s*(<\\s[A-Z][a-zA-Z_0-9]*)?")
 )
 
 func ParseClassDefinition(lines []string) (int, ast.Node, error) {
@@ -21,6 +22,7 @@ func ParseClassDefinition(lines []string) (int, ast.Node, error) {
 	}
 
 	node := ast.ClassDefn{Name: matches[1]}
+	findNamespaceInLine(lines[0], &node)
 
 	if len(matches) > 2 && len(matches[2]) > 0 {
 		superClass := matches[2]
@@ -28,4 +30,13 @@ func ParseClassDefinition(lines []string) (int, ast.Node, error) {
 	}
 
 	return 1, node, nil
+}
+
+func findNamespaceInLine(line string, node *ast.ClassDefn) {
+	matches := namespaceRegexp.FindStringSubmatch(line)
+	if len(matches) < 2 {
+		return
+	}
+
+	node.Namespace = matches[1][:len(matches[1])-2]
 }

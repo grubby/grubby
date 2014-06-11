@@ -40,4 +40,5 @@ type FuncDecl struct {
 type ClassDefn struct {
 	Name       string
 	SuperClass string
+	Namespace  string
 }
