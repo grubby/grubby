@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("parsing ruby files", func() {
-	FDescribe("parsing Fixnums", func() {
+	Describe("parsing Fixnums", func() {
 		It(`parses the integer "9001"`, func() {
 			node := parser.Parse("9001")
 			Expect(node).To(Equal(ast.Block{
@@ -25,7 +25,7 @@ var _ = Describe("parsing ruby files", func() {
 		})
 	})
 
-	FDescribe("parsing strings", func() {
+	Describe("parsing strings", func() {
 		It(`parses the string "hello world"`, func() {
 			node := parser.Parse("'hello world'")
 			Expect(node).To(Equal(ast.Block{
@@ -45,7 +45,7 @@ world'
 		})
 	})
 
-	FIt("parses the bare reference `foo`", func() {
+	It("parses the bare reference `foo`", func() {
 		statements := parser.Parse("foo").Statements
 		Expect(len(statements)).To(Equal(1))
 
@@ -54,14 +54,14 @@ world'
 		Expect(ref.Name).To(Equal("foo"))
 	})
 
-	FIt("parses symbols", func() {
+	It("parses symbols", func() {
 		node := parser.Parse(":bar")
 		Expect(node.Statements).To(Equal([]ast.Node{
 			ast.Symbol{Name: "bar"},
 		}))
 	})
 
-	FDescribe("call expressions", func() {
+	Describe("call expressions", func() {
 		It("parses a simple call expression", func() {
 			statements := parser.Parse("puts()").Statements
 			Expect(len(statements)).To(Equal(1))
@@ -98,7 +98,7 @@ world'
 		})
 	})
 
-	FDescribe("method definitions", func() {
+	Describe("method definitions", func() {
 		It("parses a simple method with no args", func() {
 			statements := parser.Parse(`
 def foo
@@ -147,7 +147,7 @@ end
 	})
 
 	Describe("classes", func() {
-		FIt("parses a simple class definition", func() {
+		It("parses a simple class definition", func() {
 			statements := parser.Parse(`
 class MyClass
 end
@@ -158,7 +158,7 @@ end
 			}))
 		})
 
-		FIt("parses a class that inherits from another class", func() {
+		It("parses a class that inherits from another class", func() {
 			statements := parser.Parse(`
 class MyClass < Object
 end
@@ -174,14 +174,14 @@ end
 
 		It("parses a class with a namespace", func() {
 			statements := parser.Parse(`
-class MyNamespace::MyClass
+class MyNamespace::NS2::MyClass
 end
 `).Statements
 
 			Expect(statements).To(Equal([]ast.Node{
 				ast.ClassDefn{
 					Name:      "MyClass",
-					Namespace: "MyNamespace",
+					Namespace: "MyNamespace::NS2",
 				},
 			}))
 		})
