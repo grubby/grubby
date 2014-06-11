@@ -61,7 +61,7 @@ world'
 		}))
 	})
 
-	Describe("call expressions", func() {
+	FDescribe("call expressions", func() {
 		It("parses a simple call expression", func() {
 			statements := parser.Parse("puts()").Statements
 			Expect(len(statements)).To(Equal(1))

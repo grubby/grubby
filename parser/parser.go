@@ -82,6 +82,10 @@ func parseNextTokens(block *ast.Block, index *int, tokens *[]string) error {
 		args := make([]ast.Node, 0)
 		for i := firstParen + 1; i < lastParen; i++ {
 			piece := (*tokens)[i]
+			if strings.HasSuffix(piece, ",") {
+				piece = piece[:len(piece)-1]
+			}
+
 			args = append(args, Parse(piece).Statements...)
 		}
 
