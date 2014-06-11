@@ -61,7 +61,7 @@ world'
 		}))
 	})
 
-	Describe("call expressions", func() {
+	FDescribe("call expressions", func() {
 		It("parses a simple call expression", func() {
 			statements := parser.Parse("puts()").Statements
 			Expect(len(statements)).To(Equal(1))
@@ -90,7 +90,11 @@ world'
 
 			callExpr, ok := statements[0].(ast.CallExpression)
 			Expect(ok).To(BeTrue(), "expected to receive a call expression")
-			Expect(len(callExpr.Args)).To(Equal(3), "expected three arguments")
+			Expect(callExpr.Args).To(Equal([]ast.Node{
+				ast.BareReference{Name: "foo"},
+				ast.BareReference{Name: "bar"},
+				ast.BareReference{Name: "baz"},
+			}))
 		})
 	})
 
