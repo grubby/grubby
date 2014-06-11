@@ -20,7 +20,7 @@ func ParseFunctionDefinition(t string, block *ast.Block, index *int, tokens *[]s
 
 	nextToken := (*tokens)[(*index)+1]
 	if !funcNameRegexp.MatchString(nextToken) {
-		panic(fmt.Sprintf("Failed to find expected method name in line: '%s'", nextToken))
+		panic(fmt.Sprintf("Failed to find expected method name in '%s'", nextToken))
 	}
 	name := nextToken
 

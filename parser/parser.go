@@ -49,6 +49,9 @@ func parseNextTokens(block *ast.Block, index *int, tokens *[]string) error {
 	case t == "def":
 		defn := ParseFunctionDefinition(t, block, index, tokens)
 		block.Statements = append(block.Statements, defn)
+	case t == "class":
+		defn := ParseClassDefinition(t, block, index, tokens)
+		block.Statements = append(block.Statements, defn)
 	case callExprRegexp.MatchString(t) || peek(tokens, index) == "(":
 		// find first and last parens
 		firstParen := -1

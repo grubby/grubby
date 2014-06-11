@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("parsing ruby files", func() {
-	Describe("parsing Fixnums", func() {
+	FDescribe("parsing Fixnums", func() {
 		It(`parses the integer "9001"`, func() {
 			node := parser.Parse("9001")
 			Expect(node).To(Equal(ast.Block{
@@ -25,7 +25,7 @@ var _ = Describe("parsing ruby files", func() {
 		})
 	})
 
-	Describe("parsing strings", func() {
+	FDescribe("parsing strings", func() {
 		It(`parses the string "hello world"`, func() {
 			node := parser.Parse("'hello world'")
 			Expect(node).To(Equal(ast.Block{
@@ -45,7 +45,7 @@ world'
 		})
 	})
 
-	It("parses the bare reference `foo`", func() {
+	FIt("parses the bare reference `foo`", func() {
 		statements := parser.Parse("foo").Statements
 		Expect(len(statements)).To(Equal(1))
 
@@ -54,7 +54,7 @@ world'
 		Expect(ref.Name).To(Equal("foo"))
 	})
 
-	It("parses symbols", func() {
+	FIt("parses symbols", func() {
 		node := parser.Parse(":bar")
 		Expect(node.Statements).To(Equal([]ast.Node{
 			ast.Symbol{Name: "bar"},
@@ -98,8 +98,8 @@ world'
 		})
 	})
 
-	Describe("method definitions", func() {
-		FIt("parses a simple method with no args", func() {
+	FDescribe("method definitions", func() {
+		It("parses a simple method with no args", func() {
 			statements := parser.Parse(`
 def foo
   puts('HAI')
@@ -120,7 +120,7 @@ end
 			}))
 		})
 
-		FIt("parses a method with args", func() {
+		It("parses a method with args", func() {
 			statements := parser.Parse(`
 def foo_2(bar, baz, biz)
   puts(bar)
@@ -147,7 +147,7 @@ end
 	})
 
 	Describe("classes", func() {
-		It("parses a simple class definition", func() {
+		FIt("parses a simple class definition", func() {
 			statements := parser.Parse(`
 class MyClass
 end
@@ -158,7 +158,7 @@ end
 			}))
 		})
 
-		It("parses a class that inherits from another class", func() {
+		FIt("parses a class that inherits from another class", func() {
 			statements := parser.Parse(`
 class MyClass < Object
 end
@@ -184,6 +184,10 @@ end
 					Namespace: "MyNamespace",
 				},
 			}))
+		})
+
+		PIt("parses a class with instance methods", func() {
+
 		})
 	})
 })

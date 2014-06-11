@@ -1,42 +1,48 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
-	"strings"
 
 	"github.com/grubby/grubby/ast"
 )
 
 var (
 	namespaceRegexp = regexp.MustCompile("^\\s*class ([A-Z][a-zA-Z_0-9]*::)+")
-	classDefnRegex  = regexp.MustCompile("^\\s*class (?:(?:[A-Z][a-zA-Z_0-9]*::))*([A-Z][a-zA-Z_0-9]*)\\s*(<\\s[A-Z][a-zA-Z_0-9]*)?")
+	classNameRegex  = regexp.MustCompile("^(?:(?:[A-Z][a-zA-Z_0-9]*::))*([A-Z][a-zA-Z_0-9]*)\\s*(<\\s[A-Z][a-zA-Z_0-9]*)?")
 )
 
-func ParseClassDefinition(lines []string) (int, ast.Node, error) {
-	matches := classDefnRegex.FindStringSubmatch(lines[0])
-	if len(matches) < 2 {
-		err := errors.New(fmt.Sprintf("Could not match class name in line '%s'", lines[0]))
-		return 0, nil, err
+func ParseClassDefinition(t string, block *ast.Block, index *int, tokens *[]string) ast.ClassDefn {
+	if t != "class" {
+		panic("Expected to be parsing a class definition. Received: '" + t + "'")
 	}
 
-	node := ast.ClassDefn{Name: matches[1]}
-	findNamespaceInLine(lines[0], &node)
-
-	if len(matches) > 2 && len(matches[2]) > 0 {
-		superClass := matches[2]
-		node.SuperClass = strings.TrimSpace(superClass[strings.Index(superClass, "<")+1:])
+	nextToken := (*tokens)[(*index)+1]
+	if !classNameRegex.MatchString(nextToken) {
+		panic(fmt.Sprintf("Failed to find class name in '%s'", nextToken))
 	}
 
-	return 1, node, nil
-}
+	*index += 1
+	node := ast.ClassDefn{Name: nextToken}
+	nextToken = (*tokens)[(*index)+1]
 
-func findNamespaceInLine(line string, node *ast.ClassDefn) {
-	matches := namespaceRegexp.FindStringSubmatch(line)
-	if len(matches) < 2 {
-		return
+	if nextToken == "<" {
+		*index += 2
+		nextToken = (*tokens)[*index]
+		if !classNameRegex.MatchString(nextToken) {
+			panic(fmt.Sprintf("Expected super class '%s' to be a class name", nextToken))
+		}
+
+		node.SuperClass = nextToken
 	}
 
-	node.Namespace = matches[1][:len(matches[1])-2]
+	// just consume tokens until we read an "end"
+	// (obviously this is wrong)
+	for nextToken != "end" {
+		*index += 1
+		nextToken = (*tokens)[*index]
+	}
+
+	*index += 1 // move past 'end'
+	return node
 }
