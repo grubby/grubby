@@ -1,4 +1,4 @@
-package tests_test
+package token_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestAllTheTests(t *testing.T) {
+func TestTokenizer(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Grubby Test Suite")
+	RunSpecs(t, "Grubby Token Suite")
 }

@@ -1,4 +1,4 @@
-package tests_test
+package parser_test
 
 import (
 	"github.com/grubby/grubby/ast"
@@ -146,7 +146,7 @@ end
 			}))
 		})
 
-		FIt("parses a class with a namespace", func() {
+		It("parses a class with a namespace", func() {
 			statement := parser.Parse(`
 class MyNamespace::MyClass
 end
