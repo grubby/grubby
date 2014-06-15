@@ -154,7 +154,10 @@ end
 `).Statements
 
 			Expect(statements).To(Equal([]ast.Node{
-				ast.ClassDefn{Name: "MyClass"},
+				ast.ClassDefn{
+					Name: "MyClass",
+					Body: []ast.Node{},
+				},
 			}))
 		})
 
@@ -168,6 +171,7 @@ end
 				ast.ClassDefn{
 					Name:       "MyClass",
 					SuperClass: "Object",
+					Body:       []ast.Node{},
 				},
 			}))
 		})
@@ -182,12 +186,37 @@ end
 				ast.ClassDefn{
 					Name:      "MyClass",
 					Namespace: "MyNamespace::NS2",
+					Body:      []ast.Node{},
 				},
 			}))
 		})
 
-		PIt("parses a class with instance methods", func() {
+		It("parses a class with instance methods", func() {
+			statements := parser.Parse(`
+class MyClass
+  def test
+    puts(:test)
+  end
+end
+`).Statements
 
+			Expect(statements).To(Equal([]ast.Node{
+				ast.ClassDefn{
+					Name: "MyClass",
+					Body: []ast.Node{
+						ast.FuncDecl{
+							Name: "test",
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: "puts",
+									Args: []ast.Node{ast.Symbol{Name: "test"}},
+								},
+							},
+						},
+					},
+				},
+			}))
 		})
 	})
 })

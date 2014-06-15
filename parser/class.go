@@ -18,29 +18,29 @@ func ParseClassDefinition(t string, block *ast.Block, index *int, tokens *[]stri
 		panic("Expected to be parsing a class definition. Received: '" + t + "'")
 	}
 
-	*index += 1
+	*index += 1 // move past the class token
 	nextToken := (*tokens)[*index]
 	if !classNameRegex.MatchString(nextToken) {
 		panic(fmt.Sprintf("Failed to find class name in '%s'", nextToken))
 	}
 
 	name := nextToken
-	node := ast.ClassDefn{Name: name}
+	node := ast.ClassDefn{Name: name, Body: []ast.Node{}}
 
 	matches := namespaceRegexp.FindStringSubmatch(nextToken)
 	if len(matches) > 2 {
-		println("debug matches")
 		name := matches[len(matches)-1]
 		namespaces := strings.Replace(matches[0], name, "", 1)
 		node.Namespace = namespaces[:len(namespaces)-2]
 		node.Name = name
 	}
 
-	nextToken = (*tokens)[(*index)+1]
+	*index += 1
+	nextToken = (*tokens)[(*index)]
 
 	if nextToken == "<" {
 		*index += 2
-		nextToken = (*tokens)[*index]
+		nextToken = (*tokens)[*index-1]
 		if !classNameRegex.MatchString(nextToken) {
 			panic(fmt.Sprintf("Expected super class '%s' to be a class name", nextToken))
 		}
@@ -48,11 +48,20 @@ func ParseClassDefinition(t string, block *ast.Block, index *int, tokens *[]stri
 		node.SuperClass = nextToken
 	}
 
-	// just consume tokens until we read an "end"
-	// (obviously this is wrong)
-	for nextToken != "end" {
-		*index += 1
-		nextToken = (*tokens)[*index]
+	foundEnd := false
+	newBlock := ast.Block{Statements: []ast.Node{}}
+
+	for *index < len(*tokens) {
+		err := parseNextTokens(&newBlock, index, tokens)
+		if _, ok := err.(*UnexpectedEndError); ok {
+			foundEnd = true
+			node.Body = append(node.Body, newBlock.Statements...)
+			break
+		}
+	}
+
+	if !foundEnd {
+		panic("Expected to find an end to class '" + node.Name + "'")
 	}
 
 	*index += 1 // move past 'end'

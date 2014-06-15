@@ -41,4 +41,5 @@ type ClassDefn struct {
 	Name       string
 	SuperClass string
 	Namespace  string
+	Body       []Node
 }
