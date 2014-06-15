@@ -113,9 +113,10 @@ func parseNextTokens(block *ast.Block, index *int, tokens *[]string) error {
 
 func Parse(input string) ast.Block {
 	block := ast.Block{Statements: []ast.Node{}}
+	lexer := token.NewLexer()
 
 	index := 0
-	tokens := token.Tokenize(input)
+	tokens := lexer.Tokenize(input)
 	for index < len(tokens) {
 		err := parseNextTokens(&block, &index, &tokens)
 		if err != nil {

@@ -5,56 +5,73 @@ import (
 	"unicode"
 )
 
-func Tokenize(input string) []string {
-	var (
-		tokens       = []string{}
-		currentToken = ""
-	)
+type rubyLexer struct {
+	index        int
+	currentToken string
+	tokens       []string
+}
 
-	index := 0
-	for index < len(input) {
-		char := rune(input[index])
+type Lexer interface {
+	Tokenize(input string) []string
+}
+
+func NewLexer() Lexer {
+	return &rubyLexer{}
+}
+
+func (lexer *rubyLexer) Tokenize(input string) []string {
+	lexer.tokens = []string{}
+	lexer.currentToken = ""
+	lexer.index = 0
+
+	for lexer.index < len(input) {
+		char := rune(input[lexer.index])
 
 		switch {
 		case char == '(' || char == ')':
-			tokens = append(
-				tokens,
-				strings.TrimSpace(currentToken),
-				string(char),
-			)
-			currentToken = ""
+			lexer.appendNonEmptyTokens(lexer.currentToken, string(char))
 		case char == '\'':
-			currentToken = tokenizeString(input, &index)
-		case isSeparator(char) && strings.TrimSpace(currentToken) != "":
-			tokens = append(tokens, strings.TrimSpace(currentToken))
-			currentToken = ""
+			lexer.tokenizeString(input)
+		case char == '[' || char == ']':
+			lexer.appendNonEmptyTokens(lexer.currentToken, string(char))
+		case isSeparator(char):
+			lexer.appendNonEmptyTokens(lexer.currentToken)
 		default:
-			currentToken += string(char)
+			lexer.currentToken += string(char)
 		}
 
-		index += 1
+		lexer.index++
 	}
 
-	if currentToken != "" {
-		tokens = append(tokens, currentToken)
-	}
-
-	return tokens
+	lexer.appendNonEmptyTokens(lexer.currentToken)
+	return lexer.tokens
 }
 
-func tokenizeString(input string, index *int) string {
-	token := string(input[*index])
-	for i := *index + 1; i < len(input); i += 1 {
+func (lexer *rubyLexer) appendNonEmptyTokens(tokens ...string) {
+	defer func() {
+		lexer.currentToken = ""
+	}()
+
+	for _, token := range tokens {
+		if strings.TrimSpace(token) != "" {
+			lexer.tokens = append(lexer.tokens, token)
+		}
+	}
+}
+
+func (lexer *rubyLexer) tokenizeString(input string) {
+	token := string(input[lexer.index])
+	for i := lexer.index + 1; i < len(input); i += 1 {
 		char := input[i]
 		token += string(char)
 
 		if char == '\'' {
-			(*index) = i
+			lexer.index = i
 			break
 		}
 	}
 
-	return token
+	lexer.currentToken = token
 }
 
 func isSeparator(r rune) bool {

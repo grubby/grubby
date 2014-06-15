@@ -1,25 +1,23 @@
-
 //line parser.y:2
+package parser
 
-package main
 import __yyfmt__ "fmt"
+
 //line parser.y:3
-		
 import (
-  "bufio"
-  "fmt"
-  "os"
-  "unicode"
+	"bufio"
+	"fmt"
+	"os"
+	"unicode"
 )
 
 var regs = make([]int, 26)
 var base int
 
-
 //line parser.y:17
-type RubySymType struct{
+type RubySymType struct {
 	yys int
-  val int
+	val int
 }
 
 const DIGIT = 57346
@@ -36,52 +34,53 @@ const RubyErrCode = 2
 const RubyMaxDepth = 200
 
 //line parser.y:55
-   /* start of legit parser? */
+
+/* start of legit parser? */
 
 type RubyLex struct {
-  s string
-  pos int
+	s   string
+	pos int
 }
 
 func (l *RubyLex) Lex(lval *RubySymType) int {
-  var c rune = ' '
-  for c == ' ' {
-    if l.pos == len(l.s) {
-      return 0
-    }
+	var c rune = ' '
+	for c == ' ' {
+		if l.pos == len(l.s) {
+			return 0
+		}
 
-    c = rune(l.s[l.pos])
-    l.pos++
-  }
+		c = rune(l.s[l.pos])
+		l.pos++
+	}
 
-  if unicode.IsDigit(c) {
-    fmt.Printf("storing an int value in a lex val %#v\n", lval)
-    lval.val = int(c - '0')
-    return DIGIT
-  }
+	if unicode.IsDigit(c) {
+		fmt.Printf("storing an int value in a lex val %#v\n", lval)
+		lval.val = int(c - '0')
+		return DIGIT
+	}
 
-  return int(c)
+	return int(c)
 }
 
 func (l *RubyLex) Error(s string) {
-  panic(fmt.Sprintf("syntax error: %s\n", s))
+	panic(fmt.Sprintf("syntax error: %s\n", s))
 }
 
 func main() {
-  stdin := bufio.NewReader(os.NewFile(0, "stdin"))
+	stdin := bufio.NewReader(os.NewFile(0, "stdin"))
 
-  var line string
-  var err error
-  for {
-    fmt.Printf("give me your best rubby: ")
+	var line string
+	var err error
+	for {
+		fmt.Printf("give me your best rubby: ")
 
-    if line, err = stdin.ReadString('\n'); err == nil{
-      ret := RubyParse(&RubyLex{s: line})
-      fmt.Printf("got a %T :: %#v\n", ret, ret)
-    } else {
-      break
-    }
-  }
+		if line, err = stdin.ReadString('\n'); err == nil {
+			ret := RubyParse(&RubyLex{s: line})
+			fmt.Printf("got a %T :: %#v\n", ret, ret)
+		} else {
+			break
+		}
+	}
 }
 
 //line yacctab:1
@@ -368,23 +367,25 @@ Rubydefault:
 	case 3:
 		//line parser.y:34
 		{
-	      return RubyS[Rubypt-0].val
-	    }
+			return RubyS[Rubypt-0].val
+		}
 	case 4:
 		RubyVAL.val = RubyS[Rubypt-0].val
 	case 5:
 		//line parser.y:43
 		{
-	      RubyVAL.val = RubyS[Rubypt-0].val
-	      if RubyS[Rubypt-0].val == 0 {
-	        base = 8
-	      } else {
-	        base = 10
-	      }
-	    }
+			RubyVAL.val = RubyS[Rubypt-0].val
+			if RubyS[Rubypt-0].val == 0 {
+				base = 8
+			} else {
+				base = 10
+			}
+		}
 	case 6:
 		//line parser.y:52
-		{ RubyVAL.val = base * RubyS[Rubypt-1].val + RubyS[Rubypt-0].val }
+		{
+			RubyVAL.val = base*RubyS[Rubypt-1].val + RubyS[Rubypt-0].val
+		}
 	}
 	goto Rubystack /* stack new state and value */
 }

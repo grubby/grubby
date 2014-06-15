@@ -7,8 +7,37 @@ import (
 )
 
 var _ = Describe("tokenizing", func() {
+	var lexer Lexer
+	BeforeEach(func() {
+		lexer = NewLexer()
+	})
+
 	It("returns a single string back", func() {
-		Expect(Tokenize("'hello world'")).To(Equal([]string{"'hello world'"}))
+		Expect(lexer.Tokenize("'hello world'")).To(Equal([]string{"'hello world'"}))
+	})
+
+	It("understands multiline strings", func() {
+		input := `
+'hello
+world'`
+
+		Expect(lexer.Tokenize(input)).To(Equal([]string{"'hello\nworld'"}))
+	})
+
+	XDescribe("collections", func() {
+		It("has tokens for opening and closing array brackets", func() {
+			input := `
+[1,2,3]
+`
+
+			Expect(lexer.Tokenize(input)).To(Equal([]string{
+				"[",
+				"1,",
+				"2,",
+				"3",
+				"]",
+			}))
+		})
 	})
 
 	It("returns a chunk of ruby code split on delimiters", func() {
@@ -24,7 +53,7 @@ class Whatever < Foo
 end
 `
 
-		Expect(Tokenize(input)).To(Equal([]string{
+		Expect(lexer.Tokenize(input)).To(Equal([]string{
 			"require",
 			"'foo'",
 			"class",
@@ -52,7 +81,7 @@ def foo
 end
 `
 
-		Expect(Tokenize(input)).To(Equal([]string{
+		Expect(lexer.Tokenize(input)).To(Equal([]string{
 			"def",
 			"foo",
 			"puts",
