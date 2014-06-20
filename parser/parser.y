@@ -3,7 +3,6 @@
 package parser
 
 var regs = make([]int, 26)
-var base int
 
 %}
 
@@ -26,29 +25,17 @@ var base int
 %%
 
 list  : /* empty */
-  | list stat '\n'
+  | list statement '\n'
   ;
 
-stat  :    expr
-    {
-      return $1
-    }
-  ;
+statement  :    expr;
 
-expr  :    number
-  ;
+expr  :    number;
 
 number  :   DIGIT
-    {
-      $$ = $1
-      if $1 == 0 {
-        base = 8
-      } else {
-        base = 10
-      }
-    }
-  |    number DIGIT
-    { $$ = base * $1 + $2 }
+    { $$ = $1 }
+  |    FLOAT
+    { $$ = $1 }
   ;
 
 %%

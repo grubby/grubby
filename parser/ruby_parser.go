@@ -5,9 +5,8 @@ import __yyfmt__ "fmt"
 
 //line parser/parser.y:3
 var regs = make([]int, 26)
-var base int
 
-//line parser/parser.y:15
+//line parser/parser.y:14
 type RubySymType struct {
 	yys      int
 	Val      int
@@ -27,7 +26,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser/parser.y:54
+//line parser/parser.y:41
 
 //line yacctab:1
 var RubyExca = []int{
@@ -46,11 +45,11 @@ const RubyLast = 7
 
 var RubyAct = []int{
 
-	6, 7, 5, 2, 1, 4, 3,
+	7, 5, 6, 2, 1, 4, 3,
 }
 var RubyPact = []int{
 
-	-1000, -2, -6, -1000, -3, -1000, -1000, -1000,
+	-1000, -3, -6, -1000, -1000, -1000, -1000, -1000,
 }
 var RubyPgo = []int{
 
@@ -62,15 +61,15 @@ var RubyR1 = []int{
 }
 var RubyR2 = []int{
 
-	0, 0, 3, 1, 1, 1, 2,
+	0, 0, 3, 1, 1, 1, 1,
 }
 var RubyChk = []int{
 
-	-1000, -3, -4, -1, -2, 4, 6, 4,
+	-1000, -3, -4, -1, -2, 4, 5, 6,
 }
 var RubyDef = []int{
 
-	1, -2, 0, 3, 4, 5, 2, 6,
+	1, -2, 0, 3, 4, 5, 6, 2,
 }
 var RubyTok1 = []int{
 
@@ -310,27 +309,17 @@ Rubydefault:
 	// dummy call; replaced with literal code
 	switch Rubynt {
 
-	case 3:
-		//line parser/parser.y:33
-		{
-			return RubyS[Rubypt-0].Val
-		}
 	case 4:
 		RubyVAL.Val = RubyS[Rubypt-0].Val
 	case 5:
-		//line parser/parser.y:42
+		//line parser/parser.y:36
 		{
 			RubyVAL.Val = RubyS[Rubypt-0].Val
-			if RubyS[Rubypt-0].Val == 0 {
-				base = 8
-			} else {
-				base = 10
-			}
 		}
 	case 6:
-		//line parser/parser.y:51
+		//line parser/parser.y:38
 		{
-			RubyVAL.Val = base*RubyS[Rubypt-1].Val + RubyS[Rubypt-0].Val
+			RubyVAL.Val = RubyS[Rubypt-0].Val
 		}
 	}
 	goto Rubystack /* stack new state and value */
