@@ -66,6 +66,9 @@ func (lexer *rubyLexer) Lex(lval *RubySymType) int {
 	case integerRegexp.MatchString(token):
 		lval.Val, _ = strconv.Atoi(token)
 		return DIGIT
+	case floatRegexp.MatchString(token):
+		lval.FloatVal, _ = strconv.ParseFloat(token, 10)
+		return FLOAT
 	}
 
 	return 0

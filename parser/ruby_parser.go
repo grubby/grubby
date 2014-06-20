@@ -9,16 +9,17 @@ var base int
 
 //line parser/parser.y:15
 type RubySymType struct {
-	yys int
-	Val int
+	yys      int
+	Val      int
+	FloatVal float64
 }
 
 const DIGIT = 57346
-const LETTER = 57347
+const FLOAT = 57347
 
 var RubyToknames = []string{
 	"DIGIT",
-	"LETTER",
+	"FLOAT",
 }
 var RubyStatenames = []string{}
 
@@ -26,7 +27,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser/parser.y:53
+//line parser/parser.y:54
 
 //line yacctab:1
 var RubyExca = []int{
@@ -310,14 +311,14 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser/parser.y:32
+		//line parser/parser.y:33
 		{
 			return RubyS[Rubypt-0].Val
 		}
 	case 4:
 		RubyVAL.Val = RubyS[Rubypt-0].Val
 	case 5:
-		//line parser/parser.y:41
+		//line parser/parser.y:42
 		{
 			RubyVAL.Val = RubyS[Rubypt-0].Val
 			if RubyS[Rubypt-0].Val == 0 {
@@ -327,7 +328,7 @@ Rubydefault:
 			}
 		}
 	case 6:
-		//line parser/parser.y:50
+		//line parser/parser.y:51
 		{
 			RubyVAL.Val = base*RubyS[Rubypt-1].Val + RubyS[Rubypt-0].Val
 		}

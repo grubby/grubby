@@ -95,12 +95,24 @@ end
 	})
 
 	Describe("RubyLexer interface", func() {
-		It("lexes a single digit", func() {
+		var symbol *RubySymType
+
+		BeforeEach(func() {
+			symbol = &RubySymType{}
+		})
+
+		It("identifies a single digit", func() {
 			lexer.Tokenize("666")
 
-			symbol := &RubySymType{}
 			Expect(lexer.Lex(symbol)).To(Equal(DIGIT), "Expected to lex a DIGIT")
 			Expect(symbol.Val).To(Equal(666))
+		})
+
+		It("identifies a float", func() {
+			lexer.Tokenize("6.66")
+
+			Expect(lexer.Lex(symbol)).To(Equal(FLOAT), "Expected to lex a FLOAT")
+			Expect(symbol.FloatVal).To(Equal(6.66))
 		})
 	})
 })

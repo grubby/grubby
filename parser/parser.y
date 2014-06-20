@@ -14,13 +14,14 @@ var base int
 // will want to save for each token it handles
 %union{
   Val int
+  FloatVal float64
 }
 
 // any token that returns a value needs a type
 // these will become field names in the above struct
 %type <Val> expr number
 
-%token <Val> DIGIT LETTER
+%token <Val> DIGIT FLOAT
 
 %%
 
