@@ -93,4 +93,14 @@ end
 			"end",
 		}))
 	})
+
+	Describe("RubyLexer interface", func() {
+		It("lexes a single digit", func() {
+			lexer.Tokenize("666")
+
+			symbol := &RubySymType{}
+			Expect(lexer.Lex(symbol)).To(Equal(DIGIT), "Expected to lex a DIGIT")
+			Expect(symbol.Val).To(Equal(666))
+		})
+	})
 })

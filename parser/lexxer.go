@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -9,11 +10,14 @@ import (
 type rubyLexer struct {
 	index        int
 	currentToken string
-	tokens       []string
+
+	lexIndex int
+	tokens   []string
 }
 
 type Lexer interface {
 	Tokenize(input string) []string
+	Lex(lval *RubySymType) int
 }
 
 func NewLexer() Lexer {
@@ -49,6 +53,21 @@ func (lexer *rubyLexer) Tokenize(input string) []string {
 }
 
 func (lexer *rubyLexer) Lex(lval *RubySymType) int {
+	if lexer.lexIndex == len(lexer.tokens) {
+		return 0
+	}
+
+	defer func() {
+		lexer.lexIndex++
+	}()
+
+	token := lexer.tokens[lexer.lexIndex]
+	switch {
+	case integerRegexp.MatchString(token):
+		lval.Val, _ = strconv.Atoi(token)
+		return DIGIT
+	}
+
 	return 0
 }
 

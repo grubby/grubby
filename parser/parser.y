@@ -1,13 +1,6 @@
 %{
 
-package main
-
-import (
-  "bufio"
-  "fmt"
-  "os"
-  "unicode"
-)
+package parser
 
 var regs = make([]int, 26)
 var base int
@@ -20,14 +13,14 @@ var base int
 // effectively you can use this to declare what values the lexer
 // will want to save for each token it handles
 %union{
-  val int
+  Val int
 }
 
 // any token that returns a value needs a type
 // these will become field names in the above struct
-%type <val> expr number
+%type <Val> expr number
 
-%token <val> DIGIT LETTER
+%token <Val> DIGIT LETTER
 
 %%
 
@@ -58,49 +51,3 @@ number  :   DIGIT
   ;
 
 %%
-
-type RubyLex struct {
-  s string
-  pos int
-}
-
-func (l *RubyLex) Lex(lval *RubySymType) int {
-  var c rune = ' '
-  for c == ' ' {
-    if l.pos == len(l.s) {
-      return 0
-    }
-
-    c = rune(l.s[l.pos])
-    l.pos++
-  }
-
-  if unicode.IsDigit(c) {
-    fmt.Printf("storing an int value in a lex val %#v\n", lval)
-    lval.val = int(c - '0')
-    return DIGIT
-  }
-
-  return int(c)
-}
-
-func (l *RubyLex) Error(s string) {
-  panic(fmt.Sprintf("syntax error: %s\n", s))
-}
-
-func main() {
-  stdin := bufio.NewReader(os.NewFile(0, "stdin"))
-
-  var line string
-  var err error
-  for {
-    fmt.Printf("give me your best rubby: ")
-
-    if line, err = stdin.ReadString('\n'); err == nil{
-      ret := RubyParse(&RubyLex{s: line})
-      fmt.Printf("got a %T :: %#v\n", ret, ret)
-    } else {
-      break
-    }
-  }
-}

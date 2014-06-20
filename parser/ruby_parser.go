@@ -1,23 +1,16 @@
-//line parser.y:2
+//line parser/parser.y:2
 package parser
 
 import __yyfmt__ "fmt"
 
-//line parser.y:3
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"unicode"
-)
-
+//line parser/parser.y:3
 var regs = make([]int, 26)
 var base int
 
-//line parser.y:17
+//line parser/parser.y:15
 type RubySymType struct {
 	yys int
-	val int
+	Val int
 }
 
 const DIGIT = 57346
@@ -33,55 +26,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:55
-
-/* start of legit parser? */
-
-type RubyLex struct {
-	s   string
-	pos int
-}
-
-func (l *RubyLex) Lex(lval *RubySymType) int {
-	var c rune = ' '
-	for c == ' ' {
-		if l.pos == len(l.s) {
-			return 0
-		}
-
-		c = rune(l.s[l.pos])
-		l.pos++
-	}
-
-	if unicode.IsDigit(c) {
-		fmt.Printf("storing an int value in a lex val %#v\n", lval)
-		lval.val = int(c - '0')
-		return DIGIT
-	}
-
-	return int(c)
-}
-
-func (l *RubyLex) Error(s string) {
-	panic(fmt.Sprintf("syntax error: %s\n", s))
-}
-
-func main() {
-	stdin := bufio.NewReader(os.NewFile(0, "stdin"))
-
-	var line string
-	var err error
-	for {
-		fmt.Printf("give me your best rubby: ")
-
-		if line, err = stdin.ReadString('\n'); err == nil {
-			ret := RubyParse(&RubyLex{s: line})
-			fmt.Printf("got a %T :: %#v\n", ret, ret)
-		} else {
-			break
-		}
-	}
-}
+//line parser/parser.y:53
 
 //line yacctab:1
 var RubyExca = []int{
@@ -365,26 +310,26 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:34
+		//line parser/parser.y:32
 		{
-			return RubyS[Rubypt-0].val
+			return RubyS[Rubypt-0].Val
 		}
 	case 4:
-		RubyVAL.val = RubyS[Rubypt-0].val
+		RubyVAL.Val = RubyS[Rubypt-0].Val
 	case 5:
-		//line parser.y:43
+		//line parser/parser.y:41
 		{
-			RubyVAL.val = RubyS[Rubypt-0].val
-			if RubyS[Rubypt-0].val == 0 {
+			RubyVAL.Val = RubyS[Rubypt-0].Val
+			if RubyS[Rubypt-0].Val == 0 {
 				base = 8
 			} else {
 				base = 10
 			}
 		}
 	case 6:
-		//line parser.y:52
+		//line parser/parser.y:50
 		{
-			RubyVAL.val = base*RubyS[Rubypt-1].val + RubyS[Rubypt-0].val
+			RubyVAL.Val = base*RubyS[Rubypt-1].Val + RubyS[Rubypt-0].Val
 		}
 	}
 	goto Rubystack /* stack new state and value */
