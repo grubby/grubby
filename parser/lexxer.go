@@ -1,6 +1,7 @@
-package token
+package parser
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
@@ -45,6 +46,14 @@ func (lexer *rubyLexer) Tokenize(input string) []string {
 
 	lexer.appendNonEmptyTokens(lexer.currentToken)
 	return lexer.tokens
+}
+
+func (lexer *rubyLexer) Lex(lval *RubySymType) int {
+	return 0
+}
+
+func (lexer *rubyLexer) Error(s string) {
+	panic(fmt.Sprintf("syntax error: %s\n", s))
 }
 
 func (lexer *rubyLexer) appendNonEmptyTokens(tokens ...string) {

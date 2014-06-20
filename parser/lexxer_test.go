@@ -1,7 +1,7 @@
-package token_test
+package parser_test
 
 import (
-	. "github.com/grubby/grubby/token"
+	. "github.com/grubby/grubby/parser"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

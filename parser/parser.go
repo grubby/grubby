@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/grubby/grubby/ast"
-	"github.com/grubby/grubby/token"
 )
 
 var (
@@ -113,7 +112,7 @@ func parseNextTokens(block *ast.Block, index *int, tokens *[]string) error {
 
 func Parse(input string) ast.Block {
 	block := ast.Block{Statements: []ast.Node{}}
-	lexer := token.NewLexer()
+	lexer := NewLexer()
 
 	index := 0
 	tokens := lexer.Tokenize(input)

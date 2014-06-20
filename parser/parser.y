@@ -14,6 +14,11 @@ var base int
 
 %}
 
+// fields inside this union end up as the fields in a structure known
+// as ${PREFIX}SymType, of which a reference is passed to the lexer.
+
+// effectively you can use this to declare what values the lexer
+// will want to save for each token it handles
 %union{
   val int
 }
@@ -52,7 +57,7 @@ number  :   DIGIT
     { $$ = base * $1 + $2 }
   ;
 
-%%   /* start of legit parser? */
+%%
 
 type RubyLex struct {
   s string
