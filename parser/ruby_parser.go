@@ -9,13 +9,13 @@ import (
 )
 
 var regs = make([]int, 26)
-var base int
 var Statements []interface{}
 
-//line parser.y:17
+//line parser.y:16
 type RubySymType struct {
-	yys int
-	val int
+	yys      int
+	intval   int
+	floatval float64
 }
 
 const DIGIT = 57346
@@ -40,7 +40,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:87
+//line parser.y:81
 
 /*  start  of  programs  */
 
@@ -353,82 +353,77 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:41
+		//line parser.y:42
 		{
-			fmt.Printf("you typed '%d'\n", RubyS[Rubypt-0].val)
-			Statements = append(Statements, RubyS[Rubypt-0].val)
+			fmt.Printf("you typed '%d'\n", RubyS[Rubypt-0].intval)
+			Statements = append(Statements, RubyS[Rubypt-0].intval)
 		}
 	case 4:
-		//line parser.y:46
+		//line parser.y:47
 		{
-			regs[RubyS[Rubypt-2].val] = RubyS[Rubypt-0].val
+			regs[RubyS[Rubypt-2].intval] = RubyS[Rubypt-0].intval
 		}
 	case 5:
-		//line parser.y:52
+		//line parser.y:53
 		{
-			RubyVAL.val = RubyS[Rubypt-1].val
+			RubyVAL.intval = RubyS[Rubypt-1].intval
 		}
 	case 6:
-		//line parser.y:54
+		//line parser.y:55
 		{
-			RubyVAL.val = RubyS[Rubypt-2].val + RubyS[Rubypt-0].val
+			RubyVAL.intval = RubyS[Rubypt-2].intval + RubyS[Rubypt-0].intval
 		}
 	case 7:
-		//line parser.y:56
+		//line parser.y:57
 		{
-			RubyVAL.val = RubyS[Rubypt-2].val - RubyS[Rubypt-0].val
+			RubyVAL.intval = RubyS[Rubypt-2].intval - RubyS[Rubypt-0].intval
 		}
 	case 8:
-		//line parser.y:58
+		//line parser.y:59
 		{
-			RubyVAL.val = RubyS[Rubypt-2].val * RubyS[Rubypt-0].val
+			RubyVAL.intval = RubyS[Rubypt-2].intval * RubyS[Rubypt-0].intval
 		}
 	case 9:
-		//line parser.y:60
+		//line parser.y:61
 		{
-			RubyVAL.val = RubyS[Rubypt-2].val / RubyS[Rubypt-0].val
+			RubyVAL.intval = RubyS[Rubypt-2].intval / RubyS[Rubypt-0].intval
 		}
 	case 10:
-		//line parser.y:62
+		//line parser.y:63
 		{
-			RubyVAL.val = RubyS[Rubypt-2].val % RubyS[Rubypt-0].val
+			RubyVAL.intval = RubyS[Rubypt-2].intval % RubyS[Rubypt-0].intval
 		}
 	case 11:
-		//line parser.y:64
+		//line parser.y:65
 		{
-			RubyVAL.val = RubyS[Rubypt-2].val & RubyS[Rubypt-0].val
+			RubyVAL.intval = RubyS[Rubypt-2].intval & RubyS[Rubypt-0].intval
 		}
 	case 12:
-		//line parser.y:66
+		//line parser.y:67
 		{
-			RubyVAL.val = RubyS[Rubypt-2].val | RubyS[Rubypt-0].val
+			RubyVAL.intval = RubyS[Rubypt-2].intval | RubyS[Rubypt-0].intval
 		}
 	case 13:
-		//line parser.y:68
+		//line parser.y:69
 		{
-			RubyVAL.val = -RubyS[Rubypt-0].val
+			RubyVAL.intval = -RubyS[Rubypt-0].intval
 		}
 	case 14:
-		//line parser.y:70
+		//line parser.y:71
 		{
-			RubyVAL.val = regs[RubyS[Rubypt-0].val]
+			RubyVAL.intval = regs[RubyS[Rubypt-0].intval]
 		}
 	case 15:
-		RubyVAL.val = RubyS[Rubypt-0].val
+		RubyVAL.intval = RubyS[Rubypt-0].intval
 	case 16:
-		//line parser.y:75
+		//line parser.y:76
 		{
-			RubyVAL.val = RubyS[Rubypt-0].val
-			if RubyS[Rubypt-0].val == 0 {
-				base = 8
-			} else {
-				base = 10
-			}
+			RubyVAL.intval = RubyS[Rubypt-0].intval
 		}
 	case 17:
-		//line parser.y:84
+		//line parser.y:78
 		{
-			RubyVAL.val = base*RubyS[Rubypt-1].val + RubyS[Rubypt-0].val
+			RubyVAL.intval = 10*RubyS[Rubypt-1].intval + RubyS[Rubypt-0].intval
 		}
 	}
 	goto Rubystack /* stack new state and value */

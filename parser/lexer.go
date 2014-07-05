@@ -25,10 +25,10 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 	}
 
 	if unicode.IsDigit(c) {
-		lval.val = int(c - '0')
+		lval.intval = int(c - '0')
 		return DIGIT
 	} else if unicode.IsLower(c) {
-		lval.val = int(c - 'a')
+		lval.intval = int(c - 'a')
 		return LETTER
 	}
 

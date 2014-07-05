@@ -7,7 +7,6 @@ import (
 )
 
 var regs = make([]int, 26)
-var base int
 var Statements []interface{}
 
 %}
@@ -15,15 +14,17 @@ var Statements []interface{}
 // fields inside this union end up as the fields in a structure known
 // as ${PREFIX}SymType, of which a reference is passed to the lexer.
 %union{
-	val int
+	intval int
+  floatval float64
 }
 
 // any non-terminal which returns a value needs a type, which is
 // really a field name in the above union struct
-%type <val> expr number
+%type <intval> expr number
+// %type <floatval> ffloat
 
 // same for terminals
-%token <val> DIGIT LETTER
+%token <intval> DIGIT LETTER
 
 %left '|'
 %left '&'
@@ -72,16 +73,9 @@ expr	:    '(' expr ')'
 	;
 
 number	:    DIGIT
-		{
-			$$ = $1;
-			if $1==0 {
-				base = 8
-			} else {
-				base = 10
-			}
-		}
+		{ $$ = $1; }
 	|    number DIGIT
-		{ $$ = base * $1 + $2 }
-	;
+    { $$ = 10 * $1 + $2 }
+  ;
 
 %%      /*  start  of  programs  */
