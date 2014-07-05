@@ -17,8 +17,13 @@ func main() {
 		if line, err := stdin.ReadString('\n'); err == nil {
 			lexer := parser.NewLexer(line)
 
-			something := parser.RubyParse(lexer)
-			fmt.Printf("Got a %T: %#v\n", something, something)
+			if parser.RubyParse(lexer) != 0 {
+				break
+			}
+
+			statements := parser.Statements
+			fmt.Printf("There are now %d statements\n", len(statements))
+			fmt.Printf("The latest statement is %#v\n", statements[len(statements)-1])
 		} else {
 			println("FAIL:", err.Error())
 			break

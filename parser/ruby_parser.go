@@ -1,17 +1,18 @@
-//line parser.y:8
+//line parser.y:2
 package parser
 
 import __yyfmt__ "fmt"
 
-//line parser.y:9
+//line parser.y:3
 import (
 	"fmt"
 )
 
 var regs = make([]int, 26)
 var base int
+var Statements []interface{}
 
-//line parser.y:22
+//line parser.y:17
 type RubySymType struct {
 	yys int
 	val int
@@ -39,7 +40,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:91
+//line parser.y:87
 
 /*  start  of  programs  */
 
@@ -352,69 +353,70 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:46
+		//line parser.y:41
 		{
 			fmt.Printf("you typed '%d'\n", RubyS[Rubypt-0].val)
+			Statements = append(Statements, RubyS[Rubypt-0].val)
 		}
 	case 4:
-		//line parser.y:50
+		//line parser.y:46
 		{
 			regs[RubyS[Rubypt-2].val] = RubyS[Rubypt-0].val
 		}
 	case 5:
-		//line parser.y:56
+		//line parser.y:52
 		{
 			RubyVAL.val = RubyS[Rubypt-1].val
 		}
 	case 6:
-		//line parser.y:58
+		//line parser.y:54
 		{
 			RubyVAL.val = RubyS[Rubypt-2].val + RubyS[Rubypt-0].val
 		}
 	case 7:
-		//line parser.y:60
+		//line parser.y:56
 		{
 			RubyVAL.val = RubyS[Rubypt-2].val - RubyS[Rubypt-0].val
 		}
 	case 8:
-		//line parser.y:62
+		//line parser.y:58
 		{
 			RubyVAL.val = RubyS[Rubypt-2].val * RubyS[Rubypt-0].val
 		}
 	case 9:
-		//line parser.y:64
+		//line parser.y:60
 		{
 			RubyVAL.val = RubyS[Rubypt-2].val / RubyS[Rubypt-0].val
 		}
 	case 10:
-		//line parser.y:66
+		//line parser.y:62
 		{
 			RubyVAL.val = RubyS[Rubypt-2].val % RubyS[Rubypt-0].val
 		}
 	case 11:
-		//line parser.y:68
+		//line parser.y:64
 		{
 			RubyVAL.val = RubyS[Rubypt-2].val & RubyS[Rubypt-0].val
 		}
 	case 12:
-		//line parser.y:70
+		//line parser.y:66
 		{
 			RubyVAL.val = RubyS[Rubypt-2].val | RubyS[Rubypt-0].val
 		}
 	case 13:
-		//line parser.y:72
+		//line parser.y:68
 		{
 			RubyVAL.val = -RubyS[Rubypt-0].val
 		}
 	case 14:
-		//line parser.y:74
+		//line parser.y:70
 		{
 			RubyVAL.val = regs[RubyS[Rubypt-0].val]
 		}
 	case 15:
 		RubyVAL.val = RubyS[Rubypt-0].val
 	case 16:
-		//line parser.y:79
+		//line parser.y:75
 		{
 			RubyVAL.val = RubyS[Rubypt-0].val
 			if RubyS[Rubypt-0].val == 0 {
@@ -424,7 +426,7 @@ Rubydefault:
 			}
 		}
 	case 17:
-		//line parser.y:88
+		//line parser.y:84
 		{
 			RubyVAL.val = base*RubyS[Rubypt-1].val + RubyS[Rubypt-0].val
 		}
