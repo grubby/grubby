@@ -1,24 +1,37 @@
-//line parser/parser.y:2
+//line parser.y:8
 package parser
 
 import __yyfmt__ "fmt"
 
-//line parser/parser.y:3
-var regs = make([]int, 26)
+//line parser.y:9
+import (
+	"fmt"
+)
 
-//line parser/parser.y:14
+var regs = make([]int, 26)
+var base int
+
+//line parser.y:22
 type RubySymType struct {
-	yys      int
-	Val      int
-	FloatVal float64
+	yys int
+	val int
 }
 
 const DIGIT = 57346
-const FLOAT = 57347
+const LETTER = 57347
+const UMINUS = 57348
 
 var RubyToknames = []string{
 	"DIGIT",
-	"FLOAT",
+	"LETTER",
+	" |",
+	" &",
+	" +",
+	" -",
+	" *",
+	" /",
+	" %",
+	"UMINUS",
 }
 var RubyStatenames = []string{}
 
@@ -26,7 +39,9 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser/parser.y:41
+//line parser.y:91
+
+/*  start  of  programs  */
 
 //line yacctab:1
 var RubyExca = []int{
@@ -35,50 +50,77 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 7
+const RubyNprod = 18
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 7
+const RubyLast = 54
 
 var RubyAct = []int{
 
-	7, 5, 6, 2, 1, 4, 3,
+	3, 10, 11, 12, 13, 14, 18, 20, 21, 17,
+	9, 22, 23, 24, 25, 26, 27, 28, 29, 16,
+	15, 10, 11, 12, 13, 14, 8, 19, 8, 4,
+	30, 6, 2, 6, 1, 12, 13, 14, 5, 7,
+	5, 16, 15, 10, 11, 12, 13, 14, 15, 10,
+	11, 12, 13, 14,
 }
 var RubyPact = []int{
 
-	-1000, -3, -6, -1000, -1000, -1000, -1000, -1000,
+	-1000, 24, -4, 35, -6, 22, 22, 4, -1000, -1000,
+	22, 22, 22, 22, 22, 22, 22, 22, 13, -1000,
+	-1000, -1000, 25, 25, -1000, -1000, -1000, -7, 41, 35,
+	-1000,
 }
 var RubyPgo = []int{
 
-	0, 6, 5, 4, 3,
+	0, 0, 39, 34, 32,
 }
 var RubyR1 = []int{
 
-	0, 3, 3, 4, 1, 2, 2,
+	0, 3, 3, 4, 4, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 2, 2,
 }
 var RubyR2 = []int{
 
-	0, 0, 3, 1, 1, 1, 1,
+	0, 0, 3, 1, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 2, 1, 1, 1, 2,
 }
 var RubyChk = []int{
 
-	-1000, -3, -4, -1, -2, 4, 5, 6,
+	-1000, -3, -4, -1, 5, 16, 9, -2, 4, 14,
+	8, 9, 10, 11, 12, 7, 6, 15, -1, 5,
+	-1, 4, -1, -1, -1, -1, -1, -1, -1, -1,
+	17,
 }
 var RubyDef = []int{
 
-	1, -2, 0, 3, 4, 5, 6, 2,
+	1, -2, 0, 3, 14, 0, 0, 15, 16, 2,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 14,
+	13, 17, 6, 7, 8, 9, 10, 11, 12, 4,
+	5,
 }
 var RubyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	6,
+	14, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 12, 7, 3,
+	16, 17, 10, 8, 3, 9, 3, 11, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 15, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 6,
 }
 var RubyTok2 = []int{
 
-	2, 3, 4, 5,
+	2, 3, 4, 5, 13,
 }
 var RubyTok3 = []int{
 	0,
@@ -309,17 +351,82 @@ Rubydefault:
 	// dummy call; replaced with literal code
 	switch Rubynt {
 
-	case 4:
-		RubyVAL.Val = RubyS[Rubypt-0].Val
-	case 5:
-		//line parser/parser.y:36
+	case 3:
+		//line parser.y:46
 		{
-			RubyVAL.Val = RubyS[Rubypt-0].Val
+			fmt.Printf("you typed '%d'\n", RubyS[Rubypt-0].val)
+		}
+	case 4:
+		//line parser.y:50
+		{
+			regs[RubyS[Rubypt-2].val] = RubyS[Rubypt-0].val
+		}
+	case 5:
+		//line parser.y:56
+		{
+			RubyVAL.val = RubyS[Rubypt-1].val
 		}
 	case 6:
-		//line parser/parser.y:38
+		//line parser.y:58
 		{
-			RubyVAL.Val = RubyS[Rubypt-0].Val
+			RubyVAL.val = RubyS[Rubypt-2].val + RubyS[Rubypt-0].val
+		}
+	case 7:
+		//line parser.y:60
+		{
+			RubyVAL.val = RubyS[Rubypt-2].val - RubyS[Rubypt-0].val
+		}
+	case 8:
+		//line parser.y:62
+		{
+			RubyVAL.val = RubyS[Rubypt-2].val * RubyS[Rubypt-0].val
+		}
+	case 9:
+		//line parser.y:64
+		{
+			RubyVAL.val = RubyS[Rubypt-2].val / RubyS[Rubypt-0].val
+		}
+	case 10:
+		//line parser.y:66
+		{
+			RubyVAL.val = RubyS[Rubypt-2].val % RubyS[Rubypt-0].val
+		}
+	case 11:
+		//line parser.y:68
+		{
+			RubyVAL.val = RubyS[Rubypt-2].val & RubyS[Rubypt-0].val
+		}
+	case 12:
+		//line parser.y:70
+		{
+			RubyVAL.val = RubyS[Rubypt-2].val | RubyS[Rubypt-0].val
+		}
+	case 13:
+		//line parser.y:72
+		{
+			RubyVAL.val = -RubyS[Rubypt-0].val
+		}
+	case 14:
+		//line parser.y:74
+		{
+			RubyVAL.val = regs[RubyS[Rubypt-0].val]
+		}
+	case 15:
+		RubyVAL.val = RubyS[Rubypt-0].val
+	case 16:
+		//line parser.y:79
+		{
+			RubyVAL.val = RubyS[Rubypt-0].val
+			if RubyS[Rubypt-0].val == 0 {
+				base = 8
+			} else {
+				base = 10
+			}
+		}
+	case 17:
+		//line parser.y:88
+		{
+			RubyVAL.val = base*RubyS[Rubypt-1].val + RubyS[Rubypt-0].val
 		}
 	}
 	goto Rubystack /* stack new state and value */

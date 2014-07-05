@@ -2,40 +2,84 @@
 
 package parser
 
+import (
+  "fmt"
+)
+
 var regs = make([]int, 26)
+var base int
 
 %}
 
 // fields inside this union end up as the fields in a structure known
 // as ${PREFIX}SymType, of which a reference is passed to the lexer.
-
-// effectively you can use this to declare what values the lexer
-// will want to save for each token it handles
 %union{
-  Val int
-  FloatVal float64
+	val int
 }
 
-// any token that returns a value needs a type
-// these will become field names in the above struct
-%type <Val> expr number
+// any non-terminal which returns a value needs a type, which is
+// really a field name in the above union struct
+%type <val> expr number
 
-%token <Val> DIGIT FLOAT
+// same for terminals
+%token <val> DIGIT LETTER
 
-%%
-
-list  : /* empty */
-  | list statement '\n'
-  ;
-
-statement  :    expr;
-
-expr  :    number;
-
-number  :   DIGIT
-    { $$ = $1 }
-  |    FLOAT
-    { $$ = $1 }
-  ;
+%left '|'
+%left '&'
+%left '+'  '-'
+%left '*'  '/'  '%'
+%left UMINUS      /*  supplies  precedence  for  unary  minus  */
 
 %%
+
+list	: /* empty */
+	| list stat '\n'
+	;
+
+stat	:    expr
+		{
+			fmt.Printf( "you typed '%d'\n", $1 );
+		}
+	|    LETTER '=' expr
+		{
+			regs[$1]  =  $3
+		}
+	;
+
+expr	:    '(' expr ')'
+		{ $$  =  $2 }
+	|    expr '+' expr
+		{ $$  =  $1 + $3 }
+	|    expr '-' expr
+		{ $$  =  $1 - $3 }
+	|    expr '*' expr
+		{ $$  =  $1 * $3 }
+	|    expr '/' expr
+		{ $$  =  $1 / $3 }
+	|    expr '%' expr
+		{ $$  =  $1 % $3 }
+	|    expr '&' expr
+		{ $$  =  $1 & $3 }
+	|    expr '|' expr
+		{ $$  =  $1 | $3 }
+	|    '-'  expr        %prec  UMINUS
+		{ $$  = -$2  }
+	|    LETTER
+		{ $$  = regs[$1] }
+	|    number
+	;
+
+number	:    DIGIT
+		{
+			$$ = $1;
+			if $1==0 {
+				base = 8
+			} else {
+				base = 10
+			}
+		}
+	|    number DIGIT
+		{ $$ = base * $1 + $2 }
+	;
+
+%%      /*  start  of  programs  */
