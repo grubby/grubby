@@ -74,8 +74,6 @@ expr	:    '(' expr ')'
 
 number	:    DIGIT
 		{ $$ = $1; }
-	|    number DIGIT
-    { $$ = 10 * $1 + $2 }
   ;
 
 %%      /*  start  of  programs  */

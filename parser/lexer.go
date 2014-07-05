@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"math"
 	"unicode"
 )
 
@@ -25,7 +26,28 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 	}
 
 	if unicode.IsDigit(c) {
-		lval.intval = int(c - '0')
+		intvals := []int{int(c - '0')}
+
+		c = rune(l.s[l.pos])
+		for unicode.IsDigit(c) {
+			intvals = append(intvals, int(c-'0'))
+
+			l.pos += 1
+			if l.pos == len(l.s) {
+				l.pos--
+				break
+			}
+			c = rune(l.s[l.pos])
+		}
+
+		pow := -1
+		for i := len(intvals) - 1; i >= 0; i-- {
+			// for i := 0; i < len(intvals); i++ {
+			pow += 1
+			inc := intvals[i] * int(math.Pow(10, float64(pow)))
+			lval.intval += inc
+		}
+
 		return DIGIT
 	} else if unicode.IsLower(c) {
 		lval.intval = int(c - 'a')
