@@ -22,8 +22,7 @@ func main() {
 			}
 
 			statements := parser.Statements
-			fmt.Printf("There are now %d statements\n", len(statements))
-			fmt.Printf("The latest statement is %#v\n", statements[len(statements)-1])
+			fmt.Printf("you typed '%#v'\n", statements[len(statements)-1])
 		} else {
 			println("FAIL:", err.Error())
 			break

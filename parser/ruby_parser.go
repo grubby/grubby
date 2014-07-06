@@ -4,13 +4,9 @@ package parser
 import __yyfmt__ "fmt"
 
 //line parser.y:3
-import (
-	"fmt"
-)
-
 var Statements []interface{}
 
-//line parser.y:15
+//line parser.y:11
 type RubySymType struct {
 	yys      int
 	intval   int
@@ -37,7 +33,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:71
+//line parser.y:66
 
 //line yacctab:1
 var RubyExca = []int{
@@ -345,60 +341,59 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:41
+		//line parser.y:37
 		{
-			fmt.Printf("you typed '%d'\n", RubyS[Rubypt-0].intval)
 			Statements = append(Statements, RubyS[Rubypt-0].intval)
 		}
 	case 4:
-		//line parser.y:47
+		//line parser.y:42
 		{
 			RubyVAL.intval = RubyS[Rubypt-1].intval
 		}
 	case 5:
-		//line parser.y:49
+		//line parser.y:44
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval + RubyS[Rubypt-0].intval
 		}
 	case 6:
-		//line parser.y:51
+		//line parser.y:46
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval - RubyS[Rubypt-0].intval
 		}
 	case 7:
-		//line parser.y:53
+		//line parser.y:48
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval * RubyS[Rubypt-0].intval
 		}
 	case 8:
-		//line parser.y:55
+		//line parser.y:50
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval / RubyS[Rubypt-0].intval
 		}
 	case 9:
-		//line parser.y:57
+		//line parser.y:52
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval % RubyS[Rubypt-0].intval
 		}
 	case 10:
-		//line parser.y:59
+		//line parser.y:54
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval & RubyS[Rubypt-0].intval
 		}
 	case 11:
-		//line parser.y:61
+		//line parser.y:56
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval | RubyS[Rubypt-0].intval
 		}
 	case 12:
-		//line parser.y:63
+		//line parser.y:58
 		{
 			RubyVAL.intval = -RubyS[Rubypt-0].intval
 		}
 	case 13:
 		RubyVAL.intval = RubyS[Rubypt-0].intval
 	case 14:
-		//line parser.y:68
+		//line parser.y:63
 		{
 			RubyVAL.intval = RubyS[Rubypt-0].intval
 		}

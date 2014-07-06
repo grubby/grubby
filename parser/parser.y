@@ -2,10 +2,6 @@
 
 package parser
 
-import (
-  "fmt"
-)
-
 var Statements []interface{}
 
 %}
@@ -39,7 +35,6 @@ list	: /* empty */
 
 stat	:    expr
 		{
-			fmt.Printf( "you typed '%d'\n", $1 );
       Statements = append(Statements, $1 );
 		};
 

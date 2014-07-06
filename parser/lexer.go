@@ -28,16 +28,18 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 	if unicode.IsDigit(c) {
 		intvals := []int{int(c - '0')}
 
-		c = rune(l.s[l.pos])
-		for unicode.IsDigit(c) {
-			intvals = append(intvals, int(c-'0'))
-
-			l.pos += 1
-			if l.pos == len(l.s) {
-				l.pos--
-				break
-			}
+		if l.pos < len(l.s) {
 			c = rune(l.s[l.pos])
+			for unicode.IsDigit(c) {
+				intvals = append(intvals, int(c-'0'))
+
+				l.pos += 1
+				if l.pos == len(l.s) {
+					l.pos--
+					break
+				}
+				c = rune(l.s[l.pos])
+			}
 		}
 
 		pow := -1
