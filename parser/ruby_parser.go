@@ -8,10 +8,9 @@ import (
 	"fmt"
 )
 
-var regs = make([]int, 26)
 var Statements []interface{}
 
-//line parser.y:16
+//line parser.y:15
 type RubySymType struct {
 	yys      int
 	intval   int
@@ -19,12 +18,10 @@ type RubySymType struct {
 }
 
 const DIGIT = 57346
-const LETTER = 57347
-const UMINUS = 57348
+const UMINUS = 57347
 
 var RubyToknames = []string{
 	"DIGIT",
-	"LETTER",
 	" |",
 	" &",
 	" +",
@@ -40,9 +37,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:79
-
-/*  start  of  programs  */
+//line parser.y:71
 
 //line yacctab:1
 var RubyExca = []int{
@@ -51,74 +46,74 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 17
+const RubyNprod = 15
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 54
+const RubyLast = 52
 
 var RubyAct = []int{
 
-	3, 10, 11, 12, 13, 14, 18, 20, 2, 17,
-	9, 21, 22, 23, 24, 25, 26, 27, 28, 16,
-	15, 10, 11, 12, 13, 14, 8, 19, 8, 4,
-	29, 6, 1, 6, 7, 12, 13, 14, 5, 0,
-	5, 16, 15, 10, 11, 12, 13, 14, 15, 10,
-	11, 12, 13, 14,
+	3, 11, 12, 13, 8, 16, 17, 2, 1, 6,
+	18, 19, 20, 21, 22, 23, 24, 15, 14, 9,
+	10, 11, 12, 13, 0, 0, 0, 25, 15, 14,
+	9, 10, 11, 12, 13, 14, 9, 10, 11, 12,
+	13, 7, 0, 0, 0, 5, 9, 10, 11, 12,
+	13, 4,
 }
 var RubyPact = []int{
 
-	-1000, 24, -4, 35, -6, 22, 22, -1000, -1000, -1000,
-	22, 22, 22, 22, 22, 22, 22, 22, 13, -1000,
-	-1000, 25, 25, -1000, -1000, -1000, -7, 41, 35, -1000,
+	-1000, 37, -9, 23, 37, 37, -1000, -1000, -1000, 37,
+	37, 37, 37, 37, 37, 37, 12, -1000, -8, -8,
+	-1000, -1000, -1000, 39, 29, -1000,
 }
 var RubyPgo = []int{
 
-	0, 0, 34, 32, 8,
+	0, 0, 9, 8, 7,
 }
 var RubyR1 = []int{
 
-	0, 3, 3, 4, 4, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 2,
+	0, 3, 3, 4, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 2,
 }
 var RubyR2 = []int{
 
 	0, 0, 3, 1, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 2, 1, 1, 1,
+	3, 3, 2, 1, 1,
 }
 var RubyChk = []int{
 
-	-1000, -3, -4, -1, 5, 16, 9, -2, 4, 14,
-	8, 9, 10, 11, 12, 7, 6, 15, -1, 5,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, 17,
+	-1000, -3, -4, -1, 14, 8, -2, 4, 13, 7,
+	8, 9, 10, 11, 6, 5, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, 15,
 }
 var RubyDef = []int{
 
-	1, -2, 0, 3, 14, 0, 0, 15, 16, 2,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 14,
-	13, 6, 7, 8, 9, 10, 11, 12, 4, 5,
+	1, -2, 0, 3, 0, 0, 13, 14, 2, 0,
+	0, 0, 0, 0, 0, 0, 0, 12, 5, 6,
+	7, 8, 9, 10, 11, 4,
 }
 var RubyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	14, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	13, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 12, 7, 3,
-	16, 17, 10, 8, 3, 9, 3, 11, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 15, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 11, 6, 3,
+	14, 15, 9, 7, 3, 8, 3, 10, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 6,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 5,
 }
 var RubyTok2 = []int{
 
-	2, 3, 4, 5, 13,
+	2, 3, 4, 12,
 }
 var RubyTok3 = []int{
 	0,
@@ -350,7 +345,7 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:42
+		//line parser.y:41
 		{
 			fmt.Printf("you typed '%d'\n", RubyS[Rubypt-0].intval)
 			Statements = append(Statements, RubyS[Rubypt-0].intval)
@@ -358,62 +353,52 @@ Rubydefault:
 	case 4:
 		//line parser.y:47
 		{
-			regs[RubyS[Rubypt-2].intval] = RubyS[Rubypt-0].intval
-		}
-	case 5:
-		//line parser.y:53
-		{
 			RubyVAL.intval = RubyS[Rubypt-1].intval
 		}
-	case 6:
-		//line parser.y:55
+	case 5:
+		//line parser.y:49
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval + RubyS[Rubypt-0].intval
 		}
-	case 7:
-		//line parser.y:57
+	case 6:
+		//line parser.y:51
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval - RubyS[Rubypt-0].intval
 		}
-	case 8:
-		//line parser.y:59
+	case 7:
+		//line parser.y:53
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval * RubyS[Rubypt-0].intval
 		}
-	case 9:
-		//line parser.y:61
+	case 8:
+		//line parser.y:55
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval / RubyS[Rubypt-0].intval
 		}
-	case 10:
-		//line parser.y:63
+	case 9:
+		//line parser.y:57
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval % RubyS[Rubypt-0].intval
 		}
-	case 11:
-		//line parser.y:65
+	case 10:
+		//line parser.y:59
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval & RubyS[Rubypt-0].intval
 		}
-	case 12:
-		//line parser.y:67
+	case 11:
+		//line parser.y:61
 		{
 			RubyVAL.intval = RubyS[Rubypt-2].intval | RubyS[Rubypt-0].intval
 		}
-	case 13:
-		//line parser.y:69
+	case 12:
+		//line parser.y:63
 		{
 			RubyVAL.intval = -RubyS[Rubypt-0].intval
 		}
-	case 14:
-		//line parser.y:71
-		{
-			RubyVAL.intval = regs[RubyS[Rubypt-0].intval]
-		}
-	case 15:
+	case 13:
 		RubyVAL.intval = RubyS[Rubypt-0].intval
-	case 16:
-		//line parser.y:76
+	case 14:
+		//line parser.y:68
 		{
 			RubyVAL.intval = RubyS[Rubypt-0].intval
 		}

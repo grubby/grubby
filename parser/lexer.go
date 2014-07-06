@@ -49,9 +49,6 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 		}
 
 		return DIGIT
-	} else if unicode.IsLower(c) {
-		lval.intval = int(c - 'a')
-		return LETTER
 	}
 
 	return int(c)

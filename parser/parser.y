@@ -6,7 +6,6 @@ import (
   "fmt"
 )
 
-var regs = make([]int, 26)
 var Statements []interface{}
 
 %}
@@ -24,7 +23,7 @@ var Statements []interface{}
 // %type <floatval> ffloat
 
 // same for terminals
-%token <intval> DIGIT LETTER
+%token <intval> DIGIT
 
 %left '|'
 %left '&'
@@ -42,12 +41,7 @@ stat	:    expr
 		{
 			fmt.Printf( "you typed '%d'\n", $1 );
       Statements = append(Statements, $1 );
-		}
-	|    LETTER '=' expr
-		{
-			regs[$1]  =  $3
-		}
-	;
+		};
 
 expr	:    '(' expr ')'
 		{ $$  =  $2 }
@@ -67,8 +61,6 @@ expr	:    '(' expr ')'
 		{ $$  =  $1 | $3 }
 	|    '-'  expr        %prec  UMINUS
 		{ $$  = -$2  }
-	|    LETTER
-		{ $$  = regs[$1] }
 	|    number
 	;
 
@@ -76,4 +68,4 @@ number	:    DIGIT
 		{ $$ = $1; }
   ;
 
-%%      /*  start  of  programs  */
+%%
