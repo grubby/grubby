@@ -24,76 +24,72 @@ Roadmap
 
 Here's a short list of areas I'm planning on working on in the near future:
 
+(NB: This will likely get out of date quickly)
+
 Grubby yacc
-[x] parse an integer
-[x] parse a float
-[x] remove warnings for DIGIT and FLOAT (?)
-[x] remove any dead code that isn't helping (because it assumes int or w/e)
-[x] throw some ast nodes into the parser
-[ ] try to refactor int, float to be less error prone && less codefull
-[ ] parse simple strings
-[ ] parse symbols
-[ ] parse a bare reference to **something**
-[ ] parse call expressions
-    [ ] no args
-    [ ] one arg
-    [ ] many args
-[ ] parse method definitions
-    [ ] no args
-    [ ] one arg
-    [ ] many args
-[ ] parse a class
-    [ ] with a super class
-    [ ] with a namespace
-    [ ] with a body
+###########
+* [x] parse an integer
+* [x] parse a float
+* [x] remove warnings for DIGIT and FLOAT (?)
+* [x] remove any dead code that isn't helping (because it assumes int or w/e)
+* [x] throw some ast nodes into the parser
+* [ ] try to refactor int, float to be less error prone && less codefull
+* [ ] parse simple strings
+* [ ] parse symbols
+* [ ] parse a bare reference to **something**
+* [ ] parse call expressions
+    * [ ] no args
+    * [ ] one arg
+    * [ ] many args
+* [ ] parse method definitions
+    * [ ] no args
+    * [ ] one arg
+    * [ ] many args
+* [ ] parse a class
+    * [ ] with a super class
+    * [ ] with a namespace
+    * [ ] with a body
+    * [ ] class + instance methods
+    * [ ] class + class methods
+* [ ] define a module
+* [ ] assignment
+* [ ] postfix // prefix operations
+* [ ] binary operators
+* [ ] hashes
+* [ ] arrays
+* [ ] blocks
+* [ ] arguments on a method decl have optional parens
+* [ ] call expressions have optional parens
+* [ ] heredoc
+* [ ] globals ($: and $?)
+* [ ] backtics
+* [ ] string interpolation
+* [ ] semicolons
+* [ ] method calls (message passing?)
+* [ ] comments
+
 
 Grubby Lexer
-[x] class methods
-[x] method calls with dot syntax
-[x] semicolons
-[x] switch to a Lex(lval *RubySymType) (int) interface
-[ ] strings
-[ ] array?
-[ ] hashes
-[ ] - , +, *, /  (etc)
-[ ] ++, --, etc
-[ ] assignment (optional whitespace)
-[ ] blocks?
-[ ] heredoc (zomgggg)
-[ ] backtics
-[ ] string interpolation?
-
-Grubby Parser
-[x] add a stateful parser (eg: multi-line strings)
-    -- stateful parsers can keep reading lines until done or error
-[x] define a method (no args)
-[x] args on a method
-[x] symbols
-[x] define a class
-[x] class + inheritance
-[x] class + namespaces
-[ ] class + methods
-[ ] class + class methods
-[ ] define a module
-[ ] assignment
-[ ] postfix // prefix operations
-[ ] binary operators
-[ ] hashes
-[ ] arrays
-[ ] blocks
-[ ] arguments on a method decl have optional parens
-[ ] call expressions have optional parens
-[ ] heredoc
-[ ] globals ($: and $?)
-[ ] backtics
-[ ] string interpolation
-[ ] semicolons
-[ ] method calls (message passing?)
-[ ] comments
+############
+* [x] class methods
+* [x] method calls with dot syntax
+* [x] semicolons
+* [x] switch to a Lex(lval *RubySymType) (int) interface
+* [ ] strings
+* [ ] array?
+* [ ] hashes
+* [ ] - , +, *, /  (etc)
+* [ ] ++, --, etc
+* [ ] assignment (optional whitespace)
+* [ ] blocks?
+* [ ] heredoc (zomgggg)
+* [ ] backtics
+* [ ] string interpolation?
 
 Grubby interpreter
-[ ] write a simple REPL / interpreter
-[ ] what does ObjectSpace need to look like?
-[ ] what are the builtins we need to have by default?
+##################
+* [ ] write a simple REPL / interpreter
+* [ ] what does ObjectSpace need to look like?
+* [ ] what are the builtins we need to have by default?
     (Object has 97 class methods, 56 instance methods)
-[ ] benchmark against jruby / mri for something simple
+* [ ] benchmark against jruby / mri for something simple
