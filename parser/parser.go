@@ -27,7 +27,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:33
+//line parser.y:39
 
 //line yacctab:1
 var RubyExca = []int{
@@ -311,7 +311,7 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:30
+		//line parser.y:36
 		{
 			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
 		}
