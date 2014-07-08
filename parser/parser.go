@@ -4,22 +4,22 @@ package parser
 import __yyfmt__ "fmt"
 
 //line parser.y:3
-var Statements []interface{}
+import (
+	"github.com/grubby/grubby/ast"
+)
 
-//line parser.y:11
+var Statements []ast.Node
+
+//line parser.y:15
 type RubySymType struct {
-	yys           int
-	intval        int
-	genericNumber interface{}
-	floatval      float64
+	yys          int
+	genericValue ast.Node
 }
 
-const DIGIT = 57346
-const FLOAT = 57347
+const NODE = 57346
 
 var RubyToknames = []string{
-	"DIGIT",
-	"FLOAT",
+	"NODE",
 }
 var RubyStatenames = []string{}
 
@@ -27,7 +27,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:44
+//line parser.y:33
 
 //line yacctab:1
 var RubyExca = []int{
@@ -36,54 +36,50 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 7
+const RubyNprod = 4
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 11
+const RubyLast = 4
 
 var RubyAct = []int{
 
-	5, 6, 9, 4, 7, 3, 2, 1, 0, 0,
-	8,
+	4, 3, 2, 1,
 }
 var RubyPact = []int{
 
-	-1000, -4, -2, -1000, -4, -1000, -1000, -1000, -6, -1000,
+	-1000, -3, -5, -1000, -1000,
 }
 var RubyPgo = []int{
 
-	0, 5, 7, 6,
+	0, 3, 2,
 }
 var RubyR1 = []int{
 
-	0, 2, 2, 3, 1, 1, 1,
+	0, 1, 1, 2,
 }
 var RubyR2 = []int{
 
-	0, 0, 3, 1, 3, 1, 1,
+	0, 0, 3, 1,
 }
 var RubyChk = []int{
 
-	-1000, -2, -3, -1, 7, 4, 5, 6, -1, 8,
+	-1000, -1, -2, 4, 5,
 }
 var RubyDef = []int{
 
-	1, -2, 0, 3, 0, 5, 6, 2, 0, 4,
+	1, -2, 0, 3, 2,
 }
 var RubyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	6, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	7, 8,
+	5,
 }
 var RubyTok2 = []int{
 
-	2, 3, 4, 5,
+	2, 3, 4,
 }
 var RubyTok3 = []int{
 	0,
@@ -315,24 +311,9 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:32
+		//line parser.y:30
 		{
-			Statements = append(Statements, RubyS[Rubypt-0].genericNumber)
-		}
-	case 4:
-		//line parser.y:37
-		{
-			RubyVAL.genericNumber = RubyS[Rubypt-1].genericNumber
-		}
-	case 5:
-		//line parser.y:39
-		{
-			RubyVAL.genericNumber = RubyS[Rubypt-0].intval
-		}
-	case 6:
-		//line parser.y:41
-		{
-			RubyVAL.genericNumber = RubyS[Rubypt-0].floatval
+			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
 		}
 	}
 	goto Rubystack /* stack new state and value */

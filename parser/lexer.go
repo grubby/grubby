@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/grubby/grubby/ast"
 )
 
 type rubyLex struct {
@@ -62,13 +64,16 @@ func (l *rubyLex) parseDigitsOrFail(lval *RubySymType, c rune) int {
 	}
 
 	pow := -1
+	intVal := 0
 	for i := len(integerDigits) - 1; i >= 0; i-- {
 		pow += 1
 		inc := integerDigits[i] * int(math.Pow(10, float64(pow)))
-		lval.intval += inc
+		intVal += inc
 	}
 
-	return DIGIT
+	lval.genericValue = ast.ConstantInt{Value: intVal}
+
+	return NODE
 }
 
 func (l *rubyLex) parseFloatOrFail(lval *RubySymType, intDigits []int) int {
@@ -101,16 +106,16 @@ func (l *rubyLex) parseFloatOrFail(lval *RubySymType, intDigits []int) int {
 			integer += fmt.Sprintf("%d", d)
 		}
 
-		var err error
 		float := strings.Join([]string{integer, mantissa}, ".")
-		lval.floatval, err = strconv.ParseFloat(float, 64)
+		floatval, err := strconv.ParseFloat(float, 64)
+		lval.genericValue = ast.ConstantFloat{Value: floatval}
 
 		if err != nil {
 			panic("FREAKOUT: " + err.Error())
 		}
 	}
 
-	return FLOAT
+	return NODE
 }
 
 func parseIntSliceAsInteger(digits []int) int {

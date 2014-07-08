@@ -10,16 +10,16 @@ type ConstantInt struct {
 	Value int
 }
 
+type ConstantFloat struct {
+	Value float64
+}
+
 type SimpleString struct {
 	Value string
 }
 
 type Symbol struct {
 	Name string
-}
-
-type ConstantFloat struct {
-	Value float64
 }
 
 type BareReference struct {

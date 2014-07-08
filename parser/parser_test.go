@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"github.com/grubby/grubby/ast"
 	"github.com/grubby/grubby/parser"
 
 	. "github.com/onsi/ginkgo"
@@ -13,7 +14,7 @@ var _ = Describe("goyacc parser", func() {
 	)
 
 	JustBeforeEach(func() {
-		parser.Statements = []interface{}{}
+		parser.Statements = make([]ast.Node, 0)
 		Expect(parser.RubyParse(lexer)).To(Equal(0))
 	})
 
@@ -23,7 +24,9 @@ var _ = Describe("goyacc parser", func() {
 		})
 
 		It("works, mostly", func() {
-			Expect(parser.Statements).To(Equal([]interface{}{5}))
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.ConstantInt{Value: 5},
+			}))
 		})
 	})
 
@@ -33,7 +36,9 @@ var _ = Describe("goyacc parser", func() {
 		})
 
 		It("works, mostly", func() {
-			Expect(parser.Statements).To(Equal([]interface{}{123.4567}))
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.ConstantFloat{Value: 123.4567},
+			}))
 		})
 	})
 })
