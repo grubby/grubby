@@ -16,17 +16,11 @@ var Statements []interface{}
 
 // any non-terminal which returns a value needs a type, which is
 // really a field name in the above union struct
-%type <genericNumber> expr number ffloat
+%type <genericNumber> expr
 
 // same for terminals
 %token <intval> DIGIT
 %token <floatval> FLOAT
-
-%left '|'
-%left '&'
-%left '+'  '-'
-%left '*'  '/'  '%'
-%left UMINUS      /*  supplies  precedence  for  unary  minus  */
 
 %%
 
@@ -41,34 +35,10 @@ stat	:    expr
 
 expr	:    '(' expr ')'
 		{ $$  =  $2 }
-	/* |    expr '+' expr */
-	/* 	{ $$  =  $1 + $3 } */
-	/* |    expr '-' expr */
-	/* 	{ $$  =  $1 - $3 } */
-	/* |    expr '*' expr */
-	/* 	{ $$  =  $1 * $3 } */
-	/* |    expr '/' expr */
-	/* 	{ $$  =  $1 / $3 } */
-	/* |    expr '%' expr */
-	/* 	{ $$  =  $1 % $3 } */
-	/* |    expr '&' expr */
-	/* 	{ $$  =  $1 & $3 } */
-	/* |    expr '|' expr */
-	/* 	{ $$  =  $1 | $3 } */
-	/* |    '-'  expr        %prec  UMINUS */
-	/* 	{ $$  = -$2  } */
   |    DIGIT
     { $$ = $1 }
   |    FLOAT
     { $$ = $1; }
 	;
-
-number	:    DIGIT
-		{ $$ = $1; }
-  ;
-
-ffloat   :    FLOAT
-    { $$ = $1; }
-  ;
 
 %%

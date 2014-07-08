@@ -16,19 +16,10 @@ type RubySymType struct {
 
 const DIGIT = 57346
 const FLOAT = 57347
-const UMINUS = 57348
 
 var RubyToknames = []string{
 	"DIGIT",
 	"FLOAT",
-	" |",
-	" &",
-	" +",
-	" -",
-	" *",
-	" /",
-	" %",
-	"UMINUS",
 }
 var RubyStatenames = []string{}
 
@@ -36,7 +27,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:74
+//line parser.y:44
 
 //line yacctab:1
 var RubyExca = []int{
@@ -45,38 +36,38 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 9
+const RubyNprod = 7
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 12
+const RubyLast = 11
 
 var RubyAct = []int{
 
-	5, 6, 9, 7, 3, 2, 1, 0, 0, 8,
-	0, 4,
+	5, 6, 9, 4, 7, 3, 2, 1, 0, 0,
+	8,
 }
 var RubyPact = []int{
 
-	-1000, -4, -11, -1000, -4, -1000, -1000, -1000, -14, -1000,
+	-1000, -4, -2, -1000, -4, -1000, -1000, -1000, -6, -1000,
 }
 var RubyPgo = []int{
 
-	0, 4, 7, 7, 6, 5,
+	0, 5, 7, 6,
 }
 var RubyR1 = []int{
 
-	0, 4, 4, 5, 1, 1, 1, 2, 3,
+	0, 2, 2, 3, 1, 1, 1,
 }
 var RubyR2 = []int{
 
-	0, 0, 3, 1, 3, 1, 1, 1, 1,
+	0, 0, 3, 1, 3, 1, 1,
 }
 var RubyChk = []int{
 
-	-1000, -4, -5, -1, 15, 4, 5, 14, -1, 16,
+	-1000, -2, -3, -1, 7, 4, 5, 6, -1, 8,
 }
 var RubyDef = []int{
 
@@ -85,22 +76,14 @@ var RubyDef = []int{
 var RubyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	14, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 12, 7, 3,
-	15, 16, 10, 8, 3, 9, 3, 11, 3, 3,
+	6, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 6,
+	7, 8,
 }
 var RubyTok2 = []int{
 
-	2, 3, 4, 5, 13,
+	2, 3, 4, 5,
 }
 var RubyTok3 = []int{
 	0,
@@ -332,32 +315,22 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:38
+		//line parser.y:32
 		{
 			Statements = append(Statements, RubyS[Rubypt-0].genericNumber)
 		}
 	case 4:
-		//line parser.y:43
+		//line parser.y:37
 		{
 			RubyVAL.genericNumber = RubyS[Rubypt-1].genericNumber
 		}
 	case 5:
-		//line parser.y:61
+		//line parser.y:39
 		{
 			RubyVAL.genericNumber = RubyS[Rubypt-0].intval
 		}
 	case 6:
-		//line parser.y:63
-		{
-			RubyVAL.genericNumber = RubyS[Rubypt-0].floatval
-		}
-	case 7:
-		//line parser.y:67
-		{
-			RubyVAL.genericNumber = RubyS[Rubypt-0].intval
-		}
-	case 8:
-		//line parser.y:71
+		//line parser.y:41
 		{
 			RubyVAL.genericNumber = RubyS[Rubypt-0].floatval
 		}
