@@ -2,7 +2,7 @@ package parser
 
 import (
 	"fmt"
-	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"unicode"
@@ -10,122 +10,96 @@ import (
 	"github.com/grubby/grubby/ast"
 )
 
+var (
+	integerRegexp = regexp.MustCompile("^[0-9]+$")
+	floatRegexp   = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
+)
+
 type rubyLex struct {
-	s   string
-	pos int
+	input        string
+	position     int
+	currentToken string
+
+	lexIndex int
+	tokens   []string
 }
 
-func NewLexer(str string) *rubyLex {
-	return &rubyLex{s: str}
+func NewLexer(input string) *rubyLex {
+	lexer := &rubyLex{input: input}
+	lexer.tokenize()
+
+	return lexer
+}
+
+func (lexer *rubyLex) tokenize() {
+	for lexer.position < len(lexer.input) {
+		char := rune(lexer.input[lexer.position])
+
+		switch {
+		case isSeparator(char):
+			lexer.appendNonEmptyTokens(lexer.currentToken)
+			lexer.tokens = append(lexer.tokens, string(char))
+		default:
+			lexer.currentToken += string(char)
+		}
+
+		lexer.position++
+	}
+
+	lexer.appendNonEmptyTokens(lexer.currentToken)
+}
+
+func (lexer *rubyLex) appendNonEmptyTokens(tokens ...string) {
+	defer func() {
+		lexer.currentToken = ""
+	}()
+
+	for _, token := range tokens {
+		if strings.TrimSpace(token) != "" {
+			lexer.tokens = append(lexer.tokens, token)
+		}
+	}
 }
 
 func (l *rubyLex) Lex(lval *RubySymType) int {
-	var c rune = ' '
-	for c == ' ' {
-		if l.pos == len(l.s) {
-			return 0
+	for l.lexIndex < len(l.tokens) {
+		token := l.tokens[l.lexIndex]
+		defer func() {
+			l.lexIndex++
+		}()
+
+		switch {
+		case integerRegexp.MatchString(token):
+			intVal, err := strconv.Atoi(token)
+			if err != nil {
+				panic(err)
+			}
+
+			lval.genericValue = ast.ConstantInt{Value: intVal}
+			return NODE
+		case floatRegexp.MatchString(token):
+			floatval, err := strconv.ParseFloat(token, 64)
+			if err != nil {
+				panic(err)
+			}
+
+			lval.genericValue = ast.ConstantFloat{Value: floatval}
+			return NODE
+		case len(token) == 1: // ;  " " or another separator
+			return int(rune(token[0]))
+		default:
+			panic("unknown token: " + token)
 		}
-		c = rune(l.s[l.pos])
-		l.pos += 1
 	}
 
-	if unicode.IsDigit(c) {
-		return l.parseDigitsOrFail(lval, c)
-	}
-
-	return int(c)
+	return 0
 }
 
 func (l *rubyLex) Error(s string) {
 	fmt.Printf("syntax error: %s\n", s)
 }
 
-func (l *rubyLex) parseDigitsOrFail(lval *RubySymType, c rune) int {
-	integerDigits := []int{int(c - '0')}
+func isSeparator(r rune) bool {
+	return unicode.IsSpace(r) || r == ';'
 
-	if l.pos < len(l.s) {
-		c = rune(l.s[l.pos])
-		for unicode.IsDigit(c) {
-			integerDigits = append(integerDigits, int(c-'0'))
-
-			l.pos += 1
-			if l.pos == len(l.s) {
-				l.pos--
-				break
-			}
-			c = rune(l.s[l.pos])
-		}
-
-		// check if we have a float
-		if c == '.' {
-			l.pos++
-			return l.parseFloatOrFail(lval, integerDigits)
-		}
-	}
-
-	pow := -1
-	intVal := 0
-	for i := len(integerDigits) - 1; i >= 0; i-- {
-		pow += 1
-		inc := integerDigits[i] * int(math.Pow(10, float64(pow)))
-		intVal += inc
-	}
-
-	lval.genericValue = ast.ConstantInt{Value: intVal}
-
-	return NODE
-}
-
-func (l *rubyLex) parseFloatOrFail(lval *RubySymType, intDigits []int) int {
-	if l.pos < len(l.s) {
-		fractionalDigits := []int{}
-
-		c := rune(l.s[l.pos])
-		for unicode.IsDigit(c) {
-			fractionalDigits = append(fractionalDigits, int(c-'0'))
-
-			l.pos++
-			if l.pos == len(l.s) {
-				l.pos--
-				break
-			}
-			c = rune(l.s[l.pos])
-		}
-
-		if len(fractionalDigits) == 0 {
-			return -1 // does not compute
-		}
-
-		mantissa := ""
-		for _, f := range fractionalDigits {
-			mantissa += fmt.Sprintf("%d", f)
-		}
-
-		integer := ""
-		for _, d := range intDigits {
-			integer += fmt.Sprintf("%d", d)
-		}
-
-		float := strings.Join([]string{integer, mantissa}, ".")
-		floatval, err := strconv.ParseFloat(float, 64)
-		lval.genericValue = ast.ConstantFloat{Value: floatval}
-
-		if err != nil {
-			panic("FREAKOUT: " + err.Error())
-		}
-	}
-
-	return NODE
-}
-
-func parseIntSliceAsInteger(digits []int) int {
-	pow := -1
-	val := 0
-	for i := len(digits) - 1; i >= 0; i-- {
-		pow += 1
-		inc := digits[i] * int(math.Pow(10, float64(pow)))
-		val += inc
-	}
-
-	return val
 }
