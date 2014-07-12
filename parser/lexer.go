@@ -13,6 +13,7 @@ import (
 var (
 	integerRegexp = regexp.MustCompile("^[0-9]+$")
 	floatRegexp   = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
+	stringRegexp  = regexp.MustCompile("^'[^']*'$")
 )
 
 type rubyLex struct {
@@ -39,6 +40,8 @@ func (lexer *rubyLex) tokenize() {
 		case isSeparator(char):
 			lexer.appendNonEmptyTokens(lexer.currentToken)
 			lexer.tokens = append(lexer.tokens, string(char))
+		case char == '\'':
+			lexer.tokenizeString()
 		default:
 			lexer.currentToken += string(char)
 		}
@@ -59,6 +62,22 @@ func (lexer *rubyLex) appendNonEmptyTokens(tokens ...string) {
 			lexer.tokens = append(lexer.tokens, token)
 		}
 	}
+}
+
+func (lexer *rubyLex) tokenizeString() {
+	token := string(lexer.input[lexer.position])
+	for i := lexer.position + 1; i < len(lexer.input); i += 1 {
+		char := lexer.input[i]
+		token += string(char)
+
+		if char == '\'' {
+			lexer.position = i
+			break
+		}
+	}
+
+	// FIXME: needs to blow up if the string was never closed
+	lexer.currentToken = token
 }
 
 func (l *rubyLex) Lex(lval *RubySymType) int {
@@ -84,6 +103,9 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			}
 
 			lval.genericValue = ast.ConstantFloat{Value: floatval}
+			return NODE
+		case stringRegexp.MatchString(token):
+			lval.genericValue = ast.SimpleString{Value: token}
 			return NODE
 		case len(token) == 1: // ;  " " or another separator
 			return int(rune(token[0]))

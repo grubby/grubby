@@ -41,4 +41,16 @@ var _ = Describe("goyacc parser", func() {
 			}))
 		})
 	})
+
+	Describe("strings", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer("'hello world'\n")
+		})
+
+		It("returns a SimpleString struct", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.SimpleString{Value: "'hello world'"},
+			}))
+		})
+	})
 })
