@@ -14,6 +14,7 @@ var (
 	integerRegexp = regexp.MustCompile("^[0-9]+$")
 	floatRegexp   = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
 	stringRegexp  = regexp.MustCompile("^'[^']*'$")
+	symbolRegexp  = regexp.MustCompile("^:[a-zA-Z\\-_\\+\\*][a-zA-Z\\-_+\\*0-9]*$")
 )
 
 type rubyLex struct {
@@ -42,6 +43,8 @@ func (lexer *rubyLex) tokenize() {
 			lexer.tokens = append(lexer.tokens, string(char))
 		case char == '\'':
 			lexer.tokenizeString()
+		case char == ':':
+			lexer.tokenizeSymbol()
 		default:
 			lexer.currentToken += string(char)
 		}
@@ -66,7 +69,7 @@ func (lexer *rubyLex) appendNonEmptyTokens(tokens ...string) {
 
 func (lexer *rubyLex) tokenizeString() {
 	token := string(lexer.input[lexer.position])
-	for i := lexer.position + 1; i < len(lexer.input); i += 1 {
+	for i := lexer.position + 1; i < len(lexer.input); i++ {
 		char := lexer.input[i]
 		token += string(char)
 
@@ -77,6 +80,26 @@ func (lexer *rubyLex) tokenizeString() {
 	}
 
 	// FIXME: needs to blow up if the string was never closed
+	lexer.currentToken = token
+}
+
+func (lexer *rubyLex) tokenizeSymbol() {
+	token := string(lexer.input[lexer.position])
+	for i := lexer.position + 1; i < len(lexer.input); i++ {
+		char := rune(lexer.input[i])
+
+		if isSeparator(char) {
+			lexer.position = i - 1
+			break
+		}
+
+		if !unicode.IsLetter(char) && !unicode.IsDigit(char) {
+			panic("unexpected character in token: " + string(char))
+		}
+
+		token += string(char)
+	}
+
 	lexer.currentToken = token
 }
 
@@ -106,6 +129,9 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			return NODE
 		case stringRegexp.MatchString(token):
 			lval.genericValue = ast.SimpleString{Value: token}
+			return NODE
+		case symbolRegexp.MatchString(token):
+			lval.genericValue = ast.Symbol{Name: token[1:]}
 			return NODE
 		case len(token) == 1: // ;  " " or another separator
 			return int(rune(token[0]))

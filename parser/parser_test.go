@@ -53,4 +53,16 @@ var _ = Describe("goyacc parser", func() {
 			}))
 		})
 	})
+
+	Describe("symbols", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(":foo\n")
+		})
+
+		It("returns an ast.Symbol", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.Symbol{Name: "foo"},
+			}))
+		})
+	})
 })
