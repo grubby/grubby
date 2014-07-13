@@ -28,11 +28,11 @@ var Statements []ast.Node
 
 %%
 
-list	: /* empty */
-	| list statement '\n'
-	;
+list	: /* empty */ | list statement;
 
-statement : NODE
+statement : expr | expr '\n';
+
+expr : NODE
   { Statements = append(Statements, $1); };
 
 

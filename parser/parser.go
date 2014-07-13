@@ -36,41 +36,41 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 4
+const RubyNprod = 6
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 4
+const RubyLast = 5
 
 var RubyAct = []int{
 
-	4, 3, 2, 1,
+	5, 4, 3, 2, 1,
 }
 var RubyPact = []int{
 
-	-1000, -3, -5, -1000, -1000,
+	-1000, -3, -1000, -5, -1000, -1000,
 }
 var RubyPgo = []int{
 
-	0, 3, 2,
+	0, 4, 3, 2,
 }
 var RubyR1 = []int{
 
-	0, 1, 1, 2,
+	0, 1, 1, 2, 2, 3,
 }
 var RubyR2 = []int{
 
-	0, 0, 3, 1,
+	0, 0, 2, 1, 2, 1,
 }
 var RubyChk = []int{
 
-	-1000, -1, -2, 4, 5,
+	-1000, -1, -2, -3, 4, 5,
 }
 var RubyDef = []int{
 
-	1, -2, 0, 3, 2,
+	1, -2, 2, 3, 5, 4,
 }
 var RubyTok1 = []int{
 
@@ -310,7 +310,7 @@ Rubydefault:
 	// dummy call; replaced with literal code
 	switch Rubynt {
 
-	case 3:
+	case 5:
 		//line parser.y:36
 		{
 			Statements = append(Statements, RubyS[Rubypt-0].genericValue)

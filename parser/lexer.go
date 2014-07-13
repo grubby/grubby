@@ -86,6 +86,7 @@ func (lexer *rubyLex) tokenizeString() {
 func (lexer *rubyLex) tokenizeSymbol() {
 	token := string(lexer.input[lexer.position])
 	for i := lexer.position + 1; i < len(lexer.input); i++ {
+		lexer.position = i
 		char := rune(lexer.input[i])
 
 		if isSeparator(char) {

@@ -20,7 +20,7 @@ var _ = Describe("goyacc parser", func() {
 
 	Describe("parsing an integer", func() {
 		BeforeEach(func() {
-			lexer = parser.NewLexer("5\n")
+			lexer = parser.NewLexer("5")
 		})
 
 		It("works, mostly", func() {
@@ -32,7 +32,7 @@ var _ = Describe("goyacc parser", func() {
 
 	Describe("parsing a float", func() {
 		BeforeEach(func() {
-			lexer = parser.NewLexer("123.4567\n")
+			lexer = parser.NewLexer("123.4567")
 		})
 
 		It("works, mostly", func() {
@@ -44,7 +44,7 @@ var _ = Describe("goyacc parser", func() {
 
 	Describe("strings", func() {
 		BeforeEach(func() {
-			lexer = parser.NewLexer("'hello world'\n")
+			lexer = parser.NewLexer("'hello world'")
 		})
 
 		It("returns a SimpleString struct", func() {
@@ -56,12 +56,25 @@ var _ = Describe("goyacc parser", func() {
 
 	Describe("symbols", func() {
 		BeforeEach(func() {
-			lexer = parser.NewLexer(":foo\n")
+			lexer = parser.NewLexer(":foo")
 		})
 
 		It("returns an ast.Symbol", func() {
 			Expect(parser.Statements).To(Equal([]ast.Node{
 				ast.Symbol{Name: "foo"},
+			}))
+		})
+	})
+
+	Describe("parsing multiple lines", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(":foo\n:bar")
+		})
+
+		It("returns multiple nodes", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.Symbol{Name: "foo"},
+				ast.Symbol{Name: "bar"},
 			}))
 		})
 	})
