@@ -33,9 +33,9 @@ Grubby yacc
 * [x] remove warnings for DIGIT and FLOAT (?)
 * [x] remove any dead code that isn't helping (because it assumes int or w/e)
 * [x] throw some ast nodes into the parser
-* [ ] try to refactor int, float to be less error prone && less codefull
-* [ ] parse simple strings
-* [ ] parse symbols
+* [x] refactor lexer to be less error prone && fewer lines of code
+* [x] parse simple strings
+* [x] parse symbols
 * [ ] parse a bare reference to **something**
 * [ ] parse call expressions
     * [ ] no args
