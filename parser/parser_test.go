@@ -78,4 +78,16 @@ var _ = Describe("goyacc parser", func() {
 			}))
 		})
 	})
+
+	Describe("variables", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer("foo")
+		})
+
+		It("returns a bare reference", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.BareReference{Name: "foo"},
+			}))
+		})
+	})
 })

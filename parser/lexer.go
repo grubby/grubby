@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	integerRegexp = regexp.MustCompile("^[0-9]+$")
-	floatRegexp   = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
-	stringRegexp  = regexp.MustCompile("^'[^']*'$")
-	symbolRegexp  = regexp.MustCompile("^:[a-zA-Z\\-_\\+\\*][a-zA-Z\\-_+\\*0-9]*$")
+	integerRegexp   = regexp.MustCompile("^[0-9]+$")
+	floatRegexp     = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
+	stringRegexp    = regexp.MustCompile("^'[^']*'$")
+	symbolRegexp    = regexp.MustCompile("^:[a-zA-Z\\-_\\+\\*][a-zA-Z\\-_+\\*0-9]*$")
+	referenceRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 )
 
 type rubyLex struct {
@@ -133,6 +134,9 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			return NODE
 		case symbolRegexp.MatchString(token):
 			lval.genericValue = ast.Symbol{Name: token[1:]}
+			return NODE
+		case referenceRegexp.MatchString(token):
+			lval.genericValue = ast.BareReference{Name: token}
 			return NODE
 		case len(token) == 1: // ;  " " or another separator
 			return int(rune(token[0]))
