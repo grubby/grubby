@@ -90,4 +90,19 @@ var _ = Describe("goyacc parser", func() {
 			}))
 		})
 	})
+
+	Describe("call expressions", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer("puts 'foo'")
+		})
+
+		It("handles a simple call expression without parens", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.CallExpression{
+					Func: "puts",
+					Args: []ast.Node{ast.SimpleString{Value: "foo"}},
+				},
+			}))
+		})
+	})
 })
