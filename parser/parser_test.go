@@ -91,7 +91,7 @@ var _ = Describe("goyacc parser", func() {
 		})
 	})
 
-	Describe("call expressions", func() {
+	PDescribe("call expressions", func() {
 		BeforeEach(func() {
 			lexer = parser.NewLexer("puts 'foo'")
 		})
