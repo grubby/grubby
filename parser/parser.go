@@ -27,7 +27,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:39
+//line parser.y:54
 
 //line yacctab:1
 var RubyExca = []int{
@@ -36,46 +36,48 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 6
+const RubyNprod = 8
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 5
+const RubyLast = 8
 
 var RubyAct = []int{
 
-	5, 4, 3, 2, 1,
+	7, 6, 8, 5, 2, 1, 3, 4,
 }
 var RubyPact = []int{
 
-	-1000, -3, -1000, -5, -1000, -1000,
+	-1000, -1, -1000, -1000, -4, -6, -1000, -2, -1000,
 }
 var RubyPgo = []int{
 
-	0, 4, 3, 2,
+	0, 7, 6, 5, 4,
 }
 var RubyR1 = []int{
 
-	0, 1, 1, 2, 2, 3,
+	0, 3, 3, 4, 4, 4, 2, 1,
 }
 var RubyR2 = []int{
 
-	0, 0, 2, 1, 2, 1,
+	0, 0, 2, 1, 1, 2, 3, 1,
 }
 var RubyChk = []int{
 
-	-1000, -1, -2, -3, 4, 5,
+	-1000, -3, -4, -2, -1, 4, 5, 6, 4,
 }
 var RubyDef = []int{
 
-	1, -2, 2, 3, 5, 4,
+	1, -2, 2, 3, 4, 7, 5, 0, 6,
 }
 var RubyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	5,
+	5, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 6,
 }
 var RubyTok2 = []int{
 
@@ -310,11 +312,31 @@ Rubydefault:
 	// dummy call; replaced with literal code
 	switch Rubynt {
 
-	case 5:
-		//line parser.y:36
+	case 3:
+		//line parser.y:37
 		{
 			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
 		}
+	case 4:
+		//line parser.y:39
+		{
+			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
+		}
+	case 5:
+		//line parser.y:41
+		{
+			Statements = append(Statements, RubyS[Rubypt-1].genericValue)
+		}
+	case 6:
+		//line parser.y:44
+		{
+			RubyVAL.genericValue = ast.CallExpression{
+				Func: RubyS[Rubypt-2].genericValue.StringValue(),
+				Args: []ast.Node{RubyS[Rubypt-0].genericValue},
+			}
+		}
+	case 7:
+		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	}
 	goto Rubystack /* stack new state and value */
 }

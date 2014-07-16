@@ -26,14 +26,29 @@ var Statements []ast.Node
       declare a type (or possibly just a token)
 */
 
+%type <genericValue> expr
+%type <genericValue> callexpr
+
 %%
 
 list	: /* empty */ | list statement;
 
-statement : expr | expr '\n';
-
-expr : NODE
+statement : callexpr
+  { Statements = append(Statements, $1); }
+| expr
+  { Statements = append(Statements, $1); }
+| expr '\n'
   { Statements = append(Statements, $1); };
+
+callexpr : NODE " " NODE
+  {
+    $$ = ast.CallExpression{
+      Func: $1.StringValue(),
+      Args: []ast.Node{$3},
+    }
+  };
+
+expr : NODE;
 
 
 %%

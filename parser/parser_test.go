@@ -91,7 +91,7 @@ var _ = Describe("goyacc parser", func() {
 		})
 	})
 
-	PDescribe("call expressions", func() {
+	Describe("call expressions", func() {
 		BeforeEach(func() {
 			lexer = parser.NewLexer("puts 'foo'")
 		})
@@ -100,7 +100,7 @@ var _ = Describe("goyacc parser", func() {
 			Expect(parser.Statements).To(Equal([]ast.Node{
 				ast.CallExpression{
 					Func: "puts",
-					Args: []ast.Node{ast.SimpleString{Value: "foo"}},
+					Args: []ast.Node{ast.SimpleString{Value: "'foo'"}},
 				},
 			}))
 		})
