@@ -36,11 +36,12 @@ Grubby yacc
 * [x] refactor lexer to be less error prone && fewer lines of code
 * [x] parse simple strings
 * [x] parse symbols
-* [ ] parse a bare reference to **something**
+* [x] parse a bare reference to **something**
 * [ ] parse call expressions
-    * [ ] no args
-    * [ ] one arg
+    * [x] one arg
+    * [x] with parens
     * [ ] many args
+    * [ ] no args
 * [ ] parse method definitions
     * [ ] no args
     * [ ] one arg
