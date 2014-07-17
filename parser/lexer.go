@@ -137,7 +137,11 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			return NODE
 		case referenceRegexp.MatchString(token):
 			lval.genericValue = ast.BareReference{Name: token}
-			return NODE
+			return REF
+		case token == "(":
+			return LPAREN
+		case token == ")":
+			return RPAREN
 		case len(token) == 1: // ;  " " or another separator
 			return int(rune(token[0]))
 		default:
@@ -153,6 +157,5 @@ func (l *rubyLex) Error(s string) {
 }
 
 func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';'
-
+	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '('
 }

@@ -19,6 +19,9 @@ var Statements []ast.Node
 // any non-terminal which returns a value needs a type, which is
 // really a field name in the above union struct
 %token <genericValue> NODE
+%token <genericValue> REF
+%token <genericValue> LPAREN
+%token <genericValue> RPAREN
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
@@ -28,6 +31,7 @@ var Statements []ast.Node
 
 %type <genericValue> expr
 %type <genericValue> callexpr
+%type <genericValue> callargs
 
 %%
 
@@ -40,7 +44,14 @@ statement : callexpr
 | expr '\n'
   { Statements = append(Statements, $1); };
 
-callexpr : NODE " " NODE
+callexpr : REF callargs
+  {
+    $$ = ast.CallExpression{
+      Func: $1.StringValue(),
+      Args: []ast.Node{$2},
+    }
+  }
+| REF " " callargs
   {
     $$ = ast.CallExpression{
       Func: $1.StringValue(),
@@ -48,7 +59,8 @@ callexpr : NODE " " NODE
     }
   };
 
-expr : NODE;
+callargs : NODE | LPAREN NODE RPAREN;
+expr : NODE | REF;
 
 
 %%

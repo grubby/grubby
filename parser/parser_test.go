@@ -92,17 +92,34 @@ var _ = Describe("goyacc parser", func() {
 	})
 
 	Describe("call expressions", func() {
-		BeforeEach(func() {
-			lexer = parser.NewLexer("puts 'foo'")
+		Context("without parens", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("puts 'foo'")
+			})
+
+			It("returns a call expression with one arg", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.CallExpression{
+						Func: "puts",
+						Args: []ast.Node{ast.SimpleString{Value: "'foo'"}},
+					},
+				}))
+			})
 		})
 
-		It("handles a simple call expression without parens", func() {
-			Expect(parser.Statements).To(Equal([]ast.Node{
-				ast.CallExpression{
-					Func: "puts",
-					Args: []ast.Node{ast.SimpleString{Value: "'foo'"}},
-				},
-			}))
+		Context("with parens", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("puts('foo')")
+			})
+
+			It("returns a call expression with args", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.CallExpression{
+						Func: "puts",
+						Args: []ast.Node{ast.SimpleString{Value: "'foo'"}},
+					},
+				}))
+			})
 		})
 	})
 })
