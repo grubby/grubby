@@ -20,12 +20,14 @@ const NODE = 57346
 const REF = 57347
 const LPAREN = 57348
 const RPAREN = 57349
+const COMMA = 57350
 
 var RubyToknames = []string{
 	"NODE",
 	"REF",
 	"LPAREN",
 	"RPAREN",
+	"COMMA",
 }
 var RubyStatenames = []string{}
 
@@ -33,7 +35,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:66
+//line parser.y:68
 
 //line yacctab:1
 var RubyExca = []int{
@@ -42,58 +44,58 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 12
+const RubyNprod = 14
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 16
+const RubyLast = 19
 
 var RubyAct = []int{
 
-	10, 8, 11, 7, 14, 9, 10, 13, 11, 6,
-	5, 12, 2, 1, 3, 4,
+	10, 8, 11, 7, 15, 16, 9, 10, 17, 11,
+	14, 12, 6, 5, 13, 2, 1, 3, 4,
 }
 var RubyPact = []int{
 
-	-1000, 5, -1000, -1000, -5, -4, -1000, -1000, -1000, 2,
-	-1000, 3, -1000, -3, -1000,
+	-1000, 8, -1000, -1000, -6, -4, -1000, -1000, -1000, 3,
+	-1000, 6, -1000, -3, -1000, -1000, 4, -1000,
 }
 var RubyPgo = []int{
 
-	0, 15, 14, 1, 13, 12,
+	0, 18, 17, 1, 16, 15, 14,
 }
 var RubyR1 = []int{
 
 	0, 4, 4, 5, 5, 5, 2, 2, 3, 3,
-	1, 1,
+	6, 6, 1, 1,
 }
 var RubyR2 = []int{
 
 	0, 0, 2, 1, 1, 2, 2, 3, 1, 3,
-	1, 1,
+	1, 3, 1, 1,
 }
 var RubyChk = []int{
 
-	-1000, -4, -5, -2, -1, 5, 4, 8, -3, 9,
-	4, 6, -3, 4, 7,
+	-1000, -4, -5, -2, -1, 5, 4, 9, -3, 10,
+	4, 6, -3, -6, 4, 7, 8, 4,
 }
 var RubyDef = []int{
 
-	1, -2, 2, 3, 4, 11, 10, 5, 6, 0,
-	8, 0, 7, 0, 9,
+	1, -2, 2, 3, 4, 13, 12, 5, 6, 0,
+	8, 0, 7, 0, 10, 9, 0, 11,
 }
 var RubyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	8, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	9, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 9,
+	3, 3, 10,
 }
 var RubyTok2 = []int{
 
-	2, 3, 4, 5, 6, 7,
+	2, 3, 4, 5, 6, 7, 8,
 }
 var RubyTok3 = []int{
 	0,
@@ -325,22 +327,22 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:41
+		//line parser.y:42
 		{
 			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
 		}
 	case 4:
-		//line parser.y:43
+		//line parser.y:44
 		{
 			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
 		}
 	case 5:
-		//line parser.y:45
+		//line parser.y:46
 		{
 			Statements = append(Statements, RubyS[Rubypt-1].genericValue)
 		}
 	case 6:
-		//line parser.y:48
+		//line parser.y:49
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func: RubyS[Rubypt-1].genericValue.StringValue(),
@@ -348,7 +350,7 @@ Rubydefault:
 			}
 		}
 	case 7:
-		//line parser.y:55
+		//line parser.y:56
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func: RubyS[Rubypt-2].genericValue.StringValue(),
@@ -359,9 +361,9 @@ Rubydefault:
 		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	case 9:
 		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 10:
+	case 12:
 		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 11:
+	case 13:
 		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	}
 	goto Rubystack /* stack new state and value */

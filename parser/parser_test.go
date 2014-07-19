@@ -4,6 +4,7 @@ import (
 	"github.com/grubby/grubby/ast"
 	"github.com/grubby/grubby/parser"
 
+	. "github.com/grubby/grubby/parser/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -14,8 +15,9 @@ var _ = Describe("goyacc parser", func() {
 	)
 
 	JustBeforeEach(func() {
+		parser.DebugStatements = []string{}
 		parser.Statements = make([]ast.Node, 0)
-		Expect(parser.RubyParse(lexer)).To(Equal(0))
+		Expect(parser.RubyParse(lexer)).To(BeSuccessful())
 	})
 
 	Describe("parsing an integer", func() {

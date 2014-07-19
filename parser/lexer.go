@@ -16,6 +16,7 @@ var (
 	stringRegexp    = regexp.MustCompile("^'[^']*'$")
 	symbolRegexp    = regexp.MustCompile("^:[a-zA-Z\\-_\\+\\*][a-zA-Z\\-_+\\*0-9]*$")
 	referenceRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
+	DebugStatements = []string{}
 )
 
 type rubyLex struct {
@@ -54,6 +55,7 @@ func (lexer *rubyLex) tokenize() {
 	}
 
 	lexer.appendNonEmptyTokens(lexer.currentToken)
+	debug("Lexed %d tokens", len(lexer.tokens))
 }
 
 func (lexer *rubyLex) appendNonEmptyTokens(tokens ...string) {
@@ -106,6 +108,11 @@ func (lexer *rubyLex) tokenizeSymbol() {
 }
 
 func (l *rubyLex) Lex(lval *RubySymType) int {
+	debug("Called Lex()")
+	defer func() {
+		debug("")
+	}()
+
 	for l.lexIndex < len(l.tokens) {
 		token := l.tokens[l.lexIndex]
 		defer func() {
@@ -114,6 +121,7 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 
 		switch {
 		case integerRegexp.MatchString(token):
+			debug("integer: %s", token)
 			intVal, err := strconv.Atoi(token)
 			if err != nil {
 				panic(err)
@@ -122,6 +130,7 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.ConstantInt{Value: intVal}
 			return NODE
 		case floatRegexp.MatchString(token):
+			debug("float: %s", token)
 			floatval, err := strconv.ParseFloat(token, 64)
 			if err != nil {
 				panic(err)
@@ -130,19 +139,28 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.ConstantFloat{Value: floatval}
 			return NODE
 		case stringRegexp.MatchString(token):
+			debug("string: %s", token)
 			lval.genericValue = ast.SimpleString{Value: token}
 			return NODE
 		case symbolRegexp.MatchString(token):
+			debug("symbol: %s", token)
 			lval.genericValue = ast.Symbol{Name: token[1:]}
 			return NODE
 		case referenceRegexp.MatchString(token):
+			debug("ref: %s", token)
 			lval.genericValue = ast.BareReference{Name: token}
 			return REF
 		case token == "(":
+			debug("LPAREN")
 			return LPAREN
 		case token == ")":
+			debug("RPAREN")
 			return RPAREN
+		case token == ",":
+			debug("COMMA")
+			return COMMA
 		case len(token) == 1: // ;  " " or another separator
+			debug("separator: '%s'", token)
 			return int(rune(token[0]))
 		default:
 			panic("unknown token: " + token)
@@ -156,6 +174,19 @@ func (l *rubyLex) Error(s string) {
 	fmt.Printf("syntax error: %s\n", s)
 }
 
+// FIXME: is there a concept of a character set that would make this faster?
+//        barring that, maybe just a map lookup?
 func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '('
+	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ','
+}
+
+func debug(formatString string, args ...interface{}) {
+	var msg string
+	if len(args) > 0 {
+		msg = fmt.Sprintf(formatString, args...)
+	} else {
+		msg = formatString
+	}
+
+	DebugStatements = append(DebugStatements, msg)
 }

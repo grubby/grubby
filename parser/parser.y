@@ -22,6 +22,7 @@ var Statements []ast.Node
 %token <genericValue> REF
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
+%token <genericValue> COMMA
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
@@ -59,7 +60,8 @@ callexpr : REF callargs
     }
   };
 
-callargs : NODE | LPAREN NODE RPAREN;
+callargs : NODE | LPAREN nodes_with_commas RPAREN;
+nodes_with_commas: NODE | nodes_with_commas COMMA NODE;
 expr : NODE | REF;
 
 
