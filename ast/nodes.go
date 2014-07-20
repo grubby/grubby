@@ -9,6 +9,8 @@ type Node interface {
 	StringValue() string
 }
 
+type Nodes []Node
+
 type Block struct {
 	Statements []Node
 }

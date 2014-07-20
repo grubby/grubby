@@ -14,6 +14,7 @@ var Statements []ast.Node
 // as RubySymType, of which a reference is passed to the lexer.
 %union{
   genericValue ast.Node
+  genericSlice ast.Nodes
 }
 
 // any non-terminal which returns a value needs a type, which is
@@ -32,7 +33,8 @@ var Statements []ast.Node
 
 %type <genericValue> expr
 %type <genericValue> callexpr
-%type <genericValue> callargs
+%type <genericSlice> callargs
+%type <genericSlice> nodes_with_commas
 
 %%
 
@@ -49,19 +51,27 @@ callexpr : REF callargs
   {
     $$ = ast.CallExpression{
       Func: $1.StringValue(),
-      Args: []ast.Node{$2},
+      Args: $2,
     }
   }
 | REF " " callargs
   {
     $$ = ast.CallExpression{
       Func: $1.StringValue(),
-      Args: []ast.Node{$3},
+      Args: $3,
     }
   };
 
-callargs : NODE | LPAREN nodes_with_commas RPAREN;
-nodes_with_commas: NODE | nodes_with_commas COMMA NODE;
+callargs : NODE
+  {  $$ = append($$, $1) }
+| LPAREN nodes_with_commas RPAREN
+  { $$ = $2 };
+
+nodes_with_commas: NODE
+  { $$ = append($$, $1); }
+| nodes_with_commas COMMA " " NODE
+  { $$ = append($$, $4); };
+
 expr : NODE | REF;
 
 

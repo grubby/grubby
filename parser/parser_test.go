@@ -111,14 +111,18 @@ var _ = Describe("goyacc parser", func() {
 
 		Context("with parens", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("puts('foo')")
+				lexer = parser.NewLexer("puts('foo', 'bar', 'baz')")
 			})
 
 			It("returns a call expression with args", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.CallExpression{
 						Func: "puts",
-						Args: []ast.Node{ast.SimpleString{Value: "'foo'"}},
+						Args: []ast.Node{
+							ast.SimpleString{Value: "'foo'"},
+							ast.SimpleString{Value: "'bar'"},
+							ast.SimpleString{Value: "'baz'"},
+						},
 					},
 				}))
 			})

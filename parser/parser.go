@@ -14,6 +14,7 @@ var Statements []ast.Node
 type RubySymType struct {
 	yys          int
 	genericValue ast.Node
+	genericSlice ast.Nodes
 }
 
 const NODE = 57346
@@ -35,7 +36,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:68
+//line parser.y:81
 
 //line yacctab:1
 var RubyExca = []int{
@@ -50,41 +51,41 @@ const RubyPrivate = 57344
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 19
+const RubyLast = 20
 
 var RubyAct = []int{
 
-	10, 8, 11, 7, 15, 16, 9, 10, 17, 11,
-	14, 12, 6, 5, 13, 2, 1, 3, 4,
+	10, 17, 11, 8, 15, 16, 9, 7, 10, 18,
+	11, 6, 5, 12, 14, 2, 1, 13, 3, 4,
 }
 var RubyPact = []int{
 
-	-1000, 8, -1000, -1000, -6, -4, -1000, -1000, -1000, 3,
-	-1000, 6, -1000, -3, -1000, -1000, 4, -1000,
+	-1000, 7, -1000, -1000, -2, -4, -1000, -1000, -1000, 4,
+	-1000, 10, -1000, -3, -1000, -1000, -9, 5, -1000,
 }
 var RubyPgo = []int{
 
-	0, 18, 17, 1, 16, 15, 14,
+	0, 19, 18, 3, 17, 16, 15,
 }
 var RubyR1 = []int{
 
-	0, 4, 4, 5, 5, 5, 2, 2, 3, 3,
-	6, 6, 1, 1,
+	0, 5, 5, 6, 6, 6, 2, 2, 3, 3,
+	4, 4, 1, 1,
 }
 var RubyR2 = []int{
 
 	0, 0, 2, 1, 1, 2, 2, 3, 1, 3,
-	1, 3, 1, 1,
+	1, 4, 1, 1,
 }
 var RubyChk = []int{
 
-	-1000, -4, -5, -2, -1, 5, 4, 9, -3, 10,
-	4, 6, -3, -6, 4, 7, 8, 4,
+	-1000, -5, -6, -2, -1, 5, 4, 9, -3, 10,
+	4, 6, -3, -4, 4, 7, 8, 10, 4,
 }
 var RubyDef = []int{
 
 	1, -2, 2, 3, 4, 13, 12, 5, 6, 0,
-	8, 0, 7, 0, 10, 9, 0, 11,
+	8, 0, 7, 0, 10, 9, 0, 0, 11,
 }
 var RubyTok1 = []int{
 
@@ -327,40 +328,56 @@ Rubydefault:
 	switch Rubynt {
 
 	case 3:
-		//line parser.y:42
-		{
-			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
-		}
-	case 4:
 		//line parser.y:44
 		{
 			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
 		}
-	case 5:
+	case 4:
 		//line parser.y:46
+		{
+			Statements = append(Statements, RubyS[Rubypt-0].genericValue)
+		}
+	case 5:
+		//line parser.y:48
 		{
 			Statements = append(Statements, RubyS[Rubypt-1].genericValue)
 		}
 	case 6:
-		//line parser.y:49
+		//line parser.y:51
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func: RubyS[Rubypt-1].genericValue.StringValue(),
-				Args: []ast.Node{RubyS[Rubypt-0].genericValue},
+				Args: RubyS[Rubypt-0].genericSlice,
 			}
 		}
 	case 7:
-		//line parser.y:56
+		//line parser.y:58
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func: RubyS[Rubypt-2].genericValue.StringValue(),
-				Args: []ast.Node{RubyS[Rubypt-0].genericValue},
+				Args: RubyS[Rubypt-0].genericSlice,
 			}
 		}
 	case 8:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+		//line parser.y:66
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
 	case 9:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+		//line parser.y:68
+		{
+			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
+		}
+	case 10:
+		//line parser.y:72
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 11:
+		//line parser.y:76
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
 	case 12:
 		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	case 13:
