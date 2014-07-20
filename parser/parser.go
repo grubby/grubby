@@ -36,7 +36,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:81
+//line parser.y:79
 
 //line yacctab:1
 var RubyExca = []int{
@@ -45,7 +45,7 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 14
+const RubyNprod = 15
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
@@ -70,12 +70,12 @@ var RubyPgo = []int{
 var RubyR1 = []int{
 
 	0, 5, 5, 6, 6, 6, 2, 2, 3, 3,
-	4, 4, 1, 1,
+	4, 4, 4, 1, 1,
 }
 var RubyR2 = []int{
 
 	0, 0, 2, 1, 1, 2, 2, 3, 1, 3,
-	1, 4, 1, 1,
+	0, 1, 4, 1, 1,
 }
 var RubyChk = []int{
 
@@ -84,8 +84,8 @@ var RubyChk = []int{
 }
 var RubyDef = []int{
 
-	1, -2, 2, 3, 4, 13, 12, 5, 6, 0,
-	8, 0, 7, 0, 10, 9, 0, 0, 11,
+	1, -2, 2, 3, 4, 14, 13, 5, 6, 0,
+	8, 10, 7, 0, 11, 9, 0, 0, 12,
 }
 var RubyTok1 = []int{
 
@@ -369,18 +369,23 @@ Rubydefault:
 			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
 		}
 	case 10:
+		//line parser.y:70
+		{
+			RubyVAL.genericSlice = ast.Nodes{}
+		}
+	case 11:
 		//line parser.y:72
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
-	case 11:
-		//line parser.y:76
+	case 12:
+		//line parser.y:74
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
-	case 12:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	case 13:
+		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+	case 14:
 		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	}
 	goto Rubystack /* stack new state and value */

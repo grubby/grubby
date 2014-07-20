@@ -127,5 +127,17 @@ var _ = Describe("goyacc parser", func() {
 				}))
 			})
 		})
+
+		Context("without args", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("puts()")
+			})
+
+			It("returns a call expression without args", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.CallExpression{Func: "puts", Args: []ast.Node{}},
+				}))
+			})
+		})
 	})
 })

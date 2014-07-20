@@ -40,8 +40,8 @@ Grubby yacc
 * [ ] parse call expressions
     * [x] one arg
     * [x] with parens
-    * [ ] many args
-    * [ ] no args
+    * [x] many args
+    * [x] no args
 * [ ] parse method definitions
     * [ ] no args
     * [ ] one arg

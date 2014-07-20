@@ -67,7 +67,8 @@ callargs : NODE
 | LPAREN nodes_with_commas RPAREN
   { $$ = $2 };
 
-nodes_with_commas: NODE
+nodes_with_commas: /* empty */ { $$ = ast.Nodes{} }
+| NODE
   { $$ = append($$, $1); }
 | nodes_with_commas COMMA " " NODE
   { $$ = append($$, $4); };
