@@ -346,7 +346,7 @@ Rubydefault:
 		//line parser.y:51
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func: RubyS[Rubypt-1].genericValue.StringValue(),
+				Func: RubyS[Rubypt-1].genericValue,
 				Args: RubyS[Rubypt-0].genericSlice,
 			}
 		}
@@ -354,7 +354,7 @@ Rubydefault:
 		//line parser.y:58
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func: RubyS[Rubypt-2].genericValue.StringValue(),
+				Func: RubyS[Rubypt-2].genericValue,
 				Args: RubyS[Rubypt-0].genericSlice,
 			}
 		}

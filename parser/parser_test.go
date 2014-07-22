@@ -102,7 +102,7 @@ var _ = Describe("goyacc parser", func() {
 			It("returns a call expression with one arg", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.CallExpression{
-						Func: "puts",
+						Func: ast.BareReference{Name: "puts"},
 						Args: []ast.Node{ast.SimpleString{Value: "'foo'"}},
 					},
 				}))
@@ -117,7 +117,7 @@ var _ = Describe("goyacc parser", func() {
 			It("returns a call expression with args", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.CallExpression{
-						Func: "puts",
+						Func: ast.BareReference{Name: "puts"},
 						Args: []ast.Node{
 							ast.SimpleString{Value: "'foo'"},
 							ast.SimpleString{Value: "'bar'"},
@@ -135,7 +135,10 @@ var _ = Describe("goyacc parser", func() {
 
 			It("returns a call expression without args", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.CallExpression{Func: "puts", Args: []ast.Node{}},
+					ast.CallExpression{
+						Func: ast.BareReference{Name: "puts"},
+						Args: []ast.Node{},
+					},
 				}))
 			})
 		})

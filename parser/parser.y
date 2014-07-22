@@ -50,14 +50,14 @@ statement : callexpr
 callexpr : REF callargs
   {
     $$ = ast.CallExpression{
-      Func: $1.StringValue(),
+      Func: $1,
       Args: $2,
     }
   }
 | REF " " callargs
   {
     $$ = ast.CallExpression{
-      Func: $1.StringValue(),
+      Func: $1,
       Args: $3,
     }
   };
