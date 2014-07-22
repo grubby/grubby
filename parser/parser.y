@@ -44,8 +44,8 @@ statement : callexpr
   { Statements = append(Statements, $1); }
 | expr
   { Statements = append(Statements, $1); }
-| expr '\n'
-  { Statements = append(Statements, $1); };
+| '\n'
+  { /* ignores new lines around statements */ } ;
 
 callexpr : REF callargs
   {

@@ -143,4 +143,21 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 	})
+
+	Describe("whitespace", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+puts()
+`)
+		})
+
+		It("parses just fine", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.CallExpression{
+					Func: ast.BareReference{Name: "puts"},
+					Args: []ast.Node{},
+				},
+			}))
+		})
+	})
 })
