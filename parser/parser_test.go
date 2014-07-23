@@ -160,4 +160,29 @@ puts()
 			}))
 		})
 	})
+
+	Describe("method definitions", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+def something
+  puts 'hai'
+end
+`)
+		})
+
+		It("returns a function declaration with the body set", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.FuncDecl{
+					Name: "something",
+					Args: []ast.Node{},
+					Body: []ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "puts"},
+							Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+						},
+					},
+				},
+			}))
+		})
+	})
 })
