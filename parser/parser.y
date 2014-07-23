@@ -25,6 +25,11 @@ var Statements []ast.Node
 %token <genericValue> RPAREN
 %token <genericValue> COMMA
 
+// keywords
+%token <genericValue> DEF
+%token <genericValue> END
+%token <genericValue> CLASS
+
 /*
   eg: if you want to be able to assign to something in the RubySymType
       struct, or if you want a terminating node below, you'll want to

@@ -120,6 +120,14 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 		}()
 
 		switch {
+		case token == "def":
+			debug("def")
+			return DEF
+		case token == "end":
+			debug("end")
+			return END
+		case token == "class":
+			return CLASS
 		case integerRegexp.MatchString(token):
 			debug("integer: %s", token)
 			intVal, err := strconv.Atoi(token)
