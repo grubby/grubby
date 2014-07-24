@@ -35,7 +35,7 @@ type CallExpression struct {
 }
 
 type FuncDecl struct {
-	Name string
+	Name BareReference
 	Args []Node
 	Body []Node
 }

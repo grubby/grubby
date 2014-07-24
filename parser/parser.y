@@ -32,25 +32,50 @@ var Statements []ast.Node
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
-      struct, or if you want a terminating node below, you'll want to
+      struct, or if you want a terminating node below, you will want to
       declare a type (or possibly just a token)
 */
 
+// single nodes
 %type <genericValue> expr
 %type <genericValue> callexpr
+%type <genericValue> statement
+%type <genericValue> func_declaration
+
+// slice nodes
+%type <genericSlice> list
 %type <genericSlice> callargs
+%type <genericSlice> capture_list
 %type <genericSlice> nodes_with_commas
 
 %%
 
-list	: /* empty */ | list statement;
+capture_list : /* empty */
+  { Statements = []ast.Node{} }
+| capture_list statement
+  {
+		if $2 != nil {
+			Statements = append(Statements, $2)
+		}
+	};
+
+list : /* empty */
+  { $$ = []ast.Node{} }
+| list statement
+  {
+		if $2 != nil {
+			$$ = append($$, $2)
+		}
+	};
 
 statement : callexpr
-  { Statements = append(Statements, $1); }
+  { $$ = $1 }
 | expr
-  { Statements = append(Statements, $1); }
+  { $$ = $1 }
 | '\n'
-  { /* ignores new lines around statements */ } ;
+  { $$ = nil; /* ignores new lines around statements */ }
+| ' '
+  { $$ = nil; /* ignores whitespace around statements */ };
 
 callexpr : REF callargs
   {
@@ -72,13 +97,21 @@ callargs : NODE
 | LPAREN nodes_with_commas RPAREN
   { $$ = $2 };
 
-nodes_with_commas: /* empty */ { $$ = ast.Nodes{} }
+nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | NODE
   { $$ = append($$, $1); }
 | nodes_with_commas COMMA " " NODE
   { $$ = append($$, $4); };
 
-expr : NODE | REF;
+expr : NODE | REF | func_declaration;
 
+func_declaration : DEF " " REF "\n" list END
+  {
+		$$ = ast.FuncDecl{
+			Name: $3.(ast.BareReference),
+      Args: []ast.Node{},
+			Body: $5,
+    }
+  };
 
 %%
