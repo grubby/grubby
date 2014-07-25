@@ -42,7 +42,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:117
+//line parser.y:126
 
 //line yacctab:1
 var RubyExca = []int{
@@ -51,52 +51,57 @@ var RubyExca = []int{
 	-2, 0,
 }
 
-const RubyNprod = 20
+const RubyNprod = 24
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 34
+const RubyLast = 39
 
 var RubyAct = []int{
 
-	2, 8, 7, 8, 7, 23, 10, 27, 10, 5,
-	6, 5, 6, 13, 15, 14, 11, 22, 20, 21,
-	19, 13, 12, 14, 25, 26, 18, 17, 1, 16,
-	24, 9, 3, 4,
+	2, 11, 8, 7, 8, 7, 25, 10, 31, 10,
+	5, 6, 5, 6, 17, 13, 14, 15, 16, 26,
+	22, 23, 21, 24, 12, 13, 14, 15, 27, 28,
+	30, 20, 19, 18, 1, 29, 9, 3, 4,
 }
 var RubyPact = []int{
 
-	-1000, -1, -1000, -1000, -1000, -1000, -1000, 9, -1000, -1000,
-	1, -1000, 17, -1000, 22, 15, -1000, 11, -1000, 5,
-	-1000, -8, -1000, 20, -3, -1000, -1000, -1000,
+	-1000, 0, -1000, -1000, -1000, -1000, -1000, 11, -1000, -1000,
+	5, -1000, 21, -1000, -1000, 27, 17, -1000, 13, -1000,
+	-1000, 21, -1000, -7, 7, 24, -1000, -1000, -1000, -2,
+	-1000, -1000,
 }
 var RubyPgo = []int{
 
-	0, 33, 32, 0, 31, 30, 16, 28, 27,
+	0, 38, 37, 0, 36, 35, 1, 34, 33,
 }
 var RubyR1 = []int{
 
 	0, 7, 7, 5, 5, 3, 3, 3, 3, 2,
-	2, 6, 6, 8, 8, 8, 1, 1, 1, 4,
+	2, 1, 1, 1, 6, 6, 6, 6, 8, 8,
+	8, 8, 8, 4,
 }
 var RubyR2 = []int{
 
 	0, 0, 2, 0, 2, 1, 1, 1, 1, 2,
-	3, 1, 3, 0, 1, 4, 1, 1, 1, 6,
+	3, 1, 1, 1, 0, 1, 1, 3, 0, 1,
+	1, 4, 4, 7,
 }
 var RubyChk = []int{
 
 	-1000, -7, -3, -2, -1, 12, 13, 5, 4, -4,
-	9, -6, 13, 4, 6, 13, -6, -8, 4, 5,
-	7, 8, 12, 13, -5, 4, -3, 10,
+	9, -6, 13, 4, 5, 6, 13, -6, -8, 5,
+	4, 5, 7, 8, -6, 13, 12, 4, 5, -5,
+	-3, 10,
 }
 var RubyDef = []int{
 
-	1, -2, 2, 5, 6, 7, 8, 17, 16, 18,
-	0, 9, 0, 11, 13, 0, 10, 0, 14, 0,
-	12, 0, 3, 0, 0, 15, 4, 19,
+	1, -2, 2, 5, 6, 7, 8, 12, 11, 13,
+	0, 9, 14, 15, 16, 18, 0, 10, 0, 19,
+	20, 14, 17, 0, 0, 0, 3, 21, 22, 0,
+	4, 23,
 }
 var RubyTok1 = []int{
 
@@ -399,42 +404,62 @@ Rubydefault:
 			}
 		}
 	case 11:
-		//line parser.y:96
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
+		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	case 12:
-		//line parser.y:98
-		{
-			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
-		}
+		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	case 13:
-		//line parser.y:100
+		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+	case 14:
+		//line parser.y:97
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
-	case 14:
-		//line parser.y:102
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
 	case 15:
-		//line parser.y:104
+		//line parser.y:99
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 16:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+		//line parser.y:101
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
 	case 17:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+		//line parser.y:103
+		{
+			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
+		}
 	case 18:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+		//line parser.y:107
+		{
+			RubyVAL.genericSlice = ast.Nodes{}
+		}
 	case 19:
 		//line parser.y:109
 		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 20:
+		//line parser.y:111
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 21:
+		//line parser.y:113
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 22:
+		//line parser.y:115
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 23:
+		//line parser.y:118
+		{
 			RubyVAL.genericValue = ast.FuncDecl{
-				Name: RubyS[Rubypt-3].genericValue.(ast.BareReference),
-				Args: []ast.Node{},
+				Name: RubyS[Rubypt-4].genericValue.(ast.BareReference),
+				Args: RubyS[Rubypt-3].genericSlice,
 				Body: RubyS[Rubypt-1].genericSlice,
 			}
 		}

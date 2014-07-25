@@ -37,15 +37,15 @@ Grubby yacc
 * [x] parse simple strings
 * [x] parse symbols
 * [x] parse a bare reference to **something**
-* [ ] parse call expressions
+* [x] parse call expressions
     * [x] one arg
     * [x] with parens
     * [x] many args
     * [x] no args
-* [ ] parse method definitions
-    * [ ] no args
-    * [ ] one arg
-    * [ ] many args
+* [x] parse method definitions
+    * [x] no args
+    * [x] one arg
+    * [x] many args
 * [ ] parse a class
     * [ ] with a super class
     * [ ] with a namespace

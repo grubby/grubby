@@ -162,27 +162,62 @@ puts()
 	})
 
 	Describe("method definitions", func() {
-		BeforeEach(func() {
-			lexer = parser.NewLexer(`
+		Context("without parameters", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
 def something
   puts 'hai'
 end
 `)
-		})
+			})
 
-		It("returns a function declaration with the body set", func() {
-			Expect(parser.Statements).To(Equal([]ast.Node{
-				ast.FuncDecl{
-					Name: ast.BareReference{Name: "something"},
-					Args: []ast.Node{},
-					Body: []ast.Node{
-						ast.CallExpression{
-							Func: ast.BareReference{Name: "puts"},
-							Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+			It("returns a function declaration with the body set", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.FuncDecl{
+						Name: ast.BareReference{Name: "something"},
+						Args: []ast.Node{},
+						Body: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "puts"},
+								Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+							},
 						},
 					},
-				},
-			}))
+				}))
+			})
+		})
+
+		Context("with parameters", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+def multi_put(str1, str2)
+  puts str1
+  puts str2
+end
+`)
+			})
+
+			It("returns a function declaration with the args set", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.FuncDecl{
+						Name: ast.BareReference{Name: "multi_put"},
+						Args: []ast.Node{
+							ast.BareReference{Name: "str1"},
+							ast.BareReference{Name: "str2"},
+						},
+						Body: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "puts"},
+								Args: []ast.Node{ast.BareReference{Name: "str1"}},
+							},
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "puts"},
+								Args: []ast.Node{ast.BareReference{Name: "str2"}},
+							},
+						},
+					},
+				}))
+			})
 		})
 	})
 })

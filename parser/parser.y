@@ -92,25 +92,34 @@ callexpr : REF callargs
     }
   };
 
-callargs : NODE
-  {  $$ = append($$, $1) }
+expr : NODE | REF | func_declaration;
+
+callargs : /* empty */ { $$ = ast.Nodes{} }
+| NODE
+  { $$ = append($$, $1) }
+| REF
+  { $$ = append($$, $1) }
 | LPAREN nodes_with_commas RPAREN
-  { $$ = $2 };
+  {
+		$$ = $2
+	};
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
+| REF
+  { $$ = append($$, $1); }
 | NODE
   { $$ = append($$, $1); }
 | nodes_with_commas COMMA " " NODE
   { $$ = append($$, $4); };
+| nodes_with_commas COMMA " " REF
+  { $$ = append($$, $4); };
 
-expr : NODE | REF | func_declaration;
-
-func_declaration : DEF " " REF "\n" list END
+func_declaration : DEF " " REF callargs "\n" list END
   {
 		$$ = ast.FuncDecl{
 			Name: $3.(ast.BareReference),
-      Args: []ast.Node{},
-			Body: $5,
+      Args: $4,
+			Body: $6,
     }
   };
 
