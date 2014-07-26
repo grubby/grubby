@@ -220,4 +220,28 @@ end
 			})
 		})
 	})
+
+	Describe("classes", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+class Foo
+  puts 'hai'
+end
+`)
+		})
+
+		It("returns a ClassDefn with the body set", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.ClassDecl{
+					Name: ast.BareReference{Name: "Foo"},
+					Body: []ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "puts"},
+							Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+						},
+					},
+				},
+			}))
+		})
+	})
 })

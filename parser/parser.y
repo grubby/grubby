@@ -29,6 +29,7 @@ var Statements []ast.Node
 %token <genericValue> DEF
 %token <genericValue> END
 %token <genericValue> CLASS
+%token <genericValue> MODULE
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
@@ -41,6 +42,7 @@ var Statements []ast.Node
 %type <genericValue> callexpr
 %type <genericValue> statement
 %type <genericValue> func_declaration
+%type <genericValue> class_declaration
 
 // slice nodes
 %type <genericSlice> list
@@ -92,7 +94,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | func_declaration;
+expr : NODE | REF | func_declaration | class_declaration;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -120,6 +122,14 @@ func_declaration : DEF " " REF callargs "\n" list END
 			Name: $3.(ast.BareReference),
       Args: $4,
 			Body: $6,
+    }
+  };
+
+class_declaration: CLASS " " REF "\n" list END
+  {
+    $$ = ast.ClassDecl{
+       Name: $3.(ast.BareReference),
+       Body: $5,
     }
   };
 

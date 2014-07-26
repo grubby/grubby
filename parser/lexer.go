@@ -127,6 +127,7 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			debug("end")
 			return END
 		case token == "class":
+			debug("class")
 			return CLASS
 		case integerRegexp.MatchString(token):
 			debug("integer: %s", token)
@@ -168,7 +169,7 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			debug("COMMA")
 			return COMMA
 		case len(token) == 1: // ;  " " or another separator
-			debug("separator: '%s'", token)
+			debug("separator: '%s'", strings.Replace(token, string('\n'), "\\n", -1))
 			return int(rune(token[0]))
 		default:
 			panic("unknown token: " + token)
