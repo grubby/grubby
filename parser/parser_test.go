@@ -222,24 +222,45 @@ end
 	})
 
 	Describe("classes", func() {
-		BeforeEach(func() {
-			lexer = parser.NewLexer(`
+		Describe("without any frills, bells, or whistles", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
 class Foo
   puts 'hai'
 end
 `)
-		})
+			})
 
-		It("returns a ClassDefn with the body set", func() {
-			Expect(parser.Statements).To(Equal([]ast.Node{
-				ast.ClassDecl{
-					Name: ast.BareReference{Name: "Foo"},
-					Body: []ast.Node{
-						ast.CallExpression{
-							Func: ast.BareReference{Name: "puts"},
-							Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+			It("returns a ClassDefn with the body set", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.ClassDecl{
+						Name: ast.BareReference{Name: "Foo"},
+						Body: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "puts"},
+								Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+							},
 						},
 					},
+				}))
+			})
+		})
+	})
+
+	Describe("with a superclass", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+class Foo < Bar
+end
+`)
+		})
+
+		It("returns a class with the superclass set", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.ClassDecl{
+					Name:       ast.BareReference{Name: "Foo"},
+					SuperClass: ast.BareReference{Name: "Bar"},
+					Body:       []ast.Node{},
 				},
 			}))
 		})

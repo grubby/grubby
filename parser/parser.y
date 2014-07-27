@@ -31,6 +31,11 @@ var Statements []ast.Node
 %token <genericValue> CLASS
 %token <genericValue> MODULE
 
+// operators
+%token <genericValue> LESSTHAN
+%token <genericValue> GREATERTHAN
+%token <genericValue> EQUALTO
+
 /*
   eg: if you want to be able to assign to something in the RubySymType
       struct, or if you want a terminating node below, you will want to
@@ -130,6 +135,14 @@ class_declaration: CLASS " " REF "\n" list END
     $$ = ast.ClassDecl{
        Name: $3.(ast.BareReference),
        Body: $5,
+    }
+  }
+| CLASS " " REF " " LESSTHAN " " REF "\n" list END
+  {
+    $$ = ast.ClassDecl{
+       Name: $3.(ast.BareReference),
+       SuperClass: $7.(ast.BareReference),
+       Body: $9,
     }
   };
 
