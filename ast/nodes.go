@@ -41,8 +41,13 @@ type FuncDecl struct {
 }
 
 type ClassDecl struct {
-	Name       BareReference
-	SuperClass BareReference
+	Name       string
+	SuperClass Class
 	Namespace  string
 	Body       []Node
+}
+
+type Class struct {
+	Name      string
+	Namespace string
 }

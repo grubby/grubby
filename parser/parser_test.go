@@ -234,7 +234,7 @@ end
 			It("returns a ClassDefn with the body set", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.ClassDecl{
-						Name: ast.BareReference{Name: "Foo"},
+						Name: "Foo",
 						Body: []ast.Node{
 							ast.CallExpression{
 								Func: ast.BareReference{Name: "puts"},
@@ -255,11 +255,31 @@ end
 `)
 		})
 
-		It("returns a class with the superclass set", func() {
+		It("returns a class with the given superclass", func() {
 			Expect(parser.Statements).To(Equal([]ast.Node{
 				ast.ClassDecl{
-					Name:       ast.BareReference{Name: "Foo"},
-					SuperClass: ast.BareReference{Name: "Bar"},
+					Name:       "Foo",
+					SuperClass: ast.Class{Name: "Bar"},
+					Body:       []ast.Node{},
+				},
+			}))
+		})
+	})
+
+	Describe("with namespaces", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+class Foo::Biz::Bar < Foo::Biz::Baz
+end
+`)
+		})
+
+		It("returns a class with the given namespace", func() {
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.ClassDecl{
+					Name:       "Bar",
+					SuperClass: ast.Class{Name: "Baz", Namespace: "Foo::Biz"},
+					Namespace:  "Foo::Biz",
 					Body:       []ast.Node{},
 				},
 			}))

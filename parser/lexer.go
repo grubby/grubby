@@ -14,7 +14,6 @@ var (
 	integerRegexp   = regexp.MustCompile("^[0-9]+$")
 	floatRegexp     = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
 	stringRegexp    = regexp.MustCompile("^'[^']*'$")
-	symbolRegexp    = regexp.MustCompile("^:[a-zA-Z\\-_\\+\\*][a-zA-Z\\-_+\\*0-9]*$")
 	referenceRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 	DebugStatements = []string{}
 )
@@ -45,8 +44,6 @@ func (lexer *rubyLex) tokenize() {
 			lexer.tokens = append(lexer.tokens, string(char))
 		case char == '\'':
 			lexer.tokenizeString()
-		case char == ':':
-			lexer.tokenizeSymbol()
 		default:
 			lexer.currentToken += string(char)
 		}
@@ -83,27 +80,6 @@ func (lexer *rubyLex) tokenizeString() {
 	}
 
 	// FIXME: needs to blow up if the string was never closed
-	lexer.currentToken = token
-}
-
-func (lexer *rubyLex) tokenizeSymbol() {
-	token := string(lexer.input[lexer.position])
-	for i := lexer.position + 1; i < len(lexer.input); i++ {
-		lexer.position = i
-		char := rune(lexer.input[i])
-
-		if isSeparator(char) {
-			lexer.position = i - 1
-			break
-		}
-
-		if !unicode.IsLetter(char) && !unicode.IsDigit(char) {
-			panic("unexpected character in token: " + string(char))
-		}
-
-		token += string(char)
-	}
-
 	lexer.currentToken = token
 }
 
@@ -151,10 +127,6 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			debug("string: %s", token)
 			lval.genericValue = ast.SimpleString{Value: token}
 			return NODE
-		case symbolRegexp.MatchString(token):
-			debug("symbol: %s", token)
-			lval.genericValue = ast.Symbol{Name: token[1:]}
-			return NODE
 		case referenceRegexp.MatchString(token):
 			debug("ref: %s", token)
 			lval.genericValue = ast.BareReference{Name: token}
@@ -174,11 +146,14 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 		case token == ",":
 			debug("COMMA")
 			return COMMA
+		case token == ":":
+			debug("COLON")
+			return COLON
 		case len(token) == 1: // ;  " " or another separator
 			debug("separator: '%s'", strings.Replace(token, string('\n'), "\\n", -1))
 			return int(rune(token[0]))
 		default:
-			panic("unknown token: " + token)
+			panic(fmt.Sprintf("unknown token: '%s'", token))
 		}
 	}
 
@@ -192,7 +167,7 @@ func (l *rubyLex) Error(s string) {
 // FIXME: is there a concept of a character set that would make this faster?
 //        barring that, maybe just a map lookup?
 func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ','
+	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':'
 }
 
 func debug(formatString string, args ...interface{}) {
