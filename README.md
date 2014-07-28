@@ -52,8 +52,8 @@ Grubby yacc
     * [x] with a body
     * [x] class + instance methods
     * [x] class + class methods
-* [ ] define a module
-* [ ] assignment
+* [x] define a module
+* [x] assignment
 * [ ] postfix // prefix operations
 * [ ] binary operators
 * [ ] hashes
