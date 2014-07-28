@@ -46,12 +46,12 @@ Grubby yacc
     * [x] no args
     * [x] one arg
     * [x] many args
-* [ ] parse a class
-    * [ ] with a super class
-    * [ ] with a namespace
-    * [ ] with a body
-    * [ ] class + instance methods
-    * [ ] class + class methods
+* [x] parse a class
+    * [x] with a super class
+    * [x] with a namespace
+    * [x] with a body
+    * [x] class + instance methods
+    * [x] class + class methods
 * [ ] define a module
 * [ ] assignment
 * [ ] postfix // prefix operations
@@ -68,24 +68,6 @@ Grubby yacc
 * [ ] semicolons
 * [ ] method calls (message passing?)
 * [ ] comments
-
-
-Grubby Lexer
-############
-* [x] class methods
-* [x] method calls with dot syntax
-* [x] semicolons
-* [x] switch to a Lex(lval *RubySymType) (int) interface
-* [ ] strings
-* [ ] array?
-* [ ] hashes
-* [ ] - , +, *, /  (etc)
-* [ ] ++, --, etc
-* [ ] assignment (optional whitespace)
-* [ ] blocks?
-* [ ] heredoc (zomgggg)
-* [ ] backtics
-* [ ] string interpolation?
 
 Grubby interpreter
 ##################

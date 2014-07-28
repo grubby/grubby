@@ -23,6 +23,7 @@ var Statements []ast.Node
 // really a field name in the above union struct
 %token <genericValue> NODE
 %token <genericValue> REF
+%token <genericValue> CAPITAL_REF
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
 %token <genericValue> COMMA
@@ -113,7 +114,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | func_declaration | class_declaration | symbol;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -161,13 +162,13 @@ class_declaration: CLASS " " class_name_with_modules "\n" list END
     }
   }
 
-class_name_with_modules: REF
+class_name_with_modules: CAPITAL_REF
   {
     $$ = ast.Class{
       Name: $1.(ast.BareReference).Name,
     }
   }
-| namespaced_modules COLON COLON REF
+| namespaced_modules COLON COLON CAPITAL_REF
   {
     $$ = ast.Class{
        Name: $4.(ast.BareReference).Name,
@@ -175,11 +176,11 @@ class_name_with_modules: REF
     }
   };
 
-namespaced_modules : REF
+namespaced_modules : CAPITAL_REF
   {
     $$ = append($$, $1.(ast.BareReference).Name)
   }
-|  namespaced_modules COLON COLON REF
+|  namespaced_modules COLON COLON CAPITAL_REF
   {
     $$ = append($$, $4.(ast.BareReference).Name)
   };

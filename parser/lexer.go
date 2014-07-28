@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -11,30 +12,33 @@ import (
 )
 
 var (
-	integerRegexp   = regexp.MustCompile("^[0-9]+$")
-	floatRegexp     = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
-	stringRegexp    = regexp.MustCompile("^'[^']*'$")
-	referenceRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
-	DebugStatements = []string{}
+	integerRegexp          = regexp.MustCompile("^[0-9]+$")
+	floatRegexp            = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
+	stringRegexp           = regexp.MustCompile("^'[^']*'$")
+	referenceRegexp        = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
+	capitalReferenceRegexp = regexp.MustCompile("^[A-Z][a-zA-Z0-9_]*$")
+	DebugStatements        = []string{}
 )
 
-type rubyLex struct {
+type RubyLex struct {
 	input        string
 	position     int
 	currentToken string
 
 	lexIndex int
 	tokens   []string
+
+	LastError error
 }
 
-func NewLexer(input string) *rubyLex {
-	lexer := &rubyLex{input: input}
+func NewLexer(input string) RubyLexer {
+	lexer := &RubyLex{input: input}
 	lexer.tokenize()
 
 	return lexer
 }
 
-func (lexer *rubyLex) tokenize() {
+func (lexer *RubyLex) tokenize() {
 	for lexer.position < len(lexer.input) {
 		char := rune(lexer.input[lexer.position])
 
@@ -55,7 +59,7 @@ func (lexer *rubyLex) tokenize() {
 	debug("Lexed %d tokens", len(lexer.tokens))
 }
 
-func (lexer *rubyLex) appendNonEmptyTokens(tokens ...string) {
+func (lexer *RubyLex) appendNonEmptyTokens(tokens ...string) {
 	defer func() {
 		lexer.currentToken = ""
 	}()
@@ -67,7 +71,7 @@ func (lexer *rubyLex) appendNonEmptyTokens(tokens ...string) {
 	}
 }
 
-func (lexer *rubyLex) tokenizeString() {
+func (lexer *RubyLex) tokenizeString() {
 	token := string(lexer.input[lexer.position])
 	for i := lexer.position + 1; i < len(lexer.input); i++ {
 		char := lexer.input[i]
@@ -83,7 +87,7 @@ func (lexer *rubyLex) tokenizeString() {
 	lexer.currentToken = token
 }
 
-func (l *rubyLex) Lex(lval *RubySymType) int {
+func (l *RubyLex) Lex(lval *RubySymType) int {
 	debug("Called Lex()")
 	defer func() {
 		debug("")
@@ -127,6 +131,10 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 			debug("string: %s", token)
 			lval.genericValue = ast.SimpleString{Value: token}
 			return NODE
+		case capitalReferenceRegexp.MatchString(token):
+			debug("capitalized ref: %s", token)
+			lval.genericValue = ast.BareReference{Name: token}
+			return CAPITAL_REF
 		case referenceRegexp.MatchString(token):
 			debug("ref: %s", token)
 			lval.genericValue = ast.BareReference{Name: token}
@@ -160,8 +168,8 @@ func (l *rubyLex) Lex(lval *RubySymType) int {
 	return 0
 }
 
-func (l *rubyLex) Error(s string) {
-	fmt.Printf("syntax error: %s\n", s)
+func (l *RubyLex) Error(error string) {
+	l.LastError = errors.New(fmt.Sprintf("syntax error: %s\n", error))
 }
 
 // FIXME: is there a concept of a character set that would make this faster?
