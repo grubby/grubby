@@ -57,3 +57,8 @@ type ModuleDecl struct {
 	Namespace string
 	Body      []Node
 }
+
+type Assignment struct {
+	LHS Node
+	RHS Node
+}

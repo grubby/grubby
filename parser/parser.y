@@ -54,6 +54,7 @@ var Statements []ast.Node
 %type <genericValue> symbol
 %type <genericValue> callexpr
 %type <genericValue> statement
+%type <genericValue> assignment
 %type <genericValue> func_declaration
 %type <genericValue> class_declaration
 %type <genericValue> module_declaration
@@ -115,7 +116,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -193,6 +194,14 @@ namespaced_modules : CAPITAL_REF
 |  namespaced_modules COLON COLON CAPITAL_REF
   {
     $$ = append($$, $4.(ast.BareReference).Name)
+  };
+
+assignment: REF " " EQUALTO " " expr
+  {
+    $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $5,
+    }
   };
 
 %%

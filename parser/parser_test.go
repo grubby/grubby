@@ -315,6 +315,21 @@ end
 				}))
 			})
 		})
+
+		Describe("assignment to a variable", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`foo = 5`)
+			})
+
+			It("returns an assignment expression", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Assignment{
+						LHS: ast.BareReference{Name: "foo"},
+						RHS: ast.ConstantInt{Value: 5},
+					},
+				}))
+			})
+		})
 	})
 
 	Describe("invalid syntax", func() {

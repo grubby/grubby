@@ -143,10 +143,13 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.BareReference{Name: token}
 			return REF
 		case token == "<":
+			debug("LESS THAN")
 			return LESSTHAN
 		case token == ">":
+			debug("GREATER THAN")
 			return GREATERTHAN
 		case token == "=":
+			debug("EQUAL")
 			return EQUALTO
 		case token == "(":
 			debug("LPAREN")
