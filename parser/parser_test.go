@@ -330,6 +330,34 @@ end
 				}))
 			})
 		})
+
+		Describe("booleans", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+true
+false
+`)
+			})
+
+			It("returns a Boolean", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Boolean{Value: true},
+					ast.Boolean{Value: false},
+				}))
+			})
+		})
+
+		PDescribe("unary operators", func() {
+			Describe("unary NOT", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`!true`)
+				})
+
+				It("returns a NegatedExpression", func() {
+					Fail("not there yet, boss")
+				})
+			})
+		})
 	})
 
 	Describe("invalid syntax", func() {

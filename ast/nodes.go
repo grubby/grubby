@@ -62,3 +62,7 @@ type Assignment struct {
 	LHS Node
 	RHS Node
 }
+
+type Boolean struct {
+	Value bool
+}

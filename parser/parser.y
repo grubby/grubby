@@ -34,6 +34,10 @@ var Statements []ast.Node
 %token <genericValue> CLASS
 %token <genericValue> MODULE
 
+// booleans
+%token <genericValue> TRUE
+%token <genericValue> FALSE
+
 // operators
 %token <genericValue> LESSTHAN
 %token <genericValue> GREATERTHAN
@@ -51,6 +55,8 @@ var Statements []ast.Node
 
 // single nodes
 %type <genericValue> expr
+%type <genericValue> true
+%type <genericValue> false
 %type <genericValue> symbol
 %type <genericValue> callexpr
 %type <genericValue> statement
@@ -116,7 +122,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -203,5 +209,8 @@ assignment: REF " " EQUALTO " " expr
       RHS: $5,
     }
   };
+
+true: TRUE { $$ = ast.Boolean{Value: true} }
+false: FALSE { $$ = ast.Boolean{Value: false} }
 
 %%

@@ -54,19 +54,25 @@ Grubby yacc
     * [x] class + class methods
 * [x] define a module
 * [x] assignment
-* [ ] postfix // prefix operations
+* [x] booleans
+* [ ] unary operators
+    * [ ] !
+    * [ ] +
+    * [ ] -
+    * [ ] ~
 * [ ] binary operators
 * [ ] hashes
 * [ ] arrays
 * [ ] blocks
+    * [ ] with block params
 * [ ] arguments on a method decl have optional parens
 * [ ] call expressions have optional parens
 * [ ] heredoc
-* [ ] globals ($: and $?)
+* [ ] globals ($: and $?, et cetera)
 * [ ] backtics
 * [ ] string interpolation
 * [ ] semicolons
-* [ ] method calls (message passing?)
+* [ ] method calls
 * [ ] comments
 
 Grubby interpreter

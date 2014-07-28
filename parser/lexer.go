@@ -112,6 +112,12 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 		case token == "module":
 			debug("module")
 			return MODULE
+		case token == "true":
+			debug("TRUE")
+			return TRUE
+		case token == "false":
+			debug("FALSE")
+			return FALSE
 		case integerRegexp.MatchString(token):
 			debug("integer: %s", token)
 			intVal, err := strconv.Atoi(token)
