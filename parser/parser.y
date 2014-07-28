@@ -56,6 +56,7 @@ var Statements []ast.Node
 %type <genericValue> statement
 %type <genericValue> func_declaration
 %type <genericValue> class_declaration
+%type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
 
 // slice nodes
@@ -114,7 +115,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -160,7 +161,16 @@ class_declaration: CLASS " " class_name_with_modules "\n" list END
        Namespace: $3.(ast.Class).Namespace,
        Body: $9,
     }
-  }
+  };
+
+module_declaration: MODULE " " class_name_with_modules "\n" list END
+  {
+    $$ = ast.ModuleDecl{
+      Name: $3.(ast.Class).Name,
+      Namespace: $3.(ast.Class).Namespace,
+      Body: $5,
+    }
+  };
 
 class_name_with_modules: CAPITAL_REF
   {

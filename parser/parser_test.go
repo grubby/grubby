@@ -290,6 +290,31 @@ end
 				}))
 			})
 		})
+
+		Describe("modules", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+module Foo::Bar::Baz
+puts 'tumescent-wasty'
+end
+`)
+			})
+
+			It("returns a module declaration", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.ModuleDecl{
+						Name:      "Baz",
+						Namespace: "Foo::Bar",
+						Body: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "puts"},
+								Args: []ast.Node{ast.SimpleString{Value: "'tumescent-wasty'"}},
+							},
+						},
+					},
+				}))
+			})
+		})
 	})
 
 	Describe("invalid syntax", func() {

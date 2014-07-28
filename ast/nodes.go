@@ -51,3 +51,9 @@ type Class struct {
 	Name      string
 	Namespace string
 }
+
+type ModuleDecl struct {
+	Name      string
+	Namespace string
+	Body      []Node
+}
