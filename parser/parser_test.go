@@ -418,6 +418,21 @@ false
 					}))
 				})
 			})
+
+			Describe("*", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("321 * 123")
+				})
+
+				It("returns a Multiplication expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Multiplication{
+							LHS: ast.ConstantInt{Value: 321},
+							RHS: ast.ConstantInt{Value: 123},
+						},
+					}))
+				})
+			})
 		})
 	})
 

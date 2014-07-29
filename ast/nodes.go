@@ -92,3 +92,8 @@ type Subtraction struct {
 	LHS Node
 	RHS Node
 }
+
+type Multiplication struct {
+	LHS Node
+	RHS Node
+}

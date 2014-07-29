@@ -46,6 +46,7 @@ var Statements []ast.Node
 %token <genericValue> COMPLEMENT
 %token <genericValue> POSITIVE
 %token <genericValue> NEGATIVE
+%token <genericValue> STAR
 
 // misc
 %token <genericValue> COLON
@@ -79,8 +80,9 @@ var Statements []ast.Node
 %type <genericValue> negative   // -
 
 // binary operator nodes
-%type <genericValue> binary_addition    // 2 + 3
-%type <genericValue> binary_subtraction // 2 - 3
+%type <genericValue> binary_addition       // 2 + 3
+%type <genericValue> binary_subtraction    // 2 - 3
+%type <genericValue> binary_multiplication // 2 * 3
 
 // slice nodes
 %type <genericSlice> list
@@ -131,7 +133,7 @@ callexpr : REF whitespace callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -235,6 +237,14 @@ binary_addition: expr whitespace POSITIVE whitespace expr
 binary_subtraction: expr whitespace NEGATIVE whitespace expr
   {
     $$ = ast.Subtraction{
+      LHS: $1,
+      RHS: $5,
+    }
+  };
+
+binary_multiplication: expr whitespace STAR whitespace expr
+  {
+    $$ = ast.Multiplication{
       LHS: $1,
       RHS: $5,
     }
