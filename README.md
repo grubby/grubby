@@ -74,10 +74,12 @@ Grubby yacc
 * [ ] semicolons
 * [ ] method calls
 * [ ] comments
+* [ ] go docs (see: http://godoc.org/github.com/robertkrimen/otto)
 
 Grubby interpreter
 ##################
 * [ ] write a simple REPL / interpreter
+* [ ] write some simple tests based on Otto: http://github.com/robertkrimen/otto
 * [ ] what does ObjectSpace need to look like?
 * [ ] what are the builtins we need to have by default?
     (Object has 97 class methods, 56 instance methods)
