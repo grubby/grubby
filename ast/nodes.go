@@ -66,3 +66,7 @@ type Assignment struct {
 type Boolean struct {
 	Value bool
 }
+
+type Negation struct {
+	Target Node
+}

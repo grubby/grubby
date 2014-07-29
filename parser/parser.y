@@ -42,6 +42,10 @@ var Statements []ast.Node
 %token <genericValue> LESSTHAN
 %token <genericValue> GREATERTHAN
 %token <genericValue> EQUALTO
+%token <genericValue> BANG
+%token <genericValue> COMPLEMENT
+%token <genericValue> PLUS
+%token <genericValue> MINUS
 
 // misc
 %token <genericValue> COLON
@@ -59,6 +63,7 @@ var Statements []ast.Node
 %type <genericValue> false
 %type <genericValue> symbol
 %type <genericValue> callexpr
+%type <genericValue> negation
 %type <genericValue> statement
 %type <genericValue> assignment
 %type <genericValue> func_declaration
@@ -122,7 +127,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -209,6 +214,8 @@ assignment: REF " " EQUALTO " " expr
       RHS: $5,
     }
   };
+
+negation: BANG expr { $$ = ast.Negation{Target: $2} };
 
 true: TRUE { $$ = ast.Boolean{Value: true} }
 false: FALSE { $$ = ast.Boolean{Value: false} }

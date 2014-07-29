@@ -169,6 +169,18 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 		case token == ":":
 			debug("COLON")
 			return COLON
+		case token == "!":
+			debug("BANG")
+			return BANG
+		case token == "~":
+			debug("COMPLEMENT")
+			return COMPLEMENT
+		case token == "+":
+			debug("PLUS")
+			return PLUS
+		case token == "-":
+			debug("MINUS")
+			return MINUS
 		case len(token) == 1: // ;  " " or another separator
 			debug("separator: '%s'", strings.Replace(token, string('\n'), "\\n", -1))
 			return int(rune(token[0]))
@@ -187,7 +199,7 @@ func (l *RubyLex) Error(error string) {
 // FIXME: is there a concept of a character set that would make this faster?
 //        barring that, maybe just a map lookup?
 func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':'
+	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-'
 }
 
 func debug(formatString string, args ...interface{}) {

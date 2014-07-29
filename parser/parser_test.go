@@ -347,14 +347,18 @@ false
 			})
 		})
 
-		PDescribe("unary operators", func() {
+		Describe("unary operators", func() {
 			Describe("unary NOT", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`!true`)
 				})
 
 				It("returns a NegatedExpression", func() {
-					Fail("not there yet, boss")
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Negation{
+							Target: ast.Boolean{Value: true},
+						},
+					}))
 				})
 			})
 		})
