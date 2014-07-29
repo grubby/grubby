@@ -353,10 +353,24 @@ false
 					lexer = parser.NewLexer(`!true`)
 				})
 
-				It("returns a NegatedExpression", func() {
+				It("returns a Negation expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Negation{
 							Target: ast.Boolean{Value: true},
+						},
+					}))
+				})
+			})
+
+			Describe("unary COMPLEMENT", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("~false")
+				})
+
+				It("returns a Complement expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Complement{
+							Target: ast.Boolean{Value: false},
 						},
 					}))
 				})

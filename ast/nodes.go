@@ -70,3 +70,7 @@ type Boolean struct {
 type Negation struct {
 	Target Node
 }
+
+type Complement struct {
+	Target Node
+}

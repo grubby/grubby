@@ -64,6 +64,7 @@ var Statements []ast.Node
 %type <genericValue> symbol
 %type <genericValue> callexpr
 %type <genericValue> negation
+%type <genericValue> complement
 %type <genericValue> statement
 %type <genericValue> assignment
 %type <genericValue> func_declaration
@@ -127,7 +128,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -216,6 +217,8 @@ assignment: REF " " EQUALTO " " expr
   };
 
 negation: BANG expr { $$ = ast.Negation{Target: $2} };
+
+complement: COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
 
 true: TRUE { $$ = ast.Boolean{Value: true} }
 false: FALSE { $$ = ast.Boolean{Value: false} }
