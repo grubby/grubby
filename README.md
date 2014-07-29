@@ -61,6 +61,22 @@ Grubby yacc
     * [x] -
     * [x] ~
 * [ ] binary operators
+    * [x] +
+    * [x] -
+    * [ ] *
+    * [ ] /
+    * [ ] %
+    * [ ] <<
+    * [ ] >>
+    * [ ] & (bitwise and)
+    * [ ] | (bitwise or)
+    * [ ] ^ (bitwise exclusive)
+    * [ ] <= >= and <>
+    * [ ] &&
+    * [ ] ||
+    * [ ] <=> == === != =~ !~
+    * [ ] fix associativity of unary + and - (try "abc - 123")
+
 * [ ] hashes
 * [ ] arrays
 * [ ] blocks

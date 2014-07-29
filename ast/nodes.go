@@ -87,3 +87,8 @@ type Addition struct {
 	LHS Node
 	RHS Node
 }
+
+type Subtraction struct {
+	LHS Node
+	RHS Node
+}

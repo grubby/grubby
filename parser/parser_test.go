@@ -403,6 +403,21 @@ false
 					}))
 				})
 			})
+
+			Describe("-", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("555 - 123")
+				})
+
+				It("returns a Subtraction expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Subtraction{
+							LHS: ast.ConstantInt{Value: 555},
+							RHS: ast.ConstantInt{Value: 123},
+						},
+					}))
+				})
+			})
 		})
 	})
 

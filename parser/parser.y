@@ -79,7 +79,8 @@ var Statements []ast.Node
 %type <genericValue> negative   // -
 
 // binary operator nodes
-%type <genericValue> binary_addition // 2 + 3
+%type <genericValue> binary_addition    // 2 + 3
+%type <genericValue> binary_subtraction // 2 - 3
 
 // slice nodes
 %type <genericSlice> list
@@ -122,14 +123,7 @@ statement : callexpr
 | whitespace
   { $$ = nil; /* ignores whitespace around statements */ };
 
-callexpr : REF callargs
-  {
-    $$ = ast.CallExpression{
-      Func: $1,
-      Args: $2,
-    }
-  }
-| REF whitespace callargs
+callexpr : REF whitespace callargs
   {
     $$ = ast.CallExpression{
       Func: $1,
@@ -137,7 +131,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -230,15 +224,22 @@ complement: COMPLEMENT whitespace expr { $$ = ast.Complement{Target: $3} };
 positive: POSITIVE whitespace expr { $$ = ast.Positive{Target: $3} };
 negative: NEGATIVE whitespace expr { $$ = ast.Negative{Target: $3} };
 
-binary_addition: expr whitespace_padded_plus_sign expr
+binary_addition: expr whitespace POSITIVE whitespace expr
   {
     $$ = ast.Addition{
       LHS: $1,
-      RHS: $3,
+      RHS: $5,
     }
   };
 
-whitespace_padded_plus_sign : POSITIVE | whitespace POSITIVE whitespace;
+binary_subtraction: expr whitespace NEGATIVE whitespace expr
+  {
+    $$ = ast.Subtraction{
+      LHS: $1,
+      RHS: $5,
+    }
+  };
+
 whitespace : /* zero or more */
   { $$ = nil }
 | " " whitespace
