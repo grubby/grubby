@@ -375,6 +375,34 @@ false
 					}))
 				})
 			})
+
+			Describe("unary plus", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("+foo")
+				})
+
+				It("returns a Positive expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Positive{
+							Target: ast.BareReference{Name: "foo"},
+						},
+					}))
+				})
+			})
+
+			Describe("unary minus", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("-867.5309")
+				})
+
+				It("returns a Negative expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Negative{
+							Target: ast.ConstantFloat{Value: 867.5309},
+						},
+					}))
+				})
+			})
 		})
 	})
 

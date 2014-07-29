@@ -74,3 +74,11 @@ type Negation struct {
 type Complement struct {
 	Target Node
 }
+
+type Positive struct {
+	Target Node
+}
+
+type Negative struct {
+	Target Node
+}

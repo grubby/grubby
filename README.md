@@ -55,11 +55,11 @@ Grubby yacc
 * [x] define a module
 * [x] assignment
 * [x] booleans
-* [ ] unary operators
-    * [ ] !
-    * [ ] +
-    * [ ] -
-    * [ ] ~
+* [x] unary operators
+    * [x] !
+    * [x] +
+    * [x] -
+    * [x] ~
 * [ ] binary operators
 * [ ] hashes
 * [ ] arrays

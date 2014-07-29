@@ -176,11 +176,11 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 			debug("COMPLEMENT")
 			return COMPLEMENT
 		case token == "+":
-			debug("PLUS")
-			return PLUS
+			debug("POSITIVE")
+			return POSITIVE
 		case token == "-":
-			debug("MINUS")
-			return MINUS
+			debug("NEGATIVE")
+			return NEGATIVE
 		case len(token) == 1: // ;  " " or another separator
 			debug("separator: '%s'", strings.Replace(token, string('\n'), "\\n", -1))
 			return int(rune(token[0]))

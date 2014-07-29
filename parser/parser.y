@@ -44,8 +44,8 @@ var Statements []ast.Node
 %token <genericValue> EQUALTO
 %token <genericValue> BANG
 %token <genericValue> COMPLEMENT
-%token <genericValue> PLUS
-%token <genericValue> MINUS
+%token <genericValue> POSITIVE
+%token <genericValue> NEGATIVE
 
 // misc
 %token <genericValue> COLON
@@ -63,14 +63,18 @@ var Statements []ast.Node
 %type <genericValue> false
 %type <genericValue> symbol
 %type <genericValue> callexpr
-%type <genericValue> negation
-%type <genericValue> complement
 %type <genericValue> statement
 %type <genericValue> assignment
 %type <genericValue> func_declaration
 %type <genericValue> class_declaration
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
+
+// unary operator nodes
+%type <genericValue> negation   // !
+%type <genericValue> complement // ~
+%type <genericValue> positive   // +
+%type <genericValue> negative   // -
 
 // slice nodes
 %type <genericSlice> list
@@ -128,7 +132,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -217,8 +221,9 @@ assignment: REF " " EQUALTO " " expr
   };
 
 negation: BANG expr { $$ = ast.Negation{Target: $2} };
-
 complement: COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
+positive: POSITIVE expr { $$ = ast.Positive{Target: $2} };
+negative: NEGATIVE expr { $$ = ast.Negative{Target: $2} };
 
 true: TRUE { $$ = ast.Boolean{Value: true} }
 false: FALSE { $$ = ast.Boolean{Value: false} }
