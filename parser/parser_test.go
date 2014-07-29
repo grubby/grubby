@@ -404,6 +404,23 @@ false
 				})
 			})
 		})
+
+		Describe("binary operators", func() {
+			Describe("+", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("5 + 12")
+				})
+
+				It("returns a Addition expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Addition{
+							LHS: ast.ConstantInt{Value: 5},
+							RHS: ast.ConstantInt{Value: 12},
+						},
+					}))
+				})
+			})
+		})
 	})
 
 	Describe("invalid syntax", func() {

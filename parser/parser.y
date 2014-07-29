@@ -76,6 +76,9 @@ var Statements []ast.Node
 %type <genericValue> positive   // +
 %type <genericValue> negative   // -
 
+// binary operator nodes
+%type <genericValue> binary_addition // 2 + 3
+
 // slice nodes
 %type <genericSlice> list
 %type <genericSlice> callargs
@@ -132,7 +135,7 @@ callexpr : REF callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -224,6 +227,17 @@ negation: BANG expr { $$ = ast.Negation{Target: $2} };
 complement: COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
 positive: POSITIVE expr { $$ = ast.Positive{Target: $2} };
 negative: NEGATIVE expr { $$ = ast.Negative{Target: $2} };
+
+binary_addition: expr whitespace_padded_plus_sign expr
+  {
+    $$ = ast.Addition{
+      LHS: $1,
+      RHS: $3,
+    }
+  };
+
+whitespace_padded_plus_sign : POSITIVE | whitespace POSITIVE whitespace;
+whitespace : /* zero or more */ | " " whitespace;
 
 true: TRUE { $$ = ast.Boolean{Value: true} }
 false: FALSE { $$ = ast.Boolean{Value: false} }

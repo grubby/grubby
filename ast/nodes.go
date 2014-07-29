@@ -82,3 +82,8 @@ type Positive struct {
 type Negative struct {
 	Target Node
 }
+
+type Addition struct {
+	LHS Node
+	RHS Node
+}
