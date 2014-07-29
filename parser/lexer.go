@@ -199,7 +199,7 @@ func (l *RubyLex) Error(error string) {
 // FIXME: is there a concept of a character set that would make this faster?
 //        barring that, maybe just a map lookup?
 func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-'
+	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-' || r == '<'
 }
 
 func debug(formatString string, args ...interface{}) {

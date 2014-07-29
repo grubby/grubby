@@ -149,23 +149,6 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 
-		Describe("whitespace", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(`
-puts()
-`)
-			})
-
-			It("parses just fine", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.CallExpression{
-						Func: ast.BareReference{Name: "puts"},
-						Args: []ast.Node{},
-					},
-				}))
-			})
-		})
-
 		Describe("method definitions", func() {
 			Context("without parameters", func() {
 				BeforeEach(func() {
@@ -420,6 +403,38 @@ false
 					}))
 				})
 			})
+		})
+	})
+
+	Describe("optional whitespace is optional", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+class Foo<Bar
+	 1+1
+   5    +    5
+	 puts      'foo'
+	 puts(     'foo',    'bar', 'baz'    )
+
+	 def    something
+	           puts 'whatever'
+	   end
+
+	 def something2(  foo  ,   bar   )
+	end
+
+  abc    =   123
+
+  !  true
+  ~    true
+  +   5
+  -    123
+end
+`)
+		})
+
+		It("parses just fine", func() {
+			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+			Expect(lexer.(*parser.RubyLex).LastError).To(BeNil())
 		})
 	})
 

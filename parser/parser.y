@@ -57,6 +57,8 @@ var Statements []ast.Node
       declare a type (or possibly just a token)
 */
 
+%type <genericValue> whitespace
+
 // single nodes
 %type <genericValue> expr
 %type <genericValue> true
@@ -117,7 +119,7 @@ statement : callexpr
   { $$ = $1 }
 | '\n'
   { $$ = nil; /* ignores new lines around statements */ }
-| ' '
+| whitespace
   { $$ = nil; /* ignores whitespace around statements */ };
 
 callexpr : REF callargs
@@ -127,7 +129,7 @@ callexpr : REF callargs
       Args: $2,
     }
   }
-| REF " " callargs
+| REF whitespace callargs
   {
     $$ = ast.CallExpression{
       Func: $1,
@@ -142,9 +144,9 @@ callargs : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $1) }
 | REF
   { $$ = append($$, $1) }
-| LPAREN nodes_with_commas RPAREN
+| LPAREN whitespace nodes_with_commas whitespace RPAREN
   {
-		$$ = $2
+		$$ = $3
 	};
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
@@ -152,12 +154,12 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $1); }
 | NODE
   { $$ = append($$, $1); }
-| nodes_with_commas COMMA " " NODE
-  { $$ = append($$, $4); };
-| nodes_with_commas COMMA " " REF
-  { $$ = append($$, $4); };
+| nodes_with_commas whitespace COMMA whitespace NODE
+  { $$ = append($$, $5); };
+| nodes_with_commas whitespace COMMA whitespace REF
+  { $$ = append($$, $5); };
 
-func_declaration : DEF " " REF callargs "\n" list END
+func_declaration : DEF whitespace REF callargs "\n" list END
   {
 		$$ = ast.FuncDecl{
 			Name: $3.(ast.BareReference),
@@ -166,24 +168,24 @@ func_declaration : DEF " " REF callargs "\n" list END
     }
   };
 
-class_declaration: CLASS " " class_name_with_modules "\n" list END
+class_declaration: CLASS whitespace class_name_with_modules "\n" list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
        Body: $5,
     }
   }
-| CLASS " " class_name_with_modules " " LESSTHAN " " class_name_with_modules "\n" list END
+| CLASS whitespace class_name_with_modules LESSTHAN class_name_with_modules "\n" list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
-       SuperClass: $7.(ast.Class),
+       SuperClass: $5.(ast.Class),
        Namespace: $3.(ast.Class).Namespace,
-       Body: $9,
+       Body: $7,
     }
   };
 
-module_declaration: MODULE " " class_name_with_modules "\n" list END
+module_declaration: MODULE whitespace class_name_with_modules "\n" list END
   {
     $$ = ast.ModuleDecl{
       Name: $3.(ast.Class).Name,
@@ -192,17 +194,17 @@ module_declaration: MODULE " " class_name_with_modules "\n" list END
     }
   };
 
-class_name_with_modules: CAPITAL_REF
+class_name_with_modules: whitespace CAPITAL_REF whitespace
   {
     $$ = ast.Class{
-      Name: $1.(ast.BareReference).Name,
+      Name: $2.(ast.BareReference).Name,
     }
   }
-| namespaced_modules COLON COLON CAPITAL_REF
+| whitespace namespaced_modules COLON COLON CAPITAL_REF whitespace
   {
     $$ = ast.Class{
-       Name: $4.(ast.BareReference).Name,
-       Namespace: strings.Join($1, "::"),
+       Name: $5.(ast.BareReference).Name,
+       Namespace: strings.Join($2, "::"),
     }
   };
 
@@ -215,7 +217,7 @@ namespaced_modules : CAPITAL_REF
     $$ = append($$, $4.(ast.BareReference).Name)
   };
 
-assignment: REF " " EQUALTO " " expr
+assignment: REF whitespace EQUALTO whitespace expr
   {
     $$ = ast.Assignment{
       LHS: $1,
@@ -223,10 +225,10 @@ assignment: REF " " EQUALTO " " expr
     }
   };
 
-negation: BANG expr { $$ = ast.Negation{Target: $2} };
-complement: COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
-positive: POSITIVE expr { $$ = ast.Positive{Target: $2} };
-negative: NEGATIVE expr { $$ = ast.Negative{Target: $2} };
+negation: BANG whitespace expr { $$ = ast.Negation{Target: $3} };
+complement: COMPLEMENT whitespace expr { $$ = ast.Complement{Target: $3} };
+positive: POSITIVE whitespace expr { $$ = ast.Positive{Target: $3} };
+negative: NEGATIVE whitespace expr { $$ = ast.Negative{Target: $3} };
 
 binary_addition: expr whitespace_padded_plus_sign expr
   {
@@ -237,7 +239,12 @@ binary_addition: expr whitespace_padded_plus_sign expr
   };
 
 whitespace_padded_plus_sign : POSITIVE | whitespace POSITIVE whitespace;
-whitespace : /* zero or more */ | " " whitespace;
+whitespace : /* zero or more */
+  { $$ = nil }
+| " " whitespace
+  { $$ = nil }
+| "\t" whitespace
+  { $$ = nil };
 
 true: TRUE { $$ = ast.Boolean{Value: true} }
 false: FALSE { $$ = ast.Boolean{Value: false} }
