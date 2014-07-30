@@ -48,4 +48,13 @@ end`)
 			))
 		})
 	})
+
+	Describe("strings", func() {
+		It("returns a ruby String object", func() {
+			val, err := vm.Run("'nonrestricted-consonantize'")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
+		})
+	})
 })

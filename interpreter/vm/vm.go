@@ -54,6 +54,8 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 			method := builtins.NewMethod(funcNode.Name.Name)
 			val = method
 			vm.ObjectSpace["Kernel"].AddPrivateMethod(method)
+		case ast.SimpleString:
+			val = builtins.NewString(statement.(ast.SimpleString).Value)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
