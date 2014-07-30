@@ -5,15 +5,18 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/grubby/grubby/interpreter/vm"
 	"github.com/grubby/grubby/parser"
 )
 
 var lexer parser.RubyLexer
 
 func main() {
+	vm := vm.NewVM()
+
 	for {
-		lexer = parser.NewLexer(readInput())
-		parser.RubyParse(lexer)
+		vm.Run(readInput())
+
 		println("parsed", len(parser.Statements), "statements")
 		for _, stmt := range parser.Statements {
 			fmt.Printf("%#v\n", stmt)
@@ -22,7 +25,7 @@ func main() {
 }
 
 func readInput() string {
-	print(" > ")
+	print("> ")
 	bio := bufio.NewReader(os.Stdin)
 	userInput, err := bio.ReadString('\n')
 	if err != nil {
