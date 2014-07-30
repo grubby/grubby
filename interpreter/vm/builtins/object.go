@@ -24,3 +24,7 @@ func (object *object) AddMethod(Method) {
 func (object *object) AddPrivateMethod(Method) {
 
 }
+
+func (obj *object) String() string {
+	return "Object"
+}

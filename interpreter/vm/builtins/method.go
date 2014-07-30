@@ -1,5 +1,7 @@
 package builtins
 
+import "fmt"
+
 type method struct {
 	name            string
 	methods         []Method
@@ -33,4 +35,8 @@ func (method *method) AddMethod(Method) {
 
 func (method *method) AddPrivateMethod(Method) {
 
+}
+
+func (method *method) String() string {
+	return fmt.Sprintf("#Method: FIXME(ClassNameGoesHere)#%s", method.name)
 }

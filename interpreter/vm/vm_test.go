@@ -21,7 +21,7 @@ var _ = Describe("VM", func() {
 
 	Describe("creating a simple function", func() {
 		BeforeEach(func() {
-			err := vm.Run(`
+			_, err := vm.Run(`
 def foo
 end`)
 

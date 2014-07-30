@@ -14,7 +14,7 @@ type vm struct {
 }
 
 type VM interface {
-	Run(string) error
+	Run(string) (builtins.Value, error)
 	Get(string) (builtins.Value, error)
 	MustGet(string) builtins.Value
 }
@@ -41,20 +41,27 @@ func (vm *vm) Get(key string) (builtins.Value, error) {
 	return val, nil
 }
 
-func (vm *vm) Run(input string) error {
+func (vm *vm) Run(input string) (builtins.Value, error) {
 	lexer := parser.NewLexer(input)
 	parser.RubyParse(lexer)
 
+	var val builtins.Value
 	for _, statement := range parser.Statements {
 		switch statement.(type) {
 		case ast.FuncDecl:
 			// FIXME: assumes for now this will only ever be at the top level
 			funcNode := statement.(ast.FuncDecl)
-			vm.ObjectSpace["Kernel"].AddPrivateMethod(builtins.NewMethod(funcNode.Name.Name))
+			method := builtins.NewMethod(funcNode.Name.Name)
+			val = method
+			vm.ObjectSpace["Kernel"].AddPrivateMethod(method)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
 	}
 
-	return nil
+	if val == nil {
+		return nil, nil
+	} else {
+		return val, nil
+	}
 }

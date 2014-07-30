@@ -15,12 +15,12 @@ func main() {
 	vm := vm.NewVM()
 
 	for {
-		vm.Run(readInput())
-
-		println("parsed", len(parser.Statements), "statements")
-		for _, stmt := range parser.Statements {
-			fmt.Printf("%#v\n", stmt)
+		result, err := vm.Run(readInput())
+		if err != nil {
+			panic(err.Error())
 		}
+
+		fmt.Printf("=> %s", result.String())
 	}
 }
 

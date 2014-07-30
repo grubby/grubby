@@ -6,4 +6,6 @@ type Value interface {
 
 	AddMethod(Method)
 	AddPrivateMethod(Method)
+
+	String() string
 }

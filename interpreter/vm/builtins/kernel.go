@@ -24,3 +24,7 @@ func (kernel *kernel) AddMethod(m Method) {
 func (kernel *kernel) AddPrivateMethod(m Method) {
 	kernel.private_methods = append(kernel.private_methods, m)
 }
+
+func (kernel *kernel) String() string {
+	return "Kernel"
+}
