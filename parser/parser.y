@@ -143,7 +143,11 @@ callargs : /* empty */ { $$ = ast.Nodes{} }
 | LPAREN whitespace nodes_with_commas whitespace RPAREN
   {
 		$$ = $3
-	};
+	}
+| nodes_with_commas
+  {
+    $$ = $1
+  };
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | REF
@@ -155,12 +159,14 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | nodes_with_commas whitespace COMMA whitespace REF
   { $$ = append($$, $5); };
 
-func_declaration : DEF whitespace REF callargs "\n" list END
+// FIXME: this should use a different type than callargs
+// call args can be a list of expressions. This is just a list of REFs or NODEs
+func_declaration : DEF whitespace REF whitespace callargs whitespace "\n" list END
   {
 		$$ = ast.FuncDecl{
 			Name: $3.(ast.BareReference),
-      Args: $4,
-			Body: $6,
+      Args: $5,
+			Body: $8,
     }
   };
 

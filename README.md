@@ -55,6 +55,8 @@ Grubby yacc
 * [x] define a module
 * [x] assignment
 * [x] booleans
+* [x] arguments on a method decl have optional parens
+* [x] call expressions have optional parens
 * [x] unary operators
     * [x] !
     * [x] +
@@ -76,13 +78,10 @@ Grubby yacc
     * [ ] ||
     * [ ] <=> == === != =~ !~
     * [ ] fix associativity of unary + and - (try "abc - 123")
-
 * [ ] hashes
 * [ ] arrays
 * [ ] blocks
     * [ ] with block params
-* [ ] arguments on a method decl have optional parens
-* [ ] call expressions have optional parens
 * [ ] heredoc
 * [ ] globals ($: and $?, et cetera)
 * [ ] backtics

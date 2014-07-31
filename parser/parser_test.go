@@ -175,7 +175,7 @@ end
 				})
 			})
 
-			Context("with parameters", func() {
+			Context("with parameters surrounded by parens", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
 def multi_put(str1, str2)
@@ -201,6 +201,37 @@ end
 								ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
 									Args: []ast.Node{ast.BareReference{Name: "str2"}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
+			Context("with parameters but no parens", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def multi_put str1, str2
+  puts str1, str2
+end
+`)
+				})
+
+				It("returns a function declaration with the args set", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Name: ast.BareReference{Name: "multi_put"},
+							Args: []ast.Node{
+								ast.BareReference{Name: "str1"},
+								ast.BareReference{Name: "str2"},
+							},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{
+										ast.BareReference{Name: "str1"},
+										ast.BareReference{Name: "str2"},
+									},
 								},
 							},
 						},
