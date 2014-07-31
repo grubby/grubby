@@ -240,6 +240,34 @@ end
 			})
 		})
 
+		Describe("comments", func() {
+			Context("on a single line", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("#ceci n'est pas un ligne de code")
+				})
+
+				It("is ignored", func() {
+					Expect(parser.Statements).To(BeEmpty())
+				})
+			})
+
+			Context("at the end of a line of code", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+5#this is a comment
+12 # this is also a comment
+`)
+				})
+
+				It("reads the line of code, ignoring the comment", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.ConstantInt{Value: 5},
+						ast.ConstantInt{Value: 12},
+					}))
+				})
+			})
+		})
+
 		Describe("classes", func() {
 			Context("without any frills, bells, or whistles", func() {
 				BeforeEach(func() {

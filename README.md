@@ -88,7 +88,7 @@ Grubby yacc
 * [ ] string interpolation
 * [ ] semicolons
 * [ ] method calls
-* [ ] comments
+* [x] comments
 * [ ] go docs (see: http://godoc.org/github.com/robertkrimen/otto)
 
 Grubby interpreter

@@ -116,9 +116,9 @@ symbol : COLON REF
     $$ = ast.Symbol{Name: $2.(ast.BareReference).Name}
   };
 
-statement : callexpr
+statement : callexpr whitespace
   { $$ = $1 }
-| expr
+| expr whitespace
   { $$ = $1 }
 | '\n'
   { $$ = nil; /* ignores new lines around statements */ }

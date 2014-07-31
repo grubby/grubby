@@ -48,6 +48,9 @@ func (lexer *RubyLex) tokenize() {
 			lexer.tokens = append(lexer.tokens, string(char))
 		case char == '\'':
 			lexer.tokenizeString()
+		case char == '#':
+			lexer.appendNonEmptyTokens(lexer.currentToken)
+			lexer.readCommentUntilNewline()
 		default:
 			lexer.currentToken += string(char)
 		}
@@ -67,6 +70,18 @@ func (lexer *RubyLex) appendNonEmptyTokens(tokens ...string) {
 	for _, token := range tokens {
 		if strings.TrimSpace(token) != "" {
 			lexer.tokens = append(lexer.tokens, token)
+		}
+	}
+}
+
+func (lexer *RubyLex) readCommentUntilNewline() {
+	for i := lexer.position + 1; i < len(lexer.input); i++ {
+		lexer.position = i
+		char := lexer.input[i]
+
+		if char == '\n' {
+			lexer.position = i - 1
+			break
 		}
 	}
 }
