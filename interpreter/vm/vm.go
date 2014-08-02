@@ -56,6 +56,8 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 			vm.ObjectSpace["Kernel"].AddPrivateMethod(method)
 		case ast.SimpleString:
 			val = builtins.NewString(statement.(ast.SimpleString).Value)
+		case ast.ConstantInt:
+			val = builtins.NewInt(statement.(ast.ConstantInt).Value)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}

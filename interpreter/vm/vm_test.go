@@ -55,6 +55,17 @@ end`)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
+			Expect(val.String()).To(Equal("'nonrestricted-consonantize'"))
+		})
+	})
+
+	Describe("numbers", func() {
+		It("returns a ruby Fixnum object", func() {
+			val, err := vm.Run("5")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewInt(0)))
+			Expect(val.String()).To(Equal("5"))
 		})
 	})
 })
