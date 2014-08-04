@@ -51,6 +51,10 @@ var Statements []ast.Node
 // misc
 %token <genericValue> COLON
 %token <genericValue> DOT
+%token <genericValue> LBRACKET // "["
+%token <genericValue> RBRACKET // "]"
+%token <genericValue> LBRACE   // "{"
+%token <genericValue> RBRACE   // "}"
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
@@ -64,6 +68,7 @@ var Statements []ast.Node
 %type <genericValue> expr
 %type <genericValue> true
 %type <genericValue> false
+%type <genericValue> array
 %type <genericValue> symbol
 %type <genericValue> callexpr
 %type <genericValue> statement
@@ -133,7 +138,7 @@ callexpr : REF whitespace callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -265,5 +270,9 @@ whitespace : /* zero or more */
 
 true: TRUE { $$ = ast.Boolean{Value: true} }
 false: FALSE { $$ = ast.Boolean{Value: false} }
+array : LBRACKET whitespace nodes_with_commas whitespace RBRACKET
+  {
+    $$ = ast.Array{Nodes: $3};
+  };
 
 %%

@@ -97,3 +97,7 @@ type Multiplication struct {
 	LHS Node
 	RHS Node
 }
+
+type Array struct {
+	Nodes []Node
+}
