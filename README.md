@@ -78,8 +78,10 @@ Grubby yacc
     * [ ] ||
     * [ ] <=> == === != =~ !~
     * [ ] fix associativity of unary + and - (try "abc - 123")
-* [ ] hashes
-* [ ] arrays
+* [x] hashes
+    * [x] => syntax
+      [ ] key: value syntax
+* [x] arrays
 * [ ] blocks
     * [ ] with block params
 * [ ] heredoc

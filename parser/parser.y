@@ -47,6 +47,7 @@ var Statements []ast.Node
 %token <genericValue> POSITIVE
 %token <genericValue> NEGATIVE
 %token <genericValue> STAR
+%token <genericValue> HASHROCKET
 
 // misc
 %token <genericValue> COLON
@@ -63,10 +64,12 @@ var Statements []ast.Node
 */
 
 %type <genericValue> whitespace
+%type <genericValue> optional_newline
 
 // single nodes
 %type <genericValue> expr
 %type <genericValue> true
+%type <genericValue> hash
 %type <genericValue> false
 %type <genericValue> array
 %type <genericValue> symbol
@@ -93,6 +96,7 @@ var Statements []ast.Node
 %type <genericSlice> list
 %type <genericSlice> callargs
 %type <genericSlice> capture_list
+%type <genericSlice> key_value_pairs
 %type <genericSlice> nodes_with_commas
 %type <stringSlice> namespaced_modules
 
@@ -138,7 +142,7 @@ callexpr : REF whitespace callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -274,5 +278,26 @@ array : LBRACKET whitespace nodes_with_commas whitespace RBRACKET
   {
     $$ = ast.Array{Nodes: $3};
   };
+hash: LBRACE whitespace optional_newline whitespace key_value_pairs whitespace optional_newline whitespace RBRACE
+  {
+    pairs := []ast.HashKeyValuePair{}
+    for _, node := range $5 {
+      pairs = append(pairs, node.(ast.HashKeyValuePair))
+    }
+    $$ = ast.Hash{Pairs: pairs}
+  };
+
+optional_newline : /* possibly nothing */
+  { $$ = nil }
+| "\n"
+  { $$ = nil }
+| optional_newline whitespace "\n" whitespace
+  { $$ = nil };
+
+key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
+| expr whitespace HASHROCKET whitespace expr
+  { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $5}) }
+| key_value_pairs whitespace COMMA whitespace expr whitespace HASHROCKET whitespace expr
+  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $9}) };
 
 %%

@@ -514,6 +514,27 @@ false
 				}))
 			})
 		})
+
+		Describe("hashes", func() {
+			Context("with hashrockets", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("{:foo => bar}")
+				})
+
+				It("returns a Hash node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Hash{
+							Pairs: []ast.HashKeyValuePair{
+								{
+									Key:   ast.Symbol{Name: "foo"},
+									Value: ast.BareReference{Name: "bar"},
+								},
+							},
+						},
+					}))
+				})
+			})
+		})
 	})
 
 	Describe("optional whitespace is optional", func() {

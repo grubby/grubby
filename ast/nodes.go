@@ -101,3 +101,12 @@ type Multiplication struct {
 type Array struct {
 	Nodes []Node
 }
+
+type Hash struct {
+	Pairs []HashKeyValuePair
+}
+
+type HashKeyValuePair struct {
+	Key   Node
+	Value Node
+}
