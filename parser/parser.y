@@ -97,6 +97,7 @@ var Statements []ast.Node
 %type <genericSlice> callargs
 %type <genericSlice> capture_list
 %type <genericSlice> key_value_pairs
+%type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nodes_with_commas
 %type <stringSlice> namespaced_modules
 
@@ -285,6 +286,14 @@ hash: LBRACE whitespace optional_newline whitespace key_value_pairs whitespace o
       pairs = append(pairs, node.(ast.HashKeyValuePair))
     }
     $$ = ast.Hash{Pairs: pairs}
+  }
+| LBRACE whitespace optional_newline whitespace symbol_key_value_pairs whitespace optional_newline whitespace RBRACE
+  {
+    pairs := []ast.HashKeyValuePair{}
+    for _, node := range $5 {
+      pairs = append(pairs, node.(ast.HashKeyValuePair))
+    }
+    $$ = ast.Hash{Pairs: pairs}
   };
 
 optional_newline : /* possibly nothing */
@@ -297,7 +306,35 @@ optional_newline : /* possibly nothing */
 key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
 | expr whitespace HASHROCKET whitespace expr
   { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $5}) }
-| key_value_pairs whitespace COMMA whitespace expr whitespace HASHROCKET whitespace expr
+| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace HASHROCKET whitespace expr
+  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $9}) }
+| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace HASHROCKET whitespace expr COMMA
   { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $9}) };
+
+symbol_key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
+| REF COLON whitespace expr
+  {
+    $$ = append($$, ast.HashKeyValuePair{
+      Key: ast.Symbol{Name: $1.(ast.BareReference).Name},
+      Value: $4,
+    })
+  }
+| symbol_key_value_pairs whitespace COMMA optional_newline whitespace REF COLON whitespace expr
+  {
+    $$ = append($$, ast.HashKeyValuePair{
+      Key: ast.Symbol{Name: $6.(ast.BareReference).Name},
+      Value: $9,
+    })
+  }
+| symbol_key_value_pairs whitespace COMMA optional_newline whitespace REF COLON whitespace expr COMMA
+  {
+    $$ = append($$, ast.HashKeyValuePair{
+      Key: ast.Symbol{Name: $6.(ast.BareReference).Name},
+      Value: $9,
+    })
+  };
+
+
+optional_comma: /* nothing */ | COMMA;
 
 %%

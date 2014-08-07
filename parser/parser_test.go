@@ -534,6 +534,31 @@ false
 					}))
 				})
 			})
+
+			Context("with 1.9 'key: value' pairs", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`{
+key: value,
+foo: bar,
+}`)
+				})
+
+				It("returns a Hash node with symbol keys", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Hash{
+							Pairs: []ast.HashKeyValuePair{
+								{
+									Key:   ast.Symbol{Name: "key"},
+									Value: ast.BareReference{Name: "value"},
+								}, {
+									Key:   ast.Symbol{Name: "foo"},
+									Value: ast.BareReference{Name: "bar"},
+								},
+							},
+						},
+					}))
+				})
+			})
 		})
 	})
 
