@@ -80,7 +80,7 @@ Grubby yacc
     * [ ] fix associativity of unary + and - (try "abc - 123")
 * [x] hashes
     * [x] => syntax
-      [ ] key: value syntax
+      [x] ruby 1.9 {key: value} syntax
 * [x] arrays
 * [ ] blocks
     * [ ] with block params
