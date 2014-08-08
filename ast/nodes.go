@@ -30,7 +30,7 @@ type BareReference struct {
 }
 
 type CallExpression struct {
-	Func Node
+	Func BareReference
 	Args []Node
 }
 

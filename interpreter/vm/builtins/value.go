@@ -8,4 +8,5 @@ type Value interface {
 	AddPrivateMethod(Method)
 
 	String() string
+	Class() Class
 }

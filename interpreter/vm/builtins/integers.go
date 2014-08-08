@@ -31,3 +31,7 @@ func (intValue *intValue) AddPrivateMethod(m Method) {
 func (intValue *intValue) String() string {
 	return fmt.Sprintf("%d", intValue.value)
 }
+
+func (intValue *intValue) Class() Class {
+	return nil
+}

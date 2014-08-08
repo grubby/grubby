@@ -138,7 +138,7 @@ statement : callexpr whitespace
 callexpr : REF whitespace callargs
   {
     $$ = ast.CallExpression{
-      Func: $1,
+      Func: $1.(ast.BareReference),
       Args: $3,
     }
   };

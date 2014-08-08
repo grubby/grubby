@@ -2,6 +2,7 @@ package vm_test
 
 import (
 	"github.com/grubby/grubby/interpreter/vm/builtins"
+	"github.com/grubby/grubby/interpreter/vm/builtins/errors"
 
 	. "github.com/grubby/grubby/interpreter/vm"
 	. "github.com/onsi/ginkgo"
@@ -31,9 +32,8 @@ end`)
 		It("creates a private method on Kernel", func() {
 			kernel, err := vm.Get("Kernel")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(kernel.PrivateMethods()).To(ContainElement(
-				builtins.NewMethod("foo"),
-			))
+			Expect(len(kernel.PrivateMethods())).To(Equal(1))
+			Expect(kernel.PrivateMethods()[0].Name()).To(Equal("foo"))
 		})
 
 		// FIXME: to fix this, methods should know about
@@ -44,7 +44,7 @@ end`)
 			object, err := vm.Get("Object")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(object.PrivateMethods()).To(ContainElement(
-				builtins.NewMethod("foo"),
+				builtins.NewMethod("foo", nil),
 			))
 		})
 	})
@@ -66,6 +66,15 @@ end`)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(BeAssignableToTypeOf(builtins.NewInt(0)))
 			Expect(val.String()).To(Equal("5"))
+		})
+	})
+
+	Describe("the require method on Kernel", func() {
+		It("searches for a file with the given name", func() {
+			_, err := vm.Run("require 'something'")
+
+			Expect(err).To(HaveOccurred())
+			Expect(err).To(BeAssignableToTypeOf(errors.NewLoadError("")))
 		})
 	})
 })

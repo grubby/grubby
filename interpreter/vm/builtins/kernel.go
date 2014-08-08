@@ -5,7 +5,7 @@ type kernel struct {
 	private_methods []Method
 }
 
-func NewGlobalKernel() Value {
+func NewGlobalKernelClass() Value {
 	return &kernel{}
 }
 
@@ -27,4 +27,8 @@ func (kernel *kernel) AddPrivateMethod(m Method) {
 
 func (kernel *kernel) String() string {
 	return "Kernel"
+}
+
+func (kernel *kernel) Class() Class {
+	return nil
 }

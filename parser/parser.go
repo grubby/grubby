@@ -576,7 +576,7 @@ Rubydefault:
 		//line parser.y:139
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func: RubyS[Rubypt-2].genericValue,
+				Func: RubyS[Rubypt-2].genericValue.(ast.BareReference),
 				Args: RubyS[Rubypt-0].genericSlice,
 			}
 		}
