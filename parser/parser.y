@@ -56,6 +56,7 @@ var Statements []ast.Node
 %token <genericValue> RBRACKET // "]"
 %token <genericValue> LBRACE   // "{"
 %token <genericValue> RBRACE   // "}"
+%token <genericValue> DOLLARSIGN
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
@@ -72,6 +73,7 @@ var Statements []ast.Node
 %type <genericValue> hash
 %type <genericValue> false
 %type <genericValue> array
+%type <genericValue> global
 %type <genericValue> symbol
 %type <genericValue> callexpr
 %type <genericValue> statement
@@ -143,7 +145,7 @@ callexpr : REF whitespace callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash;
+expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | global;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -336,5 +338,10 @@ symbol_key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
 
 
 optional_comma: /* nothing */ | COMMA;
+
+global: DOLLARSIGN REF
+  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
+| DOLLARSIGN CAPITAL_REF
+  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} };
 
 %%

@@ -560,6 +560,18 @@ foo: bar,
 				})
 			})
 		})
+
+		Describe("globals", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("$LOAD_PATH")
+			})
+
+			It("should be parsed as a GlobalVariable", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.GlobalVariable{Name: "LOAD_PATH"},
+				}))
+			})
+		})
 	})
 
 	Describe("optional whitespace is optional", func() {

@@ -214,6 +214,9 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 		case token == "=>":
 			debug("HASHROCKET")
 			return HASHROCKET
+		case token == "$":
+			debug("DOLLARSIGN")
+			return DOLLARSIGN
 		case len(token) == 1: // ;  " " or another separator
 			debug("separator: '%s'", strings.Replace(token, string('\n'), "\\n", -1))
 			return int(rune(token[0]))
@@ -231,8 +234,10 @@ func (l *RubyLex) Error(error string) {
 
 // FIXME: is there a concept of a character set that would make this faster?
 //        barring that, maybe just a map lookup?
+// a better fix would be to reimplement this parser using the style of tokenization
+// that Rob Pike discussed in his talk on the Golang template parser / lexer
 func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-' || r == '<' || r == '*' || r == '[' || r == ']' || r == '{' || r == '}'
+	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-' || r == '<' || r == '*' || r == '[' || r == ']' || r == '{' || r == '}' || r == '$'
 }
 
 func debug(formatString string, args ...interface{}) {

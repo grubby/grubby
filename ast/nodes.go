@@ -110,3 +110,7 @@ type HashKeyValuePair struct {
 	Key   Node
 	Value Node
 }
+
+type GlobalVariable struct {
+	Name string
+}
