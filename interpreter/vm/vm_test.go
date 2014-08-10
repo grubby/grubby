@@ -95,4 +95,11 @@ end`)
 			})
 		})
 	})
+
+	Describe("File class", func() {
+		It("exists", func() {
+			_, err := vm.Get("File")
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
 })
