@@ -1,28 +1,29 @@
 package builtins
 
+import (
+	"os"
+	"path/filepath"
+)
+
 type file struct {
-	methods         []Method
-	private_methods []Method
+	valueStub
 }
 
 func NewFileClass() Value {
-	return &file{}
-}
+	f := &file{}
+	f.initialize()
+	f.AddMethod(NewMethod("expand_path", func(args ...Value) (Value, error) {
+		arg := args[0].(*StringValue).String()
 
-func (file *file) Methods() []Method {
-	return file.methods
-}
+		if arg[0] == '~' {
+			arg = os.Getenv("HOME") + arg[1:]
+		}
 
-func (file *file) PrivateMethods() []Method {
-	return file.private_methods
-}
+		path, _ := filepath.Abs(arg)
+		return NewString(path), nil
+	}))
 
-func (file *file) AddMethod(m Method) {
-	file.methods = append(file.methods, m)
-}
-
-func (file *file) AddPrivateMethod(m Method) {
-	file.private_methods = append(file.private_methods, m)
+	return f
 }
 
 func (file *file) String() string {
@@ -31,12 +32,4 @@ func (file *file) String() string {
 
 func (file *file) New() Value {
 	return file
-}
-
-func (file *file) Class() Class {
-	return file
-}
-
-func (file *file) SuperClass() Class {
-	return nil
 }

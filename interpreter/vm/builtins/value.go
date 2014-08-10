@@ -1,7 +1,10 @@
 package builtins
 
 type Value interface {
+	Method(string) (Method, error)
 	Methods() []Method
+
+	PrivateMethod(string) (Method, error)
 	PrivateMethods() []Method
 
 	AddMethod(Method)

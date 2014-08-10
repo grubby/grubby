@@ -1,6 +1,8 @@
 package vm_test
 
 import (
+	"os"
+
 	"github.com/grubby/grubby/interpreter/vm/builtins"
 	"github.com/grubby/grubby/interpreter/vm/builtins/errors"
 
@@ -31,10 +33,11 @@ end`)
 		})
 
 		It("creates a private method on Kernel", func() {
-			kernel, err := vm.Get("Kernel")
+			kernel := vm.MustGet("Kernel")
+			method, err := kernel.PrivateMethod("foo")
+
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(kernel.PrivateMethods())).To(Equal(1))
-			Expect(kernel.PrivateMethods()[0].Name()).To(Equal("foo"))
+			Expect(method.Name()).To(Equal("foo"))
 		})
 
 		// FIXME: to fix this, methods should know about
@@ -85,21 +88,28 @@ end`)
 
 			It("requires the file", func() {
 				_, err := vm.Run("require 'foo'")
-
 				Expect(err).ToNot(HaveOccurred())
 
-				kernel, err := vm.Get("Kernel")
+				kernel := vm.MustGet("Kernel")
+				method, err := kernel.PrivateMethod("foo")
+
 				Expect(err).ToNot(HaveOccurred())
-				Expect(len(kernel.PrivateMethods())).To(Equal(1))
-				Expect(kernel.PrivateMethods()[0].Name()).To(Equal("foo"))
+				Expect(method.Name()).To(Equal("foo"))
 			})
 		})
 	})
 
 	Describe("File class", func() {
-		It("exists", func() {
-			_, err := vm.Get("File")
+		It("has a reasonable .expand_path method", func() {
+			fileClass, err := vm.Get("File")
 			Expect(err).ToNot(HaveOccurred())
+
+			method, err := fileClass.Method("expand_path")
+			Expect(err).ToNot(HaveOccurred())
+
+			result, err := method.Execute(builtins.NewString("~/foobar"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.String()).To(Equal(os.Getenv("HOME") + "/foobar"))
 		})
 	})
 })

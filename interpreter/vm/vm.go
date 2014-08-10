@@ -109,8 +109,10 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 }
 
 func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) (builtins.Value, error) {
-	var val builtins.Value
-	var err error
+	var (
+		returnValue builtins.Value
+		returnErr   error
+	)
 
 	for _, statement := range statements {
 		switch statement.(type) {
@@ -122,25 +124,18 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			method := builtins.NewMethod(funcNode.Name.Name, func(args ...builtins.Value) (builtins.Value, error) {
 				return nil, nil
 			})
-			val = method
+			returnValue = method
 			vm.ObjectSpace["Kernel"].AddPrivateMethod(method)
 		case ast.SimpleString:
-			val = builtins.NewString(statement.(ast.SimpleString).Value)
+			returnValue = builtins.NewString(statement.(ast.SimpleString).Value)
 		case ast.ConstantInt:
-			val = builtins.NewInt(statement.(ast.ConstantInt).Value)
+			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
 		case ast.CallExpression:
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)
+			method, err := context.Method(callExpr.Func.Name)
 
-			// FIXME: this should not be a linear time lookup
-			for _, m := range context.Methods() {
-				if m.Name() == callExpr.Func.Name {
-					method = m
-					break
-				}
-			}
-
-			if method == nil {
+			if err != nil {
 				err := builtin_errors.NewNameError(callExpr.Func.Name, context.String(), context.Class().String())
 				return nil, err
 			}
@@ -155,12 +150,11 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 				args = append(args, arg)
 			}
 
-			val, err = method.Execute(args...)
-
+			returnValue, returnErr = method.Execute(args...)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
 	}
 
-	return val, err
+	return returnValue, returnErr
 }
