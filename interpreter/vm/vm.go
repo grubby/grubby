@@ -3,7 +3,9 @@ package vm
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/grubby/grubby/ast"
 	"github.com/grubby/grubby/interpreter/vm/builtins"
@@ -13,6 +15,7 @@ import (
 
 type vm struct {
 	ObjectSpace map[string]builtins.Value
+	Globals     map[string]builtins.Value
 }
 
 type VM interface {
@@ -23,8 +26,14 @@ type VM interface {
 
 func NewVM() VM {
 	vm := &vm{
+		Globals:     make(map[string]builtins.Value),
 		ObjectSpace: make(map[string]builtins.Value),
 	}
+
+	loadPath := builtins.NewArrayClass()
+	vm.Globals["$LOAD_PATH"] = loadPath
+	vm.Globals["$:"] = loadPath // FIXME: add a test that these are the same object
+
 	objectClass := builtins.NewGlobalObjectClass()
 	vm.ObjectSpace["Object"] = objectClass
 	vm.ObjectSpace["Kernel"] = builtins.NewGlobalKernelClass()
@@ -34,14 +43,28 @@ func NewVM() VM {
 		return builtins.NewString("main"), nil
 	}))
 	main.AddMethod(builtins.NewMethod("require", func(args ...builtins.Value) (builtins.Value, error) {
-		fileName := args[0].(*builtins.StringValue)
-		_, err := os.Open(fileName.String())
-		if err != nil {
-			err := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName.String())
-			return nil, builtin_errors.NewLoadError(err)
+		fileName := args[0].(*builtins.StringValue).String()
+		fileName = fileName[1 : len(fileName)-1]
+
+		for _, pathStr := range loadPath.(*builtins.Array).Members() {
+			path := pathStr.(*builtins.StringValue)
+			fullPath := filepath.Join(path.String(), fileName+".rb")
+			file, err := os.Open(fullPath)
+			if err != nil {
+				continue
+			}
+
+			contents, err := ioutil.ReadAll(file)
+
+			if err == nil {
+				vm.Run(string(contents))
+				return nil, nil
+			}
 		}
 
-		return nil, nil
+		err := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
+		return nil, builtin_errors.NewLoadError(err)
+
 	}))
 	vm.ObjectSpace["main"] = main
 
@@ -49,16 +72,31 @@ func NewVM() VM {
 }
 
 func (vm *vm) MustGet(key string) builtins.Value {
-	return vm.ObjectSpace[key]
+	val, ok := vm.ObjectSpace[key]
+	if ok {
+		return val
+	}
+
+	val, ok = vm.Globals[key]
+	if ok {
+		return val
+	}
+
+	return nil
 }
 
 func (vm *vm) Get(key string) (builtins.Value, error) {
 	val, ok := vm.ObjectSpace[key]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("NameError: undefined local variable or method '%s' for main:Object", key))
+	if ok {
+		return val, nil
 	}
 
-	return val, nil
+	val, ok = vm.Globals[key]
+	if ok {
+		return val, nil
+	}
+
+	return nil, errors.New(fmt.Sprintf("'%s' is undefined", key))
 }
 
 func (vm *vm) Run(input string) (builtins.Value, error) {

@@ -5,6 +5,7 @@ import (
 	"github.com/grubby/grubby/interpreter/vm/builtins/errors"
 
 	. "github.com/grubby/grubby/interpreter/vm"
+	. "github.com/grubby/grubby/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -75,6 +76,23 @@ end`)
 
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(BeAssignableToTypeOf(errors.NewLoadError("")))
+		})
+
+		Context("with a load path and a file to require", func() {
+			BeforeEach(func() {
+				SetupLoadPathWithAFileToRequire(vm)
+			})
+
+			It("requires the file", func() {
+				_, err := vm.Run("require 'foo'")
+
+				Expect(err).ToNot(HaveOccurred())
+
+				kernel, err := vm.Get("Kernel")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(kernel.PrivateMethods())).To(Equal(1))
+				Expect(kernel.PrivateMethods()[0].Name()).To(Equal("foo"))
+			})
 		})
 	})
 })

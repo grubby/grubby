@@ -95,9 +95,9 @@ Grubby yacc
 
 Grubby interpreter
 ##################
-* [ ] write a simple REPL / interpreter
-* [ ] write some simple tests based on Otto: http://github.com/robertkrimen/otto
-* [ ] what does ObjectSpace need to look like?
+* [x] write a simple REPL / interpreter
+* [x] write some simple tests based on Otto: http://github.com/robertkrimen/otto
+* [x] what does ObjectSpace need to look like?
 * [ ] what are the builtins we need to have by default?
     (Object has 97 class methods, 56 instance methods)
     * [ ] by default method calls go to Kernel
@@ -151,7 +151,7 @@ Grubby interpreter
         * [ ] exit
         * [ ] abort
         * [ ] load
-        * [ ] require
+        * [x] require
         * [ ] require_relative
         * [ ] autoload
         * [ ] autoload?
