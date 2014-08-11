@@ -61,9 +61,9 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 
-		Describe("symbols", func() {
+		FDescribe("symbols", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer(":foo")
+				lexer = parser.NewBetterLexer(":foo")
 			})
 
 			It("returns an ast.Symbol", func() {

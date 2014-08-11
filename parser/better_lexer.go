@@ -27,6 +27,7 @@ const (
 	tokenTypeInteger
 	tokenTypeFloat
 	tokenTypeString
+	tokenTypeSymbol
 )
 
 type BetterRubyLexer struct {
@@ -67,7 +68,10 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			l.backup()
 			return lexNumber
 		case r == '\'':
-			return lexSimpleString
+			return lexSingleQuoteString
+		case r == ':':
+			l.start += 1 // skip past the colon
+			return lexSymbol
 		}
 
 		if l.next() == eof {
@@ -93,7 +97,19 @@ func lexNumber(l *BetterRubyLexer) stateFn {
 	return lexAnything
 }
 
-func lexSimpleString(l *BetterRubyLexer) stateFn {
+const alphaLower = "abcdefghijklmnopqrstuvwxyz"
+const alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const alphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const symbolRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+
+func lexSymbol(l *BetterRubyLexer) stateFn {
+	l.accept(alpha + "_")
+	l.acceptRun(symbolRunes)
+	l.emit(tokenTypeSymbol)
+	return lexAnything
+}
+
+func lexSingleQuoteString(l *BetterRubyLexer) stateFn {
 	var (
 		r    rune
 		prev rune
@@ -195,6 +211,10 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 			debug("string: '%s'", token.value)
 			lval.genericValue = ast.SimpleString{Value: token.value}
 			return NODE // ditto
+		case tokenTypeSymbol:
+			debug("symbol: '%s", token.value)
+			lval.genericValue = ast.Symbol{Name: token.value}
+			return NODE
 		case tokenTypeEOF:
 			debug("EOF")
 			return EOF
