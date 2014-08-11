@@ -359,9 +359,13 @@ global: DOLLARSIGN REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} };
 
 instance_variable: ATSIGN REF
+  { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} }
+| ATSIGN CAPITAL_REF
   { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} };
 
 class_variable: ATSIGN ATSIGN REF
+  { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} }
+| ATSIGN ATSIGN CAPITAL_REF
   { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} };
 
 %%

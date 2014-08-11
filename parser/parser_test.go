@@ -575,7 +575,10 @@ foo: bar,
 
 		Describe("instance variables", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("@foo = :bar")
+				lexer = parser.NewLexer(`
+@foo = :bar
+@FOO = :baz
+`)
 			})
 
 			It("should be parsed as an InstanceVariable", func() {
@@ -584,13 +587,20 @@ foo: bar,
 						LHS: ast.InstanceVariable{Name: "foo"},
 						RHS: ast.Symbol{Name: "bar"},
 					},
+					ast.Assignment{
+						LHS: ast.InstanceVariable{Name: "FOO"},
+						RHS: ast.Symbol{Name: "baz"},
+					},
 				}))
 			})
 		})
 
 		Describe("class variables", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("@@foo = :bar")
+				lexer = parser.NewLexer(`
+@@foo = :bar
+@@FOO = :baz
+`)
 			})
 
 			It("should be parsed as an ClassVariable", func() {
@@ -598,6 +608,10 @@ foo: bar,
 					ast.Assignment{
 						LHS: ast.ClassVariable{Name: "foo"},
 						RHS: ast.Symbol{Name: "bar"},
+					},
+					ast.Assignment{
+						LHS: ast.ClassVariable{Name: "FOO"},
+						RHS: ast.Symbol{Name: "baz"},
 					},
 				}))
 			})
