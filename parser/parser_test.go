@@ -22,12 +22,12 @@ var _ = Describe("goyacc parser", func() {
 	Context("when the code parsed is syntactically valid", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.RubyLex).LastError).To(BeNil())
+			Expect(lexer.(*parser.BetterRubyLexer).LastError).To(BeNil())
 		})
 
-		Describe("parsing an integer", func() {
+		FDescribe("parsing an integer", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("5")
+				lexer = parser.NewBetterLexer("5")
 			})
 
 			It("works, mostly", func() {

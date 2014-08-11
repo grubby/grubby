@@ -57,6 +57,7 @@ var Statements []ast.Node
 %token <genericValue> RBRACE     // "}"
 %token <genericValue> DOLLARSIGN // "$"
 %token <genericValue> ATSIGN     // "@"
+%token <genericValue> EOF
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
@@ -111,7 +112,9 @@ var Statements []ast.Node
 
 capture_list : /* empty */
   { Statements = []ast.Node{} }
-| capture_list statement
+| EOF
+  { Statements = []ast.Node{} }
+| capture_list statement EOF
   {
 		if $2 != nil {
 			Statements = append(Statements, $2)

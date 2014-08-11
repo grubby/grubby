@@ -7,4 +7,4 @@ pushd parser
 go tool yacc -o parser.go -p Ruby parser.y
 popd
 
-ginkgo -r
+ginkgo -r $@
