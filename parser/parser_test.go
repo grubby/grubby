@@ -49,9 +49,9 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 
-		Describe("strings", func() {
+		FDescribe("strings", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("'hello world'")
+				lexer = parser.NewBetterLexer("'hello world'")
 			})
 
 			It("returns a SimpleString struct", func() {

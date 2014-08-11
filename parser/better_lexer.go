@@ -26,6 +26,7 @@ const (
 	tokenTypeEOF
 	tokenTypeInteger
 	tokenTypeFloat
+	tokenTypeString
 )
 
 type BetterRubyLexer struct {
@@ -65,6 +66,8 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 		case '0' <= r && r <= '9':
 			l.backup()
 			return lexNumber
+		case r == '\'':
+			return lexSimpleString
 		}
 
 		if l.next() == eof {
@@ -87,6 +90,27 @@ func lexNumber(l *BetterRubyLexer) stateFn {
 	}
 
 	l.emit(tokenTypeInteger)
+	return lexAnything
+}
+
+func lexSimpleString(l *BetterRubyLexer) stateFn {
+	var (
+		r    rune
+		prev rune
+	)
+
+	for {
+		prev = r
+		switch r = l.next(); {
+		case r == '\'' && prev != '\'':
+			l.emit(tokenTypeString)
+			return lexAnything
+		case r == eof:
+			l.emit(tokenTypeError)
+			return lexAnything
+		}
+	}
+
 	return lexAnything
 }
 
@@ -167,6 +191,10 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 
 			lval.genericValue = ast.ConstantFloat{Value: floatval}
 			return NODE // as above, maybe a different type?
+		case tokenTypeString:
+			debug("string: '%s'", token.value)
+			lval.genericValue = ast.SimpleString{Value: token.value}
+			return NODE // ditto
 		case tokenTypeEOF:
 			debug("EOF")
 			return EOF
