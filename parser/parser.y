@@ -47,16 +47,16 @@ var Statements []ast.Node
 %token <genericValue> POSITIVE
 %token <genericValue> NEGATIVE
 %token <genericValue> STAR
-%token <genericValue> HASHROCKET
 
 // misc
 %token <genericValue> COLON
 %token <genericValue> DOT
-%token <genericValue> LBRACKET // "["
-%token <genericValue> RBRACKET // "]"
-%token <genericValue> LBRACE   // "{"
-%token <genericValue> RBRACE   // "}"
-%token <genericValue> DOLLARSIGN
+%token <genericValue> LBRACKET   // "["
+%token <genericValue> RBRACKET   // "]"
+%token <genericValue> LBRACE     // "{"
+%token <genericValue> RBRACE     // "}"
+%token <genericValue> DOLLARSIGN // "$"
+%token <genericValue> ATSIGN     // "@"
 
 /*
   eg: if you want to be able to assign to something in the RubySymType
@@ -65,6 +65,7 @@ var Statements []ast.Node
 */
 
 %type <genericValue> whitespace
+%type <genericValue> optional_comma
 %type <genericValue> optional_newline
 
 // single nodes
@@ -76,10 +77,13 @@ var Statements []ast.Node
 %type <genericValue> global
 %type <genericValue> symbol
 %type <genericValue> callexpr
+%type <genericValue> variable // represents anything that could be assigned to
 %type <genericValue> statement
 %type <genericValue> assignment
+%type <genericValue> class_variable
 %type <genericValue> func_declaration
 %type <genericValue> class_declaration
+%type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
 
@@ -145,7 +149,9 @@ callexpr : REF whitespace callargs
     }
   };
 
-expr : NODE | REF | CAPITAL_REF | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | global;
+expr : NODE | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | variable;
+
+variable: REF | CAPITAL_REF | instance_variable | class_variable | global;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -238,6 +244,13 @@ assignment: REF whitespace EQUALTO whitespace expr
       RHS: $5,
     }
   };
+| variable whitespace EQUALTO whitespace expr
+  { // FIXME: this is a hack. If this rule is not present, "foo = 5" will not parse
+    $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $5,
+    }
+  };
 
 negation: BANG whitespace expr { $$ = ast.Negation{Target: $3} };
 complement: COMPLEMENT whitespace expr { $$ = ast.Complement{Target: $3} };
@@ -306,12 +319,12 @@ optional_newline : /* possibly nothing */
   { $$ = nil };
 
 key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
-| expr whitespace HASHROCKET whitespace expr
-  { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $5}) }
-| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace HASHROCKET whitespace expr
-  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $9}) }
-| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace HASHROCKET whitespace expr COMMA
-  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $9}) };
+| expr whitespace EQUALTO GREATERTHAN whitespace expr
+  { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $6}) }
+| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr
+  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $10}) }
+| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr COMMA
+  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $10}) };
 
 symbol_key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
 | REF COLON whitespace expr
@@ -337,11 +350,18 @@ symbol_key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
   };
 
 
-optional_comma: /* nothing */ | COMMA;
+optional_comma: /* nothing */ { $$ = nil; }
+| COMMA  { $$ = nil; };
 
 global: DOLLARSIGN REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
 | DOLLARSIGN CAPITAL_REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} };
+
+instance_variable: ATSIGN REF
+  { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} };
+
+class_variable: ATSIGN ATSIGN REF
+  { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} };
 
 %%

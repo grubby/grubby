@@ -156,11 +156,11 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.SimpleString{Value: token}
 			return NODE
 		case capitalReferenceRegexp.MatchString(token):
-			debug("capitalized ref: %s", token)
+			debug("CAPITAL_REF: '%s'", token)
 			lval.genericValue = ast.BareReference{Name: token}
 			return CAPITAL_REF
 		case referenceRegexp.MatchString(token):
-			debug("ref: %s", token)
+			debug("REF: '%s'", token)
 			lval.genericValue = ast.BareReference{Name: token}
 			return REF
 		case token == "<":
@@ -170,7 +170,7 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 			debug("GREATER THAN")
 			return GREATERTHAN
 		case token == "=":
-			debug("EQUAL")
+			debug("EQUALTO")
 			return EQUALTO
 		case token == "(":
 			debug("LPAREN")
@@ -211,12 +211,12 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 		case token == "}":
 			debug("RBRACE")
 			return RBRACE
-		case token == "=>":
-			debug("HASHROCKET")
-			return HASHROCKET
 		case token == "$":
 			debug("DOLLARSIGN")
 			return DOLLARSIGN
+		case token == "@":
+			debug("ATSIGN")
+			return ATSIGN
 		case len(token) == 1: // ;  " " or another separator
 			debug("separator: '%s'", strings.Replace(token, string('\n'), "\\n", -1))
 			return int(rune(token[0]))
@@ -237,7 +237,7 @@ func (l *RubyLex) Error(error string) {
 // a better fix would be to reimplement this parser using the style of tokenization
 // that Rob Pike discussed in his talk on the Golang template parser / lexer
 func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-' || r == '<' || r == '*' || r == '[' || r == ']' || r == '{' || r == '}' || r == '$'
+	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-' || r == '<' || r == '*' || r == '[' || r == ']' || r == '{' || r == '}' || r == '$' || r == '@' || r == '='
 }
 
 func debug(formatString string, args ...interface{}) {

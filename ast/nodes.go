@@ -114,3 +114,11 @@ type HashKeyValuePair struct {
 type GlobalVariable struct {
 	Name string
 }
+
+type InstanceVariable struct {
+	Name string
+}
+
+type ClassVariable struct {
+	Name string
+}
