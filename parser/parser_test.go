@@ -30,19 +30,19 @@ var _ = Describe("goyacc parser", func() {
 				lexer = parser.NewBetterLexer("5")
 			})
 
-			It("works, mostly", func() {
+			It("returns a ConstantInt struct representing the value", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.ConstantInt{Value: 5},
 				}))
 			})
 		})
 
-		Describe("parsing a float", func() {
+		FDescribe("parsing a float", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("123.4567")
+				lexer = parser.NewBetterLexer("123.4567")
 			})
 
-			It("works, mostly", func() {
+			It("returns a ConstantFloat struct representing the value", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.ConstantFloat{Value: 123.4567},
 				}))

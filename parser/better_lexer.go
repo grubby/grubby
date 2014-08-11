@@ -25,6 +25,7 @@ const (
 	tokenTypeError tokenType = iota
 	tokenTypeEOF
 	tokenTypeInteger
+	tokenTypeFloat
 )
 
 type BetterRubyLexer struct {
@@ -75,8 +76,16 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 	return nil
 }
 
+const digits = "0123456789"
+
 func lexNumber(l *BetterRubyLexer) stateFn {
-	l.acceptRun("0123456789")
+	l.acceptRun(digits)
+	if l.next() == '.' {
+		l.acceptRun(digits)
+		l.emit(tokenTypeFloat)
+		return lexAnything
+	}
+
 	l.emit(tokenTypeInteger)
 	return lexAnything
 }
@@ -141,7 +150,7 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 	for token := range lexer.tokens {
 		switch token.typ {
 		case tokenTypeInteger:
-			debug("integer: %s", token)
+			debug("integer: %s", token.value)
 			intVal, err := strconv.Atoi(token.value)
 			if err != nil {
 				panic(err)
@@ -149,9 +158,20 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 
 			lval.genericValue = ast.ConstantInt{Value: intVal}
 			return NODE // Consider: should this be a different type?
+		case tokenTypeFloat:
+			debug("float: %s", token.value)
+			floatval, err := strconv.ParseFloat(token.value, 64)
+			if err != nil {
+				panic(err)
+			}
+
+			lval.genericValue = ast.ConstantFloat{Value: floatval}
+			return NODE // as above, maybe a different type?
 		case tokenTypeEOF:
 			debug("EOF")
 			return EOF
+		default:
+			panic(fmt.Sprintf("unknown token: '%s'", token))
 		}
 	}
 
