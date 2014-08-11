@@ -587,6 +587,21 @@ foo: bar,
 				}))
 			})
 		})
+
+		Describe("class variables", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("@@foo = :bar")
+			})
+
+			It("should be parsed as an ClassVariable", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Assignment{
+						LHS: ast.ClassVariable{Name: "foo"},
+						RHS: ast.Symbol{Name: "bar"},
+					},
+				}))
+			})
+		})
 	})
 
 	// FIXME: don't mark this as pending

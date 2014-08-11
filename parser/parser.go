@@ -751,7 +751,7 @@ Rubydefault:
 		}
 	case 53:
 		//line parser.y:248
-		{
+		{ // FIXME: this is a hack. If this rule is not present, "foo = 5" will not parse
 			RubyVAL.genericValue = ast.Assignment{
 				LHS: RubyS[Rubypt-4].genericValue,
 				RHS: RubyS[Rubypt-0].genericValue,
