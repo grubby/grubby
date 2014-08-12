@@ -14,20 +14,24 @@ import (
 )
 
 type vm struct {
-	ObjectSpace map[string]builtins.Value
-	Globals     map[string]builtins.Value
+	ObjectSpace  map[string]builtins.Value
+	Globals      map[string]builtins.Value
+	KnownSymbols map[string]builtins.Value
 }
 
 type VM interface {
 	Run(string) (builtins.Value, error)
 	Get(string) (builtins.Value, error)
 	MustGet(string) builtins.Value
+
+	Symbols() map[string]builtins.Value
 }
 
 func NewVM() VM {
 	vm := &vm{
-		Globals:     make(map[string]builtins.Value),
-		ObjectSpace: make(map[string]builtins.Value),
+		Globals:      make(map[string]builtins.Value),
+		ObjectSpace:  make(map[string]builtins.Value),
+		KnownSymbols: make(map[string]builtins.Value),
 	}
 
 	loadPath := builtins.NewArrayClass()
@@ -100,6 +104,10 @@ func (vm *vm) Get(key string) (builtins.Value, error) {
 	return nil, errors.New(fmt.Sprintf("'%s' is undefined", key))
 }
 
+func (vm *vm) Symbols() map[string]builtins.Value {
+	return vm.KnownSymbols
+}
+
 func (vm *vm) Run(input string) (builtins.Value, error) {
 	lexer := parser.NewLexer(input)
 	parser.RubyParse(lexer)
@@ -132,6 +140,8 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
 		case ast.ConstantFloat:
 			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value)
+		case ast.Symbol:
+			returnValue = builtins.NewSymbol(statement.(ast.Symbol).Name)
 		case ast.CallExpression:
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)

@@ -83,6 +83,26 @@ end`)
 		})
 	})
 
+	Describe("interpreting a symbol", func() {
+		var (
+			val builtins.Value
+			err error
+		)
+
+		BeforeEach(func() {
+			val, err = vm.Run(":foo")
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("returns a ruby Symbol object", func() {
+			Expect(val).To(Equal(builtins.NewSymbol("foo")))
+		})
+
+		PIt("registers the symbol globally", func() {
+			Expect(vm.Symbols()).To(ContainElement(builtins.NewSymbol("foo")))
+		})
+	})
+
 	Describe("the require method on Kernel", func() {
 		It("searches for a file with the given name", func() {
 			_, err := vm.Run("require 'something'")
