@@ -63,13 +63,23 @@ end`)
 		})
 	})
 
-	Describe("numbers", func() {
+	Describe("interpreting a number", func() {
 		It("returns a ruby Fixnum object", func() {
 			val, err := vm.Run("5")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(BeAssignableToTypeOf(builtins.NewInt(0)))
 			Expect(val.String()).To(Equal("5"))
+		})
+	})
+
+	Describe("interpreting a float", func() {
+		It("returns a ruby Float object", func() {
+			val, err := vm.Run("5.123")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewFloat(0.0)))
+			Expect(val).To(Equal(builtins.NewFloat(5.123)))
 		})
 	})
 

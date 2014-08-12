@@ -130,6 +130,8 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewString(statement.(ast.SimpleString).Value)
 		case ast.ConstantInt:
 			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
+		case ast.ConstantFloat:
+			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value)
 		case ast.CallExpression:
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)
