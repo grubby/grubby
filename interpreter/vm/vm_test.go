@@ -2,6 +2,7 @@ package vm_test
 
 import (
 	"os"
+	"reflect"
 
 	"github.com/grubby/grubby/interpreter/vm/builtins"
 	"github.com/grubby/grubby/interpreter/vm/builtins/errors"
@@ -98,8 +99,17 @@ end`)
 			Expect(val).To(Equal(builtins.NewSymbol("foo")))
 		})
 
-		PIt("registers the symbol globally", func() {
+		It("registers the symbol globally", func() {
 			Expect(vm.Symbols()).To(ContainElement(builtins.NewSymbol("foo")))
+		})
+
+		It("records the symbol only once", func() {
+			sameSymbol, err := vm.Run(":foo")
+			Expect(err).ToNot(HaveOccurred())
+
+			firstPointer := reflect.ValueOf(val).Pointer()
+			secondPointer := reflect.ValueOf(sameSymbol).Pointer()
+			Expect(secondPointer).To(Equal(firstPointer))
 		})
 	})
 

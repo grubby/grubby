@@ -141,7 +141,14 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 		case ast.ConstantFloat:
 			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value)
 		case ast.Symbol:
-			returnValue = builtins.NewSymbol(statement.(ast.Symbol).Name)
+			name := statement.(ast.Symbol).Name
+			maybe, ok := vm.KnownSymbols[name]
+			if !ok {
+				returnValue = builtins.NewSymbol(name)
+				vm.KnownSymbols[name] = returnValue
+			} else {
+				returnValue = maybe
+			}
 		case ast.CallExpression:
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)
