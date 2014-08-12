@@ -19,6 +19,14 @@ var _ = Describe("goyacc parser", func() {
 		parser.Statements = make([]ast.Node, 0)
 	})
 
+	Describe("parsing nothing at all", func() {
+		It("succeeds without any errors", func() {
+			lexer = parser.NewBetterLexer("")
+			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+			Expect(lexer.(*parser.BetterRubyLexer).LastError).To(BeNil())
+		})
+	})
+
 	Context("when the code parsed is syntactically valid", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
@@ -88,9 +96,9 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 
-		Describe("variables", func() {
+		FDescribe("variables", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("foo")
+				lexer = parser.NewBetterLexer("foo")
 			})
 
 			It("returns a bare reference", func() {

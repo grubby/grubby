@@ -105,6 +105,7 @@ var Statements []ast.Node
 %type <genericSlice> key_value_pairs
 %type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nodes_with_commas
+%type <genericSlice> nonempty_nodes_with_commas
 %type <stringSlice> namespaced_modules
 
 %%
@@ -136,7 +137,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | variable;
+expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash;
 
 variable: REF | CAPITAL_REF | instance_variable | class_variable | global;
 
@@ -148,8 +149,7 @@ callexpr : REF whitespace callargs
     }
   };
 
-callargs : /* empty */ { $$ = ast.Nodes{} }
-| NODE
+callargs : NODE
   { $$ = append($$, $1) }
 | REF
   { $$ = append($$, $1) }
@@ -157,10 +157,19 @@ callargs : /* empty */ { $$ = ast.Nodes{} }
   {
 		$$ = $3
 	}
-| nodes_with_commas
+| nonempty_nodes_with_commas
   {
     $$ = $1
   };
+
+nonempty_nodes_with_commas : REF
+  { $$ = append($$, $1); }
+| NODE
+  { $$ = append($$, $1); }
+| nodes_with_commas whitespace COMMA whitespace NODE
+  { $$ = append($$, $5); };
+| nodes_with_commas whitespace COMMA whitespace REF
+{ $$ = append($$, $5); };
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | REF
@@ -171,6 +180,7 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $5); };
 | nodes_with_commas whitespace COMMA whitespace REF
   { $$ = append($$, $5); };
+
 
 // FIXME: this should use a different type than callargs
 // call args can be a list of expressions. This is just a list of REFs or NODEs

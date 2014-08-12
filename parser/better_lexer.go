@@ -24,10 +24,13 @@ type tokenType int
 const (
 	tokenTypeError tokenType = iota
 	tokenTypeEOF
+
 	tokenTypeInteger
 	tokenTypeFloat
 	tokenTypeString
 	tokenTypeSymbol
+	TokenTypeReference
+
 	tokenTypeWhitespace
 	tokenTypeNewline
 )
@@ -78,11 +81,17 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			return lexWhitespace
 		case r == '\n':
 			return lexNewlines
+		case ('a' <= r && 'a' <= 'z') || r == '_':
+			return lexReference
 		}
 
 		if l.next() == eof {
 			break
 		}
+	}
+
+	if l.start != len(l.input) {
+		l.emit(tokenTypeError)
 	}
 
 	l.emit(tokenTypeEOF)
@@ -123,12 +132,18 @@ func lexNewlines(l *BetterRubyLexer) stateFn {
 const alphaLower = "abcdefghijklmnopqrstuvwxyz"
 const alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const alphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-const symbolRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+const alphaNumericUnderscore = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 
 func lexSymbol(l *BetterRubyLexer) stateFn {
 	l.accept(alpha + "_")
-	l.acceptRun(symbolRunes)
+	l.acceptRun(alphaNumericUnderscore)
 	l.emit(tokenTypeSymbol)
+	return lexAnything
+}
+
+func lexReference(l *BetterRubyLexer) stateFn {
+	l.acceptRun(alphaNumericUnderscore)
+	l.emit(TokenTypeReference)
 	return lexAnything
 }
 
@@ -240,12 +255,18 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 			debug("symbol: %s", token.value)
 			lval.genericValue = ast.Symbol{Name: token.value}
 			return NODE
+		case TokenTypeReference:
+			debug("REF: %s", token.value)
+			lval.genericValue = ast.BareReference{Name: token.value}
+			return REF
 		case tokenTypeWhitespace:
 			debug("WHITESPACE")
 			return WHITESPACE
 		case tokenTypeEOF:
 			debug("EOF")
 			return EOF
+		case tokenTypeError:
+			panic(fmt.Sprintf("error, unknown token: '%s'", token))
 		default:
 			panic(fmt.Sprintf("unknown token: '%s'", token))
 		}
