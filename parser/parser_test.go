@@ -109,9 +109,9 @@ var _ = Describe("goyacc parser", func() {
 		})
 
 		Describe("call expressions", func() {
-			Context("without parens", func() {
+			FContext("without parens", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("puts 'foo'")
+					lexer = parser.NewBetterLexer("puts 'foo'")
 				})
 
 				It("returns a call expression with one arg", func() {
@@ -124,9 +124,9 @@ var _ = Describe("goyacc parser", func() {
 				})
 			})
 
-			Context("with parens", func() {
+			FContext("with parens", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("puts('foo', 'bar', 'baz')")
+					lexer = parser.NewBetterLexer("puts('foo', 'bar', 'baz')")
 				})
 
 				It("returns a call expression with args", func() {
@@ -143,9 +143,9 @@ var _ = Describe("goyacc parser", func() {
 				})
 			})
 
-			Context("without args", func() {
+			FContext("without args", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("puts()")
+					lexer = parser.NewBetterLexer("puts()")
 				})
 
 				It("returns a call expression without args", func() {

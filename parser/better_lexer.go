@@ -24,15 +24,16 @@ type tokenType int
 const (
 	tokenTypeError tokenType = iota
 	tokenTypeEOF
-
 	tokenTypeInteger
 	tokenTypeFloat
 	tokenTypeString
 	tokenTypeSymbol
-	TokenTypeReference
-
+	tokenTypeReference
 	tokenTypeWhitespace
 	tokenTypeNewline
+	tokenTypeLParen
+	tokenTypeRParen
+	tokenTypeComma
 )
 
 type BetterRubyLexer struct {
@@ -83,9 +84,15 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			return lexNewlines
 		case ('a' <= r && 'a' <= 'z') || r == '_':
 			return lexReference
+		case r == '(':
+			l.emit(tokenTypeLParen)
+		case r == ')':
+			l.emit(tokenTypeRParen)
+		case r == ',':
+			l.emit(tokenTypeComma)
 		}
 
-		if l.next() == eof {
+		if l.peek() == eof {
 			break
 		}
 	}
@@ -143,7 +150,7 @@ func lexSymbol(l *BetterRubyLexer) stateFn {
 
 func lexReference(l *BetterRubyLexer) stateFn {
 	l.acceptRun(alphaNumericUnderscore)
-	l.emit(TokenTypeReference)
+	l.emit(tokenTypeReference)
 	return lexAnything
 }
 
@@ -255,10 +262,19 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 			debug("symbol: %s", token.value)
 			lval.genericValue = ast.Symbol{Name: token.value}
 			return NODE
-		case TokenTypeReference:
+		case tokenTypeReference:
 			debug("REF: %s", token.value)
 			lval.genericValue = ast.BareReference{Name: token.value}
 			return REF
+		case tokenTypeLParen:
+			debug("LPAREN")
+			return LPAREN
+		case tokenTypeRParen:
+			debug("RPAREN")
+			return RPAREN
+		case tokenTypeComma:
+			debug("COMMA")
+			return COMMA
 		case tokenTypeWhitespace:
 			debug("WHITESPACE")
 			return WHITESPACE
@@ -266,7 +282,7 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 			debug("EOF")
 			return EOF
 		case tokenTypeError:
-			panic(fmt.Sprintf("error, unknown token: '%s'", token))
+			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
 			panic(fmt.Sprintf("unknown token: '%s'", token))
 		}
