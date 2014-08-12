@@ -73,9 +73,11 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 
-		Describe("parsing multiple lines", func() {
+		FDescribe("parsing multiple lines", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer(":foo\n:bar")
+				lexer = parser.NewBetterLexer(`
+:foo
+:bar`)
 			})
 
 			It("returns multiple nodes", func() {

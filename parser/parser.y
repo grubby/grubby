@@ -49,6 +49,9 @@ var Statements []ast.Node
 %token <genericValue> STAR
 
 // misc
+%token <genericValue> WHITESPACE
+%token <genericValue> NEWLINE
+%token <genericValue> SEMICOLON
 %token <genericValue> COLON
 %token <genericValue> DOT
 %token <genericValue> LBRACKET   // "["
@@ -65,9 +68,7 @@ var Statements []ast.Node
       declare a type (or possibly just a token)
 */
 
-%type <genericValue> whitespace
 %type <genericValue> optional_comma
-%type <genericValue> optional_newline
 
 // single nodes
 %type <genericValue> expr
@@ -76,10 +77,8 @@ var Statements []ast.Node
 %type <genericValue> false
 %type <genericValue> array
 %type <genericValue> global
-%type <genericValue> symbol
 %type <genericValue> callexpr
 %type <genericValue> variable // represents anything that could be assigned to
-%type <genericValue> statement
 %type <genericValue> assignment
 %type <genericValue> class_variable
 %type <genericValue> func_declaration
@@ -112,37 +111,34 @@ var Statements []ast.Node
 
 capture_list : /* empty */
   { Statements = []ast.Node{} }
-| EOF
-  { Statements = []ast.Node{} }
-| capture_list statement EOF
+| capture_list expr
   {
 		if $2 != nil {
 			Statements = append(Statements, $2)
 		}
-	};
+	}
+| capture_list expr EOF
+  {
+		if $2 != nil {
+			Statements = append(Statements, $2)
+		}
+	}
 
 list : /* empty */
   { $$ = []ast.Node{} }
-| list statement
+| list expr
   {
 		if $2 != nil {
 			$$ = append($$, $2)
 		}
 	};
 
-symbol : COLON REF
-  {
-    $$ = ast.Symbol{Name: $2.(ast.BareReference).Name}
-  };
+whitespace : /* zero or more */ | WHITESPACE whitespace
+optional_newline : /* empty */ | optional_newline NEWLINE;
 
-statement : callexpr whitespace
-  { $$ = $1 }
-| expr whitespace
-  { $$ = $1 }
-| '\n'
-  { $$ = nil; /* ignores new lines around statements */ }
-| whitespace
-  { $$ = nil; /* ignores whitespace around statements */ };
+expr : NODE | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | variable;
+
+variable: REF | CAPITAL_REF | instance_variable | class_variable | global;
 
 callexpr : REF whitespace callargs
   {
@@ -151,10 +147,6 @@ callexpr : REF whitespace callargs
       Args: $3,
     }
   };
-
-expr : NODE | func_declaration | class_declaration | symbol | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | variable;
-
-variable: REF | CAPITAL_REF | instance_variable | class_variable | global;
 
 callargs : /* empty */ { $$ = ast.Nodes{} }
 | NODE
@@ -284,13 +276,6 @@ binary_multiplication: expr whitespace STAR whitespace expr
     }
   };
 
-whitespace : /* zero or more */
-  { $$ = nil }
-| " " whitespace
-  { $$ = nil }
-| "\t" whitespace
-  { $$ = nil };
-
 true: TRUE { $$ = ast.Boolean{Value: true} }
 false: FALSE { $$ = ast.Boolean{Value: false} }
 array : LBRACKET whitespace nodes_with_commas whitespace RBRACKET
@@ -314,23 +299,15 @@ hash: LBRACE whitespace optional_newline whitespace key_value_pairs whitespace o
     $$ = ast.Hash{Pairs: pairs}
   };
 
-optional_newline : /* possibly nothing */
-  { $$ = nil }
-| "\n"
-  { $$ = nil }
-| optional_newline whitespace "\n" whitespace
-  { $$ = nil };
-
 key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
 | expr whitespace EQUALTO GREATERTHAN whitespace expr
   { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $6}) }
 | key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr
-  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $10}) }
+  { $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $11}) }
 | key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr COMMA
-  { $$ = append($$, ast.HashKeyValuePair{Key: $5, Value: $10}) };
+  { $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $11}) };
 
-symbol_key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
-| REF COLON whitespace expr
+symbol_key_value_pairs: REF COLON whitespace expr
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $1.(ast.BareReference).Name},

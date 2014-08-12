@@ -28,6 +28,8 @@ const (
 	tokenTypeFloat
 	tokenTypeString
 	tokenTypeSymbol
+	tokenTypeWhitespace
+	tokenTypeNewline
 )
 
 type BetterRubyLexer struct {
@@ -72,6 +74,10 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 		case r == ':':
 			l.start += 1 // skip past the colon
 			return lexSymbol
+		case r == ' ' || r == '\t':
+			return lexWhitespace
+		case r == '\n':
+			return lexNewlines
 		}
 
 		if l.next() == eof {
@@ -87,13 +93,30 @@ const digits = "0123456789"
 
 func lexNumber(l *BetterRubyLexer) stateFn {
 	l.acceptRun(digits)
-	if l.next() == '.' {
+	if l.peek() == '.' {
+		l.accept(".")
 		l.acceptRun(digits)
 		l.emit(tokenTypeFloat)
 		return lexAnything
 	}
 
 	l.emit(tokenTypeInteger)
+	return lexAnything
+}
+
+const whitespace = " \t"
+
+func lexWhitespace(l *BetterRubyLexer) stateFn {
+	l.acceptRun(whitespace)
+	l.emit(tokenTypeWhitespace)
+	return lexAnything
+}
+
+const newline = "\n"
+
+func lexNewlines(l *BetterRubyLexer) stateFn {
+	l.acceptRun(newline)
+	l.ignore()
 	return lexAnything
 }
 
@@ -181,6 +204,8 @@ func (lexer *BetterRubyLexer) emit(t tokenType) {
 		typ:   t,
 		value: lexer.input[lexer.start:lexer.pos],
 	}
+
+	lexer.start = lexer.pos
 }
 
 func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
@@ -212,9 +237,12 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.SimpleString{Value: token.value}
 			return NODE // ditto
 		case tokenTypeSymbol:
-			debug("symbol: '%s", token.value)
+			debug("symbol: %s", token.value)
 			lval.genericValue = ast.Symbol{Name: token.value}
 			return NODE
+		case tokenTypeWhitespace:
+			debug("WHITESPACE")
+			return WHITESPACE
 		case tokenTypeEOF:
 			debug("EOF")
 			return EOF
