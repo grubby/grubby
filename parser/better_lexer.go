@@ -79,10 +79,13 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			l.start += 1 // skip past the colon
 			return lexSymbol
 		case r == ' ' || r == '\t':
+			l.backup()
 			return lexWhitespace
 		case r == '\n':
+			l.backup()
 			return lexNewlines
 		case ('a' <= r && 'a' <= 'z') || r == '_':
+			l.backup()
 			return lexReference
 		case r == '(':
 			l.emit(tokenTypeLParen)
@@ -208,6 +211,9 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeWhitespace:
 			debug("WHITESPACE")
 			return WHITESPACE
+		case tokenTypeNewline:
+			debug("NEWLINE")
+			return NEWLINE
 		case tokenTypeEOF:
 			debug("EOF")
 			return EOF

@@ -114,6 +114,8 @@ capture_list : /* empty */
   { Statements = []ast.Node{} }
 | EOF
   { Statements = []ast.Node{} }
+| capture_list NEWLINE
+  { /* do nothing */ }
 | capture_list expr
   {
 		if $2 != nil {

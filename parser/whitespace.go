@@ -11,7 +11,8 @@ func lexWhitespace(l *BetterRubyLexer) stateFn {
 const newline = "\n"
 
 func lexNewlines(l *BetterRubyLexer) stateFn {
-	l.acceptRun(newline)
-	l.ignore()
+	for l.accept(newline) {
+		l.emit(tokenTypeNewline)
+	}
 	return lexAnything
 }
