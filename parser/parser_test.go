@@ -525,7 +525,7 @@ false
 			})
 		})
 
-		XDescribe("hashes", func() {
+		Describe("hashes", func() {
 			Context("with hashrockets", func() {
 				BeforeEach(func() {
 					lexer = parser.NewBetterLexer("{:foo => bar}")

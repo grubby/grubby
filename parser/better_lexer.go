@@ -42,6 +42,7 @@ const (
 	tokenTypeTRUE
 	tokenTypeFALSE
 	tokenTypeLessThan
+	tokenTypeGreaterThan
 	tokenTypeColon
 	tokenTypeEQUAL
 	tokenTypeBANG
@@ -116,6 +117,9 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			return lexComment
 		case r == '<':
 			l.emit(tokenTypeLessThan)
+			return lexAnything
+		case r == '>':
+			l.emit(tokenTypeGreaterThan)
 			return lexAnything
 		case r == '=':
 			l.emit(tokenTypeEQUAL)
@@ -296,6 +300,9 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeLessThan:
 			debug("<")
 			return LESSTHAN
+		case tokenTypeGreaterThan:
+			debug(">")
+			return GREATERTHAN
 		case tokenTypeColon:
 			debug(":")
 			return COLON
