@@ -383,7 +383,7 @@ end
 			})
 		})
 
-		XDescribe("booleans", func() {
+		Describe("booleans", func() {
 			BeforeEach(func() {
 				lexer = parser.NewBetterLexer(`
 true
