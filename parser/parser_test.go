@@ -661,10 +661,10 @@ end
 		})
 	})
 
-	XDescribe("invalid syntax", func() {
+	Describe("invalid syntax", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).ToNot(BeSuccessful())
-			Expect(lexer.(*parser.RubyLex).LastError).ToNot(BeNil())
+			Expect(lexer.(*parser.BetterRubyLexer).LastError).ToNot(BeNil())
 		})
 
 		Context("given a class name that starts with a lowercase character", func() {
