@@ -250,7 +250,7 @@ end
 			})
 		})
 
-		XDescribe("comments", func() {
+		Describe("comments", func() {
 			Context("on a single line", func() {
 				BeforeEach(func() {
 					lexer = parser.NewBetterLexer("#ceci n'est pas un ligne de code")

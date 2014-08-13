@@ -99,6 +99,8 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			l.emit(tokenTypeRParen)
 		case r == ',':
 			l.emit(tokenTypeComma)
+		case r == '#':
+			return lexComment
 		}
 
 		if l.peek() == eof {

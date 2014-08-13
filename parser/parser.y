@@ -130,7 +130,7 @@ capture_list : /* empty */
 	}
 
 line : NEWLINE { $$ = nil }
-| whitespace expr { $$ = $2 };
+| whitespace expr whitespace { $$ = $2 };
 
 list : /* empty */
   { $$ = []ast.Node{} }
