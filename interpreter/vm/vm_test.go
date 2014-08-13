@@ -113,6 +113,29 @@ end`)
 		})
 	})
 
+	Describe("a reference to a variable", func() {
+		Context("when it already is defined", func() {
+			BeforeEach(func() {
+				vm.Set("foo", builtins.NewString("superinquisitive-edacity"))
+			})
+
+			It("returns the variable referenced", func() {
+				value, err := vm.Run("foo")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value).To(Equal(builtins.NewString("superinquisitive-edacity")))
+			})
+		})
+
+		Context("when it has not been defined", func() {
+			It("returns an error", func() {
+				_, err := vm.Run("grigri_incircumscription")
+
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
 	Describe("the require method on Kernel", func() {
 		It("searches for a file with the given name", func() {
 			_, err := vm.Run("require 'something'")

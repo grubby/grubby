@@ -155,6 +155,14 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			} else {
 				returnValue = maybe
 			}
+		case ast.BareReference:
+			name := statement.(ast.BareReference).Name
+			maybe, ok := vm.ObjectSpace[name]
+			if ok {
+				returnValue = maybe
+			} else {
+				returnErr = builtin_errors.NewNameError(name, context.String(), context.Class().String())
+			}
 		case ast.CallExpression:
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)
