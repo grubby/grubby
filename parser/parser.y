@@ -72,6 +72,7 @@ var Statements []ast.Node
 
 // single nodes
 %type <genericValue> expr
+%type <genericValue> line
 %type <genericValue> true
 %type <genericValue> hash
 %type <genericValue> false
@@ -100,7 +101,8 @@ var Statements []ast.Node
 
 // slice nodes
 %type <genericSlice> list
-%type <genericSlice> callargs
+%type <genericSlice> call_args
+%type <genericSlice> function_args
 %type <genericSlice> capture_list
 %type <genericSlice> key_value_pairs
 %type <genericSlice> symbol_key_value_pairs
@@ -114,27 +116,30 @@ capture_list : /* empty */
   { Statements = []ast.Node{} }
 | EOF
   { Statements = []ast.Node{} }
-| capture_list NEWLINE
-  { /* do nothing */ }
-| capture_list expr
+| capture_list line
   {
 		if $2 != nil {
 			Statements = append(Statements, $2)
 		}
 	}
-| capture_list expr EOF
+| capture_list line EOF
   {
 		if $2 != nil {
 			Statements = append(Statements, $2)
 		}
 	}
 
+line : NEWLINE { $$ = nil }
+| whitespace expr { $$ = $2 };
+
 list : /* empty */
   { $$ = []ast.Node{} }
-| list expr
+| list NEWLINE
+  { /* do nothing */ }
+| list whitespace expr
   {
-		if $2 != nil {
-			$$ = append($$, $2)
+		if $3 != nil {
+			$$ = append($$, $3)
 		}
 	};
 
@@ -145,7 +150,7 @@ expr : NODE | variable | callexpr | func_declaration | class_declaration | modul
 
 variable: REF | CAPITAL_REF | instance_variable | class_variable | global;
 
-callexpr : REF whitespace callargs
+callexpr : REF whitespace call_args
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
@@ -153,11 +158,7 @@ callexpr : REF whitespace callargs
     }
   };
 
-callargs : NODE
-  { $$ = append($$, $1) }
-| REF
-  { $$ = append($$, $1) }
-| LPAREN whitespace nodes_with_commas whitespace RPAREN
+call_args : LPAREN whitespace nodes_with_commas whitespace RPAREN
   {
 		$$ = $3
 	}
@@ -170,9 +171,9 @@ nonempty_nodes_with_commas : REF
   { $$ = append($$, $1); }
 | NODE
   { $$ = append($$, $1); }
-| nodes_with_commas whitespace COMMA whitespace NODE
+| nonempty_nodes_with_commas whitespace COMMA whitespace NODE
   { $$ = append($$, $5); };
-| nodes_with_commas whitespace COMMA whitespace REF
+| nonempty_nodes_with_commas whitespace COMMA whitespace REF
 { $$ = append($$, $5); };
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
@@ -186,9 +187,9 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $5); };
 
 
-// FIXME: this should use a different type than callargs
+// FIXME: this should use a different type than call_args
 // call args can be a list of expressions. This is just a list of REFs or NODEs
-func_declaration : DEF whitespace REF whitespace callargs whitespace "\n" list END
+func_declaration : DEF whitespace REF whitespace function_args whitespace NEWLINE list END
   {
 		$$ = ast.FuncDecl{
 			Name: $3.(ast.BareReference),
@@ -197,14 +198,17 @@ func_declaration : DEF whitespace REF whitespace callargs whitespace "\n" list E
     }
   };
 
-class_declaration: CLASS whitespace class_name_with_modules "\n" list END
+function_args : /* possibly nothing */ { $$ = []ast.Node{} };
+| call_args { $$ = $1 };
+
+class_declaration: CLASS whitespace class_name_with_modules NEWLINE list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
        Body: $5,
     }
   }
-| CLASS whitespace class_name_with_modules LESSTHAN class_name_with_modules "\n" list END
+| CLASS whitespace class_name_with_modules LESSTHAN class_name_with_modules NEWLINE list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
@@ -214,7 +218,7 @@ class_declaration: CLASS whitespace class_name_with_modules "\n" list END
     }
   };
 
-module_declaration: MODULE whitespace class_name_with_modules "\n" list END
+module_declaration: MODULE whitespace class_name_with_modules NEWLINE list END
   {
     $$ = ast.ModuleDecl{
       Name: $3.(ast.Class).Name,

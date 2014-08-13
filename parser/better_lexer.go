@@ -34,6 +34,12 @@ const (
 	tokenTypeLParen
 	tokenTypeRParen
 	tokenTypeComma
+	tokenTypeDEF
+	tokenTypeEND
+	tokenTypeCLASS
+	tokenTypeMODULE
+	tokenTypeTRUE
+	tokenTypeFALSE
 )
 
 type BetterRubyLexer struct {
@@ -217,6 +223,24 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeEOF:
 			debug("EOF")
 			return EOF
+		case tokenTypeDEF:
+			debug("DEF")
+			return DEF
+		case tokenTypeEND:
+			debug("END")
+			return END
+		case tokenTypeCLASS:
+			debug("CLASS")
+			return CLASS
+		case tokenTypeMODULE:
+			debug("MODULE")
+			return MODULE
+		case tokenTypeTRUE:
+			debug("TRUE")
+			return TRUE
+		case tokenTypeFALSE:
+			debug("FALSE")
+			return FALSE
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

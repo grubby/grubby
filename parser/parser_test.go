@@ -159,7 +159,7 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 
-		XDescribe("method definitions", func() {
+		Describe("method definitions", func() {
 			Context("without parameters", func() {
 				BeforeEach(func() {
 					lexer = parser.NewBetterLexer(`
