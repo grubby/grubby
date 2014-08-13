@@ -49,6 +49,10 @@ const (
 	tokenTypePLUS
 	tokenTypeMINUS
 	tokenTypeSTAR
+	tokenTypeLBracket
+	tokenTypeRBracket
+	tokenTypeLBrace
+	tokenTypeRBrace
 )
 
 type BetterRubyLexer struct {
@@ -131,6 +135,14 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 		case r == '*':
 			l.emit(tokenTypeSTAR)
 			return lexAnything
+		case r == '[':
+			l.emit(tokenTypeLBracket)
+		case r == ']':
+			l.emit(tokenTypeRBracket)
+		case r == '{':
+			l.emit(tokenTypeLBrace)
+		case r == '}':
+			l.emit(tokenTypeRBrace)
 		case r == eof:
 			break
 		default:
@@ -305,6 +317,18 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeSTAR:
 			debug("*")
 			return STAR
+		case tokenTypeLBracket:
+			debug("[")
+			return LBRACKET
+		case tokenTypeRBracket:
+			debug("]")
+			return RBRACKET
+		case tokenTypeLBrace:
+			debug("{")
+			return LBRACE
+		case tokenTypeRBrace:
+			debug("{")
+			return RBRACE
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
