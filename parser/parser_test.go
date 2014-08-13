@@ -457,7 +457,7 @@ false
 			})
 		})
 
-		XDescribe("binary operators", func() {
+		Describe("binary operators", func() {
 			Describe("+", func() {
 				BeforeEach(func() {
 					lexer = parser.NewBetterLexer("5 + 12")

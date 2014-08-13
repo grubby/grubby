@@ -48,6 +48,7 @@ const (
 	tokenTypeTILDE
 	tokenTypePLUS
 	tokenTypeMINUS
+	tokenTypeSTAR
 )
 
 type BetterRubyLexer struct {
@@ -126,6 +127,9 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			return lexAnything
 		case r == '-':
 			l.emit(tokenTypeMINUS)
+			return lexAnything
+		case r == '*':
+			l.emit(tokenTypeSTAR)
 			return lexAnything
 		case r == eof:
 			break
@@ -298,6 +302,9 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeMINUS:
 			debug("!")
 			return NEGATIVE
+		case tokenTypeSTAR:
+			debug("*")
+			return STAR
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
