@@ -278,7 +278,7 @@ end
 			})
 		})
 
-		XDescribe("classes", func() {
+		Describe("classes", func() {
 			Context("without any frills, bells, or whistles", func() {
 				BeforeEach(func() {
 					lexer = parser.NewBetterLexer(`
@@ -343,7 +343,7 @@ end
 			})
 		})
 
-		XDescribe("modules", func() {
+		Describe("modules", func() {
 			BeforeEach(func() {
 				lexer = parser.NewBetterLexer(`
 module Foo::Bar::Baz

@@ -6,7 +6,15 @@ const alphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345
 const alphaNumericUnderscore = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 
 func lexSymbol(l *BetterRubyLexer) stateFn {
-	l.accept(alpha + "_")
+	if !l.accept(alpha + "_") {
+		l.emit(tokenTypeColon)
+		for l.accept(":") {
+			l.emit(tokenTypeColon)
+		}
+
+		return lexAnything
+	}
+
 	l.acceptRun(alphaNumericUnderscore)
 	l.emit(tokenTypeSymbol)
 	return lexAnything

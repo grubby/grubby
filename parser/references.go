@@ -1,5 +1,10 @@
 package parser
 
+import (
+	"unicode"
+	"unicode/utf8"
+)
+
 func lexReference(l *BetterRubyLexer) stateFn {
 	l.acceptRun(alphaNumericUnderscore)
 
@@ -17,7 +22,12 @@ func lexReference(l *BetterRubyLexer) stateFn {
 	case "false":
 		l.emit(tokenTypeFALSE)
 	default:
-		l.emit(tokenTypeReference)
+		r, _ := utf8.DecodeRuneInString(l.input[l.start:])
+		if unicode.IsUpper(r) {
+			l.emit(tokenTypeCapitalizedReference)
+		} else {
+			l.emit(tokenTypeReference)
+		}
 	}
 	return lexAnything
 }

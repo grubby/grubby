@@ -29,6 +29,7 @@ const (
 	tokenTypeString
 	tokenTypeSymbol
 	tokenTypeReference
+	tokenTypeCapitalizedReference
 	tokenTypeWhitespace
 	tokenTypeNewline
 	tokenTypeLParen
@@ -40,6 +41,8 @@ const (
 	tokenTypeMODULE
 	tokenTypeTRUE
 	tokenTypeFALSE
+	tokenTypeLessThan
+	tokenTypeColon
 )
 
 type BetterRubyLexer struct {
@@ -90,7 +93,7 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 		case r == '\n':
 			l.backup()
 			return lexNewlines
-		case ('a' <= r && 'a' <= 'z') || r == '_':
+		case ('a' <= r && r <= 'z') || r == '_' || ('A' <= r && r <= 'Z'):
 			l.backup()
 			return lexReference
 		case r == '(':
@@ -101,6 +104,9 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			l.emit(tokenTypeComma)
 		case r == '#':
 			return lexComment
+		case r == '<':
+			l.emit(tokenTypeLessThan)
+			return lexAnything
 		}
 
 		if l.peek() == eof {
@@ -207,6 +213,10 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 			debug("REF: %s", token.value)
 			lval.genericValue = ast.BareReference{Name: token.value}
 			return REF
+		case tokenTypeCapitalizedReference:
+			debug("CAPITAL REF: %s", token.value)
+			lval.genericValue = ast.BareReference{Name: token.value}
+			return CAPITAL_REF
 		case tokenTypeLParen:
 			debug("LPAREN")
 			return LPAREN
@@ -243,6 +253,12 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeFALSE:
 			debug("FALSE")
 			return FALSE
+		case tokenTypeLessThan:
+			debug("<")
+			return LESSTHAN
+		case tokenTypeColon:
+			debug(":")
+			return COLON
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
