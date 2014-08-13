@@ -111,6 +111,8 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 		case r == '=':
 			l.emit(tokenTypeEQUAL)
 			return lexAnything
+		default:
+			panic(fmt.Sprintf("unknown rune encountered: '%s'", string(r)))
 		}
 
 		if l.peek() == eof {
