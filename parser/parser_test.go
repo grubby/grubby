@@ -368,7 +368,7 @@ end
 			})
 		})
 
-		XDescribe("assignment to a variable", func() {
+		Describe("assignment to a variable", func() {
 			BeforeEach(func() {
 				lexer = parser.NewBetterLexer(`foo = 5`)
 			})

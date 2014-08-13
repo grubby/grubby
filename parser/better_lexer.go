@@ -43,6 +43,7 @@ const (
 	tokenTypeFALSE
 	tokenTypeLessThan
 	tokenTypeColon
+	tokenTypeEQUAL
 )
 
 type BetterRubyLexer struct {
@@ -106,6 +107,9 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			return lexComment
 		case r == '<':
 			l.emit(tokenTypeLessThan)
+			return lexAnything
+		case r == '=':
+			l.emit(tokenTypeEQUAL)
 			return lexAnything
 		}
 
@@ -259,6 +263,9 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeColon:
 			debug(":")
 			return COLON
+		case tokenTypeEQUAL:
+			debug("=")
+			return EQUALTO
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
