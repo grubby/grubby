@@ -44,6 +44,10 @@ const (
 	tokenTypeLessThan
 	tokenTypeColon
 	tokenTypeEQUAL
+	tokenTypeBANG
+	tokenTypeTILDE
+	tokenTypePLUS
+	tokenTypeMINUS
 )
 
 type BetterRubyLexer struct {
@@ -111,6 +115,20 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 		case r == '=':
 			l.emit(tokenTypeEQUAL)
 			return lexAnything
+		case r == '!':
+			l.emit(tokenTypeBANG)
+			return lexAnything
+		case r == '~':
+			l.emit(tokenTypeTILDE)
+			return lexAnything
+		case r == '+':
+			l.emit(tokenTypePLUS)
+			return lexAnything
+		case r == '-':
+			l.emit(tokenTypeMINUS)
+			return lexAnything
+		case r == eof:
+			break
 		default:
 			panic(fmt.Sprintf("unknown rune encountered: '%s'", string(r)))
 		}
@@ -268,6 +286,18 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeEQUAL:
 			debug("=")
 			return EQUALTO
+		case tokenTypeBANG:
+			debug("!")
+			return BANG
+		case tokenTypeTILDE:
+			debug("!")
+			return COMPLEMENT
+		case tokenTypePLUS:
+			debug("!")
+			return POSITIVE
+		case tokenTypeMINUS:
+			debug("!")
+			return NEGATIVE
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

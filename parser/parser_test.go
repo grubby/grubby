@@ -399,7 +399,7 @@ false
 			})
 		})
 
-		XDescribe("unary operators", func() {
+		Describe("unary operators", func() {
 			Describe("unary NOT", func() {
 				BeforeEach(func() {
 					lexer = parser.NewBetterLexer(`!true`)
