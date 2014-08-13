@@ -571,7 +571,7 @@ foo: bar,
 			})
 		})
 
-		XDescribe("globals", func() {
+		Describe("globals", func() {
 			BeforeEach(func() {
 				lexer = parser.NewBetterLexer("$LOAD_PATH")
 			})
@@ -583,7 +583,7 @@ foo: bar,
 			})
 		})
 
-		XDescribe("instance variables", func() {
+		Describe("instance variables", func() {
 			BeforeEach(func() {
 				lexer = parser.NewBetterLexer(`
 @foo = :bar
@@ -605,7 +605,7 @@ foo: bar,
 			})
 		})
 
-		XDescribe("class variables", func() {
+		Describe("class variables", func() {
 			BeforeEach(func() {
 				lexer = parser.NewBetterLexer(`
 @@foo = :bar

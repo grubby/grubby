@@ -44,16 +44,18 @@ const (
 	tokenTypeLessThan
 	tokenTypeGreaterThan
 	tokenTypeColon
-	tokenTypeEQUAL
-	tokenTypeBANG
-	tokenTypeTILDE
-	tokenTypePLUS
-	tokenTypeMINUS
-	tokenTypeSTAR
+	tokenTypeEqual
+	tokenTypeBang
+	tokenTypeTilde
+	tokenTypePlus
+	tokenTypeMinus
+	tokenTypeStar
 	tokenTypeLBracket
 	tokenTypeRBracket
 	tokenTypeLBrace
 	tokenTypeRBrace
+	tokenTypeDollarSign
+	tokenTypeAtSign
 )
 
 type BetterRubyLexer struct {
@@ -122,31 +124,44 @@ func lexAnything(l *BetterRubyLexer) stateFn {
 			l.emit(tokenTypeGreaterThan)
 			return lexAnything
 		case r == '=':
-			l.emit(tokenTypeEQUAL)
+			l.emit(tokenTypeEqual)
 			return lexAnything
 		case r == '!':
-			l.emit(tokenTypeBANG)
+			l.emit(tokenTypeBang)
 			return lexAnything
 		case r == '~':
-			l.emit(tokenTypeTILDE)
+			l.emit(tokenTypeTilde)
 			return lexAnything
 		case r == '+':
-			l.emit(tokenTypePLUS)
+			l.emit(tokenTypePlus)
 			return lexAnything
 		case r == '-':
-			l.emit(tokenTypeMINUS)
+			l.emit(tokenTypeMinus)
 			return lexAnything
 		case r == '*':
-			l.emit(tokenTypeSTAR)
+			l.emit(tokenTypeStar)
 			return lexAnything
 		case r == '[':
 			l.emit(tokenTypeLBracket)
+			return lexAnything
 		case r == ']':
 			l.emit(tokenTypeRBracket)
+			return lexAnything
 		case r == '{':
 			l.emit(tokenTypeLBrace)
+			return lexAnything
 		case r == '}':
 			l.emit(tokenTypeRBrace)
+			return lexAnything
+		case r == '$':
+			l.emit(tokenTypeDollarSign)
+			return lexAnything
+		case r == '@':
+			l.emit(tokenTypeAtSign)
+			return lexAnything
+			// FIXME : doesn't seem necessary to
+			// explicitly return lexAnything if
+			// this is the same function we're currently in, right?
 		case r == eof:
 			break
 		default:
@@ -306,22 +321,22 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeColon:
 			debug(":")
 			return COLON
-		case tokenTypeEQUAL:
+		case tokenTypeEqual:
 			debug("=")
 			return EQUALTO
-		case tokenTypeBANG:
+		case tokenTypeBang:
 			debug("!")
 			return BANG
-		case tokenTypeTILDE:
+		case tokenTypeTilde:
 			debug("!")
 			return COMPLEMENT
-		case tokenTypePLUS:
+		case tokenTypePlus:
 			debug("!")
 			return POSITIVE
-		case tokenTypeMINUS:
+		case tokenTypeMinus:
 			debug("!")
 			return NEGATIVE
-		case tokenTypeSTAR:
+		case tokenTypeStar:
 			debug("*")
 			return STAR
 		case tokenTypeLBracket:
@@ -336,6 +351,12 @@ func (lexer *BetterRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeRBrace:
 			debug("{")
 			return RBRACE
+		case tokenTypeDollarSign:
+			debug("$")
+			return DOLLARSIGN
+		case tokenTypeAtSign:
+			debug("@")
+			return ATSIGN
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
