@@ -24,6 +24,8 @@ type VM interface {
 	Get(string) (builtins.Value, error)
 	MustGet(string) builtins.Value
 
+	Set(string, builtins.Value)
+
 	Symbols() map[string]builtins.Value
 }
 
@@ -102,6 +104,10 @@ func (vm *vm) Get(key string) (builtins.Value, error) {
 	}
 
 	return nil, errors.New(fmt.Sprintf("'%s' is undefined", key))
+}
+
+func (vm *vm) Set(key string, value builtins.Value) {
+	vm.ObjectSpace[key] = value
 }
 
 func (vm *vm) Symbols() map[string]builtins.Value {
