@@ -6,7 +6,9 @@ type SymbolValue struct {
 }
 
 func NewSymbol(val string) Value {
-	return &SymbolValue{value: val}
+	s := &SymbolValue{value: val}
+	s.initialize()
+	return s
 }
 
 func (symbolValue *SymbolValue) String() string {

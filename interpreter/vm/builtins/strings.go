@@ -6,7 +6,9 @@ type StringValue struct {
 }
 
 func NewString(val string) Value {
-	return &StringValue{value: val}
+	s := &StringValue{value: val}
+	s.initialize()
+	return s
 }
 
 func (stringValue *StringValue) String() string {

@@ -6,7 +6,9 @@ type Array struct {
 }
 
 func NewArrayClass() Value {
-	return &Array{}
+	a := &Array{}
+	a.initialize()
+	return a
 }
 
 func (array *Array) String() string {

@@ -20,8 +20,15 @@ var _ = Describe("VM", func() {
 		vm = NewVM()
 	})
 
-	It("has a global Object", func() {
-		Expect(vm.MustGet("Object")).ToNot(BeNil())
+	Describe("the global Object", func() {
+		It("exists", func() {
+			Expect(vm.MustGet("Object")).ToNot(BeNil())
+		})
+
+		It("reports its class as being 'Class'", func() {
+			o := vm.MustGet("Object")
+			Expect(o.Class().String()).To(Equal("Class"))
+		})
 	})
 
 	Describe("creating a simple function", func() {

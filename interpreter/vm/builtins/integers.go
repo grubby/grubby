@@ -8,7 +8,9 @@ type intValue struct {
 }
 
 func NewInt(val int) Value {
-	return &intValue{value: val}
+	i := &intValue{value: val}
+	i.initialize()
+	return i
 }
 
 func (intValue *intValue) Value() int {

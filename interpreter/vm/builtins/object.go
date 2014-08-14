@@ -5,7 +5,10 @@ type objectClass struct {
 }
 
 func NewGlobalObjectClass() Value {
-	return &objectClass{}
+	o := &objectClass{}
+	o.initialize()
+	o.class = NewClassValue().(Class)
+	return o
 }
 
 func (obj *objectClass) String() string {

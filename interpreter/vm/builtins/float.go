@@ -8,7 +8,9 @@ type FloatValue struct {
 }
 
 func NewFloat(val float64) Value {
-	return &FloatValue{value: val}
+	f := &FloatValue{value: val}
+	f.initialize()
+	return f
 }
 
 func (floatValue *FloatValue) ValueAsFloat() float64 {

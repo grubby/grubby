@@ -15,7 +15,9 @@ type Method interface {
 }
 
 func NewMethod(name string, body func(...Value) (Value, error)) Method {
-	return &method{name: name, body: body}
+	m := &method{name: name, body: body}
+	m.initialize()
+	return m
 }
 
 func (method *method) Name() string {
