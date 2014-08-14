@@ -136,10 +136,12 @@ list : /* empty */
   { $$ = []ast.Node{} }
 | list NEWLINE
   { /* do nothing */ }
-| list whitespace expr
+| list WHITESPACE
+  { /* do nothing */ }
+| list expr
   {
-		if $3 != nil {
-			$$ = append($$, $3)
+		if $2 != nil {
+			$$ = append($$, $2)
 		}
 	};
 
@@ -186,15 +188,19 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | nodes_with_commas whitespace COMMA whitespace REF
   { $$ = append($$, $5); };
 
+whitespace_and_newlines: /* empty */
+  | whitespace_and_newlines WHITESPACE;
+  | whitespace_and_newlines NEWLINE;
 
 // FIXME: this should use a different type than call_args
 // call args can be a list of expressions. This is just a list of REFs or NODEs
-func_declaration : DEF whitespace REF whitespace function_args whitespace NEWLINE list END
+func_declaration :
+  DEF whitespace REF whitespace function_args whitespace_and_newlines list whitespace_and_newlines END
   {
 		$$ = ast.FuncDecl{
 			Name: $3.(ast.BareReference),
       Args: $5,
-			Body: $8,
+			Body: $7,
     }
   };
 

@@ -628,8 +628,7 @@ foo: bar,
 		})
 	})
 
-	// FIXME: don't mark this as pending
-	XDescribe("optional whitespace is optional", func() {
+	Describe("having tons of optional whitespace", func() {
 		BeforeEach(func() {
 			lexer = parser.NewBetterLexer(`
 class Foo<Bar
@@ -640,10 +639,13 @@ class Foo<Bar
 
 	 def    something
 	           puts 'whatever'
-	   end
+               puts 'fasciculated-stripe'
+	  end
 
-	 def something2(  foo  ,   bar   )
-	end
+	    def something2(  foo  ,   bar   )
+
+
+      	end
 
   abc    =   123
 
@@ -657,7 +659,7 @@ end
 
 		It("parses just fine", func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.RubyLex).LastError).To(BeNil())
+			Expect(lexer.(*parser.BetterRubyLexer).LastError).To(BeNil())
 		})
 	})
 
