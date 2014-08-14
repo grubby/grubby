@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 )
 
-func lexReference(l *BetterRubyLexer) stateFn {
+func lexReference(l *StatefulRubyLexer) stateFn {
 	l.acceptRun(alphaNumericUnderscore)
 
 	switch l.input[l.start:l.pos] {

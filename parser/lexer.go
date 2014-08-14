@@ -3,223 +3,364 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
-	"unicode"
+	"unicode/utf8"
 
 	"github.com/grubby/grubby/ast"
 )
 
-var (
-	integerRegexp          = regexp.MustCompile("^[0-9]+$")
-	floatRegexp            = regexp.MustCompile("^[0-9]+\\.[0-9]+$")
-	stringRegexp           = regexp.MustCompile("^'[^']*'$")
-	referenceRegexp        = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
-	capitalReferenceRegexp = regexp.MustCompile("^[A-Z][a-zA-Z0-9_]*$")
-	DebugStatements        = []string{}
+var DebugStatements = []string{}
+
+const (
+	eof rune = iota
 )
 
-type RubyLex struct {
-	input        string
-	position     int
-	currentToken string
+type token struct {
+	typ   tokenType
+	value string
+}
 
-	lexIndex int
-	tokens   []string
+type tokenType int
+
+const (
+	tokenTypeError tokenType = iota
+	tokenTypeEOF
+	tokenTypeInteger
+	tokenTypeFloat
+	tokenTypeString
+	tokenTypeSymbol
+	tokenTypeReference
+	tokenTypeCapitalizedReference
+	tokenTypeWhitespace
+	tokenTypeNewline
+	tokenTypeLParen
+	tokenTypeRParen
+	tokenTypeComma
+	tokenTypeDEF
+	tokenTypeEND
+	tokenTypeCLASS
+	tokenTypeMODULE
+	tokenTypeTRUE
+	tokenTypeFALSE
+	tokenTypeLessThan
+	tokenTypeGreaterThan
+	tokenTypeColon
+	tokenTypeEqual
+	tokenTypeBang
+	tokenTypeTilde
+	tokenTypePlus
+	tokenTypeMinus
+	tokenTypeStar
+	tokenTypeLBracket
+	tokenTypeRBracket
+	tokenTypeLBrace
+	tokenTypeRBrace
+	tokenTypeDollarSign
+	tokenTypeAtSign
+)
+
+type StatefulRubyLexer struct {
+	input string
+	start int
+	pos   int
+	width int // width of last rune read from input
+
+	tokens chan token
 
 	LastError error
 }
 
-func NewLexer(input string) RubyLexer {
-	lexer := &RubyLex{input: input}
-	lexer.tokenize()
+type stateFn func(*StatefulRubyLexer) stateFn
 
+func NewLexer(input string) *StatefulRubyLexer {
+	lexer := &StatefulRubyLexer{
+		input:  input,
+		tokens: make(chan token),
+	}
+
+	go lexer.run()
 	return lexer
 }
 
-func (lexer *RubyLex) tokenize() {
-	for lexer.position < len(lexer.input) {
-		char := rune(lexer.input[lexer.position])
+func (lexer *StatefulRubyLexer) run() {
+	for state := lexAnything; state != nil; {
+		state = state(lexer)
+	}
 
-		switch {
-		case isSeparator(char):
-			lexer.appendNonEmptyTokens(lexer.currentToken)
-			lexer.tokens = append(lexer.tokens, string(char))
-		case char == '\'':
-			lexer.tokenizeString()
-		case char == '#':
-			lexer.appendNonEmptyTokens(lexer.currentToken)
-			lexer.readCommentUntilNewline()
+	close(lexer.tokens)
+}
+
+func lexAnything(l *StatefulRubyLexer) stateFn {
+	for {
+		switch r := l.next(); {
+		case '0' <= r && r <= '9':
+			l.backup()
+			return lexNumber
+		case r == '\'':
+			return lexSingleQuoteString
+		case r == ':':
+			l.start += 1 // skip past the colon
+			return lexSymbol
+		case r == ' ' || r == '\t':
+			l.backup()
+			return lexWhitespace
+		case r == '\n':
+			l.backup()
+			return lexNewlines
+		case ('a' <= r && r <= 'z') || r == '_' || ('A' <= r && r <= 'Z'):
+			l.backup()
+			return lexReference
+		case r == '(':
+			l.emit(tokenTypeLParen)
+		case r == ')':
+			l.emit(tokenTypeRParen)
+		case r == ',':
+			l.emit(tokenTypeComma)
+		case r == '#':
+			return lexComment
+		case r == '<':
+			l.emit(tokenTypeLessThan)
+			return lexAnything
+		case r == '>':
+			l.emit(tokenTypeGreaterThan)
+			return lexAnything
+		case r == '=':
+			l.emit(tokenTypeEqual)
+			return lexAnything
+		case r == '!':
+			l.emit(tokenTypeBang)
+			return lexAnything
+		case r == '~':
+			l.emit(tokenTypeTilde)
+			return lexAnything
+		case r == '+':
+			l.emit(tokenTypePlus)
+			return lexAnything
+		case r == '-':
+			l.emit(tokenTypeMinus)
+			return lexAnything
+		case r == '*':
+			l.emit(tokenTypeStar)
+			return lexAnything
+		case r == '[':
+			l.emit(tokenTypeLBracket)
+			return lexAnything
+		case r == ']':
+			l.emit(tokenTypeRBracket)
+			return lexAnything
+		case r == '{':
+			l.emit(tokenTypeLBrace)
+			return lexAnything
+		case r == '}':
+			l.emit(tokenTypeRBrace)
+			return lexAnything
+		case r == '$':
+			l.emit(tokenTypeDollarSign)
+			return lexAnything
+		case r == '@':
+			l.emit(tokenTypeAtSign)
+			return lexAnything
+			// FIXME : doesn't seem necessary to
+			// explicitly return lexAnything if
+			// this is the same function we're currently in, right?
+		case r == eof:
+			break
 		default:
-			lexer.currentToken += string(char)
+			panic(fmt.Sprintf("unknown rune encountered: '%s'", string(r)))
 		}
 
-		lexer.position++
-	}
-
-	lexer.appendNonEmptyTokens(lexer.currentToken)
-	debug("Lexed %d tokens", len(lexer.tokens))
-}
-
-func (lexer *RubyLex) appendNonEmptyTokens(tokens ...string) {
-	defer func() {
-		lexer.currentToken = ""
-	}()
-
-	for _, token := range tokens {
-		if strings.TrimSpace(token) != "" {
-			lexer.tokens = append(lexer.tokens, token)
-		}
-	}
-}
-
-func (lexer *RubyLex) readCommentUntilNewline() {
-	for i := lexer.position + 1; i < len(lexer.input); i++ {
-		lexer.position = i
-		char := lexer.input[i]
-
-		if char == '\n' {
-			lexer.position = i - 1
-			break
-		}
-	}
-}
-
-func (lexer *RubyLex) tokenizeString() {
-	token := string(lexer.input[lexer.position])
-	for i := lexer.position + 1; i < len(lexer.input); i++ {
-		char := lexer.input[i]
-		token += string(char)
-
-		if char == '\'' {
-			lexer.position = i
+		if l.peek() == eof {
 			break
 		}
 	}
 
-	// FIXME: needs to blow up if the string was never closed
-	lexer.currentToken = token
+	if l.start != len(l.input) {
+		l.emit(tokenTypeError)
+	}
+
+	l.emit(tokenTypeEOF)
+	return nil
 }
 
-func (l *RubyLex) Lex(lval *RubySymType) int {
+func (l *StatefulRubyLexer) next() (r rune) {
+	if l.pos >= len(l.input) {
+		l.width = 0
+		return eof
+	}
+
+	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
+	l.pos += l.width
+	return r
+}
+
+// backup steps back one rune.
+// Can be called only once per call of next.
+func (l *StatefulRubyLexer) backup() {
+	l.pos -= l.width
+}
+
+// ignore skips over the pending input before this point.
+func (l *StatefulRubyLexer) ignore() {
+	l.start = l.pos
+}
+
+// peek returns but does not consume
+// the next rune in the input.
+func (l *StatefulRubyLexer) peek() rune {
+	rune := l.next()
+	l.backup()
+	return rune
+}
+
+// accepts a single rune from valid
+func (l *StatefulRubyLexer) accept(valid string) bool {
+	if strings.IndexRune(valid, l.next()) >= 0 {
+		return true
+	}
+	l.backup()
+	return false
+}
+
+// acceptRun consumes a run of runes from the valid set.
+func (l *StatefulRubyLexer) acceptRun(valid string) {
+	for strings.IndexRune(valid, l.next()) >= 0 {
+	}
+	l.backup()
+}
+
+func (lexer *StatefulRubyLexer) emit(t tokenType) {
+	lexer.tokens <- token{
+		typ:   t,
+		value: lexer.input[lexer.start:lexer.pos],
+	}
+
+	lexer.start = lexer.pos
+}
+
+func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 	debug("Called Lex()")
-	defer func() {
-		debug("")
-	}()
+	defer func() { debug("") }()
 
-	for l.lexIndex < len(l.tokens) {
-		token := l.tokens[l.lexIndex]
-		defer func() {
-			l.lexIndex++
-		}()
-
-		switch {
-		case token == "def":
-			debug("def")
-			return DEF
-		case token == "end":
-			debug("end")
-			return END
-		case token == "class":
-			debug("class")
-			return CLASS
-		case token == "module":
-			debug("module")
-			return MODULE
-		case token == "true":
-			debug("TRUE")
-			return TRUE
-		case token == "false":
-			debug("FALSE")
-			return FALSE
-		case integerRegexp.MatchString(token):
-			debug("integer: %s", token)
-			intVal, err := strconv.Atoi(token)
+	for token := range lexer.tokens {
+		switch token.typ {
+		case tokenTypeInteger:
+			debug("integer: %s", token.value)
+			intVal, err := strconv.Atoi(token.value)
 			if err != nil {
 				panic(err)
 			}
 
 			lval.genericValue = ast.ConstantInt{Value: intVal}
-			return NODE
-		case floatRegexp.MatchString(token):
-			debug("float: %s", token)
-			floatval, err := strconv.ParseFloat(token, 64)
+			return NODE // Consider: should this be a different type?
+		case tokenTypeFloat:
+			debug("float: %s", token.value)
+			floatval, err := strconv.ParseFloat(token.value, 64)
 			if err != nil {
 				panic(err)
 			}
 
 			lval.genericValue = ast.ConstantFloat{Value: floatval}
+			return NODE // as above, maybe a different type?
+		case tokenTypeString:
+			debug("string: '%s'", token.value)
+			lval.genericValue = ast.SimpleString{Value: token.value}
+			return NODE // ditto
+		case tokenTypeSymbol:
+			debug("symbol: %s", token.value)
+			lval.genericValue = ast.Symbol{Name: token.value}
 			return NODE
-		case stringRegexp.MatchString(token):
-			debug("string: %s", token)
-			lval.genericValue = ast.SimpleString{Value: token}
-			return NODE
-		case capitalReferenceRegexp.MatchString(token):
-			debug("CAPITAL_REF: '%s'", token)
-			lval.genericValue = ast.BareReference{Name: token}
-			return CAPITAL_REF
-		case referenceRegexp.MatchString(token):
-			debug("REF: '%s'", token)
-			lval.genericValue = ast.BareReference{Name: token}
+		case tokenTypeReference:
+			debug("REF: %s", token.value)
+			lval.genericValue = ast.BareReference{Name: token.value}
 			return REF
-		case token == "<":
-			debug("LESS THAN")
-			return LESSTHAN
-		case token == ">":
-			debug("GREATER THAN")
-			return GREATERTHAN
-		case token == "=":
-			debug("EQUALTO")
-			return EQUALTO
-		case token == "(":
+		case tokenTypeCapitalizedReference:
+			debug("CAPITAL REF: %s", token.value)
+			lval.genericValue = ast.BareReference{Name: token.value}
+			return CAPITAL_REF
+		case tokenTypeLParen:
 			debug("LPAREN")
 			return LPAREN
-		case token == ")":
+		case tokenTypeRParen:
 			debug("RPAREN")
 			return RPAREN
-		case token == ",":
+		case tokenTypeComma:
 			debug("COMMA")
 			return COMMA
-		case token == ":":
-			debug("COLON")
+		case tokenTypeWhitespace:
+			debug("WHITESPACE")
+			return WHITESPACE
+		case tokenTypeNewline:
+			debug("NEWLINE")
+			return NEWLINE
+		case tokenTypeEOF:
+			debug("EOF")
+			return EOF
+		case tokenTypeDEF:
+			debug("DEF")
+			return DEF
+		case tokenTypeEND:
+			debug("END")
+			return END
+		case tokenTypeCLASS:
+			debug("CLASS")
+			return CLASS
+		case tokenTypeMODULE:
+			debug("MODULE")
+			return MODULE
+		case tokenTypeTRUE:
+			debug("TRUE")
+			return TRUE
+		case tokenTypeFALSE:
+			debug("FALSE")
+			return FALSE
+		case tokenTypeLessThan:
+			debug("<")
+			return LESSTHAN
+		case tokenTypeGreaterThan:
+			debug(">")
+			return GREATERTHAN
+		case tokenTypeColon:
+			debug(":")
 			return COLON
-		case token == "!":
-			debug("BANG")
+		case tokenTypeEqual:
+			debug("=")
+			return EQUALTO
+		case tokenTypeBang:
+			debug("!")
 			return BANG
-		case token == "~":
-			debug("COMPLEMENT")
+		case tokenTypeTilde:
+			debug("!")
 			return COMPLEMENT
-		case token == "+":
-			debug("POSITIVE")
+		case tokenTypePlus:
+			debug("!")
 			return POSITIVE
-		case token == "-":
-			debug("NEGATIVE")
+		case tokenTypeMinus:
+			debug("!")
 			return NEGATIVE
-		case token == "*":
-			debug("STAR")
+		case tokenTypeStar:
+			debug("*")
 			return STAR
-		case token == "[":
-			debug("LBRACKET")
+		case tokenTypeLBracket:
+			debug("[")
 			return LBRACKET
-		case token == "]":
-			debug("RBRACKET")
+		case tokenTypeRBracket:
+			debug("]")
 			return RBRACKET
-		case token == "{":
-			debug("LBRACE")
+		case tokenTypeLBrace:
+			debug("{")
 			return LBRACE
-		case token == "}":
-			debug("RBRACE")
+		case tokenTypeRBrace:
+			debug("{")
 			return RBRACE
-		case token == "$":
-			debug("DOLLARSIGN")
+		case tokenTypeDollarSign:
+			debug("$")
 			return DOLLARSIGN
-		case token == "@":
-			debug("ATSIGN")
+		case tokenTypeAtSign:
+			debug("@")
 			return ATSIGN
-		case len(token) == 1: // ;  " " or another separator
-			debug("separator: '%s'", strings.Replace(token, string('\n'), "\\n", -1))
-			return int(rune(token[0]))
+		case tokenTypeError:
+			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
 			panic(fmt.Sprintf("unknown token: '%s'", token))
 		}
@@ -228,16 +369,8 @@ func (l *RubyLex) Lex(lval *RubySymType) int {
 	return 0
 }
 
-func (l *RubyLex) Error(error string) {
-	l.LastError = errors.New(fmt.Sprintf("syntax error: %s\n", error))
-}
-
-// FIXME: is there a concept of a character set that would make this faster?
-//        barring that, maybe just a map lookup?
-// a better fix would be to reimplement this parser using the style of tokenization
-// that Rob Pike discussed in his talk on the Golang template parser / lexer
-func isSeparator(r rune) bool {
-	return unicode.IsSpace(r) || r == ';' || r == ')' || r == '(' || r == ',' || r == ':' || r == '!' || r == '~' || r == '+' || r == '-' || r == '<' || r == '*' || r == '[' || r == ']' || r == '{' || r == '}' || r == '$' || r == '@' || r == '='
+func (lexer *StatefulRubyLexer) Error(error string) {
+	lexer.LastError = errors.New(fmt.Sprintf("syntax error: %s\n", error))
 }
 
 func debug(formatString string, args ...interface{}) {

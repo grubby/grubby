@@ -2,7 +2,7 @@ package parser
 
 const digits = "0123456789"
 
-func lexNumber(l *BetterRubyLexer) stateFn {
+func lexNumber(l *StatefulRubyLexer) stateFn {
 	l.acceptRun(digits)
 	if l.peek() == '.' {
 		l.accept(".")

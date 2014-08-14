@@ -1,6 +1,6 @@
 package parser
 
-func lexSingleQuoteString(l *BetterRubyLexer) stateFn {
+func lexSingleQuoteString(l *StatefulRubyLexer) stateFn {
 	var (
 		r    rune
 		prev rune

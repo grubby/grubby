@@ -2,7 +2,7 @@ package parser
 
 const whitespace = " \t"
 
-func lexWhitespace(l *BetterRubyLexer) stateFn {
+func lexWhitespace(l *StatefulRubyLexer) stateFn {
 	l.acceptRun(whitespace)
 	l.emit(tokenTypeWhitespace)
 	return lexAnything
@@ -10,7 +10,7 @@ func lexWhitespace(l *BetterRubyLexer) stateFn {
 
 const newline = "\n"
 
-func lexNewlines(l *BetterRubyLexer) stateFn {
+func lexNewlines(l *StatefulRubyLexer) stateFn {
 	for l.accept(newline) {
 		l.emit(tokenTypeNewline)
 	}

@@ -21,21 +21,21 @@ var _ = Describe("goyacc parser", func() {
 
 	Describe("parsing nothing at all", func() {
 		It("succeeds without any errors", func() {
-			lexer = parser.NewBetterLexer("")
+			lexer = parser.NewLexer("")
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.BetterRubyLexer).LastError).To(BeNil())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
 		})
 	})
 
 	Context("when the code parsed is syntactically valid", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.BetterRubyLexer).LastError).To(BeNil())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
 		})
 
 		Describe("parsing an integer", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer("5")
+				lexer = parser.NewLexer("5")
 			})
 
 			It("returns a ConstantInt struct representing the value", func() {
@@ -47,7 +47,7 @@ var _ = Describe("goyacc parser", func() {
 
 		Describe("parsing a float", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer("123.4567")
+				lexer = parser.NewLexer("123.4567")
 			})
 
 			It("returns a ConstantFloat struct representing the value", func() {
@@ -59,7 +59,7 @@ var _ = Describe("goyacc parser", func() {
 
 		Describe("strings", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer("'hello world'")
+				lexer = parser.NewLexer("'hello world'")
 			})
 
 			It("returns a SimpleString struct", func() {
@@ -71,7 +71,7 @@ var _ = Describe("goyacc parser", func() {
 
 		Describe("symbols", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(":foo")
+				lexer = parser.NewLexer(":foo")
 			})
 
 			It("returns an ast.Symbol", func() {
@@ -83,7 +83,7 @@ var _ = Describe("goyacc parser", func() {
 
 		Describe("parsing multiple lines", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(`
+				lexer = parser.NewLexer(`
 :foo
 :bar`)
 			})
@@ -98,7 +98,7 @@ var _ = Describe("goyacc parser", func() {
 
 		Describe("variables", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer("foo")
+				lexer = parser.NewLexer("foo")
 			})
 
 			It("returns a bare reference", func() {
@@ -111,7 +111,7 @@ var _ = Describe("goyacc parser", func() {
 		Describe("call expressions", func() {
 			Context("without parens", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("puts 'foo'")
+					lexer = parser.NewLexer("puts 'foo'")
 				})
 
 				It("returns a call expression with one arg", func() {
@@ -126,7 +126,7 @@ var _ = Describe("goyacc parser", func() {
 
 			Context("with parens", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("puts('foo', 'bar', 'baz')")
+					lexer = parser.NewLexer("puts('foo', 'bar', 'baz')")
 				})
 
 				It("returns a call expression with args", func() {
@@ -145,7 +145,7 @@ var _ = Describe("goyacc parser", func() {
 
 			Context("without args", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("puts()")
+					lexer = parser.NewLexer("puts()")
 				})
 
 				It("returns a call expression without args", func() {
@@ -162,7 +162,7 @@ var _ = Describe("goyacc parser", func() {
 		Describe("method definitions", func() {
 			Context("without parameters", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`
+					lexer = parser.NewLexer(`
 def something
   puts 'hai'
 end
@@ -187,7 +187,7 @@ end
 
 			Context("with parameters surrounded by parens", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`
+					lexer = parser.NewLexer(`
 def multi_put(str1, str2)
   puts str1
   puts str2
@@ -220,7 +220,7 @@ end
 
 			Context("with parameters but no parens", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`
+					lexer = parser.NewLexer(`
 def multi_put str1, str2
   puts str1, str2
 end
@@ -253,7 +253,7 @@ end
 		Describe("comments", func() {
 			Context("on a single line", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("#ceci n'est pas un ligne de code")
+					lexer = parser.NewLexer("#ceci n'est pas un ligne de code")
 				})
 
 				It("is ignored", func() {
@@ -263,7 +263,7 @@ end
 
 			Context("at the end of a line of code", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`
+					lexer = parser.NewLexer(`
 5#this is a comment
 12 # this is also a comment
 `)
@@ -281,7 +281,7 @@ end
 		Describe("classes", func() {
 			Context("without any frills, bells, or whistles", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`
+					lexer = parser.NewLexer(`
 class Foo
   puts 'hai'
 end
@@ -305,7 +305,7 @@ end
 
 			Context("with a superclass", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`
+					lexer = parser.NewLexer(`
 class Foo < Bar
 end
 `)
@@ -324,7 +324,7 @@ end
 
 			Context("with namespaces", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`
+					lexer = parser.NewLexer(`
 class Foo::Biz::Bar < Foo::Biz::Baz
 end
 `)
@@ -345,7 +345,7 @@ end
 
 		Describe("modules", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(`
+				lexer = parser.NewLexer(`
 module Foo::Bar::Baz
 puts 'tumescent-wasty'
 end
@@ -370,7 +370,7 @@ end
 
 		Describe("assignment to a variable", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(`foo = 5`)
+				lexer = parser.NewLexer(`foo = 5`)
 			})
 
 			It("returns an assignment expression", func() {
@@ -385,7 +385,7 @@ end
 
 		Describe("booleans", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(`
+				lexer = parser.NewLexer(`
 true
 false
 `)
@@ -402,7 +402,7 @@ false
 		Describe("unary operators", func() {
 			Describe("unary NOT", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`!true`)
+					lexer = parser.NewLexer(`!true`)
 				})
 
 				It("returns a Negation expression", func() {
@@ -416,7 +416,7 @@ false
 
 			Describe("unary COMPLEMENT", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("~false")
+					lexer = parser.NewLexer("~false")
 				})
 
 				It("returns a Complement expression", func() {
@@ -430,7 +430,7 @@ false
 
 			Describe("unary plus", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("+foo")
+					lexer = parser.NewLexer("+foo")
 				})
 
 				It("returns a Positive expression", func() {
@@ -444,7 +444,7 @@ false
 
 			Describe("unary minus", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("-867.5309")
+					lexer = parser.NewLexer("-867.5309")
 				})
 
 				It("returns a Negative expression", func() {
@@ -460,7 +460,7 @@ false
 		Describe("binary operators", func() {
 			Describe("+", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("5 + 12")
+					lexer = parser.NewLexer("5 + 12")
 				})
 
 				It("returns a Addition expression", func() {
@@ -475,7 +475,7 @@ false
 
 			Describe("-", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("555 - 123")
+					lexer = parser.NewLexer("555 - 123")
 				})
 
 				It("returns a Subtraction expression", func() {
@@ -490,7 +490,7 @@ false
 
 			Describe("*", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("321 * 123")
+					lexer = parser.NewLexer("321 * 123")
 				})
 
 				It("returns a Multiplication expression", func() {
@@ -506,7 +506,7 @@ false
 
 		Describe("arrays", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer("[1,2,3,   4,5,6 ]")
+				lexer = parser.NewLexer("[1,2,3,   4,5,6 ]")
 			})
 
 			It("returns an Array node", func() {
@@ -528,7 +528,7 @@ false
 		Describe("hashes", func() {
 			Context("with hashrockets", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer("{:foo => bar}")
+					lexer = parser.NewLexer("{:foo => bar}")
 				})
 
 				It("returns a Hash node", func() {
@@ -547,7 +547,7 @@ false
 
 			Context("with 1.9 'key: value' pairs", func() {
 				BeforeEach(func() {
-					lexer = parser.NewBetterLexer(`{
+					lexer = parser.NewLexer(`{
 key: value,
 foo: bar,
 }`)
@@ -573,7 +573,7 @@ foo: bar,
 
 		Describe("globals", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer("$LOAD_PATH")
+				lexer = parser.NewLexer("$LOAD_PATH")
 			})
 
 			It("should be parsed as a GlobalVariable", func() {
@@ -585,7 +585,7 @@ foo: bar,
 
 		Describe("instance variables", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(`
+				lexer = parser.NewLexer(`
 @foo = :bar
 @FOO = :baz
 `)
@@ -607,7 +607,7 @@ foo: bar,
 
 		Describe("class variables", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(`
+				lexer = parser.NewLexer(`
 @@foo = :bar
 @@FOO = :baz
 `)
@@ -630,7 +630,7 @@ foo: bar,
 
 	Describe("having tons of optional whitespace", func() {
 		BeforeEach(func() {
-			lexer = parser.NewBetterLexer(`
+			lexer = parser.NewLexer(`
 class Foo<Bar
 	 1+1
    5    +    5
@@ -659,19 +659,19 @@ end
 
 		It("parses just fine", func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.BetterRubyLexer).LastError).To(BeNil())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
 		})
 	})
 
 	Describe("invalid syntax", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).ToNot(BeSuccessful())
-			Expect(lexer.(*parser.BetterRubyLexer).LastError).ToNot(BeNil())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).ToNot(BeNil())
 		})
 
 		Context("given a class name that starts with a lowercase character", func() {
 			BeforeEach(func() {
-				lexer = parser.NewBetterLexer(`
+				lexer = parser.NewLexer(`
 class foo
 end
 `)
