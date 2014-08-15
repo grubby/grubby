@@ -182,4 +182,15 @@ end`)
 			Expect(result.String()).To(Equal(os.Getenv("HOME") + "/foobar"))
 		})
 	})
+
+	Describe("assignment to a variable", func() {
+		It("stores the value assigned", func() {
+			_, err := vm.Run("foo = 'albitite-compotor'")
+			Expect(err).ToNot(HaveOccurred())
+
+			value, err := vm.Get("foo")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value).To(Equal(builtins.NewString("'albitite-compotor'")))
+		})
+	})
 })

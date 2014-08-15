@@ -184,6 +184,19 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 
 			returnValue, returnErr = method.Execute(args...)
+		case ast.Assignment:
+			assignment := statement.(ast.Assignment)
+			returnValue, err := vm.executeWithContext([]ast.Node{assignment.RHS}, context)
+			if err != nil {
+				return nil, err
+			}
+
+			ref, ok := assignment.LHS.(ast.BareReference)
+			if !ok {
+				panic("unimplemented")
+			}
+
+			vm.ObjectSpace[ref.Name] = returnValue
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
