@@ -21,6 +21,8 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeTRUE)
 	case "false":
 		l.emit(tokenTypeFALSE)
+	case "__FILE__":
+		l.emit(tokenType__FILE__)
 	default:
 		r, _ := utf8.DecodeRuneInString(l.input[l.start:])
 		if unicode.IsUpper(r) {

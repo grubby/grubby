@@ -97,14 +97,28 @@ var _ = Describe("goyacc parser", func() {
 		})
 
 		Describe("variables", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer("foo")
+			Context("that the user has defined", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo")
+				})
+
+				It("returns a bare reference", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.BareReference{Name: "foo"},
+					}))
+				})
 			})
 
-			It("returns a bare reference", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.BareReference{Name: "foo"},
-				}))
+			Context("__FILE__", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("__FILE__")
+				})
+
+				It("returns a file name reference", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FileNameConstReference{},
+					}))
+				})
 			})
 		})
 

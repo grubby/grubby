@@ -122,3 +122,5 @@ type InstanceVariable struct {
 type ClassVariable struct {
 	Name string
 }
+
+type FileNameConstReference struct{}

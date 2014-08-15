@@ -60,6 +60,7 @@ var Statements []ast.Node
 %token <genericValue> RBRACE     // "}"
 %token <genericValue> DOLLARSIGN // "$"
 %token <genericValue> ATSIGN     // "@"
+%token <genericValue> FILE_CONST_REF // __FILE__
 %token <genericValue> EOF
 
 /*
@@ -87,6 +88,7 @@ var Statements []ast.Node
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
+%type <genericValue> filename_const_reference
 
 // unary operator nodes
 %type <genericValue> negation   // !
@@ -148,7 +150,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash;
+expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | filename_const_reference;
 
 variable: REF | CAPITAL_REF | instance_variable | class_variable | global;
 
@@ -371,5 +373,8 @@ class_variable: ATSIGN ATSIGN REF
   { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} }
 | ATSIGN ATSIGN CAPITAL_REF
   { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} };
+
+filename_const_reference : FILE_CONST_REF
+  { $$ = ast.FileNameConstReference{} };
 
 %%

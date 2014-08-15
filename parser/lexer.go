@@ -58,6 +58,7 @@ const (
 	tokenTypeRBrace
 	tokenTypeDollarSign
 	tokenTypeAtSign
+	tokenType__FILE__
 )
 
 type StatefulRubyLexer struct {
@@ -359,6 +360,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeAtSign:
 			debug("@")
 			return ATSIGN
+		case tokenType__FILE__:
+			debug("__FILE__")
+			return FILE_CONST_REF
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
