@@ -14,6 +14,7 @@ import (
 )
 
 type vm struct {
+	topLevelName string
 	ObjectSpace  map[string]builtins.Value
 	Globals      map[string]builtins.Value
 	KnownSymbols map[string]builtins.Value
@@ -29,8 +30,9 @@ type VM interface {
 	Symbols() map[string]builtins.Value
 }
 
-func NewVM() VM {
+func NewVM(name string) VM {
 	vm := &vm{
+		topLevelName: name,
 		Globals:      make(map[string]builtins.Value),
 		ObjectSpace:  make(map[string]builtins.Value),
 		KnownSymbols: make(map[string]builtins.Value),
@@ -197,6 +199,9 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 
 			vm.ObjectSpace[ref.Name] = returnValue
+
+		case ast.FileNameConstReference:
+			returnValue = builtins.NewString(vm.topLevelName)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}

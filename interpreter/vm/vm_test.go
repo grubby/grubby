@@ -17,7 +17,7 @@ var _ = Describe("VM", func() {
 	var vm VM
 
 	BeforeEach(func() {
-		vm = NewVM()
+		vm = NewVM("fake-irb-under-test")
 	})
 
 	Describe("the global Object", func() {
@@ -191,6 +191,28 @@ end`)
 			value, err := vm.Get("foo")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value).To(Equal(builtins.NewString("'albitite-compotor'")))
+		})
+	})
+
+	Describe("special global variables", func() {
+		Describe("__FILE__", func() {
+			It("inherits the name given to the vm initially", func() {
+				value, err := vm.Run("__FILE__")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value).To(Equal(builtins.NewString("fake-irb-under-test")))
+			})
+
+			PIt("uses the relative path to the file if used in a require'd file", func() {
+				_, err := vm.Run("require 'foo'")
+				Expect(err).ToNot(HaveOccurred())
+
+				value, err := vm.Get("foo")
+				Expect(err).ToNot(HaveOccurred())
+
+				// should this actually be the relative path to foo.rb?
+				Expect(value).To(Equal(builtins.NewString("foo.rb")))
+			})
 		})
 	})
 })
