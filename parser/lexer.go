@@ -58,6 +58,7 @@ const (
 	tokenTypeRBrace
 	tokenTypeDollarSign
 	tokenTypeAtSign
+	tokenTypeDot
 	tokenType__FILE__
 )
 
@@ -122,49 +123,34 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			return lexComment
 		case r == '<':
 			l.emit(tokenTypeLessThan)
-			return lexAnything
 		case r == '>':
 			l.emit(tokenTypeGreaterThan)
-			return lexAnything
 		case r == '=':
 			l.emit(tokenTypeEqual)
-			return lexAnything
 		case r == '!':
 			l.emit(tokenTypeBang)
-			return lexAnything
 		case r == '~':
 			l.emit(tokenTypeTilde)
-			return lexAnything
 		case r == '+':
 			l.emit(tokenTypePlus)
-			return lexAnything
 		case r == '-':
 			l.emit(tokenTypeMinus)
-			return lexAnything
 		case r == '*':
 			l.emit(tokenTypeStar)
-			return lexAnything
 		case r == '[':
 			l.emit(tokenTypeLBracket)
-			return lexAnything
 		case r == ']':
 			l.emit(tokenTypeRBracket)
-			return lexAnything
 		case r == '{':
 			l.emit(tokenTypeLBrace)
-			return lexAnything
 		case r == '}':
 			l.emit(tokenTypeRBrace)
-			return lexAnything
 		case r == '$':
 			l.emit(tokenTypeDollarSign)
-			return lexAnything
 		case r == '@':
 			l.emit(tokenTypeAtSign)
-			return lexAnything
-			// FIXME : doesn't seem necessary to
-			// explicitly return lexAnything if
-			// this is the same function we're currently in, right?
+		case r == '.':
+			l.emit(tokenTypeDot)
 		case r == eof:
 			break
 		default:
@@ -363,6 +349,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenType__FILE__:
 			debug("__FILE__")
 			return FILE_CONST_REF
+		case tokenTypeDot:
+			debug(".")
+			return DOT
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

@@ -160,7 +160,15 @@ callexpr : REF whitespace call_args
       Func: $1.(ast.BareReference),
       Args: $3,
     }
-  };
+  }
+| REF DOT REF whitespace call_args
+  {
+    $$ = ast.CallExpression{
+      Target: $1.(ast.BareReference),
+      Func: $3.(ast.BareReference),
+      Args: $5,
+    };
+  }
 
 call_args : LPAREN whitespace nodes_with_commas whitespace RPAREN
   {

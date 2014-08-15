@@ -171,6 +171,22 @@ var _ = Describe("goyacc parser", func() {
 					}))
 				})
 			})
+
+			Context("on an object", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo.send(:catalecta_coassistant)")
+				})
+
+				It("correctly sets the target", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "foo"},
+							Func:   ast.BareReference{Name: "send"},
+							Args:   []ast.Node{ast.Symbol{Name: "catalecta_coassistant"}},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("method definitions", func() {
