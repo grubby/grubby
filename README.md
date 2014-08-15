@@ -82,14 +82,14 @@ Grubby yacc
     * [x] => syntax
       [x] ruby 1.9 {key: value} syntax
 * [x] arrays
-* [ ] blocks
+* [x] blocks
     * [ ] with block params
 * [ ] heredoc
-* [ ] globals ($: and $?, et cetera)
+* [x] globals ($: and $?, et cetera)
 * [ ] backtics
 * [ ] string interpolation
 * [ ] semicolons
-* [ ] method calls
+* [x] method calls
 * [x] comments
 * [ ] go docs (see: http://godoc.org/github.com/robertkrimen/otto)
 
