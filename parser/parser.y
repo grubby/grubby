@@ -156,7 +156,7 @@ optional_newline : /* empty */ | optional_newline NEWLINE;
 
 expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | filename_const_reference;
 
-variable: REF | CAPITAL_REF | instance_variable | class_variable | global;
+variable : REF | CAPITAL_REF | instance_variable | class_variable | global;
 
 callexpr : REF whitespace call_args
   {
@@ -216,7 +216,7 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | nodes_with_commas whitespace COMMA whitespace REF
   { $$ = append($$, $5); };
 
-whitespace_and_newlines: /* empty */
+whitespace_and_newlines : /* empty */
   | whitespace_and_newlines WHITESPACE;
   | whitespace_and_newlines NEWLINE;
 
@@ -235,7 +235,7 @@ func_declaration :
 function_args : /* possibly nothing */ { $$ = []ast.Node{} };
 | call_args { $$ = $1 };
 
-class_declaration: CLASS whitespace class_name_with_modules NEWLINE list END
+class_declaration : CLASS whitespace class_name_with_modules NEWLINE list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
@@ -252,7 +252,7 @@ class_declaration: CLASS whitespace class_name_with_modules NEWLINE list END
     }
   };
 
-module_declaration: MODULE whitespace class_name_with_modules NEWLINE list END
+module_declaration : MODULE whitespace class_name_with_modules NEWLINE list END
   {
     $$ = ast.ModuleDecl{
       Name: $3.(ast.Class).Name,
@@ -261,7 +261,7 @@ module_declaration: MODULE whitespace class_name_with_modules NEWLINE list END
     }
   };
 
-class_name_with_modules: whitespace CAPITAL_REF whitespace
+class_name_with_modules : whitespace CAPITAL_REF whitespace
   {
     $$ = ast.Class{
       Name: $2.(ast.BareReference).Name,
@@ -284,7 +284,7 @@ namespaced_modules : CAPITAL_REF
     $$ = append($$, $4.(ast.BareReference).Name)
   };
 
-assignment: REF whitespace EQUALTO whitespace expr
+assignment : REF whitespace EQUALTO whitespace expr
   {
     $$ = ast.Assignment{
       LHS: $1,
@@ -299,12 +299,12 @@ assignment: REF whitespace EQUALTO whitespace expr
     }
   };
 
-negation: BANG whitespace expr { $$ = ast.Negation{Target: $3} };
-complement: COMPLEMENT whitespace expr { $$ = ast.Complement{Target: $3} };
-positive: POSITIVE whitespace expr { $$ = ast.Positive{Target: $3} };
-negative: NEGATIVE whitespace expr { $$ = ast.Negative{Target: $3} };
+negation : BANG whitespace expr { $$ = ast.Negation{Target: $3} };
+complement : COMPLEMENT whitespace expr { $$ = ast.Complement{Target: $3} };
+positive : POSITIVE whitespace expr { $$ = ast.Positive{Target: $3} };
+negative : NEGATIVE whitespace expr { $$ = ast.Negative{Target: $3} };
 
-binary_addition: expr whitespace POSITIVE whitespace expr
+binary_addition : expr whitespace POSITIVE whitespace expr
   {
     $$ = ast.Addition{
       LHS: $1,
@@ -312,7 +312,7 @@ binary_addition: expr whitespace POSITIVE whitespace expr
     }
   };
 
-binary_subtraction: expr whitespace NEGATIVE whitespace expr
+binary_subtraction : expr whitespace NEGATIVE whitespace expr
   {
     $$ = ast.Subtraction{
       LHS: $1,
@@ -320,7 +320,7 @@ binary_subtraction: expr whitespace NEGATIVE whitespace expr
     }
   };
 
-binary_multiplication: expr whitespace STAR whitespace expr
+binary_multiplication : expr whitespace STAR whitespace expr
   {
     $$ = ast.Multiplication{
       LHS: $1,
@@ -328,13 +328,13 @@ binary_multiplication: expr whitespace STAR whitespace expr
     }
   };
 
-true: TRUE { $$ = ast.Boolean{Value: true} }
-false: FALSE { $$ = ast.Boolean{Value: false} }
+true : TRUE { $$ = ast.Boolean{Value: true} }
+false : FALSE { $$ = ast.Boolean{Value: false} }
 array : LBRACKET whitespace nodes_with_commas whitespace RBRACKET
   {
     $$ = ast.Array{Nodes: $3};
   };
-hash: LBRACE whitespace optional_newline whitespace key_value_pairs whitespace optional_newline whitespace RBRACE
+hash : LBRACE whitespace optional_newline whitespace key_value_pairs whitespace optional_newline whitespace RBRACE
   {
     pairs := []ast.HashKeyValuePair{}
     for _, node := range $5 {
@@ -351,7 +351,7 @@ hash: LBRACE whitespace optional_newline whitespace key_value_pairs whitespace o
     $$ = ast.Hash{Pairs: pairs}
   };
 
-key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
+key_value_pairs : /* empty */ { $$ = ast.Nodes{} }
 | expr whitespace EQUALTO GREATERTHAN whitespace expr
   { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $6}) }
 | key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr
@@ -359,7 +359,7 @@ key_value_pairs: /* empty */ { $$ = ast.Nodes{} }
 | key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr COMMA
   { $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $11}) };
 
-symbol_key_value_pairs: REF COLON whitespace expr
+symbol_key_value_pairs : REF COLON whitespace expr
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $1.(ast.BareReference).Name},
@@ -382,20 +382,20 @@ symbol_key_value_pairs: REF COLON whitespace expr
   };
 
 
-optional_comma: /* nothing */ { $$ = nil; }
+optional_comma : /* nothing */ { $$ = nil; }
 | COMMA  { $$ = nil; };
 
-global: DOLLARSIGN REF
+global : DOLLARSIGN REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
 | DOLLARSIGN CAPITAL_REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} };
 
-instance_variable: ATSIGN REF
+instance_variable : ATSIGN REF
   { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} }
 | ATSIGN CAPITAL_REF
   { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} };
 
-class_variable: ATSIGN ATSIGN REF
+class_variable : ATSIGN ATSIGN REF
   { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} }
 | ATSIGN ATSIGN CAPITAL_REF
   { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} };
