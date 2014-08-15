@@ -686,7 +686,7 @@ end
 				})
 			})
 
-			PContext("with args", func() {
+			Context("with args", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
 with_a_block do |and, with, some, args|
@@ -707,7 +707,7 @@ end
 										ast.BareReference{Name: "some"},
 										ast.BareReference{Name: "args"},
 									},
-									Body: []ast.Node{ast.SimpleString{Value: "aww yiss"}},
+									Body: []ast.Node{ast.SimpleString{Value: "'aww yiss'"}},
 								},
 							},
 						},

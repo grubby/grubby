@@ -107,11 +107,13 @@ var Statements []ast.Node
 // slice nodes
 %type <genericSlice> list
 %type <genericSlice> call_args
+%type <genericSlice> block_args
 %type <genericSlice> function_args
 %type <genericSlice> capture_list
 %type <genericSlice> key_value_pairs
-%type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nodes_with_commas
+%type <genericSlice> comma_delimited_refs
+%type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nonempty_nodes_with_commas
 %type <genericSlice> nodes_with_commas_and_optional_block
 %type <stringSlice> namespaced_modules
@@ -404,6 +406,24 @@ filename_const_reference : FILE_CONST_REF
   { $$ = ast.FileNameConstReference{} };
 
 block : DO list END
-  { $$ = ast.Block{Body: $2} };
+  { $$ = ast.Block{Body: $2} }
+| DO whitespace block_args whitespace one_or_more_newlines list END
+  {
+    $$ = ast.Block{
+    Body: $6,
+    Args: $3,
+    }
+  };
+
+block_args : PIPE comma_delimited_refs PIPE
+  { $$ = $2 };
+
+comma_delimited_refs : /* empty */ { $$ = ast.Nodes{} }
+| REF
+  { $$ = append($$, $1); }
+| nodes_with_commas whitespace COMMA whitespace REF
+  { $$ = append($$, $5); };
+
+one_or_more_newlines : NEWLINE | one_or_more_newlines NEWLINE
 
 %%
