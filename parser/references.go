@@ -11,6 +11,8 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 	switch l.input[l.start:l.pos] {
 	case "def":
 		l.emit(tokenTypeDEF)
+	case "do":
+		l.emit(tokenTypeDO)
 	case "end":
 		l.emit(tokenTypeEND)
 	case "class":

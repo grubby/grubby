@@ -38,6 +38,7 @@ const (
 	tokenTypeRParen
 	tokenTypeComma
 	tokenTypeDEF
+	tokenTypeDO
 	tokenTypeEND
 	tokenTypeCLASS
 	tokenTypeMODULE
@@ -286,6 +287,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeDEF:
 			debug("DEF")
 			return DEF
+		case tokenTypeDO:
+			debug("DO")
+			return DO
 		case tokenTypeEND:
 			debug("END")
 			return END

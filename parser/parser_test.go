@@ -656,6 +656,65 @@ foo: bar,
 				}))
 			})
 		})
+
+		Describe("blocks", func() {
+			Context("without any args", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+function_that_takes_a_block do
+  puts 'semiannual-pomfret'
+end
+`)
+				})
+
+				It("is parsed as an ast.Block", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "function_that_takes_a_block"},
+							Args: []ast.Node{
+								ast.Block{
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Value: "'semiannual-pomfret'"}},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+
+			PContext("with args", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+with_a_block do |and, with, some, args|
+'aww yiss'
+end
+`)
+				})
+
+				It("is parsed as an ast.Block with args", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "with_a_block"},
+							Args: []ast.Node{
+								ast.Block{
+									Args: []ast.Node{
+										ast.BareReference{Name: "and"},
+										ast.BareReference{Name: "with"},
+										ast.BareReference{Name: "some"},
+										ast.BareReference{Name: "args"},
+									},
+									Body: []ast.Node{ast.SimpleString{Value: "aww yiss"}},
+								},
+							},
+						},
+					}))
+				})
+			})
+		})
 	})
 
 	Describe("having tons of optional whitespace", func() {

@@ -5,10 +5,6 @@ type Node interface {
 
 type Nodes []Node
 
-type Block struct {
-	Statements []Node
-}
-
 type ConstantInt struct {
 	Value int
 }
@@ -125,3 +121,8 @@ type ClassVariable struct {
 }
 
 type FileNameConstReference struct{}
+
+type Block struct {
+	Args []Node
+	Body []Node
+}

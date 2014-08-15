@@ -29,6 +29,7 @@ var Statements []ast.Node
 %token <genericValue> COMMA
 
 // keywords
+%token <genericValue> DO
 %token <genericValue> DEF
 %token <genericValue> END
 %token <genericValue> CLASS
@@ -54,6 +55,7 @@ var Statements []ast.Node
 %token <genericValue> SEMICOLON
 %token <genericValue> COLON
 %token <genericValue> DOT
+%token <genericValue> PIPE       // "|"
 %token <genericValue> LBRACKET   // "["
 %token <genericValue> RBRACKET   // "]"
 %token <genericValue> LBRACE     // "{"
@@ -76,6 +78,7 @@ var Statements []ast.Node
 %type <genericValue> line
 %type <genericValue> true
 %type <genericValue> hash
+%type <genericValue> block
 %type <genericValue> false
 %type <genericValue> array
 %type <genericValue> global
@@ -110,6 +113,7 @@ var Statements []ast.Node
 %type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nodes_with_commas
 %type <genericSlice> nonempty_nodes_with_commas
+%type <genericSlice> nodes_with_commas_and_optional_block
 %type <stringSlice> namespaced_modules
 
 %%
@@ -169,15 +173,27 @@ callexpr : REF whitespace call_args
       Args: $5,
     };
   }
+| REF whitespace nodes_with_commas_and_optional_block
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: $3,
+    };
+  };
 
 call_args : LPAREN whitespace nodes_with_commas whitespace RPAREN
-  {
-		$$ = $3
-	}
+  { $$ = $3; }
 | nonempty_nodes_with_commas
-  {
-    $$ = $1
-  };
+  { $$ = $1; };
+
+nodes_with_commas_and_optional_block : expr
+  { $$ = append($$, $1); }
+| block
+  { $$ = append($$, $1); }
+| nodes_with_commas_and_optional_block whitespace COMMA whitespace expr
+  { $$ = append($$, $5); }
+| nodes_with_commas_and_optional_block whitespace COMMA whitespace block
+  { $$ = append($$, $5); };
 
 nonempty_nodes_with_commas : REF
   { $$ = append($$, $1); }
@@ -186,7 +202,9 @@ nonempty_nodes_with_commas : REF
 | nonempty_nodes_with_commas whitespace COMMA whitespace NODE
   { $$ = append($$, $5); };
 | nonempty_nodes_with_commas whitespace COMMA whitespace REF
-{ $$ = append($$, $5); };
+  { $$ = append($$, $5); }
+| nonempty_nodes_with_commas whitespace COMMA whitespace block
+  { $$ = append($$, $5); };
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | REF
@@ -384,5 +402,8 @@ class_variable: ATSIGN ATSIGN REF
 
 filename_const_reference : FILE_CONST_REF
   { $$ = ast.FileNameConstReference{} };
+
+block : DO list END
+  { $$ = ast.Block{Body: $2} };
 
 %%
