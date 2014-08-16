@@ -203,15 +203,16 @@ end`)
 				Expect(value).To(Equal(builtins.NewString("fake-irb-under-test")))
 			})
 
-			PIt("uses the relative path to the file if used in a require'd file", func() {
+			It("uses the relative path to the file if used in a require'd file", func() {
+				SetupFileWithGlobalFilenameConst(vm)
 				_, err := vm.Run("require 'foo'")
 				Expect(err).ToNot(HaveOccurred())
 
 				value, err := vm.Get("foo")
 				Expect(err).ToNot(HaveOccurred())
 
-				// should this actually be the relative path to foo.rb?
-				Expect(value).To(Equal(builtins.NewString("foo.rb")))
+				// should this actually be the absolute path to foo.rb?
+				Expect(value.String()).To(ContainSubstring("foo.rb"))
 			})
 		})
 	})

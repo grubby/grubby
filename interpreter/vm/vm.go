@@ -66,6 +66,12 @@ func NewVM(name string) VM {
 			contents, err := ioutil.ReadAll(file)
 
 			if err == nil {
+				originalName := vm.topLevelName
+				defer func() {
+					vm.topLevelName = originalName
+				}()
+
+				vm.topLevelName = file.Name()
 				vm.Run(string(contents))
 				return nil, nil
 			}
@@ -129,7 +135,6 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 		returnValue builtins.Value
 		returnErr   error
 	)
-
 	for _, statement := range statements {
 		switch statement.(type) {
 		case ast.FuncDecl:
