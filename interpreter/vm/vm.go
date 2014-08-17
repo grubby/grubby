@@ -14,10 +14,10 @@ import (
 )
 
 type vm struct {
-	topLevelName string
-	ObjectSpace  map[string]builtins.Value
-	Globals      map[string]builtins.Value
-	KnownSymbols map[string]builtins.Value
+	currentFilename string
+	ObjectSpace     map[string]builtins.Value
+	Globals         map[string]builtins.Value
+	KnownSymbols    map[string]builtins.Value
 }
 
 type VM interface {
@@ -32,10 +32,10 @@ type VM interface {
 
 func NewVM(name string) VM {
 	vm := &vm{
-		topLevelName: name,
-		Globals:      make(map[string]builtins.Value),
-		ObjectSpace:  make(map[string]builtins.Value),
-		KnownSymbols: make(map[string]builtins.Value),
+		currentFilename: name,
+		Globals:         make(map[string]builtins.Value),
+		ObjectSpace:     make(map[string]builtins.Value),
+		KnownSymbols:    make(map[string]builtins.Value),
 	}
 
 	loadPath := builtins.NewArrayClass()
@@ -66,12 +66,12 @@ func NewVM(name string) VM {
 			contents, err := ioutil.ReadAll(file)
 
 			if err == nil {
-				originalName := vm.topLevelName
+				originalName := vm.currentFilename
 				defer func() {
-					vm.topLevelName = originalName
+					vm.currentFilename = originalName
 				}()
 
-				vm.topLevelName = file.Name()
+				vm.currentFilename = file.Name()
 				vm.Run(string(contents))
 				return nil, nil
 			}
@@ -206,7 +206,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			vm.ObjectSpace[ref.Name] = returnValue
 
 		case ast.FileNameConstReference:
-			returnValue = builtins.NewString(vm.topLevelName)
+			returnValue = builtins.NewString(vm.currentFilename)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
