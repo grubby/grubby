@@ -143,7 +143,18 @@ end`)
 		})
 	})
 
-	Describe("the require method on Kernel", func() {
+	Describe("Kernel#puts", func() {
+		It("takes the given arguments and prints them to stdout", func() {
+			output := SwapStdout(func() {
+				_, err := vm.Run("puts 'conga-oestradiol'")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			Expect(output).To(ContainSubstring("conga-oestradiol"))
+		})
+	})
+
+	Describe("Kernel#require", func() {
 		It("searches for a file with the given name", func() {
 			_, err := vm.Run("require 'something'")
 

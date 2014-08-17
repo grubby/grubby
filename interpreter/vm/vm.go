@@ -81,6 +81,14 @@ func NewVM(name string) VM {
 		return nil, builtin_errors.NewLoadError(err)
 
 	}))
+	main.AddMethod(builtins.NewMethod("puts", func(args ...builtins.Value) (builtins.Value, error) {
+		for _, arg := range args {
+			os.Stdout.Write([]byte(arg.String() + "\n"))
+		}
+
+		return nil, nil
+	}))
+
 	vm.ObjectSpace["main"] = main
 
 	return vm
