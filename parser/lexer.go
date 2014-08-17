@@ -12,9 +12,7 @@ import (
 
 var DebugStatements = []string{}
 
-const (
-	eof rune = iota
-)
+const eof = -1
 
 type token struct {
 	typ   tokenType
