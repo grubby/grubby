@@ -158,7 +158,8 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == eof:
 			break
 		default:
-			panic(fmt.Sprintf("unknown rune encountered: '%s'", string(r)))
+			msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d')", l.pos, string(r), r)
+			panic(msg)
 		}
 
 		if l.peek() == eof {

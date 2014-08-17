@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+pushd parser
+go tool yacc -o parser.go -p Ruby parser.y
+popd
+
+rm bin/irb
+rm bin/ruby
+
+root=$(dirname $0)/..
+pushd $root
+go build -o bin/irb ./main/irb
+go build -o bin/ruby ./main/ruby
+popd

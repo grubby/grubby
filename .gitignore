@@ -23,3 +23,6 @@ _testmain.go
 *.test
 
 **/y.output
+
+bin/irb
+bin/ruby
