@@ -715,6 +715,29 @@ end
 				})
 			})
 		})
+
+		Describe("if else blocks", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+if false
+  puts 'Romanize-whereover'
+end`)
+			})
+
+			It("is parsed as an ast.IfBlock struct", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.IfBlock{
+						Condition: ast.Boolean{Value: false},
+						Body: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "puts"},
+								Args: []ast.Node{ast.SimpleString{Value: "'Romanize-whereover'"}},
+							},
+						},
+					},
+				}))
+			})
+		})
 	})
 
 	Describe("having tons of optional whitespace", func() {

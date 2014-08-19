@@ -38,6 +38,9 @@ const (
 	tokenTypeDEF
 	tokenTypeDO
 	tokenTypeEND
+	tokenTypeIF
+	tokenTypeELSE
+	tokenTypeELSIF
 	tokenTypeCLASS
 	tokenTypeMODULE
 	tokenTypeTRUE
@@ -295,6 +298,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeEND:
 			debug("END")
 			return END
+		case tokenTypeIF:
+			debug("IF")
+			return IF
 		case tokenTypeCLASS:
 			debug("CLASS")
 			return CLASS

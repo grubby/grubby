@@ -32,6 +32,9 @@ var Statements []ast.Node
 %token <genericValue> DO
 %token <genericValue> DEF
 %token <genericValue> END
+%token <genericValue> IF
+%token <genericValue> ELSE
+%token <genericValue> ELSIF
 %token <genericValue> CLASS
 %token <genericValue> MODULE
 
@@ -83,6 +86,7 @@ var Statements []ast.Node
 %type <genericValue> array
 %type <genericValue> global
 %type <genericValue> callexpr
+%type <genericValue> if_block
 %type <genericValue> variable // represents anything that could be assigned to
 %type <genericValue> assignment
 %type <genericValue> class_variable
@@ -156,7 +160,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | filename_const_reference;
+expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | filename_const_reference | if_block;
 
 variable : REF | CAPITAL_REF | instance_variable | class_variable | global;
 
@@ -425,5 +429,13 @@ comma_delimited_refs : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $5); };
 
 one_or_more_newlines : NEWLINE | one_or_more_newlines NEWLINE
+
+if_block : IF whitespace expr list END
+  {
+    $$ = ast.IfBlock{
+      Condition: $3,
+      Body: $4,
+    }
+  };
 
 %%

@@ -126,3 +126,8 @@ type Block struct {
 	Args []Node
 	Body []Node
 }
+
+type IfBlock struct {
+	Condition Node
+	Body      []Node
+}
