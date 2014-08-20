@@ -436,6 +436,14 @@ if_block : IF whitespace expr list END
       Condition: $3,
       Body: $4,
     }
+  }
+| IF whitespace expr list ELSE list END
+  {
+    $$ = ast.IfBlock{
+      Condition: $3,
+      Body: $4,
+      ElseBody: $6,
+    }
   };
 
 %%

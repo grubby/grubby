@@ -717,10 +717,37 @@ end
 		})
 
 		Describe("if else blocks", func() {
+			Context("without an else", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+if false
+  puts 'Romanize-whereover'
+end`)
+				})
+
+				It("is parsed as an ast.IfBlock struct", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.IfBlock{
+							Condition: ast.Boolean{Value: false},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "'Romanize-whereover'"}},
+								},
+							},
+						},
+					}))
+				})
+			})
+		})
+
+		Context("with an else", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
 if false
   puts 'Romanize-whereover'
+else
+  puts 'Kiplingese-disinvolve'
 end`)
 			})
 
@@ -732,6 +759,12 @@ end`)
 							ast.CallExpression{
 								Func: ast.BareReference{Name: "puts"},
 								Args: []ast.Node{ast.SimpleString{Value: "'Romanize-whereover'"}},
+							},
+						},
+						ElseBody: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "puts"},
+								Args: []ast.Node{ast.SimpleString{Value: "'Kiplingese-disinvolve'"}},
 							},
 						},
 					},
