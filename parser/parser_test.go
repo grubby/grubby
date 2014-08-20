@@ -761,10 +761,13 @@ end`)
 								Args: []ast.Node{ast.SimpleString{Value: "'Romanize-whereover'"}},
 							},
 						},
-						ElseBody: []ast.Node{
-							ast.CallExpression{
-								Func: ast.BareReference{Name: "puts"},
-								Args: []ast.Node{ast.SimpleString{Value: "'Kiplingese-disinvolve'"}},
+						Else: ast.IfBlock{
+							Condition: ast.Boolean{Value: true},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "'Kiplingese-disinvolve'"}},
+								},
 							},
 						},
 					},

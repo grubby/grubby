@@ -104,7 +104,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:449
+//line parser.y:452
 
 //line yacctab:1
 var RubyExca = []int{
@@ -1186,7 +1186,10 @@ Rubydefault:
 			RubyVAL.genericValue = ast.IfBlock{
 				Condition: RubyS[Rubypt-4].genericValue,
 				Body:      RubyS[Rubypt-3].genericSlice,
-				ElseBody:  RubyS[Rubypt-1].genericSlice,
+				Else: ast.IfBlock{
+					Condition: ast.Boolean{Value: true},
+					Body:      RubyS[Rubypt-1].genericSlice,
+				},
 			}
 		}
 	}

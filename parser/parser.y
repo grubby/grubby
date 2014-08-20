@@ -442,7 +442,10 @@ if_block : IF whitespace expr list END
     $$ = ast.IfBlock{
       Condition: $3,
       Body: $4,
-      ElseBody: $6,
+      Else: ast.IfBlock{
+        Condition: ast.Boolean{Value: true},
+        Body: $6,
+      },
     }
   };
 

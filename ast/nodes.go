@@ -130,5 +130,5 @@ type Block struct {
 type IfBlock struct {
 	Condition Node
 	Body      []Node
-	ElseBody  []Node
+	Else      Node
 }
