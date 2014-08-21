@@ -493,11 +493,12 @@ false
 					lexer = parser.NewLexer("5 + 12")
 				})
 
-				It("returns a Addition expression", func() {
+				It("returns a CallExpression with the '+' method", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.Addition{
-							LHS: ast.ConstantInt{Value: 5},
-							RHS: ast.ConstantInt{Value: 12},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 5},
+							Func:   ast.BareReference{Name: "+"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 12}},
 						},
 					}))
 				})

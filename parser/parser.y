@@ -312,9 +312,10 @@ negative : NEGATIVE whitespace expr { $$ = ast.Negative{Target: $3} };
 
 binary_addition : expr whitespace POSITIVE whitespace expr
   {
-    $$ = ast.Addition{
-      LHS: $1,
-      RHS: $5,
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "+"},
+      Args: []ast.Node{$5},
     }
   };
 
