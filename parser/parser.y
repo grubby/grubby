@@ -321,9 +321,10 @@ binary_addition : expr whitespace POSITIVE whitespace expr
 
 binary_subtraction : expr whitespace NEGATIVE whitespace expr
   {
-    $$ = ast.Subtraction{
-      LHS: $1,
-      RHS: $5,
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "-"},
+      Args: []ast.Node{$5},
     }
   };
 

@@ -511,9 +511,10 @@ false
 
 				It("returns a Subtraction expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.Subtraction{
-							LHS: ast.ConstantInt{Value: 555},
-							RHS: ast.ConstantInt{Value: 123},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 555},
+							Func:   ast.BareReference{Name: "-"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
 						},
 					}))
 				})
