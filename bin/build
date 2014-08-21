@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
 pushd parser
 go tool yacc -o parser.go -p Ruby parser.y
 popd
