@@ -527,9 +527,10 @@ false
 
 				It("returns a Multiplication expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.Multiplication{
-							LHS: ast.ConstantInt{Value: 321},
-							RHS: ast.ConstantInt{Value: 123},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 321},
+							Func:   ast.BareReference{Name: "*"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
 						},
 					}))
 				})
