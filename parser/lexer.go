@@ -63,6 +63,10 @@ const (
 	tokenTypeAtSign
 	tokenTypeDot
 	tokenTypePipe
+	tokenTypeForwardSlash
+	tokenTypeAmpersand
+	tokenTypeModulo
+	tokenTypeCaret
 	tokenType__FILE__
 )
 
@@ -159,6 +163,14 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeDot)
 		case r == '|':
 			l.emit(tokenTypePipe)
+		case r == '/':
+			l.emit(tokenTypeForwardSlash)
+		case r == '&':
+			l.emit(tokenTypeAmpersand)
+		case r == '%':
+			l.emit(tokenTypeModulo)
+		case r == '^':
+			l.emit(tokenTypeCaret)
 		case r == eof:
 			break
 		default:
@@ -377,6 +389,18 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypePipe:
 			debug("|")
 			return PIPE
+		case tokenTypeForwardSlash:
+			debug("/")
+			return SLASH
+		case tokenTypeAmpersand:
+			debug("&")
+			return AMPERSAND
+		case tokenTypeModulo:
+			debug("%")
+			return MODULO
+		case tokenTypeCaret:
+			debug("^")
+			return CARET
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

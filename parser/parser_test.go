@@ -523,7 +523,7 @@ false
 					lexer = parser.NewLexer("555 - 123")
 				})
 
-				It("returns a Subtraction expression", func() {
+				It("returns a subtraction call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Target: ast.ConstantInt{Value: 555},
@@ -539,7 +539,7 @@ false
 					lexer = parser.NewLexer("321 * 123")
 				})
 
-				It("returns a Multiplication expression", func() {
+				It("returns a multiplication call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Target: ast.ConstantInt{Value: 321},
@@ -549,6 +549,93 @@ false
 					}))
 				})
 			})
+
+			Describe("/", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("321 / 123")
+				})
+
+				It("returns a division call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 321},
+							Func:   ast.BareReference{Name: "/"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
+						},
+					}))
+				})
+			})
+
+			Describe("%", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("321 % 123")
+				})
+
+				It("returns a modulo call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 321},
+							Func:   ast.BareReference{Name: "%"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
+						},
+					}))
+				})
+			})
+
+			Describe("<< and >>", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+321 << 123
+555 >> 666
+`)
+				})
+
+				It("returns a shovel call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 321},
+							Func:   ast.BareReference{Name: "<<"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 555},
+							Func:   ast.BareReference{Name: ">>"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 666}},
+						},
+					}))
+				})
+			})
+
+			Describe("bitwise binary operators", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+1 & 0
+1 | 0
+1 ^ 5
+`)
+				})
+
+				It("returns a call expressions for those methods", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "&"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "|"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "^"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 5}},
+						},
+					}))
+				})
+			})
+
 		})
 
 		Describe("arrays", func() {

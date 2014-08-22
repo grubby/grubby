@@ -59,6 +59,10 @@ var Statements []ast.Node
 %token <genericValue> COLON
 %token <genericValue> DOT
 %token <genericValue> PIPE       // "|"
+%token <genericValue> SLASH      // "/"
+%token <genericValue> AMPERSAND  // "&"
+%token <genericValue> MODULO     // "%"
+%token <genericValue> CARET      // "^"
 %token <genericValue> LBRACKET   // "["
 %token <genericValue> RBRACKET   // "]"
 %token <genericValue> LBRACE     // "{"
@@ -107,6 +111,13 @@ var Statements []ast.Node
 %type <genericValue> binary_addition       // 2 + 3
 %type <genericValue> binary_subtraction    // 2 - 3
 %type <genericValue> binary_multiplication // 2 * 3
+%type <genericValue> binary_division       // 2 / 3
+%type <genericValue> binary_modulo         // 2 % 3
+%type <genericValue> binary_shift_left     // 2 << 5
+%type <genericValue> binary_shift_right    // 2 >> 5
+%type <genericValue> bitwise_and           // 2 & 5
+%type <genericValue> bitwise_or            // 2 | 5
+%type <genericValue> bitwise_exclusive     // 2 ^ 5
 
 // slice nodes
 %type <genericSlice> list
@@ -160,7 +171,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | array | hash | filename_const_reference | if_block;
+expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | binary_modulo | binary_shift_left | binary_shift_right | bitwise_and | bitwise_or | bitwise_exclusive | array | hash | filename_const_reference | if_block;
 
 variable : REF | CAPITAL_REF | instance_variable | class_variable | global;
 
@@ -333,6 +344,69 @@ binary_multiplication : expr whitespace STAR whitespace expr
     $$ = ast.CallExpression{
       Target: $1,
       Func: ast.BareReference{Name: "*"},
+      Args: []ast.Node{$5},
+    }
+  };
+
+binary_division : expr whitespace SLASH whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "/"},
+      Args: []ast.Node{$5},
+    }
+  };
+
+binary_modulo : expr whitespace MODULO whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "%"},
+      Args: []ast.Node{$5},
+    }
+  };
+
+binary_shift_left : expr whitespace LESSTHAN LESSTHAN whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "<<"},
+      Args: []ast.Node{$6},
+    }
+  };
+
+binary_shift_right : expr whitespace GREATERTHAN GREATERTHAN whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: ">>"},
+      Args: []ast.Node{$6},
+    }
+  };
+
+bitwise_and: expr whitespace AMPERSAND whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "&"},
+      Args: []ast.Node{$5},
+    }
+  };
+
+bitwise_or: expr whitespace PIPE whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "|"},
+      Args: []ast.Node{$5},
+    }
+  };
+
+bitwise_exclusive: expr whitespace CARET whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "^"},
       Args: []ast.Node{$5},
     }
   };
