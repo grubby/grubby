@@ -17,6 +17,10 @@ type SimpleString struct {
 	Value string
 }
 
+type InterpolatedString struct {
+	Value string
+}
+
 type Symbol struct {
 	Name string
 }

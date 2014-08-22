@@ -65,7 +65,7 @@ Grubby yacc
 * [ ] binary operators
     * [x] +
     * [x] -
-    * [ ] *
+    * [x] *
     * [ ] /
     * [ ] %
     * [ ] <<
@@ -83,11 +83,11 @@ Grubby yacc
       [x] ruby 1.9 {key: value} syntax
 * [x] arrays
 * [x] blocks
-    * [ ] with block params
+    * [x] with block params
 * [ ] heredoc
 * [x] globals ($: and $?, et cetera)
 * [ ] backtics
-* [ ] string interpolation
+* [x] string interpolation
 * [ ] semicolons
 * [x] method calls
 * [x] comments

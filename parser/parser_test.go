@@ -58,14 +58,28 @@ var _ = Describe("goyacc parser", func() {
 		})
 
 		Describe("strings", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer("'hello world'")
+			Context("with single quotes", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("'hello world'")
+				})
+
+				It("returns a SimpleString struct", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.SimpleString{Value: "'hello world'"},
+					}))
+				})
 			})
 
-			It("returns a SimpleString struct", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.SimpleString{Value: "'hello world'"},
-				}))
+			Context("with double quotes", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`"pianic-#{foo}-vespid"`)
+				})
+
+				It("returns a InterpolatedString struct", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.InterpolatedString{Value: "pianic-#{foo}-vespid"},
+					}))
+				})
 			})
 		})
 
