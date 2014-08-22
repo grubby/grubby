@@ -66,13 +66,13 @@ Grubby yacc
     * [x] +
     * [x] -
     * [x] *
-    * [ ] /
-    * [ ] %
-    * [ ] <<
-    * [ ] >>
-    * [ ] & (bitwise and)
-    * [ ] | (bitwise or)
-    * [ ] ^ (bitwise exclusive)
+    * [x] /
+    * [x] %
+    * [x] <<
+    * [x] >>
+    * [x] & (bitwise and)
+    * [x] | (bitwise or)
+    * [x] ^ (bitwise exclusive)
     * [ ] <= >= and <>
     * [ ] &&
     * [ ] ||
