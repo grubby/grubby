@@ -81,6 +81,41 @@ var _ = Describe("goyacc parser", func() {
 					}))
 				})
 			})
+
+			Describe("heredoc", func() {
+				Context("with a dash", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
+<<-FOO
+spheniscomorphic-monoptic
+   FOO
+`)
+					})
+
+					It("returns an interpolated string, ending when it finds the identifier", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.InterpolatedString{Value: "spheniscomorphic-monoptic"},
+						}))
+					})
+				})
+
+				Context("without dash", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
+<<FOO
+resenter-postvenous
+  FOO
+FOO
+`)
+					})
+
+					It("returns an interpolated string, ending only when it finds the identifier at column 0", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.InterpolatedString{Value: "resenter-postvenous\n  FOO"},
+						}))
+					})
+				})
+			})
 		})
 
 		Describe("symbols", func() {

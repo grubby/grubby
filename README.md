@@ -78,6 +78,7 @@ Grubby yacc
     * [ ] ||
     * [ ] <=> == === != =~ !~
     * [ ] fix associativity of unary + and - (try "abc - 123")
+    * [ ] refactor operators by making an Operator token in the parser
 * [x] hashes
     * [x] => syntax
       [x] ruby 1.9 {key: value} syntax
@@ -91,6 +92,7 @@ Grubby yacc
 * [ ] semicolons
 * [x] method calls
 * [x] comments
+* [ ] if ; elsif; elsif; else
 * [ ] go docs (see: http://godoc.org/github.com/robertkrimen/otto)
 
 Grubby interpreter

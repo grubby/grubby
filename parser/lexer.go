@@ -132,6 +132,7 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == '#':
 			return lexComment
 		case r == '<':
+			return lexLessThan
 			l.emit(tokenTypeLessThan)
 		case r == '>':
 			l.emit(tokenTypeGreaterThan)
