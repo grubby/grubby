@@ -12,7 +12,7 @@ import (
 var lexer parser.RubyLexer
 
 func main() {
-	vm := vm.NewVM()
+	vm := vm.NewVM("(irb)")
 
 	for {
 		result, err := vm.Run(readInput())
