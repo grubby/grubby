@@ -57,6 +57,18 @@ var _ = Describe("goyacc parser", func() {
 			})
 		})
 
+		Describe("backtics", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("`echo 'this wont work on windows'`")
+			})
+
+			It("returns a Subshell struct", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Subshell{Command: "echo 'this wont work on windows'"},
+				}))
+			})
+		})
+
 		Describe("strings", func() {
 			Context("with single quotes", func() {
 				BeforeEach(func() {

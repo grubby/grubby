@@ -136,3 +136,7 @@ type IfBlock struct {
 	Body      []Node
 	Else      Node
 }
+
+type Subshell struct {
+	Command string
+}

@@ -67,6 +67,7 @@ const (
 	tokenTypeAmpersand
 	tokenTypeModulo
 	tokenTypeCaret
+	tokenTypeSubshell
 	tokenType__FILE__
 )
 
@@ -172,6 +173,8 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeModulo)
 		case r == '^':
 			l.emit(tokenTypeCaret)
+		case r == '`':
+			return lexBacktics
 		case r == eof:
 			break
 		default:
@@ -402,6 +405,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeCaret:
 			debug("^")
 			return CARET
+		case tokenTypeSubshell:
+			debug("subshell : '%s'", token.value)
+			lval.genericValue = ast.Subshell{Command: token.value}
+			return NODE
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
