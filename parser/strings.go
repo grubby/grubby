@@ -9,7 +9,7 @@ func lexSingleQuoteString(l *StatefulRubyLexer) stateFn {
 	for {
 		prev = r
 		switch r = l.next(); {
-		case r == '\'' && prev != '\'':
+		case r == '\'' && prev != '\\':
 			l.emit(tokenTypeString)
 			return lexAnything
 		case r == eof:
