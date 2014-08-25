@@ -85,15 +85,24 @@ Grubby yacc
 * [x] arrays
 * [x] blocks
     * [x] with block params
-* [ ] heredoc
+* [x] heredoc
 * [x] globals ($: and $?, et cetera)
-* [ ] backtics
+* [x] backtics
 * [x] string interpolation
 * [ ] semicolons
 * [x] method calls
 * [x] comments
 * [ ] if ; elsif; elsif; else
 * [ ] go docs (see: http://godoc.org/github.com/robertkrimen/otto)
+[ ] for loops
+[ ] while loops
+[ ] until loops
+[ ] begin / rescue / ensure
+[ ] break
+[ ] redo / retry
+[ ] return / yield
+[ ] __FILE__, __LINE__, __ENCODING__
+
 
 Grubby interpreter
 ##################
