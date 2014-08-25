@@ -936,12 +936,61 @@ end`)
 								Args: []ast.Node{ast.SimpleString{Value: "'Romanize-whereover'"}},
 							},
 						},
-						Else: ast.IfBlock{
-							Condition: ast.Boolean{Value: true},
-							Body: []ast.Node{
-								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "'Kiplingese-disinvolve'"}},
+						Else: []ast.Node{
+							ast.IfBlock{
+								Condition: ast.Boolean{Value: true},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.SimpleString{Value: "'Kiplingese-disinvolve'"}},
+									},
+								},
+							},
+						},
+					},
+				}))
+			})
+		})
+
+		Context("with multiple elsif conditions", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+if false
+  'purifier-cartouche'
+elsif false
+  'bronchophthisis-hypersurface'
+elsif false
+  'sharpware-nasality'
+else
+  'Osmeridae-harpylike'
+end
+`)
+			})
+
+			It("returns a very nested set of conditions to check", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.IfBlock{
+						Condition: ast.Boolean{Value: false},
+						Body: []ast.Node{
+							ast.SimpleString{Value: "'purifier-cartouche'"},
+						},
+						Else: []ast.Node{
+							ast.IfBlock{
+								Condition: ast.Boolean{Value: false},
+								Body: []ast.Node{
+									ast.SimpleString{Value: "'bronchophthisis-hypersurface'"},
+								},
+							},
+							ast.IfBlock{
+								Condition: ast.Boolean{Value: false},
+								Body: []ast.Node{
+									ast.SimpleString{Value: "'sharpware-nasality'"},
+								},
+							},
+							ast.IfBlock{
+								Condition: ast.Boolean{Value: true},
+								Body: []ast.Node{
+									ast.SimpleString{Value: "'Osmeridae-harpylike'"},
 								},
 							},
 						},

@@ -92,7 +92,7 @@ Grubby yacc
 * [ ] semicolons
 * [x] method calls
 * [x] comments
-* [ ] if ; elsif; elsif; else
+* [x] if ; elsif; elsif; else
 * [ ] go docs (see: http://godoc.org/github.com/robertkrimen/otto)
 [ ] for loops
 [ ] while loops

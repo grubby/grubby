@@ -134,7 +134,7 @@ type Block struct {
 type IfBlock struct {
 	Condition Node
 	Body      []Node
-	Else      Node
+	Else      []Node
 }
 
 type Subshell struct {

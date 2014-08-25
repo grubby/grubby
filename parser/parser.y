@@ -123,6 +123,7 @@ var Statements []ast.Node
 %type <genericSlice> list
 %type <genericSlice> call_args
 %type <genericSlice> block_args
+%type <genericSlice> elsif_block
 %type <genericSlice> function_args
 %type <genericSlice> capture_list
 %type <genericSlice> key_value_pairs
@@ -514,16 +515,42 @@ if_block : IF whitespace expr list END
       Body: $4,
     }
   }
-| IF whitespace expr list ELSE list END
+| IF whitespace expr list elsif_block END
   {
     $$ = ast.IfBlock{
       Condition: $3,
       Body: $4,
-      Else: ast.IfBlock{
-        Condition: ast.Boolean{Value: true},
-        Body: $6,
-      },
+      Else: $5,
     }
   };
 
+elsif_block : /* nothing */ { $$ = []ast.Node{} };
+| elsif_block ELSIF whitespace expr list
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: $4,
+      Body: $5,
+    })
+  }
+| elsif_block ELSE list
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: ast.Boolean{Value: true},
+      Body: $3,
+    })
+      }
+| ELSIF whitespace expr list
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: $3,
+      Body: $4,
+    })
+  }
+| ELSE list
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: ast.Boolean{Value: true},
+      Body: $2,
+    })
+  };
 %%

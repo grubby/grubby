@@ -327,6 +327,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeELSE:
 			debug("ELSE")
 			return ELSE
+		case tokenTypeELSIF:
+			debug("ELSIF")
+			return ELSIF
 		case tokenTypeCLASS:
 			debug("CLASS")
 			return CLASS
