@@ -168,11 +168,19 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == '.':
 			l.emit(tokenTypeDot)
 		case r == '|':
-			l.emit(tokenTypePipe)
+			if l.accept("|") {
+				l.emit(tokenTypeOperator)
+			} else {
+				l.emit(tokenTypePipe)
+			}
 		case r == '/':
 			l.emit(tokenTypeForwardSlash)
 		case r == '&':
-			l.emit(tokenTypeAmpersand)
+			if l.accept("&") {
+				l.emit(tokenTypeOperator)
+			} else {
+				l.emit(tokenTypeAmpersand)
+			}
 		case r == '%':
 			l.emit(tokenTypeModulo)
 		case r == '^':

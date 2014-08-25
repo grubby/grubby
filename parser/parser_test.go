@@ -736,6 +736,30 @@ false
 					}))
 				})
 			})
+
+			Describe("binary boolean operators", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+1 && 0
+1 || 0
+`)
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "&&"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "||"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("arrays", func() {
