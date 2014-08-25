@@ -31,6 +31,32 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeFALSE)
 	case "__FILE__":
 		l.emit(tokenType__FILE__)
+	case "__LINE__":
+		l.emit(tokenType__LINE__)
+	case "__ENCODING__":
+		l.emit(tokenType__ENCODING__)
+	case "for":
+		l.emit(tokenTypeFOR)
+	case "while":
+		l.emit(tokenTypeWHILE)
+	case "until":
+		l.emit(tokenTypeUNTIL)
+	case "begin":
+		l.emit(tokenTypeBEGIN)
+	case "rescue":
+		l.emit(tokenTypeRescue)
+	case "ensure":
+		l.emit(tokenTypeENSURE)
+	case "break":
+		l.emit(tokenTypeBREAK)
+	case "redo":
+		l.emit(tokenTypeREDO)
+	case "retry":
+		l.emit(tokenTypeRETRY)
+	case "return":
+		l.emit(tokenTypeRETURN)
+	case "yield":
+		l.emit(tokenTypeYIELD)
 	default:
 		r, _ := utf8.DecodeRuneInString(l.input[l.start:])
 		if unicode.IsUpper(r) {

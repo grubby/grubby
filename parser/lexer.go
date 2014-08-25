@@ -69,7 +69,20 @@ const (
 	tokenTypeCaret
 	tokenTypeSubshell
 	tokenTypeOperator
+	tokenTypeFOR
+	tokenTypeWHILE
+	tokenTypeUNTIL
+	tokenTypeBEGIN
+	tokenTypeRescue
+	tokenTypeENSURE
+	tokenTypeBREAK
+	tokenTypeREDO
+	tokenTypeRETRY
+	tokenTypeRETURN
+	tokenTypeYIELD
 	tokenType__FILE__
+	tokenType__LINE__
+	tokenType__ENCODING__
 )
 
 type StatefulRubyLexer struct {
