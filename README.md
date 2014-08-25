@@ -73,10 +73,10 @@ Grubby yacc
     * [x] & (bitwise and)
     * [x] | (bitwise or)
     * [x] ^ (bitwise exclusive)
-    * [ ] <= >= and <>
+    * [x] <= >= and <=>
     * [ ] &&
     * [ ] ||
-    * [ ] <=> == === != =~ !~
+    * [ ] == === != =~ !~
     * [ ] fix associativity of unary + and - (try "abc - 123")
     * [ ] refactor operators by making an Operator token in the parser
 * [x] hashes

@@ -14,10 +14,13 @@ var Statements []ast.Node
 // fields inside this union end up as the fields in a structure known
 // as RubySymType, of which a reference is passed to the lexer.
 %union{
+  operator     string
   genericValue ast.Node
   genericSlice ast.Nodes
   stringSlice []string
 }
+
+%token <operator> OPERATOR
 
 // any non-terminal which returns a value needs a type, which is
 // really a field name in the above union struct
@@ -197,6 +200,14 @@ callexpr : REF whitespace call_args
       Func: $1.(ast.BareReference),
       Args: $3,
     };
+  }
+| expr whitespace OPERATOR whitespace expr
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: $3},
+      Target: $1,
+      Args: []ast.Node{$5},
+    }
   };
 
 call_args : LPAREN whitespace nodes_with_commas whitespace RPAREN
@@ -553,4 +564,5 @@ elsif_block : /* nothing */ { $$ = []ast.Node{} };
       Body: $2,
     })
   };
+
 %%

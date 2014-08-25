@@ -707,6 +707,35 @@ false
 				})
 			})
 
+			Describe("operators for sorting", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+5 <= 55
+12 >= 21
+22 <=> 22
+`)
+				})
+
+				It("is parsed as an call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 5},
+							Func:   ast.BareReference{Name: "<="},
+							Args:   []ast.Node{ast.ConstantInt{Value: 55}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 12},
+							Func:   ast.BareReference{Name: ">="},
+							Args:   []ast.Node{ast.ConstantInt{Value: 21}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 22},
+							Func:   ast.BareReference{Name: "<=>"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 22}},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("arrays", func() {

@@ -48,6 +48,9 @@ func lexLessThan(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeLessThan)
 			l.emit(tokenTypeLessThan)
 		}
+	} else if l.accept("=") {
+		l.accept(">")
+		l.emit(tokenTypeOperator)
 	} else {
 		l.emit(tokenTypeLessThan)
 	}
