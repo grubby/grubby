@@ -155,9 +155,22 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypeGreaterThan)
 			}
 		case r == '=':
-			l.emit(tokenTypeEqual)
+			if l.accept("=") {
+				l.accept("=")
+				l.emit(tokenTypeOperator)
+			} else if l.accept("~") {
+				l.emit(tokenTypeOperator)
+			} else {
+				l.emit(tokenTypeEqual)
+			}
 		case r == '!':
-			l.emit(tokenTypeBang)
+			if l.accept("=") {
+				l.emit(tokenTypeOperator)
+			} else if l.accept("~") {
+				l.emit(tokenTypeOperator)
+			} else {
+				l.emit(tokenTypeBang)
+			}
 		case r == '~':
 			l.emit(tokenTypeTilde)
 		case r == '+':
@@ -165,7 +178,11 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == '-':
 			l.emit(tokenTypeMinus)
 		case r == '*':
-			l.emit(tokenTypeStar)
+			if l.accept("*") {
+				l.emit(tokenTypeOperator)
+			} else {
+				l.emit(tokenTypeStar)
+			}
 		case r == '[':
 			l.emit(tokenTypeLBracket)
 		case r == ']':

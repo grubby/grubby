@@ -653,6 +653,22 @@ false
 				})
 			})
 
+			Describe("**", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("321 ** 123")
+				})
+
+				It("returns a modulo call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 321},
+							Func:   ast.BareReference{Name: "**"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
+						},
+					}))
+				})
+			})
+
 			Describe("<< and >>", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
@@ -756,6 +772,48 @@ false
 							Target: ast.ConstantInt{Value: 1},
 							Func:   ast.BareReference{Name: "||"},
 							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+						},
+					}))
+				})
+			})
+
+			Describe("equality operators", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+1 == 1
+1 === 1
+1 != 1
+1 =~ 1
+1 !~ 1
+`)
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "=="},
+							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "==="},
+							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "!="},
+							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "=~"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: "!~"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
 						},
 					}))
 				})
