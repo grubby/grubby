@@ -76,7 +76,7 @@ Grubby yacc
     * [x] <= >= and <=>
     * [x] &&
     * [x] ||
-    * [ ] == === != =~ !~
+    * [x] == === != =~ !~
     * [ ] fix associativity of unary + and - (try "abc - 123")
           * [ ] (seems to apply to binary operators with REFs too)
     * [ ] refactor operators by making an Operator token in the parser

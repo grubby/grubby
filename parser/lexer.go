@@ -65,8 +65,6 @@ const (
 	tokenTypePipe
 	tokenTypeForwardSlash
 	tokenTypeAmpersand
-	tokenTypeModulo
-	tokenTypeCaret
 	tokenTypeSubshell
 	tokenTypeOperator
 	tokenTypeFOR
@@ -149,7 +147,7 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == '<':
 			return lexLessThan
 		case r == '>':
-			if l.accept("=") {
+			if l.accept("=") || l.accept(">") {
 				l.emit(tokenTypeOperator)
 			} else {
 				l.emit(tokenTypeGreaterThan)
@@ -212,9 +210,9 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypeAmpersand)
 			}
 		case r == '%':
-			l.emit(tokenTypeModulo)
+			l.emit(tokenTypeOperator)
 		case r == '^':
-			l.emit(tokenTypeCaret)
+			l.emit(tokenTypeOperator)
 		case r == '`':
 			return lexBacktics
 		case r == eof:
@@ -444,12 +442,6 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeAmpersand:
 			debug("&")
 			return AMPERSAND
-		case tokenTypeModulo:
-			debug("%")
-			return MODULO
-		case tokenTypeCaret:
-			debug("^")
-			return CARET
 		case tokenTypeSubshell:
 			debug("subshell : '%s'", token.value)
 			lval.genericValue = ast.Subshell{Command: token.value}
