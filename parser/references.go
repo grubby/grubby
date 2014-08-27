@@ -6,7 +6,7 @@ import (
 )
 
 func lexReference(l *StatefulRubyLexer) stateFn {
-	l.acceptRun(alphaNumericUnderscore)
+	l.acceptRun(alphaNumericUnderscore + "!")
 
 	switch l.input[l.start:l.pos] {
 	case "def":

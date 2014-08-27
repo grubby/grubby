@@ -208,6 +208,29 @@ FOO
 		})
 
 		Describe("call expressions", func() {
+			Context("with a dot", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+5.!
+123.abc()
+`)
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 5},
+							Func:   ast.BareReference{Name: "!"},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 123},
+							Func:   ast.BareReference{Name: "abc"},
+							Args:   []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("without parens", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("puts 'foo'")

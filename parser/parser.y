@@ -186,10 +186,25 @@ callexpr : REF whitespace call_args
       Args: $3,
     }
   }
+| NODE DOT REF whitespace call_args
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+      Args: $5,
+    };
+  }
+| NODE DOT REF
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+    };
+  }
 | REF DOT REF whitespace call_args
   {
     $$ = ast.CallExpression{
-      Target: $1.(ast.BareReference),
+      Target: $1,
       Func: $3.(ast.BareReference),
       Args: $5,
     };
