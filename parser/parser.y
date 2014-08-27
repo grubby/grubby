@@ -153,6 +153,7 @@ capture_list : /* empty */
 	}
 
 line : NEWLINE { $$ = nil }
+| SEMICOLON { $$ = nil }
 | whitespace expr whitespace { $$ = $2 };
 
 list : /* empty */

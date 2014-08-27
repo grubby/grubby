@@ -1134,6 +1134,23 @@ end
 		})
 	})
 
+	Describe("semicolons", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(";;a; b; c;;")
+		})
+
+		It("is treated as a line separator", func() {
+			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.BareReference{Name: "a"},
+				ast.BareReference{Name: "b"},
+				ast.BareReference{Name: "c"},
+			}))
+		})
+	})
+
 	Describe("having tons of optional whitespace", func() {
 		BeforeEach(func() {
 			lexer = parser.NewLexer(`

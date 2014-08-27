@@ -49,6 +49,7 @@ const (
 	tokenTypeLessThan
 	tokenTypeGreaterThan
 	tokenTypeColon
+	tokenTypeSemicolon
 	tokenTypeEqual
 	tokenTypeBang
 	tokenTypeTilde
@@ -127,6 +128,8 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == ':':
 			l.start += 1 // skip past the colon
 			return lexSymbol
+		case r == ';':
+			l.emit(tokenTypeSemicolon)
 		case r == ' ' || r == '\t':
 			l.backup()
 			return lexWhitespace
@@ -391,6 +394,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeColon:
 			debug(":")
 			return COLON
+		case tokenTypeSemicolon:
+			debug(";")
+			return SEMICOLON
 		case tokenTypeEqual:
 			debug("=")
 			return EQUALTO
