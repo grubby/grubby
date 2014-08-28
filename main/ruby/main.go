@@ -29,5 +29,9 @@ func main() {
 	}
 
 	vm := vm.NewVM(flag.Args()[1])
-	vm.Run(string(bytes))
+	_, err = vm.Run(string(bytes))
+
+	if err != nil {
+		panic(err)
+	}
 }
