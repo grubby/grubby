@@ -30,6 +30,7 @@ const (
 	tokenTypeDoubleQuoteString
 	tokenTypeSymbol
 	tokenTypeReference
+	tokenTypeGlobal
 	tokenTypeCapitalizedReference
 	tokenTypeWhitespace
 	tokenTypeNewline
@@ -193,7 +194,14 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == '}':
 			l.emit(tokenTypeRBrace)
 		case r == '$':
-			l.emit(tokenTypeDollarSign)
+			if l.accept(alphaNumericUnderscore) {
+				l.backup()
+				l.ignore()
+				l.acceptRun(alphaNumericUnderscore)
+				l.emit(tokenTypeGlobal)
+			} else {
+				l.emit(tokenTypeDollarSign)
+			}
 		case r == '@':
 			l.emit(tokenTypeAtSign)
 		case r == '.':
@@ -337,6 +345,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("CAPITAL REF: %s", token.value)
 			lval.genericValue = ast.BareReference{Name: token.value}
 			return CAPITAL_REF
+		case tokenTypeGlobal:
+			debug("GLOBAL: %s", token.value)
+			lval.genericValue = ast.GlobalVariable{Name: token.value}
+			return NODE
 		case tokenTypeLParen:
 			debug("LPAREN")
 			return LPAREN

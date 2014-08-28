@@ -924,12 +924,13 @@ foo: bar,
 
 		Describe("globals", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("$LOAD_PATH")
+				lexer = parser.NewLexer("$LOAD_PATH; $0")
 			})
 
 			It("should be parsed as a GlobalVariable", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.GlobalVariable{Name: "LOAD_PATH"},
+					ast.GlobalVariable{Name: "0"},
 				}))
 			})
 		})
