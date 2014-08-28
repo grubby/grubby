@@ -161,6 +161,8 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value)
 		case ast.ConstantInt:
 			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
+		case ast.GlobalVariable:
+			returnValue = vm.Globals[statement.(ast.GlobalVariable).Name]
 		case ast.ConstantFloat:
 			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value)
 		case ast.Symbol:
