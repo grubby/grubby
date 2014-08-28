@@ -40,6 +40,16 @@ var Statements []ast.Node
 %token <genericValue> ELSIF
 %token <genericValue> CLASS
 %token <genericValue> MODULE
+%token <genericValue> FOR
+%token <genericValue> WHILE
+%token <genericValue> UNTIL
+%token <genericValue> BEGIN
+%token <genericValue> RESCUE
+%token <genericValue> ENSURE
+%token <genericValue> BREAK
+%token <genericValue> REDO
+%token <genericValue> RETRY
+%token <genericValue> RETURN
 
 // booleans
 %token <genericValue> TRUE

@@ -44,7 +44,7 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 	case "begin":
 		l.emit(tokenTypeBEGIN)
 	case "rescue":
-		l.emit(tokenTypeRescue)
+		l.emit(tokenTypeRESCUE)
 	case "ensure":
 		l.emit(tokenTypeENSURE)
 	case "break":

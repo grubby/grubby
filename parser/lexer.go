@@ -73,7 +73,7 @@ const (
 	tokenTypeWHILE
 	tokenTypeUNTIL
 	tokenTypeBEGIN
-	tokenTypeRescue
+	tokenTypeRESCUE
 	tokenTypeENSURE
 	tokenTypeBREAK
 	tokenTypeREDO
@@ -473,6 +473,27 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug(token.value)
 			lval.operator = token.value
 			return OPERATOR
+		case tokenTypeBEGIN:
+			debug("BEGIN")
+			return BEGIN
+		case tokenTypeRESCUE:
+			debug("RESCUE")
+			return RESCUE
+		case tokenTypeENSURE:
+			debug("ENSURE")
+			return ENSURE
+		case tokenTypeBREAK:
+			debug("BREAK")
+			return BREAK
+		case tokenTypeREDO:
+			debug("REDO")
+			return REDO
+		case tokenTypeRETRY:
+			debug("RETRY")
+			return RETRY
+		case tokenTypeRETURN:
+			debug("RETURN")
+			return RETURN
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
