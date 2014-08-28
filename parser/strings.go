@@ -32,6 +32,14 @@ func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
 	for {
 		prev = r
 		switch r = l.next(); {
+		case r == '#':
+			if l.accept("{") {
+				for innerR := l.next(); innerR != '}'; innerR = l.next() {
+					if innerR == eof {
+						l.emit(tokenTypeError)
+					}
+				}
+			}
 		case r == '"' && prev != '\\':
 			l.pos -= 1
 			l.emit(tokenTypeDoubleQuoteString)

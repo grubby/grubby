@@ -116,6 +116,18 @@ var _ = Describe("goyacc parser", func() {
 						}))
 					})
 				})
+
+				Context("with double quotes inside the interpolation", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`"Raj-#{5 * " "}-Corin"`)
+					})
+
+					It("returns a InterpolatedString struct", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.InterpolatedString{Value: `Raj-#{5 * " "}-Corin`},
+						}))
+					})
+				})
 			})
 
 			Describe("heredoc", func() {
