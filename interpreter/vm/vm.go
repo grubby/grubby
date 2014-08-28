@@ -157,6 +157,8 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			vm.ObjectSpace["Kernel"].AddPrivateMethod(method)
 		case ast.SimpleString:
 			returnValue = builtins.NewString(statement.(ast.SimpleString).Value)
+		case ast.InterpolatedString:
+			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value)
 		case ast.ConstantInt:
 			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
 		case ast.ConstantFloat:
