@@ -206,6 +206,11 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeAtSign)
 		case r == '.':
 			l.emit(tokenTypeDot)
+
+			if l.accept(validMethodNameRunes) {
+				l.acceptRun(validMethodNameRunes)
+				l.emit(tokenTypeReference)
+			}
 		case r == '|':
 			if l.accept("|") {
 				l.emit(tokenTypeOperator)
@@ -348,7 +353,7 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeGlobal:
 			debug("GLOBAL: %s", token.value)
 			lval.genericValue = ast.GlobalVariable{Name: token.value}
-			return NODE
+			return REF
 		case tokenTypeLParen:
 			debug("LPAREN")
 			return LPAREN

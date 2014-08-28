@@ -8,15 +8,12 @@ func lexNumber(l *StatefulRubyLexer) stateFn {
 		if l.accept(digits) {
 			l.acceptRun(digits)
 			l.emit(tokenTypeFloat)
-		} else if l.accept(alphaNumericUnderscore + "!") {
-			l.backup()
+			return lexAnything
+		} else {
 			l.backup()
 			l.emit(tokenTypeInteger)
-			l.accept(".")
-			l.emit(tokenTypeDot)
-			return lexReference
+			return lexAnything
 		}
-		return lexAnything
 	}
 
 	l.emit(tokenTypeInteger)

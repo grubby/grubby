@@ -220,6 +220,25 @@ FOO
 		})
 
 		Describe("call expressions", func() {
+			Context("with methods containing ! and ?", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("5.even?;5.taint!")
+				})
+
+				It("is parsed just fine", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 5},
+							Func:   ast.BareReference{Name: "even?"},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 5},
+							Func:   ast.BareReference{Name: "taint!"},
+						},
+					}))
+				})
+			})
+
 			Context("with a dot", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
@@ -294,7 +313,10 @@ FOO
 
 			Context("on an object", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("foo.send(:catalecta_coassistant)")
+					lexer = parser.NewLexer(`
+foo.send(:catalecta_coassistant)
+ARGV.shift
+`)
 				})
 
 				It("correctly sets the target", func() {
@@ -303,6 +325,10 @@ FOO
 							Target: ast.BareReference{Name: "foo"},
 							Func:   ast.BareReference{Name: "send"},
 							Args:   []ast.Node{ast.Symbol{Name: "catalecta_coassistant"}},
+						},
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "ARGV"},
+							Func:   ast.BareReference{Name: "shift"},
 						},
 					}))
 				})
