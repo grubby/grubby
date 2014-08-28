@@ -94,7 +94,6 @@ var Statements []ast.Node
 %type <genericValue> global
 %type <genericValue> callexpr
 %type <genericValue> if_block
-%type <genericValue> variable // represents anything that could be assigned to
 %type <genericValue> assignment
 %type <genericValue> class_variable
 %type <genericValue> func_declaration
@@ -172,9 +171,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | variable | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block;
-
-variable : REF | CAPITAL_REF | instance_variable | class_variable | global;
+expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block;
 
 callexpr : REF whitespace call_args
   {
@@ -331,9 +328,30 @@ assignment : REF whitespace EQUALTO whitespace expr
       LHS: $1,
       RHS: $5,
     }
-  };
-| variable whitespace EQUALTO whitespace expr
-  { // FIXME: this is a hack. If this rule is not present, "foo = 5" will not parse
+  }
+|  CAPITAL_REF whitespace EQUALTO whitespace expr
+  {
+    $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $5,
+    }
+  }
+|  instance_variable whitespace EQUALTO whitespace expr
+  {
+    $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $5,
+    }
+  }
+|  class_variable whitespace EQUALTO whitespace expr
+  {
+    $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $5,
+    }
+  }
+|  global whitespace EQUALTO whitespace expr
+  {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $5,
