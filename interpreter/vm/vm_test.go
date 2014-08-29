@@ -226,5 +226,14 @@ end`)
 				Expect(value.String()).To(ContainSubstring("foo.rb"))
 			})
 		})
+
+		Describe("ARGV", func() {
+			It("has a shift method", func() {
+				value, err := vm.Run("ARGV.shift")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value).To(Equal(builtins.Nil()))
+			})
+		})
 	})
 })

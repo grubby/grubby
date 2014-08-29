@@ -38,7 +38,7 @@ func NewVM(name string) VM {
 		KnownSymbols:    make(map[string]builtins.Value),
 	}
 
-	loadPath := builtins.NewArrayClass()
+	loadPath := builtins.NewArrayClass().(builtins.Class).New()
 	vm.Globals["$LOAD_PATH"] = loadPath
 	vm.Globals["$:"] = loadPath // FIXME: add a test that these are the same object
 
@@ -46,6 +46,7 @@ func NewVM(name string) VM {
 	vm.ObjectSpace["Object"] = objectClass
 	vm.ObjectSpace["Kernel"] = builtins.NewGlobalKernelClass()
 	vm.ObjectSpace["File"] = builtins.NewFileClass()
+	vm.ObjectSpace["ARGV"] = builtins.NewArrayClass().(builtins.Class).New()
 
 	main := objectClass.(builtins.Class).New()
 	main.AddMethod(builtins.NewMethod("to_s", func(args ...builtins.Value) (builtins.Value, error) {
@@ -159,10 +160,10 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewString(statement.(ast.SimpleString).Value)
 		case ast.InterpolatedString:
 			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value)
-		case ast.ConstantInt:
-			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
 		case ast.GlobalVariable:
 			returnValue = vm.Globals[statement.(ast.GlobalVariable).Name]
+		case ast.ConstantInt:
+			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
 		case ast.ConstantFloat:
 			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value)
 		case ast.Symbol:
@@ -185,10 +186,19 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 		case ast.CallExpression:
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)
-			method, err := context.Method(callExpr.Func.Name)
+
+			var target = context
+			if callExpr.Target != nil {
+				target = vm.ObjectSpace[callExpr.Target.(ast.BareReference).Name]
+			}
+
+			if target == nil {
+				panic("could not find: " + callExpr.Target.(ast.BareReference).Name)
+			}
+			method, err := target.Method(callExpr.Func.Name)
 
 			if err != nil {
-				err := builtin_errors.NewNameError(callExpr.Func.Name, context.String(), context.Class().String())
+				err := builtin_errors.NewNameError(callExpr.Func.Name, target.String(), target.Class().String())
 				return nil, err
 			}
 
@@ -210,12 +220,16 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 				return nil, err
 			}
 
-			ref, ok := assignment.LHS.(ast.BareReference)
-			if !ok {
-				panic("unimplemented")
+			switch assignment.LHS.(type) {
+			case ast.BareReference:
+				ref := assignment.LHS.(ast.BareReference)
+				vm.ObjectSpace[ref.Name] = returnValue
+			case ast.GlobalVariable:
+				globalVar := assignment.LHS.(ast.GlobalVariable)
+				vm.Globals[globalVar.Name] = returnValue
+			default:
+				panic(fmt.Sprintf("unimplemented assignment failure: %#v", assignment.LHS))
 			}
-
-			vm.ObjectSpace[ref.Name] = returnValue
 
 		case ast.FileNameConstReference:
 			returnValue = builtins.NewString(vm.currentFilename)
