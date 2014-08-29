@@ -67,7 +67,7 @@ end`)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
-			Expect(val.String()).To(Equal("'nonrestricted-consonantize'"))
+			Expect(val.String()).To(Equal("nonrestricted-consonantize"))
 		})
 	})
 
@@ -201,7 +201,7 @@ end`)
 
 			value, err := vm.Get("foo")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value).To(Equal(builtins.NewString("'albitite-compotor'")))
+			Expect(value).To(Equal(builtins.NewString("albitite-compotor")))
 		})
 	})
 

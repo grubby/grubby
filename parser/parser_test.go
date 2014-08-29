@@ -77,7 +77,7 @@ var _ = Describe("goyacc parser", func() {
 
 				It("returns a SimpleString struct", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.SimpleString{Value: "'hello world'"},
+						ast.SimpleString{Value: "hello world"},
 					}))
 				})
 			})
@@ -89,7 +89,7 @@ var _ = Describe("goyacc parser", func() {
 
 				It("returns a SimpleString struct", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.SimpleString{Value: "'hello \\' world'"},
+						ast.SimpleString{Value: "hello \\' world"},
 					}))
 				})
 			})
@@ -271,7 +271,7 @@ FOO
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Func: ast.BareReference{Name: "puts"},
-							Args: []ast.Node{ast.SimpleString{Value: "'foo'"}},
+							Args: []ast.Node{ast.SimpleString{Value: "foo"}},
 						},
 					}))
 				})
@@ -287,9 +287,9 @@ FOO
 						ast.CallExpression{
 							Func: ast.BareReference{Name: "puts"},
 							Args: []ast.Node{
-								ast.SimpleString{Value: "'foo'"},
-								ast.SimpleString{Value: "'bar'"},
-								ast.SimpleString{Value: "'baz'"},
+								ast.SimpleString{Value: "foo"},
+								ast.SimpleString{Value: "bar"},
+								ast.SimpleString{Value: "baz"},
 							},
 						},
 					}))
@@ -353,7 +353,7 @@ end
 							Body: []ast.Node{
 								ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+									Args: []ast.Node{ast.SimpleString{Value: "hai"}},
 								},
 							},
 						},
@@ -471,7 +471,7 @@ end
 							Body: []ast.Node{
 								ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "'hai'"}},
+									Args: []ast.Node{ast.SimpleString{Value: "hai"}},
 								},
 							},
 						},
@@ -536,7 +536,7 @@ end
 						Body: []ast.Node{
 							ast.CallExpression{
 								Func: ast.BareReference{Name: "puts"},
-								Args: []ast.Node{ast.SimpleString{Value: "'tumescent-wasty'"}},
+								Args: []ast.Node{ast.SimpleString{Value: "tumescent-wasty"}},
 							},
 						},
 					},
@@ -1024,7 +1024,7 @@ end
 									Body: []ast.Node{
 										ast.CallExpression{
 											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "'semiannual-pomfret'"}},
+											Args: []ast.Node{ast.SimpleString{Value: "semiannual-pomfret"}},
 										},
 									},
 								},
@@ -1055,7 +1055,7 @@ end
 										ast.BareReference{Name: "some"},
 										ast.BareReference{Name: "args"},
 									},
-									Body: []ast.Node{ast.SimpleString{Value: "'aww yiss'"}},
+									Body: []ast.Node{ast.SimpleString{Value: "aww yiss"}},
 								},
 							},
 						},
@@ -1097,7 +1097,7 @@ end`)
 							Body: []ast.Node{
 								ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "'Romanize-whereover'"}},
+									Args: []ast.Node{ast.SimpleString{Value: "Romanize-whereover"}},
 								},
 							},
 						},
@@ -1142,7 +1142,7 @@ end`)
 							Body: []ast.Node{
 								ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "'Romanize-whereover'"}},
+									Args: []ast.Node{ast.SimpleString{Value: "Romanize-whereover"}},
 								},
 							},
 							Else: []ast.Node{
@@ -1151,7 +1151,7 @@ end`)
 									Body: []ast.Node{
 										ast.CallExpression{
 											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "'Kiplingese-disinvolve'"}},
+											Args: []ast.Node{ast.SimpleString{Value: "Kiplingese-disinvolve"}},
 										},
 									},
 								},
@@ -1181,25 +1181,25 @@ end
 						ast.IfBlock{
 							Condition: ast.Boolean{Value: false},
 							Body: []ast.Node{
-								ast.SimpleString{Value: "'purifier-cartouche'"},
+								ast.SimpleString{Value: "purifier-cartouche"},
 							},
 							Else: []ast.Node{
 								ast.IfBlock{
 									Condition: ast.Boolean{Value: false},
 									Body: []ast.Node{
-										ast.SimpleString{Value: "'bronchophthisis-hypersurface'"},
+										ast.SimpleString{Value: "bronchophthisis-hypersurface"},
 									},
 								},
 								ast.IfBlock{
 									Condition: ast.Boolean{Value: false},
 									Body: []ast.Node{
-										ast.SimpleString{Value: "'sharpware-nasality'"},
+										ast.SimpleString{Value: "sharpware-nasality"},
 									},
 								},
 								ast.IfBlock{
 									Condition: ast.Boolean{Value: true},
 									Body: []ast.Node{
-										ast.SimpleString{Value: "'Osmeridae-harpylike'"},
+										ast.SimpleString{Value: "Osmeridae-harpylike"},
 									},
 								},
 							},

@@ -235,7 +235,7 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == eof:
 			break
 		default:
-			msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d')", l.pos, string(r), r)
+			msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d') (current parse is '%s')", l.pos, string(r), r, l.input[l.start:l.pos])
 			panic(msg)
 		}
 

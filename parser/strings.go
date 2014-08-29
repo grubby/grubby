@@ -6,11 +6,16 @@ func lexSingleQuoteString(l *StatefulRubyLexer) stateFn {
 		prev rune
 	)
 
+	l.ignore() // ignore single quote
+
 	for {
 		prev = r
 		switch r = l.next(); {
 		case r == '\'' && prev != '\\':
+			l.backup()
 			l.emit(tokenTypeString)
+			l.accept("'")
+			l.ignore()
 			return lexAnything
 		case r == eof:
 			l.emit(tokenTypeError)

@@ -55,7 +55,10 @@ func NewVM(name string) VM {
 	}))
 	main.AddMethod(builtins.NewMethod("require", func(args ...builtins.Value) (builtins.Value, error) {
 		fileName := args[0].(*builtins.StringValue).String()
-		fileName = fileName[1 : len(fileName)-1]
+		if fileName == "rubygems" {
+			// don't "require 'rubygems'"
+			return builtins.NewFalseClass().(builtins.Class).New(), nil
+		}
 
 		for _, pathStr := range loadPath.(*builtins.Array).Members() {
 			path := pathStr.(*builtins.StringValue)
