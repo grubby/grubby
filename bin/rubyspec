@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# trash go's pkg cache
+# this seems to get stale very frequently when compiling bin/ruby
+rm -rf $HOME/go/pkg/*
+
+root=$(cd $(dirname $(dirname $0)) && pwd)
+$root/bin/build
+
+cd $root/../rubyspec
+export PATH=$root/bin:$PATH
+mspec language/string_spec.rb
