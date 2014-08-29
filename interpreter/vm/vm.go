@@ -147,6 +147,23 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 	)
 	for _, statement := range statements {
 		switch statement.(type) {
+		case ast.IfBlock:
+			truthy := false
+			ifBlock := statement.(ast.IfBlock)
+			switch ifBlock.Condition.(type) {
+			case ast.Boolean:
+				truthy = ifBlock.Condition.(ast.Boolean).Value
+			case ast.BareReference:
+				truthy = ifBlock.Condition.(ast.BareReference).Name == "nil"
+			default:
+				truthy = true
+			}
+
+			if truthy {
+				returnValue, returnErr = vm.executeWithContext(ifBlock.Body, context)
+			} else {
+				returnValue, returnErr = vm.executeWithContext(ifBlock.Else, context)
+			}
 		case ast.FuncDecl:
 			// FIXME: assumes for now this will only ever be at the top level
 			// it seems like this should be replaced with context, but that's really context for calling methods, not
