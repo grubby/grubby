@@ -4,8 +4,7 @@ pushd parser
 go tool yacc -o parser.go -p Ruby parser.y
 popd
 
-rm bin/irb
-rm bin/ruby
+rm bin/irb bin/ruby
 
 root=$(dirname $0)/..
 pushd $root
