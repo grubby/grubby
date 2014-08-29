@@ -38,6 +38,7 @@ var Statements []ast.Node
 %token <genericValue> IF
 %token <genericValue> ELSE
 %token <genericValue> ELSIF
+%token <genericValue> UNLESS
 %token <genericValue> CLASS
 %token <genericValue> MODULE
 %token <genericValue> FOR
@@ -528,6 +529,20 @@ if_block : IF whitespace expr list END
       Condition: $3,
       Body: $4,
       Else: $5,
+    }
+  }
+| expr whitespace IF whitespace expr
+  {
+    $$ = ast.IfBlock{
+      Condition: $5,
+      Body: []ast.Node{$1},
+    }
+  }
+| expr whitespace UNLESS whitespace expr
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $5},
+      Body: []ast.Node{$1},
     }
   };
 

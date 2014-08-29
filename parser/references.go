@@ -21,6 +21,8 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeELSE)
 	case "elsif":
 		l.emit(tokenTypeELSIF)
+	case "unless":
+		l.emit(tokenTypeUNLESS)
 	case "class":
 		l.emit(tokenTypeCLASS)
 	case "module":

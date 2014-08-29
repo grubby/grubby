@@ -43,6 +43,7 @@ const (
 	tokenTypeIF
 	tokenTypeELSE
 	tokenTypeELSIF
+	tokenTypeUNLESS
 	tokenTypeCLASS
 	tokenTypeMODULE
 	tokenTypeTRUE
@@ -390,6 +391,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeELSIF:
 			debug("ELSIF")
 			return ELSIF
+		case tokenTypeUNLESS:
+			debug("UNLESS")
+			return UNLESS
 		case tokenTypeCLASS:
 			debug("CLASS")
 			return CLASS
