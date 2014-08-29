@@ -47,6 +47,7 @@ func NewVM(name string) VM {
 	vm.ObjectSpace["Kernel"] = builtins.NewGlobalKernelClass()
 	vm.ObjectSpace["File"] = builtins.NewFileClass()
 	vm.ObjectSpace["ARGV"] = builtins.NewArrayClass().(builtins.Class).New()
+	vm.ObjectSpace["Process"] = builtins.NewProcessClass()
 
 	main := objectClass.(builtins.Class).New()
 	main.AddMethod(builtins.NewMethod("to_s", func(args ...builtins.Value) (builtins.Value, error) {
