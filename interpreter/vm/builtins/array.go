@@ -25,6 +25,15 @@ func (klass *ArrayClass) New() Value {
 		a.members = a.members[1:]
 		return val, nil
 	}))
+	a.AddMethod(NewMethod("include?", func(args ...Value) (Value, error) {
+		for _, m := range a.members {
+			if m == args[0] {
+				return NewTrueClass().(Class).New(), nil
+			}
+		}
+
+		return NewFalseClass().(Class).New(), nil
+	}))
 
 	return a
 }
