@@ -90,7 +90,7 @@ Grubby yacc
 * [x] globals ($: and $?, et cetera)
 * [x] backtics
 * [x] string interpolation
-* [ ] semicolons
+* [x] semicolons
 * [x] method calls
 * [x] comments
 * [x] if ; elsif; elsif; else
