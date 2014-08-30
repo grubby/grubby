@@ -140,3 +140,7 @@ type IfBlock struct {
 type Subshell struct {
 	Command string
 }
+
+type Group struct {
+	Body []Node
+}

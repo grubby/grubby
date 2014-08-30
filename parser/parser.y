@@ -102,6 +102,7 @@ var Statements []ast.Node
 %type <genericValue> block
 %type <genericValue> false
 %type <genericValue> array
+%type <genericValue> group
 %type <genericValue> global
 %type <genericValue> callexpr
 %type <genericValue> if_block
@@ -130,6 +131,7 @@ var Statements []ast.Node
 
 // slice nodes
 %type <genericSlice> list
+%type <genericSlice> lines
 %type <genericSlice> call_args
 %type <genericSlice> block_args
 %type <genericSlice> elsif_block
@@ -162,16 +164,15 @@ capture_list : /* empty */
 		}
 	}
 
-line : NEWLINE { $$ = nil }
-| SEMICOLON { $$ = nil }
+line : NEWLINE { $$ = nil } | SEMICOLON { $$ = nil }
 | whitespace expr whitespace { $$ = $2 };
 
 list : /* empty */
   { $$ = []ast.Node{} }
 | list NEWLINE
-  { /* do nothing */ }
+  { }
 | list WHITESPACE
-  { /* do nothing */ }
+  { }
 | list expr
   {
 		if $2 != nil {
@@ -182,13 +183,13 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block;
+expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block | group;
 
-callexpr : REF whitespace call_args
+callexpr : REF call_args
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
-      Args: $3,
+      Args: $2,
     }
   }
 | CAPITAL_REF whitespace call_args
@@ -604,6 +605,17 @@ elsif_block : /* nothing */ { $$ = []ast.Node{} };
       Condition: ast.Boolean{Value: true},
       Body: $2,
     })
-  };
+      };
+
+lines : /* empty */ { }
+| expr { $$ = []ast.Node{$1} }
+| SEMICOLON { };
+| whitespace { };
+| lines expr { $$ = append($$, $2) }
+| lines SEMICOLON { }
+| lines whitespace { };
+
+group : LPAREN lines RPAREN
+  { $$ = ast.Group{Body: $2} };
 
 %%
