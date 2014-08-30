@@ -1227,6 +1227,26 @@ end
 		})
 	})
 
+	Describe("a normal file you might parse", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+#!/usr/bin/env ruby
+
+$:.unshift File.expand_path('../../lib', __FILE__)
+
+require 'mspec/commands/mspec-run'
+require 'mspec'
+
+MSpecRun.main
+`)
+		})
+
+		It("is parsed just fine", func() {
+			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+		})
+	})
+
 	Describe("having tons of optional whitespace", func() {
 		BeforeEach(func() {
 			lexer = parser.NewLexer(`

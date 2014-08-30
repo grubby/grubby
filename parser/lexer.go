@@ -195,10 +195,11 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == '}':
 			l.emit(tokenTypeRBrace)
 		case r == '$':
-			if l.accept(alphaNumericUnderscore) {
+			validGlobalNameRunes := alphaNumericUnderscore + ":"
+			if l.accept(validGlobalNameRunes) {
 				l.backup()
 				l.ignore()
-				l.acceptRun(alphaNumericUnderscore)
+				l.acceptRun(validGlobalNameRunes)
 				l.emit(tokenTypeGlobal)
 			} else {
 				l.emit(tokenTypeDollarSign)

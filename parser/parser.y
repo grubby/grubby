@@ -191,6 +191,13 @@ callexpr : REF whitespace call_args
       Args: $3,
     }
   }
+| CAPITAL_REF whitespace call_args
+    {
+      $$ = ast.CallExpression{
+        Func: $1.(ast.BareReference),
+        Args: $3,
+      }
+    }
 | expr DOT REF
   {
     $$ = ast.CallExpression{
@@ -198,7 +205,22 @@ callexpr : REF whitespace call_args
       Func: $3.(ast.BareReference),
     };
   }
+| CAPITAL_REF DOT REF
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+    };
+  }
 | expr DOT REF whitespace call_args
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+      Args: $5,
+    };
+  }
+| CAPITAL_REF DOT REF whitespace call_args
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -238,11 +260,17 @@ nodes_with_commas_and_optional_block : expr
 
 nonempty_nodes_with_commas : REF
   { $$ = append($$, $1); }
+| CAPITAL_REF
+  { $$ = append($$, $1); }
 | NODE
   { $$ = append($$, $1); }
 | nonempty_nodes_with_commas whitespace COMMA whitespace NODE
   { $$ = append($$, $5); };
 | nonempty_nodes_with_commas whitespace COMMA whitespace REF
+  { $$ = append($$, $5); }
+| nonempty_nodes_with_commas whitespace COMMA whitespace CAPITAL_REF
+  { $$ = append($$, $5); }
+| nonempty_nodes_with_commas whitespace COMMA whitespace FILE_CONST_REF
   { $$ = append($$, $5); }
 | nonempty_nodes_with_commas whitespace COMMA whitespace block
   { $$ = append($$, $5); };
@@ -253,8 +281,10 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | NODE
   { $$ = append($$, $1); }
 | nodes_with_commas whitespace COMMA whitespace NODE
-  { $$ = append($$, $5); };
+  { $$ = append($$, $5); }
 | nodes_with_commas whitespace COMMA whitespace REF
+  { $$ = append($$, $5); }
+| nodes_with_commas whitespace COMMA whitespace FILE_CONST_REF
   { $$ = append($$, $5); };
 
 whitespace_and_newlines : /* empty */
