@@ -9,4 +9,4 @@ $root/bin/build
 
 cd $root/../rubyspec
 export PATH=$root/bin:$PATH
-mspec language/string_spec.rb
+mspec language/string_spec.rb -t $root/bin/ruby
