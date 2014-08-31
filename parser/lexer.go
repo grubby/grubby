@@ -163,6 +163,8 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypeOperator)
 			} else if l.accept("~") {
 				l.emit(tokenTypeOperator)
+			} else if l.accept(">") {
+				l.emit(tokenTypeOperator)
 			} else {
 				l.emit(tokenTypeEqual)
 			}
@@ -475,7 +477,7 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.Subshell{Command: token.value}
 			return NODE
 		case tokenTypeOperator:
-			debug(token.value)
+			debug("Operator: %s", token.value)
 			lval.operator = token.value
 			return OPERATOR
 		case tokenTypeBEGIN:

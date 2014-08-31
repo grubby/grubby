@@ -144,3 +144,18 @@ type Subshell struct {
 type Group struct {
 	Body []Node
 }
+
+type Begin struct {
+	Body   []Node
+	Rescue []Node
+}
+
+type Rescue struct {
+	Body      []Node
+	Exception RescueException
+}
+
+type RescueException struct {
+	Var   BareReference
+	Class BareReference
+}

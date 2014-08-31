@@ -107,6 +107,7 @@ var Statements []ast.Node
 %type <genericValue> callexpr
 %type <genericValue> if_block
 %type <genericValue> assignment
+%type <genericValue> begin_block
 %type <genericValue> class_variable
 %type <genericValue> func_declaration
 %type <genericValue> class_declaration
@@ -138,6 +139,7 @@ var Statements []ast.Node
 %type <genericSlice> function_args
 %type <genericSlice> capture_list
 %type <genericSlice> key_value_pairs
+%type <genericSlice> optional_rescues
 %type <genericSlice> nodes_with_commas
 %type <genericSlice> comma_delimited_refs
 %type <genericSlice> symbol_key_value_pairs
@@ -183,7 +185,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block | group;
+expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block | group | begin_block;
 
 callexpr : REF call_args
   {
@@ -475,12 +477,27 @@ hash : LBRACE whitespace optional_newline whitespace key_value_pairs whitespace 
   };
 
 key_value_pairs : /* empty */ { $$ = ast.Nodes{} }
-| expr whitespace EQUALTO GREATERTHAN whitespace expr
-  { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $6}) }
-| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr
-  { $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $11}) }
-| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace EQUALTO GREATERTHAN whitespace expr COMMA
-  { $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $11}) };
+| expr whitespace OPERATOR whitespace expr
+  {
+    if $3 != "=>" {
+      panic("FREAKOUT")
+    }
+    $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $5})
+  }
+| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace OPERATOR whitespace expr
+  {
+  if $8 != "=>" {
+      panic("FREAKOUT")
+    }
+    $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $10})
+  }
+| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace OPERATOR whitespace expr COMMA
+  {
+    if $8 != "=>" {
+      panic("FREAKOUT")
+    }
+    $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $10})
+  };
 
 symbol_key_value_pairs : REF COLON whitespace expr
   {
@@ -617,5 +634,32 @@ lines : /* empty */ { }
 
 group : LPAREN lines RPAREN
   { $$ = ast.Group{Body: $2} };
+
+begin_block : BEGIN NEWLINE list optional_rescues END
+  {
+    $$ = ast.Begin{
+      Body: $3,
+      Rescue: $4,
+    }
+  };
+
+optional_rescues : /* empty */
+  { $$ = []ast.Node{} }
+| optional_rescues optional_newline RESCUE list
+  { $$ = append($$, ast.Rescue{Body: $4}) }
+| optional_rescues optional_newline RESCUE whitespace CAPITAL_REF whitespace OPERATOR whitespace REF list
+  {
+    if $7 != "=>" {
+      panic("FREAKOUT")
+    }
+
+    $$ = append($$, ast.Rescue{
+      Body: $10,
+      Exception: ast.RescueException{
+        Var: $9.(ast.BareReference),
+        Class: $5.(ast.BareReference),
+      },
+    })
+  };
 
 %%

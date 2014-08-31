@@ -1209,6 +1209,55 @@ end
 			})
 		})
 
+		Describe("begin followed by several rescue statements", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+begin
+  foo()
+rescue
+  bar()
+rescue Exception => e
+  baz()
+end
+`)
+			})
+
+			It("is parsed as a BeginBlock struct", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Begin{
+						Body: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "foo"},
+								Args: []ast.Node{},
+							},
+						},
+						Rescue: []ast.Node{
+							ast.Rescue{
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "bar"},
+										Args: []ast.Node{},
+									},
+								},
+							},
+							ast.Rescue{
+								Exception: ast.RescueException{
+									Var:   ast.BareReference{Name: "e"},
+									Class: ast.BareReference{Name: "Exception"},
+								},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "baz"},
+										Args: []ast.Node{},
+									},
+								},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("semicolons", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(";;a; b; c;;")
