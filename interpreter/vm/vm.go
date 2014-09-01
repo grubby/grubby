@@ -137,7 +137,10 @@ func (vm *vm) Symbols() map[string]builtins.Value {
 
 func (vm *vm) Run(input string) (builtins.Value, error) {
 	lexer := parser.NewLexer(input)
-	parser.RubyParse(lexer)
+	result := parser.RubyParse(lexer)
+	if result != 0 {
+		return nil, errors.New("parse error")
+	}
 
 	main := vm.ObjectSpace["main"]
 	return vm.executeWithContext(parser.Statements, main)
