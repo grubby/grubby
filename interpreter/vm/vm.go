@@ -135,11 +135,21 @@ func (vm *vm) Symbols() map[string]builtins.Value {
 	return vm.KnownSymbols
 }
 
+type ParseError struct{}
+
+func NewParseError() *ParseError {
+	return &ParseError{}
+}
+
+func (err *ParseError) Error() string {
+	return "parse error"
+}
+
 func (vm *vm) Run(input string) (builtins.Value, error) {
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
 	if result != 0 {
-		return nil, errors.New("parse error")
+		return nil, NewParseError()
 	}
 
 	main := vm.ObjectSpace["main"]

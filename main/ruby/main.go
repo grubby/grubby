@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/grubby/grubby/interpreter/vm"
+	"github.com/grubby/grubby/parser"
 )
 
 var verboseFlag = flag.Bool("verbose", false, "enables verbose mode")
@@ -28,10 +30,34 @@ func main() {
 		panic(err)
 	}
 
-	vm := vm.NewVM(flag.Args()[1])
-	_, err = vm.Run(string(bytes))
+	_, err = vm.NewVM(flag.Args()[1]).Run(string(bytes))
 
-	if err != nil {
+	switch err.(type) {
+	case *vm.ParseError:
+		println(fmt.Sprintf("Error parsing ruby script %s", file.Name()))
+		println("last ten statements from the parser:")
+		println("")
+
+		debugStatements := []string{}
+		for _, d := range parser.DebugStatements {
+			debugStatements = append(debugStatements, d)
+		}
+
+		threshold := 21
+		debugCount := len(debugStatements)
+		if debugCount <= threshold {
+			for _, stmt := range debugStatements {
+				fmt.Printf("\t%s\n", stmt)
+			}
+		} else {
+			for _, stmt := range debugStatements[debugCount-threshold:] {
+				fmt.Printf("\t%s\n", stmt)
+			}
+		}
+
+		os.Exit(1)
+	case nil:
+	default:
 		panic(err)
 	}
 }
