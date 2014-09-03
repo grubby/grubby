@@ -647,6 +647,15 @@ optional_rescues : /* empty */
   { $$ = []ast.Node{} }
 | optional_rescues optional_newline RESCUE list
   { $$ = append($$, ast.Rescue{Body: $4}) }
+| optional_rescues optional_newline RESCUE whitespace CAPITAL_REF whitespace list
+  {
+    $$ = append($$, ast.Rescue{
+      Body: $7,
+      Exception: ast.RescueException{
+        Class: $5.(ast.BareReference),
+      },
+    })
+  }
 | optional_rescues optional_newline RESCUE whitespace CAPITAL_REF whitespace OPERATOR whitespace REF list
   {
     if $7 != "=>" {

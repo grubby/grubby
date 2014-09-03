@@ -1216,6 +1216,8 @@ begin
   foo()
 rescue
   bar()
+rescue LoadError
+  biz()
 rescue Exception => e
   baz()
 end
@@ -1236,6 +1238,17 @@ end
 								Body: []ast.Node{
 									ast.CallExpression{
 										Func: ast.BareReference{Name: "bar"},
+										Args: []ast.Node{},
+									},
+								},
+							},
+							ast.Rescue{
+								Exception: ast.RescueException{
+									Class: ast.BareReference{"LoadError"},
+								},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "biz"},
 										Args: []ast.Node{},
 									},
 								},
