@@ -1304,6 +1304,31 @@ end
 				}))
 			})
 		})
+
+		Describe("modules", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+Foo::Bar
+Foo::Bar::Baz.method_call
+`)
+			})
+
+			It("can be used to refer to classes and methods inside modules", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Class{
+						Name:      "Bar",
+						Namespace: "Foo",
+					},
+					ast.CallExpression{
+						Target: ast.Class{
+							Name:      "Baz",
+							Namespace: "Foo::Bar",
+						},
+						Func: ast.BareReference{Name: "method_call"},
+					},
+				}))
+			})
+		})
 	})
 
 	Describe("a normal file you might parse", func() {

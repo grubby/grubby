@@ -185,7 +185,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block | group | begin_block;
+expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block | group | begin_block | class_name_with_modules;
 
 callexpr : REF call_args
   {
@@ -309,43 +309,43 @@ func_declaration :
 function_args : /* possibly nothing */ { $$ = []ast.Node{} };
 | call_args { $$ = $1 };
 
-class_declaration : CLASS whitespace class_name_with_modules NEWLINE list END
+class_declaration : CLASS whitespace class_name_with_modules whitespace NEWLINE list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
-       Body: $5,
+       Body: $6,
     }
   }
-| CLASS whitespace class_name_with_modules LESSTHAN class_name_with_modules NEWLINE list END
+| CLASS whitespace class_name_with_modules whitespace LESSTHAN whitespace class_name_with_modules whitespace NEWLINE list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
-       SuperClass: $5.(ast.Class),
+       SuperClass: $7.(ast.Class),
        Namespace: $3.(ast.Class).Namespace,
-       Body: $7,
+       Body: $10,
     }
   };
 
-module_declaration : MODULE whitespace class_name_with_modules NEWLINE list END
+module_declaration : MODULE whitespace class_name_with_modules whitespace NEWLINE list END
   {
     $$ = ast.ModuleDecl{
       Name: $3.(ast.Class).Name,
       Namespace: $3.(ast.Class).Namespace,
-      Body: $5,
+      Body: $6,
     }
   };
 
-class_name_with_modules : whitespace CAPITAL_REF whitespace
+class_name_with_modules : CAPITAL_REF
   {
     $$ = ast.Class{
-      Name: $2.(ast.BareReference).Name,
+      Name: $1.(ast.BareReference).Name,
     }
   }
-| whitespace namespaced_modules COLON COLON CAPITAL_REF whitespace
+| namespaced_modules COLON COLON CAPITAL_REF
   {
     $$ = ast.Class{
-       Name: $5.(ast.BareReference).Name,
-       Namespace: strings.Join($2, "::"),
+       Name: $4.(ast.BareReference).Name,
+       Namespace: strings.Join($1, "::"),
     }
   };
 
