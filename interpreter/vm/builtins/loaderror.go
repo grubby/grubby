@@ -13,7 +13,7 @@ func NewLoadError(name string) *loadError {
 	return &loadError{filename: name}
 }
 
-func (err *loadError) ClassName() string {
+func (err *loadError) String() string {
 	return "LoadError"
 }
 

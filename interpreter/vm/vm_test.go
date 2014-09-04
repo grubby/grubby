@@ -234,5 +234,27 @@ end`)
 				Expect(value).To(Equal(builtins.Nil()))
 			})
 		})
+
+		Describe("begin; rescue; end", func() {
+			It("can be used to prevent exceptions from bubbling up", func() {
+				_, err := vm.Run(`
+foo = false
+bar = false
+begin
+  require 'some/nonsense'
+rescue LoadError
+  foo = true
+end
+
+bar = true
+`)
+
+				trueValue := builtins.NewTrueClass().(builtins.Class).New()
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(vm.MustGet("foo")).To(Equal(trueValue))
+				Expect(vm.MustGet("bar")).To(Equal(trueValue))
+			})
+		})
 	})
 })

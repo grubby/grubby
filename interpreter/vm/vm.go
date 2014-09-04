@@ -193,6 +193,12 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewString(statement.(ast.SimpleString).Value)
 		case ast.InterpolatedString:
 			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value)
+		case ast.Boolean:
+			if statement.(ast.Boolean).Value {
+				returnValue = builtins.NewTrueClass().(builtins.Class).New()
+			} else {
+				returnValue = builtins.NewFalseClass().(builtins.Class).New()
+			}
 		case ast.GlobalVariable:
 			returnValue = vm.Globals[statement.(ast.GlobalVariable).Name]
 		case ast.ConstantInt:
@@ -266,6 +272,26 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 
 		case ast.FileNameConstReference:
 			returnValue = builtins.NewString(vm.currentFilename)
+		case ast.Begin:
+			begin := statement.(ast.Begin)
+			_, err := vm.executeWithContext(begin.Body, context)
+
+			if err != nil {
+				rubyErr := err.(builtins.Value)
+				for _, rescue := range begin.Rescue {
+					r := rescue.(ast.Rescue)
+					if r.Exception.Class.Name == rubyErr.String() {
+						_, err = vm.executeWithContext(r.Body, context)
+						if err == nil {
+							break
+						}
+					}
+				}
+			}
+
+			if err != nil {
+				returnErr = err
+			}
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
