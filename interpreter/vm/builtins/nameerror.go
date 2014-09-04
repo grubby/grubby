@@ -1,4 +1,4 @@
-package errors
+package builtins
 
 import "fmt"
 
@@ -6,6 +6,7 @@ type nameError struct {
 	filename  string
 	context   string
 	className string
+	valueStub
 }
 
 func NewNameError(name, context, className string) *nameError {

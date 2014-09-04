@@ -1,13 +1,20 @@
-package errors
+package builtins
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type loadError struct {
 	filename string
+	valueStub
 }
 
 func NewLoadError(name string) *loadError {
 	return &loadError{filename: name}
+}
+
+func (err *loadError) ClassName() string {
+	return "LoadError"
 }
 
 func (err *loadError) Error() string {

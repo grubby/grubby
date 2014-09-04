@@ -9,7 +9,6 @@ import (
 
 	"github.com/grubby/grubby/ast"
 	"github.com/grubby/grubby/interpreter/vm/builtins"
-	builtin_errors "github.com/grubby/grubby/interpreter/vm/builtins/errors"
 	"github.com/grubby/grubby/parser"
 )
 
@@ -83,7 +82,7 @@ func NewVM(name string) VM {
 		}
 
 		err := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
-		return nil, builtin_errors.NewLoadError(err)
+		return nil, builtins.NewLoadError(err)
 
 	}))
 	main.AddMethod(builtins.NewMethod("puts", func(args ...builtins.Value) (builtins.Value, error) {
@@ -215,7 +214,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			if ok {
 				returnValue = maybe
 			} else {
-				returnErr = builtin_errors.NewNameError(name, context.String(), context.Class().String())
+				returnErr = builtins.NewNameError(name, context.String(), context.Class().String())
 			}
 		case ast.CallExpression:
 			var method builtins.Method
@@ -232,7 +231,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			method, err := target.Method(callExpr.Func.Name)
 
 			if err != nil {
-				err := builtin_errors.NewNameError(callExpr.Func.Name, target.String(), target.Class().String())
+				err := builtins.NewNameError(callExpr.Func.Name, target.String(), target.Class().String())
 				return nil, err
 			}
 

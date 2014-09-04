@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/grubby/grubby/interpreter/vm/builtins"
-	"github.com/grubby/grubby/interpreter/vm/builtins/errors"
 
 	. "github.com/grubby/grubby/interpreter/vm"
 	. "github.com/grubby/grubby/testhelpers"
@@ -159,7 +158,7 @@ end`)
 			_, err := vm.Run("require 'something'")
 
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(BeAssignableToTypeOf(errors.NewLoadError("")))
+			Expect(err).To(BeAssignableToTypeOf(builtins.NewLoadError("")))
 		})
 
 		Context("with a load path and a file to require", func() {
