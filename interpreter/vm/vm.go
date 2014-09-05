@@ -76,8 +76,8 @@ func NewVM(name string) VM {
 				}()
 
 				vm.currentFilename = file.Name()
-				vm.Run(string(contents))
-				return nil, nil
+				_, rubyErr := vm.Run(string(contents))
+				return builtins.NewTrueClass().(builtins.Class).New(), rubyErr
 			}
 		}
 
