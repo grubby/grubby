@@ -10,5 +10,4 @@ root=$(cd $(dirname $(dirname $0)) && pwd)
 $root/bin/build > /dev/null
 
 cd $root/../rubyspec
-export PATH=$root/bin:$PATH
 mspec language/string_spec.rb -t $root/bin/ruby
