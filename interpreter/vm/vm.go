@@ -226,16 +226,21 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)
 
-			var target = context
+			var target builtins.Value
 			switch callExpr.Target.(type) {
 			case ast.BareReference:
 				target = vm.ObjectSpace[callExpr.Target.(ast.BareReference).Name]
 			case ast.Class:
 				target = vm.ObjectSpace[callExpr.Target.(ast.Class).Name]
+			case ast.GlobalVariable:
+				target = vm.Globals[callExpr.Target.(ast.GlobalVariable).Name]
+			case nil:
+				target = context
 			}
 
 			if target == nil {
-				panic(fmt.Sprintf("could not find target: %#v", callExpr.Target))
+				nilValue := builtins.NewNilClass().(builtins.Class).New()
+				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String())
 			}
 			method, err := target.Method(callExpr.Func.Name)
 

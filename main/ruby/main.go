@@ -57,7 +57,9 @@ func main() {
 
 		os.Exit(1)
 	case nil:
+	case error:
+		panic(err.Error())
 	default:
-		panic(err)
+		panic(fmt.Sprintf("%#v", err))
 	}
 }

@@ -256,5 +256,12 @@ bar = true
 				Expect(vm.MustGet("bar")).To(Equal(trueValue))
 			})
 		})
+
+		Describe("calling a method that does not exist", func() {
+			It("raises a NoMethodError", func() {
+				_, err := vm.Run("$foo.bar()")
+				Expect(err).To(BeAssignableToTypeOf(builtins.NewNoMethodError("", "", "")))
+			})
+		})
 	})
 })
