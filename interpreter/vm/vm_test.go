@@ -179,6 +179,16 @@ end`)
 		})
 	})
 
+	Describe("the load path", func() {
+		It("is represented by $LOAD_PATH and $:", func() {
+			path := vm.MustGet("LOAD_PATH")
+			str := builtins.NewString("foo")
+			path.(*builtins.Array).Append(str)
+
+			Expect(vm.MustGet(":").(*builtins.Array).Members()).To(ContainElement(str))
+		})
+	})
+
 	Describe("File class", func() {
 		It("has a reasonable .expand_path method", func() {
 			fileClass, err := vm.Get("File")

@@ -38,8 +38,8 @@ func NewVM(name string) VM {
 	}
 
 	loadPath := builtins.NewArrayClass().(builtins.Class).New()
-	vm.Globals["$LOAD_PATH"] = loadPath
-	vm.Globals["$:"] = loadPath // FIXME: add a test that these are the same object
+	vm.Globals["LOAD_PATH"] = loadPath
+	vm.Globals[":"] = loadPath
 
 	objectClass := builtins.NewGlobalObjectClass()
 	vm.ObjectSpace["Object"] = objectClass

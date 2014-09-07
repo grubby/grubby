@@ -23,7 +23,7 @@ end
 		panic(err)
 	}
 
-	loadPathGlobal, err := vm.Get("$LOAD_PATH")
+	loadPathGlobal, err := vm.Get("LOAD_PATH")
 	if err != nil {
 		panic(err)
 	}
