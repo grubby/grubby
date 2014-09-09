@@ -333,6 +333,53 @@ ARGV.shift
 					}))
 				})
 			})
+
+			Context("a call expression with mixed arguments", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("File.expand_path('../../lib', __FILE__)")
+					for _, stmt := range parser.DebugStatements {
+						println(stmt)
+					}
+				})
+
+				It("parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "File"},
+							Func:   ast.BareReference{Name: "expand_path"},
+							Args: []ast.Node{
+								ast.SimpleString{Value: "../../lib"},
+								ast.FileNameConstReference{},
+							},
+						},
+					}))
+				})
+			})
+
+			XContext("with a call expression as an argument", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("$:.unshift File.expand_path('../../lib', __FILE__)")
+				})
+
+				It("applies the correct args to each call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func:   ast.BareReference{Name: "unshift"},
+							Target: ast.GlobalVariable{Name: ":"},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Target: ast.Class{Name: "File"},
+									Func:   ast.BareReference{Name: "expand_path"},
+									Args: []ast.Node{
+										ast.SimpleString{Value: "../../lib"},
+										ast.FileNameConstReference{},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("method definitions", func() {

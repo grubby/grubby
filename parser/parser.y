@@ -273,7 +273,7 @@ nonempty_nodes_with_commas : REF
   { $$ = append($$, $5); }
 | nonempty_nodes_with_commas whitespace COMMA whitespace CAPITAL_REF
   { $$ = append($$, $5); }
-| nonempty_nodes_with_commas whitespace COMMA whitespace FILE_CONST_REF
+| nonempty_nodes_with_commas whitespace COMMA whitespace filename_const_reference
   { $$ = append($$, $5); }
 | nonempty_nodes_with_commas whitespace COMMA whitespace block
   { $$ = append($$, $5); };
@@ -287,7 +287,7 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $5); }
 | nodes_with_commas whitespace COMMA whitespace REF
   { $$ = append($$, $5); }
-| nodes_with_commas whitespace COMMA whitespace FILE_CONST_REF
+| nodes_with_commas whitespace COMMA whitespace filename_const_reference
   { $$ = append($$, $5); };
 
 whitespace_and_newlines : /* empty */

@@ -355,7 +355,7 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.BareReference{Name: token.value}
 			return CAPITAL_REF
 		case tokenTypeGlobal:
-			debug("GLOBAL: %s", token.value)
+			debug("REF: '%s'", token.value)
 			lval.genericValue = ast.GlobalVariable{Name: token.value}
 			return REF
 		case tokenTypeLParen:
