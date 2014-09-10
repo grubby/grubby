@@ -337,9 +337,6 @@ ARGV.shift
 			Context("a call expression with mixed arguments", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("File.expand_path('../../lib', __FILE__)")
-					for _, stmt := range parser.DebugStatements {
-						println(stmt)
-					}
 				})
 
 				It("parsed correctly", func() {
