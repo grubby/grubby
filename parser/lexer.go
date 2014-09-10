@@ -459,7 +459,8 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			return ATSIGN
 		case tokenType__FILE__:
 			debug("__FILE__")
-			return FILE_CONST_REF
+			lval.genericValue = ast.FileNameConstReference{}
+			return REF
 		case tokenTypeDot:
 			debug(".")
 			return DOT

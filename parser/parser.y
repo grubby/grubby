@@ -114,7 +114,6 @@ var Statements []ast.Node
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
-%type <genericValue> filename_const_reference
 
 // unary operator nodes
 %type <genericValue> negation   // !
@@ -185,7 +184,7 @@ list : /* empty */
 whitespace : /* zero or more */ | WHITESPACE whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | filename_const_reference | if_block | group | begin_block | class_name_with_modules;
+expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | if_block | group | begin_block | class_name_with_modules;
 
 callexpr : REF call_args
   {
@@ -273,8 +272,6 @@ nonempty_nodes_with_commas : REF
   { $$ = append($$, $5); }
 | nonempty_nodes_with_commas whitespace COMMA whitespace CAPITAL_REF
   { $$ = append($$, $5); }
-| nonempty_nodes_with_commas whitespace COMMA whitespace filename_const_reference
-  { $$ = append($$, $5); }
 | nonempty_nodes_with_commas whitespace COMMA whitespace block
   { $$ = append($$, $5); };
 
@@ -286,8 +283,6 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | nodes_with_commas whitespace COMMA whitespace NODE
   { $$ = append($$, $5); }
 | nodes_with_commas whitespace COMMA whitespace REF
-  { $$ = append($$, $5); }
-| nodes_with_commas whitespace COMMA whitespace filename_const_reference
   { $$ = append($$, $5); };
 
 whitespace_and_newlines : /* empty */
@@ -539,9 +534,6 @@ class_variable : ATSIGN ATSIGN REF
   { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} }
 | ATSIGN ATSIGN CAPITAL_REF
   { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} };
-
-filename_const_reference : FILE_CONST_REF
-  { $$ = ast.FileNameConstReference{} };
 
 block : DO list END
   { $$ = ast.Block{Body: $2} }
