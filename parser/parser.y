@@ -108,6 +108,7 @@ var Statements []ast.Node
 %type <genericValue> if_block
 %type <genericValue> assignment
 %type <genericValue> begin_block
+%type <genericValue> single_node
 %type <genericValue> class_variable
 %type <genericValue> func_declaration
 %type <genericValue> class_declaration
@@ -165,8 +166,10 @@ capture_list : /* empty */
 		}
 	}
 
-line : NEWLINE { $$ = nil } | SEMICOLON { $$ = nil }
-| whitespace expr whitespace { $$ = $2 };
+line : NEWLINE { $$ = nil }
+| SEMICOLON { $$ = nil }
+| optional_whitespace single_node optional_whitespace { $$ = $2 };
+| optional_whitespace expr optional_whitespace { $$ = $2 }
 
 list : /* empty */
   { $$ = []ast.Node{} }
@@ -181,40 +184,57 @@ list : /* empty */
 		}
 	};
 
-whitespace : /* zero or more */ | WHITESPACE whitespace
+optional_whitespace : /* zero or more */ | WHITESPACE optional_whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
 
-expr : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | callexpr | func_declaration | class_declaration | module_declaration | assignment | true | false | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | array | hash | if_block | group | begin_block | class_name_with_modules;
+// e.g.: not a complex set of tokens (e.g.: call expression)
+single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules;
 
-callexpr : REF call_args
+expr : single_node | callexpr | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | if_block | group | begin_block;
+
+callexpr : REF LPAREN optional_whitespace RPAREN
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
-      Args: $2,
+      Args: []ast.Node{},
     }
   }
-| CAPITAL_REF whitespace call_args
-    {
-      $$ = ast.CallExpression{
-        Func: $1.(ast.BareReference),
-        Args: $3,
-      }
+| REF LPAREN single_node RPAREN
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: []ast.Node{$3},
     }
-| expr DOT REF
+  }
+| REF LPAREN nodes_with_commas RPAREN
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: $3,
+    }
+  }
+| REF LPAREN optional_whitespace nodes_with_commas optional_whitespace RPAREN
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: $4,
+    }
+  }
+| single_node optional_whitespace call_args
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: $3,
+    }
+  }
+| single_node DOT REF
   {
     $$ = ast.CallExpression{
       Target: $1,
       Func: $3.(ast.BareReference),
     };
   }
-| CAPITAL_REF DOT REF
-  {
-    $$ = ast.CallExpression{
-      Target: $1,
-      Func: $3.(ast.BareReference),
-    };
-  }
-| expr DOT REF whitespace call_args
+| single_node DOT REF optional_whitespace call_args
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -222,22 +242,16 @@ callexpr : REF call_args
       Args: $5,
     };
   }
-| CAPITAL_REF DOT REF whitespace call_args
-  {
-    $$ = ast.CallExpression{
-      Target: $1,
-      Func: $3.(ast.BareReference),
-      Args: $5,
-    };
-  }
-| REF whitespace nodes_with_commas_and_optional_block
+
+// e.g.: `puts 'whatever' do ; end;`
+| REF optional_whitespace nodes_with_commas_and_optional_block
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
       Args: $3,
     };
   }
-| expr whitespace OPERATOR whitespace expr
+| single_node optional_whitespace OPERATOR optional_whitespace single_node
   {
     $$ = ast.CallExpression{
       Func: ast.BareReference{Name: $3},
@@ -246,43 +260,36 @@ callexpr : REF call_args
     }
   };
 
-call_args : LPAREN whitespace nodes_with_commas whitespace RPAREN
+call_args : LPAREN optional_whitespace nodes_with_commas optional_whitespace RPAREN
   { $$ = $3; }
 | nonempty_nodes_with_commas
   { $$ = $1; };
 
+nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
+| single_node
+  { $$ = append($$, $1); }
+| nodes_with_commas optional_whitespace COMMA optional_whitespace single_node
+  { $$ = append($$, $5); };
+
+// FIXME: this should ONLY have a block at the end (not in the middle)
 nodes_with_commas_and_optional_block : expr
   { $$ = append($$, $1); }
 | block
   { $$ = append($$, $1); }
-| nodes_with_commas_and_optional_block whitespace COMMA whitespace expr
+| nodes_with_commas_and_optional_block optional_whitespace COMMA optional_whitespace expr
   { $$ = append($$, $5); }
-| nodes_with_commas_and_optional_block whitespace COMMA whitespace block
+| nodes_with_commas_and_optional_block optional_whitespace COMMA optional_whitespace block
   { $$ = append($$, $5); };
 
-nonempty_nodes_with_commas : REF
+nonempty_nodes_with_commas : single_node
   { $$ = append($$, $1); }
-| CAPITAL_REF
+| callexpr
   { $$ = append($$, $1); }
-| NODE
-  { $$ = append($$, $1); }
-| nonempty_nodes_with_commas whitespace COMMA whitespace NODE
-  { $$ = append($$, $5); };
-| nonempty_nodes_with_commas whitespace COMMA whitespace REF
+| nonempty_nodes_with_commas optional_whitespace COMMA optional_whitespace single_node
   { $$ = append($$, $5); }
-| nonempty_nodes_with_commas whitespace COMMA whitespace CAPITAL_REF
+| nonempty_nodes_with_commas optional_whitespace COMMA optional_whitespace callexpr
   { $$ = append($$, $5); }
-| nonempty_nodes_with_commas whitespace COMMA whitespace block
-  { $$ = append($$, $5); };
-
-nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
-| REF
-  { $$ = append($$, $1); }
-| NODE
-  { $$ = append($$, $1); }
-| nodes_with_commas whitespace COMMA whitespace NODE
-  { $$ = append($$, $5); }
-| nodes_with_commas whitespace COMMA whitespace REF
+| nonempty_nodes_with_commas optional_whitespace COMMA optional_whitespace block
   { $$ = append($$, $5); };
 
 whitespace_and_newlines : /* empty */
@@ -292,7 +299,7 @@ whitespace_and_newlines : /* empty */
 // FIXME: this should use a different type than call_args
 // call args can be a list of expressions. This is just a list of REFs or NODEs
 func_declaration :
-  DEF whitespace REF whitespace function_args whitespace_and_newlines list whitespace_and_newlines END
+  DEF optional_whitespace REF optional_whitespace function_args whitespace_and_newlines list whitespace_and_newlines END
   {
 		$$ = ast.FuncDecl{
 			Name: $3.(ast.BareReference),
@@ -304,14 +311,14 @@ func_declaration :
 function_args : /* possibly nothing */ { $$ = []ast.Node{} };
 | call_args { $$ = $1 };
 
-class_declaration : CLASS whitespace class_name_with_modules whitespace NEWLINE list END
+class_declaration : CLASS optional_whitespace class_name_with_modules optional_whitespace NEWLINE list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
        Body: $6,
     }
   }
-| CLASS whitespace class_name_with_modules whitespace LESSTHAN whitespace class_name_with_modules whitespace NEWLINE list END
+| CLASS optional_whitespace class_name_with_modules optional_whitespace LESSTHAN optional_whitespace class_name_with_modules optional_whitespace NEWLINE list END
   {
     $$ = ast.ClassDecl{
        Name: $3.(ast.Class).Name,
@@ -321,7 +328,7 @@ class_declaration : CLASS whitespace class_name_with_modules whitespace NEWLINE 
     }
   };
 
-module_declaration : MODULE whitespace class_name_with_modules whitespace NEWLINE list END
+module_declaration : MODULE optional_whitespace class_name_with_modules optional_whitespace NEWLINE list END
   {
     $$ = ast.ModuleDecl{
       Name: $3.(ast.Class).Name,
@@ -353,35 +360,35 @@ namespaced_modules : CAPITAL_REF
     $$ = append($$, $4.(ast.BareReference).Name)
   };
 
-assignment : REF whitespace EQUALTO whitespace expr
+assignment : REF optional_whitespace EQUALTO optional_whitespace expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $5,
     }
   }
-|  CAPITAL_REF whitespace EQUALTO whitespace expr
+|  CAPITAL_REF optional_whitespace EQUALTO optional_whitespace expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $5,
     }
   }
-|  instance_variable whitespace EQUALTO whitespace expr
+|  instance_variable optional_whitespace EQUALTO optional_whitespace expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $5,
     }
   }
-|  class_variable whitespace EQUALTO whitespace expr
+|  class_variable optional_whitespace EQUALTO optional_whitespace expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $5,
     }
   }
-|  global whitespace EQUALTO whitespace expr
+|  global optional_whitespace EQUALTO optional_whitespace expr
   {
     $$ = ast.Assignment{
       LHS: $1,
@@ -389,12 +396,12 @@ assignment : REF whitespace EQUALTO whitespace expr
     }
   };
 
-negation : BANG whitespace expr { $$ = ast.Negation{Target: $3} };
-complement : COMPLEMENT whitespace expr { $$ = ast.Complement{Target: $3} };
-positive : POSITIVE whitespace expr { $$ = ast.Positive{Target: $3} };
-negative : NEGATIVE whitespace expr { $$ = ast.Negative{Target: $3} };
+negation : BANG optional_whitespace expr { $$ = ast.Negation{Target: $3} };
+complement : COMPLEMENT optional_whitespace expr { $$ = ast.Complement{Target: $3} };
+positive : POSITIVE optional_whitespace expr { $$ = ast.Positive{Target: $3} };
+negative : NEGATIVE optional_whitespace expr { $$ = ast.Negative{Target: $3} };
 
-binary_addition : expr whitespace POSITIVE whitespace expr
+binary_addition : single_node optional_whitespace POSITIVE optional_whitespace single_node
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -403,7 +410,7 @@ binary_addition : expr whitespace POSITIVE whitespace expr
     }
   };
 
-binary_subtraction : expr whitespace NEGATIVE whitespace expr
+binary_subtraction : single_node optional_whitespace NEGATIVE optional_whitespace expr
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -412,7 +419,7 @@ binary_subtraction : expr whitespace NEGATIVE whitespace expr
     }
   };
 
-binary_multiplication : expr whitespace STAR whitespace expr
+binary_multiplication : single_node optional_whitespace STAR optional_whitespace single_node
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -421,7 +428,7 @@ binary_multiplication : expr whitespace STAR whitespace expr
     }
   };
 
-binary_division : expr whitespace SLASH whitespace expr
+binary_division : single_node optional_whitespace SLASH optional_whitespace single_node
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -430,7 +437,7 @@ binary_division : expr whitespace SLASH whitespace expr
     }
   };
 
-bitwise_and: expr whitespace AMPERSAND whitespace expr
+bitwise_and: single_node optional_whitespace AMPERSAND optional_whitespace single_node
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -439,7 +446,7 @@ bitwise_and: expr whitespace AMPERSAND whitespace expr
     }
   };
 
-bitwise_or: expr whitespace PIPE whitespace expr
+bitwise_or: single_node optional_whitespace PIPE optional_whitespace single_node
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -450,11 +457,11 @@ bitwise_or: expr whitespace PIPE whitespace expr
 
 true : TRUE { $$ = ast.Boolean{Value: true} }
 false : FALSE { $$ = ast.Boolean{Value: false} }
-array : LBRACKET whitespace nodes_with_commas whitespace RBRACKET
+array : LBRACKET optional_whitespace nodes_with_commas optional_whitespace RBRACKET
   {
     $$ = ast.Array{Nodes: $3};
   };
-hash : LBRACE whitespace optional_newline whitespace key_value_pairs whitespace optional_newline whitespace RBRACE
+hash : LBRACE optional_whitespace optional_newline optional_whitespace key_value_pairs optional_whitespace optional_newline optional_whitespace RBRACE
   {
     pairs := []ast.HashKeyValuePair{}
     for _, node := range $5 {
@@ -462,7 +469,7 @@ hash : LBRACE whitespace optional_newline whitespace key_value_pairs whitespace 
     }
     $$ = ast.Hash{Pairs: pairs}
   }
-| LBRACE whitespace optional_newline whitespace symbol_key_value_pairs whitespace optional_newline whitespace RBRACE
+| LBRACE optional_whitespace optional_newline optional_whitespace symbol_key_value_pairs optional_whitespace optional_newline optional_whitespace RBRACE
   {
     pairs := []ast.HashKeyValuePair{}
     for _, node := range $5 {
@@ -472,21 +479,21 @@ hash : LBRACE whitespace optional_newline whitespace key_value_pairs whitespace 
   };
 
 key_value_pairs : /* empty */ { $$ = ast.Nodes{} }
-| expr whitespace OPERATOR whitespace expr
+| single_node optional_whitespace OPERATOR optional_whitespace expr
   {
     if $3 != "=>" {
       panic("FREAKOUT")
     }
     $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $5})
   }
-| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace OPERATOR whitespace expr
+| key_value_pairs optional_whitespace COMMA optional_newline optional_whitespace expr optional_whitespace OPERATOR optional_whitespace expr
   {
   if $8 != "=>" {
       panic("FREAKOUT")
     }
     $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $10})
   }
-| key_value_pairs whitespace COMMA optional_newline whitespace expr whitespace OPERATOR whitespace expr COMMA
+| key_value_pairs optional_whitespace COMMA optional_newline optional_whitespace expr optional_whitespace OPERATOR optional_whitespace expr COMMA
   {
     if $8 != "=>" {
       panic("FREAKOUT")
@@ -494,21 +501,21 @@ key_value_pairs : /* empty */ { $$ = ast.Nodes{} }
     $$ = append($$, ast.HashKeyValuePair{Key: $6, Value: $10})
   };
 
-symbol_key_value_pairs : REF COLON whitespace expr
+symbol_key_value_pairs : REF COLON optional_whitespace expr
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $1.(ast.BareReference).Name},
       Value: $4,
     })
   }
-| symbol_key_value_pairs whitespace COMMA optional_newline whitespace REF COLON whitespace expr
+| symbol_key_value_pairs optional_whitespace COMMA optional_newline optional_whitespace REF COLON optional_whitespace expr
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $6.(ast.BareReference).Name},
       Value: $9,
     })
   }
-| symbol_key_value_pairs whitespace COMMA optional_newline whitespace REF COLON whitespace expr COMMA
+| symbol_key_value_pairs optional_whitespace COMMA optional_newline optional_whitespace REF COLON optional_whitespace expr COMMA
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $6.(ast.BareReference).Name},
@@ -537,7 +544,7 @@ class_variable : ATSIGN ATSIGN REF
 
 block : DO list END
   { $$ = ast.Block{Body: $2} }
-| DO whitespace block_args whitespace one_or_more_newlines list END
+| DO optional_whitespace block_args optional_whitespace one_or_more_newlines list END
   {
     $$ = ast.Block{
     Body: $6,
@@ -551,19 +558,19 @@ block_args : PIPE comma_delimited_refs PIPE
 comma_delimited_refs : /* empty */ { $$ = ast.Nodes{} }
 | REF
   { $$ = append($$, $1); }
-| nodes_with_commas whitespace COMMA whitespace REF
+| nodes_with_commas optional_whitespace COMMA optional_whitespace REF
   { $$ = append($$, $5); };
 
 one_or_more_newlines : NEWLINE | one_or_more_newlines NEWLINE
 
-if_block : IF whitespace expr list END
+if_block : IF optional_whitespace expr list END
   {
     $$ = ast.IfBlock{
       Condition: $3,
       Body: $4,
     }
   }
-| IF whitespace expr list elsif_block END
+| IF optional_whitespace expr list elsif_block END
   {
     $$ = ast.IfBlock{
       Condition: $3,
@@ -571,14 +578,21 @@ if_block : IF whitespace expr list END
       Else: $5,
     }
   }
-| expr whitespace IF whitespace expr
+| single_node optional_whitespace IF optional_whitespace single_node
   {
     $$ = ast.IfBlock{
       Condition: $5,
       Body: []ast.Node{$1},
     }
   }
-| expr whitespace UNLESS whitespace expr
+| callexpr optional_whitespace IF optional_whitespace single_node
+  {
+    $$ = ast.IfBlock{
+      Condition: $5,
+      Body: []ast.Node{$1},
+    }
+  }
+| single_node optional_whitespace UNLESS optional_whitespace expr
   {
     $$ = ast.IfBlock{
       Condition: ast.Negation{Target: $5},
@@ -587,7 +601,7 @@ if_block : IF whitespace expr list END
   };
 
 elsif_block : /* nothing */ { $$ = []ast.Node{} };
-| elsif_block ELSIF whitespace expr list
+| elsif_block ELSIF optional_whitespace expr list
   {
     $$ = append($$, ast.IfBlock{
       Condition: $4,
@@ -601,7 +615,7 @@ elsif_block : /* nothing */ { $$ = []ast.Node{} };
       Body: $3,
     })
       }
-| ELSIF whitespace expr list
+| ELSIF optional_whitespace expr list
   {
     $$ = append($$, ast.IfBlock{
       Condition: $3,
@@ -619,10 +633,10 @@ elsif_block : /* nothing */ { $$ = []ast.Node{} };
 lines : /* empty */ { }
 | expr { $$ = []ast.Node{$1} }
 | SEMICOLON { };
-| whitespace { };
+| optional_whitespace { };
 | lines expr { $$ = append($$, $2) }
 | lines SEMICOLON { }
-| lines whitespace { };
+| lines optional_whitespace { };
 
 group : LPAREN lines RPAREN
   { $$ = ast.Group{Body: $2} };
@@ -639,7 +653,7 @@ optional_rescues : /* empty */
   { $$ = []ast.Node{} }
 | optional_rescues optional_newline RESCUE list
   { $$ = append($$, ast.Rescue{Body: $4}) }
-| optional_rescues optional_newline RESCUE whitespace CAPITAL_REF whitespace list
+| optional_rescues optional_newline RESCUE optional_whitespace CAPITAL_REF optional_whitespace list
   {
     $$ = append($$, ast.Rescue{
       Body: $7,
@@ -648,7 +662,7 @@ optional_rescues : /* empty */
       },
     })
   }
-| optional_rescues optional_newline RESCUE whitespace CAPITAL_REF whitespace OPERATOR whitespace REF list
+| optional_rescues optional_newline RESCUE optional_whitespace CAPITAL_REF optional_whitespace OPERATOR optional_whitespace REF list
   {
     if $7 != "=>" {
       panic("FREAKOUT")

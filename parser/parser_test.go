@@ -353,7 +353,7 @@ ARGV.shift
 				})
 			})
 
-			XContext("with a call expression as an argument", func() {
+			Context("with a call expression as an argument", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("$:.unshift File.expand_path('../../lib', __FILE__)")
 				})
@@ -365,7 +365,7 @@ ARGV.shift
 							Target: ast.GlobalVariable{Name: ":"},
 							Args: []ast.Node{
 								ast.CallExpression{
-									Target: ast.Class{Name: "File"},
+									Target: ast.BareReference{Name: "File"}, // TODO: should be a class
 									Func:   ast.BareReference{Name: "expand_path"},
 									Args: []ast.Node{
 										ast.SimpleString{Value: "../../lib"},
