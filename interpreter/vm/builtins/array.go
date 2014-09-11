@@ -25,6 +25,12 @@ func (klass *ArrayClass) New() Value {
 		a.members = a.members[1:]
 		return val, nil
 	}))
+
+	a.AddMethod(NewMethod("unshift", func(args ...Value) (Value, error) {
+		a.members = append([]Value{args[0]}, a.members[0:]...)
+		return a, nil
+	}))
+
 	a.AddMethod(NewMethod("include?", func(args ...Value) (Value, error) {
 		for _, m := range a.members {
 			if m == args[0] {
