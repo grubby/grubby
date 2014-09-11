@@ -92,8 +92,6 @@ var Statements []ast.Node
       declare a type (or possibly just a token)
 */
 
-%type <genericValue> optional_comma
-
 // single nodes
 %type <genericValue> expr
 %type <genericValue> line
@@ -522,10 +520,6 @@ symbol_key_value_pairs : REF COLON optional_whitespace expr
       Value: $9,
     })
   };
-
-
-optional_comma : /* nothing */ { $$ = nil; }
-| COMMA  { $$ = nil; };
 
 global : DOLLARSIGN REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
