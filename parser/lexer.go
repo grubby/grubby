@@ -324,7 +324,7 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			}
 
 			lval.genericValue = ast.ConstantInt{Value: intVal}
-			return NODE // Consider: should this be a different type?
+			return NODE
 		case tokenTypeFloat:
 			debug("float: %s", token.value)
 			floatval, err := strconv.ParseFloat(token.value, 64)
@@ -333,7 +333,7 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			}
 
 			lval.genericValue = ast.ConstantFloat{Value: floatval}
-			return NODE // as above, maybe a different type?
+			return NODE
 		case tokenTypeString:
 			debug("string: '%s'", token.value)
 			lval.genericValue = ast.SimpleString{Value: token.value}
@@ -359,10 +359,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			lval.genericValue = ast.GlobalVariable{Name: token.value}
 			return REF
 		case tokenTypeLParen:
-			debug("LPAREN")
+			debug("(")
 			return LPAREN
 		case tokenTypeRParen:
-			debug("RPAREN")
+			debug(")")
 			return RPAREN
 		case tokenTypeComma:
 			debug("COMMA")
@@ -428,13 +428,13 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("!")
 			return BANG
 		case tokenTypeTilde:
-			debug("!")
+			debug("~")
 			return COMPLEMENT
 		case tokenTypePlus:
-			debug("!")
+			debug("+")
 			return POSITIVE
 		case tokenTypeMinus:
-			debug("!")
+			debug("-")
 			return NEGATIVE
 		case tokenTypeStar:
 			debug("*")
@@ -449,7 +449,7 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("{")
 			return LBRACE
 		case tokenTypeRBrace:
-			debug("{")
+			debug("}")
 			return RBRACE
 		case tokenTypeDollarSign:
 			debug("$")
