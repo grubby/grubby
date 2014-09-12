@@ -4,7 +4,7 @@ type NilClass struct {
 	valueStub
 }
 
-func NewNilClass() Value {
+func NewNilClass() Class {
 	n := &NilClass{}
 	n.initialize()
 	n.class = NewClassValue().(Class)

@@ -2,14 +2,14 @@ package builtins
 
 type Class interface {
 	New() Value
-	String() string
+	Value
 }
 
 type ClassValue struct {
 	valueStub
 }
 
-func NewClassValue() Value {
+func NewClassValue() Class {
 	c := &ClassValue{}
 	c.initialize()
 	c.class = c

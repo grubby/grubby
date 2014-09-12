@@ -17,6 +17,7 @@ type vm struct {
 	ObjectSpace     map[string]builtins.Value
 	Globals         map[string]builtins.Value
 	KnownSymbols    map[string]builtins.Value
+	Classes         map[string]builtins.Class
 }
 
 type VM interface {
@@ -36,19 +37,19 @@ func NewVM(name string) VM {
 		ObjectSpace:     make(map[string]builtins.Value),
 		KnownSymbols:    make(map[string]builtins.Value),
 	}
+	vm.registerClasses()
 
-	loadPath := builtins.NewArrayClass().(builtins.Class).New()
+	loadPath := vm.Classes["Array"].New()
 	vm.Globals["LOAD_PATH"] = loadPath
 	vm.Globals[":"] = loadPath
 
-	objectClass := builtins.NewGlobalObjectClass()
+	objectClass := vm.Classes["Object"]
 	vm.ObjectSpace["Object"] = objectClass
 	vm.ObjectSpace["Kernel"] = builtins.NewGlobalKernelClass()
 	vm.ObjectSpace["File"] = builtins.NewFileClass()
-	vm.ObjectSpace["ARGV"] = builtins.NewArrayClass().(builtins.Class).New()
-	vm.ObjectSpace["Process"] = builtins.NewProcessClass()
+	vm.ObjectSpace["ARGV"] = vm.Classes["Array"].New()
 
-	main := objectClass.(builtins.Class).New()
+	main := objectClass.New()
 	main.AddMethod(builtins.NewMethod("to_s", func(args ...builtins.Value) (builtins.Value, error) {
 		return builtins.NewString("main"), nil
 	}))
@@ -56,7 +57,7 @@ func NewVM(name string) VM {
 		fileName := args[0].(*builtins.StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
-			return builtins.NewFalseClass().(builtins.Class).New(), nil
+			return vm.Classes["False"].New(), nil
 		}
 
 		for _, pathStr := range loadPath.(*builtins.Array).Members() {
@@ -77,7 +78,7 @@ func NewVM(name string) VM {
 
 				vm.currentFilename = file.Name()
 				_, rubyErr := vm.Run(string(contents))
-				return builtins.NewTrueClass().(builtins.Class).New(), rubyErr
+				return vm.Classes["True"].New(), rubyErr
 			}
 		}
 
@@ -96,6 +97,17 @@ func NewVM(name string) VM {
 	vm.ObjectSpace["main"] = main
 
 	return vm
+}
+
+func (vm *vm) registerClasses() {
+	vm.Classes = map[string]builtins.Class{
+		"Array":   builtins.NewArrayClass().(builtins.Class),
+		"Object":  builtins.NewGlobalObjectClass(),
+		"Process": builtins.NewProcessClass(),
+		"True":    builtins.NewTrueClass(),
+		"False":   builtins.NewFalseClass(),
+		"Nil":     builtins.NewNilClass(),
+	}
 }
 
 func (vm *vm) MustGet(key string) builtins.Value {
@@ -195,9 +207,9 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value)
 		case ast.Boolean:
 			if statement.(ast.Boolean).Value {
-				returnValue = builtins.NewTrueClass().(builtins.Class).New()
+				returnValue = vm.Classes["True"].New()
 			} else {
-				returnValue = builtins.NewFalseClass().(builtins.Class).New()
+				returnValue = vm.Classes["False"].New()
 			}
 		case ast.GlobalVariable:
 			returnValue = vm.Globals[statement.(ast.GlobalVariable).Name]
@@ -231,7 +243,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			case ast.BareReference:
 				target = vm.ObjectSpace[callExpr.Target.(ast.BareReference).Name]
 			case ast.Class:
-				target = vm.ObjectSpace[callExpr.Target.(ast.Class).Name]
+				target = vm.Classes[callExpr.Target.(ast.Class).Name]
 			case ast.GlobalVariable:
 				target = vm.Globals[callExpr.Target.(ast.GlobalVariable).Name]
 			case nil:
@@ -239,7 +251,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 
 			if target == nil {
-				nilValue := builtins.NewNilClass().(builtins.Class).New()
+				nilValue := vm.Classes["Nil"].New()
 				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String())
 			}
 			method, err := target.Method(callExpr.Func.Name)

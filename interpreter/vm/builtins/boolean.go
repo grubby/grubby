@@ -4,7 +4,7 @@ type trueClass struct {
 	valueStub
 }
 
-func NewTrueClass() Value {
+func NewTrueClass() Class {
 	o := &trueClass{}
 	o.initialize()
 	o.class = NewClassValue().(Class)
@@ -31,7 +31,7 @@ type falseClass struct {
 	valueStub
 }
 
-func NewFalseClass() Value {
+func NewFalseClass() Class {
 	o := &falseClass{}
 	o.initialize()
 	o.class = NewClassValue().(Class)

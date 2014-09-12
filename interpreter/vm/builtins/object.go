@@ -4,10 +4,10 @@ type objectClass struct {
 	valueStub
 }
 
-func NewGlobalObjectClass() Value {
+func NewGlobalObjectClass() Class {
 	o := &objectClass{}
 	o.initialize()
-	o.class = NewClassValue().(Class)
+	o.class = NewClassValue() // FIXME: this should be set to the global reference
 	return o
 }
 
