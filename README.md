@@ -79,7 +79,7 @@ Grubby yacc
     * [x] == === != =~ !~
     * [ ] fix associativity of unary + and - (try "abc - 123")
           * [ ] (seems to apply to binary operators with REFs too)
-    * [ ] refactor operators by making an Operator token in the parser
+    * [x] refactor operators by making an Operator token in the parser
 * [x] hashes
     * [x] => syntax
       [x] ruby 1.9 {key: value} syntax
@@ -143,7 +143,7 @@ Grubby interpreter
         * [ ] printf
         * [ ] print
         * [ ] putc
-        * [ ] puts
+        * [x] puts
         * [ ] gets
         * [ ] readline
         * [ ] select
