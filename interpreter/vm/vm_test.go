@@ -273,5 +273,19 @@ bar = true
 				Expect(err).To(BeAssignableToTypeOf(builtins.NewNoMethodError("", "", "")))
 			})
 		})
+
+		Context("when an error occurs in the middle of a series of statements", func() {
+			It("halts execution at the error", func() {
+				_, err := vm.Run(`
+foo = 1
+require 'some/file/that/does/not/exist/hopefully'
+foo = 0
+`)
+				Expect(err).To(HaveOccurred())
+
+				value, _ := vm.Get("foo")
+				Expect(value).To(Equal(builtins.NewInt(1)))
+			})
+		})
 	})
 })

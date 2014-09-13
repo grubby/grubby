@@ -281,6 +281,10 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 
 			returnValue, returnErr = method.Execute(args...)
+			if returnErr != nil {
+				return returnValue, returnErr
+			}
+
 		case ast.Assignment:
 			assignment := statement.(ast.Assignment)
 			returnValue, err := vm.executeWithContext([]ast.Node{assignment.RHS}, context)
