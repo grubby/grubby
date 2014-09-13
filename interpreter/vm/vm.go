@@ -15,9 +15,9 @@ import (
 type vm struct {
 	currentFilename string
 	ObjectSpace     map[string]builtins.Value
-	Globals         map[string]builtins.Value
-	KnownSymbols    map[string]builtins.Value
-	Classes         map[string]builtins.Class
+	CurrentGlobals  map[string]builtins.Value
+	CurrentSymbols  map[string]builtins.Value
+	CurrentClasses  map[string]builtins.Class
 }
 
 type VM interface {
@@ -28,26 +28,28 @@ type VM interface {
 	Set(string, builtins.Value)
 
 	Symbols() map[string]builtins.Value
+	Globals() map[string]builtins.Value
+	Classes() map[string]builtins.Class
 }
 
 func NewVM(name string) VM {
 	vm := &vm{
 		currentFilename: name,
-		Globals:         make(map[string]builtins.Value),
+		CurrentGlobals:  make(map[string]builtins.Value),
 		ObjectSpace:     make(map[string]builtins.Value),
-		KnownSymbols:    make(map[string]builtins.Value),
+		CurrentSymbols:  make(map[string]builtins.Value),
 	}
 	vm.registerClasses()
 
-	loadPath := vm.Classes["Array"].New()
-	vm.Globals["LOAD_PATH"] = loadPath
-	vm.Globals[":"] = loadPath
+	loadPath := vm.CurrentClasses["Array"].New()
+	vm.CurrentGlobals["LOAD_PATH"] = loadPath
+	vm.CurrentGlobals[":"] = loadPath
 
-	objectClass := vm.Classes["Object"]
+	objectClass := vm.CurrentClasses["Object"]
 	vm.ObjectSpace["Object"] = objectClass
 	vm.ObjectSpace["Kernel"] = builtins.NewGlobalKernelClass()
 	vm.ObjectSpace["File"] = builtins.NewFileClass()
-	vm.ObjectSpace["ARGV"] = vm.Classes["Array"].New()
+	vm.ObjectSpace["ARGV"] = vm.CurrentClasses["Array"].New()
 
 	main := objectClass.New()
 	main.AddMethod(builtins.NewMethod("to_s", func(args ...builtins.Value) (builtins.Value, error) {
@@ -57,7 +59,7 @@ func NewVM(name string) VM {
 		fileName := args[0].(*builtins.StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
-			return vm.Classes["False"].New(), nil
+			return vm.CurrentClasses["False"].New(), nil
 		}
 
 		for _, pathStr := range loadPath.(*builtins.Array).Members() {
@@ -78,13 +80,12 @@ func NewVM(name string) VM {
 
 				vm.currentFilename = file.Name()
 				_, rubyErr := vm.Run(string(contents))
-				return vm.Classes["True"].New(), rubyErr
+				return vm.CurrentClasses["True"].New(), rubyErr
 			}
 		}
 
 		err := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
 		return nil, builtins.NewLoadError(err)
-
 	}))
 	main.AddMethod(builtins.NewMethod("puts", func(args ...builtins.Value) (builtins.Value, error) {
 		for _, arg := range args {
@@ -100,7 +101,7 @@ func NewVM(name string) VM {
 }
 
 func (vm *vm) registerClasses() {
-	vm.Classes = map[string]builtins.Class{
+	vm.CurrentClasses = map[string]builtins.Class{
 		"Array":   builtins.NewArrayClass().(builtins.Class),
 		"Object":  builtins.NewGlobalObjectClass(),
 		"Process": builtins.NewProcessClass(),
@@ -116,7 +117,7 @@ func (vm *vm) MustGet(key string) builtins.Value {
 		return val
 	}
 
-	val, ok = vm.Globals[key]
+	val, ok = vm.CurrentGlobals[key]
 	if ok {
 		return val
 	}
@@ -130,7 +131,7 @@ func (vm *vm) Get(key string) (builtins.Value, error) {
 		return val, nil
 	}
 
-	val, ok = vm.Globals[key]
+	val, ok = vm.CurrentGlobals[key]
 	if ok {
 		return val, nil
 	}
@@ -143,7 +144,15 @@ func (vm *vm) Set(key string, value builtins.Value) {
 }
 
 func (vm *vm) Symbols() map[string]builtins.Value {
-	return vm.KnownSymbols
+	return vm.CurrentSymbols
+}
+
+func (vm *vm) Globals() map[string]builtins.Value {
+	return vm.CurrentGlobals
+}
+
+func (vm *vm) Classes() map[string]builtins.Class {
+	return vm.CurrentClasses
 }
 
 type ParseError struct{}
@@ -207,22 +216,22 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value)
 		case ast.Boolean:
 			if statement.(ast.Boolean).Value {
-				returnValue = vm.Classes["True"].New()
+				returnValue = vm.CurrentClasses["True"].New()
 			} else {
-				returnValue = vm.Classes["False"].New()
+				returnValue = vm.CurrentClasses["False"].New()
 			}
 		case ast.GlobalVariable:
-			returnValue = vm.Globals[statement.(ast.GlobalVariable).Name]
+			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
 		case ast.ConstantInt:
 			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
 		case ast.ConstantFloat:
 			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value)
 		case ast.Symbol:
 			name := statement.(ast.Symbol).Name
-			maybe, ok := vm.KnownSymbols[name]
+			maybe, ok := vm.CurrentSymbols[name]
 			if !ok {
 				returnValue = builtins.NewSymbol(name)
-				vm.KnownSymbols[name] = returnValue
+				vm.CurrentSymbols[name] = returnValue
 			} else {
 				returnValue = maybe
 			}
@@ -243,15 +252,15 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			case ast.BareReference:
 				target = vm.ObjectSpace[callExpr.Target.(ast.BareReference).Name]
 			case ast.Class:
-				target = vm.Classes[callExpr.Target.(ast.Class).Name]
+				target = vm.CurrentClasses[callExpr.Target.(ast.Class).Name]
 			case ast.GlobalVariable:
-				target = vm.Globals[callExpr.Target.(ast.GlobalVariable).Name]
+				target = vm.CurrentGlobals[callExpr.Target.(ast.GlobalVariable).Name]
 			case nil:
 				target = context
 			}
 
 			if target == nil {
-				nilValue := vm.Classes["Nil"].New()
+				nilValue := vm.CurrentClasses["Nil"].New()
 				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String())
 			}
 			method, err := target.Method(callExpr.Func.Name)
@@ -285,7 +294,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 				vm.ObjectSpace[ref.Name] = returnValue
 			case ast.GlobalVariable:
 				globalVar := assignment.LHS.(ast.GlobalVariable)
-				vm.Globals[globalVar.Name] = returnValue
+				vm.CurrentGlobals[globalVar.Name] = returnValue
 			default:
 				panic(fmt.Sprintf("unimplemented assignment failure: %#v", assignment.LHS))
 			}
