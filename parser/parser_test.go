@@ -377,6 +377,38 @@ ARGV.shift
 					}))
 				})
 			})
+
+			Context("very nested call expressions", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("$:.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')")
+				})
+
+				It("is parsed with the correct args on the correct methods", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.GlobalVariable{Name: ":"},
+							Func:   ast.BareReference{Name: "unshift"},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "File"},
+									Func:   ast.BareReference{Name: "expand_path"},
+									Args: []ast.Node{
+										ast.CallExpression{
+											Target: ast.CallExpression{
+												Target: ast.BareReference{Name: "File"},
+												Func:   ast.BareReference{Name: "dirname"},
+												Args:   []ast.Node{ast.FileNameConstReference{}},
+											},
+											Func: ast.BareReference{Name: "+"},
+											Args: []ast.Node{ast.SimpleString{Value: "/../lib"}},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("method definitions", func() {

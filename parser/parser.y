@@ -109,6 +109,7 @@ var Statements []ast.Node
 %type <genericValue> class_variable
 %type <genericValue> call_expression
 %type <genericValue> func_declaration
+%type <genericValue> binary_expression
 %type <genericValue> class_declaration
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
@@ -134,12 +135,13 @@ var Statements []ast.Node
 %type <genericSlice> call_args
 %type <genericSlice> block_args
 %type <genericSlice> elsif_block
-%type <genericSlice> function_args
 %type <genericSlice> capture_list
+%type <genericSlice> function_args
 %type <genericSlice> key_value_pairs
 %type <genericSlice> optional_rescues
 %type <genericSlice> nodes_with_commas
 %type <genericSlice> comma_delimited_refs
+%type <genericSlice> comma_delimited_nodes
 %type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nonempty_nodes_with_commas
 %type <genericSlice> nodes_with_commas_and_optional_block
@@ -182,13 +184,16 @@ list : /* empty */
 		}
 	};
 
-optional_whitespace : /* zero or more */ | WHITESPACE optional_whitespace
 optional_newline : /* empty */ | optional_newline NEWLINE;
+one_or_more_newlines : NEWLINE | one_or_more_newlines NEWLINE;
+optional_whitespace : /* zero or more */ | WHITESPACE optional_whitespace;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
 single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules;
 
-expr : single_node | call_expression | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | if_block | group | begin_block;
+binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
+
+expr : single_node | call_expression | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | group | begin_block | binary_expression;
 
 call_expression : REF LPAREN optional_whitespace RPAREN
   {
@@ -263,8 +268,17 @@ call_args : LPAREN optional_whitespace nodes_with_commas optional_whitespace RPA
 | nonempty_nodes_with_commas
   { $$ = $1; };
 
+comma_delimited_nodes : NODE
+  { $$ = append($$, $1); }
+| comma_delimited_nodes optional_whitespace COMMA optional_whitespace NODE
+  { $$ = append($$, $5); };
+
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | single_node
+  { $$ = append($$, $1); }
+| binary_expression
+  { $$ = append($$, $1); }
+| call_expression
   { $$ = append($$, $1); }
 | nodes_with_commas optional_whitespace COMMA optional_whitespace single_node
   { $$ = append($$, $5); };
@@ -306,8 +320,10 @@ func_declaration :
     }
   };
 
-function_args : /* possibly nothing */ { $$ = []ast.Node{} };
-| call_args { $$ = $1 };
+function_args : comma_delimited_refs
+  { $$ = $1 }
+| LPAREN optional_whitespace comma_delimited_refs optional_whitespace RPAREN
+  { $$ = $3 };
 
 class_declaration : CLASS optional_whitespace class_name_with_modules optional_whitespace NEWLINE list END
   {
@@ -406,6 +422,30 @@ binary_addition : single_node optional_whitespace POSITIVE optional_whitespace s
       Func: ast.BareReference{Name: "+"},
       Args: []ast.Node{$5},
     }
+  }
+| call_expression optional_whitespace POSITIVE optional_whitespace single_node
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "+"},
+      Args: []ast.Node{$5},
+    }
+  }
+| single_node optional_whitespace POSITIVE optional_whitespace call_expression
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "+"},
+      Args: []ast.Node{$5},
+    }
+  }
+| call_expression optional_whitespace POSITIVE optional_whitespace call_expression
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: ast.BareReference{Name: "+"},
+      Args: []ast.Node{$5},
+    }
   };
 
 binary_subtraction : single_node optional_whitespace NEGATIVE optional_whitespace expr
@@ -455,10 +495,11 @@ bitwise_or: single_node optional_whitespace PIPE optional_whitespace single_node
 
 true : TRUE { $$ = ast.Boolean{Value: true} }
 false : FALSE { $$ = ast.Boolean{Value: false} }
-array : LBRACKET optional_whitespace nodes_with_commas optional_whitespace RBRACKET
-  {
-    $$ = ast.Array{Nodes: $3};
-  };
+array : LBRACKET optional_whitespace comma_delimited_nodes optional_whitespace RBRACKET
+  { $$ = ast.Array{Nodes: $3} };
+| LBRACKET optional_whitespace nodes_with_commas optional_whitespace RBRACKET
+  { $$ = ast.Array{Nodes: $3} };
+
 hash : LBRACE optional_whitespace optional_newline optional_whitespace key_value_pairs optional_whitespace optional_newline optional_whitespace RBRACE
   {
     pairs := []ast.HashKeyValuePair{}
@@ -552,10 +593,8 @@ block_args : PIPE comma_delimited_refs PIPE
 comma_delimited_refs : /* empty */ { $$ = ast.Nodes{} }
 | REF
   { $$ = append($$, $1); }
-| nodes_with_commas optional_whitespace COMMA optional_whitespace REF
+| comma_delimited_refs optional_whitespace COMMA optional_whitespace REF
   { $$ = append($$, $5); };
-
-one_or_more_newlines : NEWLINE | one_or_more_newlines NEWLINE
 
 if_block : IF optional_whitespace expr list END
   {
