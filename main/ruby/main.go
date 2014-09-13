@@ -30,12 +30,7 @@ func main() {
 		panic(err)
 	}
 
-	println("asked to interpret file", file.Name())
-	println("args:")
-	for _, whatever := range flag.Args() {
-		println(whatever)
-	}
-	_, err = vm.NewVM(flag.Args()[1]).Run(string(bytes))
+	_, err = vm.NewVM(flag.Args()[0]).Run(string(bytes))
 
 	switch err.(type) {
 	case *vm.ParseError:
