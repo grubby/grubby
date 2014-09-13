@@ -13,13 +13,19 @@ func NewFileClass() Value {
 	f := &file{}
 	f.initialize()
 	f.AddMethod(NewMethod("expand_path", func(args ...Value) (Value, error) {
-		arg := args[0].(*StringValue).String()
+		arg1 := args[0].(*StringValue).String()
 
-		if arg[0] == '~' {
-			arg = os.Getenv("HOME") + arg[1:]
+		if arg1[0] == '~' {
+			arg1 = os.Getenv("HOME") + arg1[1:]
 		}
 
-		path, _ := filepath.Abs(arg)
+		var path string
+		if len(args) == 2 {
+			path = filepath.Join(args[1].(*StringValue).String(), arg1)
+		} else {
+			path, _ = filepath.Abs(arg1)
+		}
+
 		return NewString(path), nil
 	}))
 
