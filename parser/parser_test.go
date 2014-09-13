@@ -998,6 +998,25 @@ false
 				})
 			})
 
+			Describe("assigning a value to a key", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("hash[:key] = :value")
+				})
+
+				It("returns a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "hash"},
+							Func:   ast.BareReference{Name: "[]="},
+							Args: []ast.Node{
+								ast.Symbol{Name: "key"},
+								ast.Symbol{Name: "value"},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with 1.9 'key: value' pairs", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`{
