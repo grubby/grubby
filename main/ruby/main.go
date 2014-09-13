@@ -48,7 +48,7 @@ func main() {
 			debugStatements = append(debugStatements, d)
 		}
 
-		threshold := 21
+		threshold := 31
 		debugCount := len(debugStatements)
 		if debugCount <= threshold {
 			for _, stmt := range debugStatements {
