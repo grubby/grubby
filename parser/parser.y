@@ -102,12 +102,12 @@ var Statements []ast.Node
 %type <genericValue> array
 %type <genericValue> group
 %type <genericValue> global
-%type <genericValue> callexpr
 %type <genericValue> if_block
 %type <genericValue> assignment
 %type <genericValue> begin_block
 %type <genericValue> single_node
 %type <genericValue> class_variable
+%type <genericValue> call_expression
 %type <genericValue> func_declaration
 %type <genericValue> class_declaration
 %type <genericValue> instance_variable
@@ -188,9 +188,9 @@ optional_newline : /* empty */ | optional_newline NEWLINE;
 // e.g.: not a complex set of tokens (e.g.: call expression)
 single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules;
 
-expr : single_node | callexpr | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | if_block | group | begin_block;
+expr : single_node | call_expression | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | if_block | group | begin_block;
 
-callexpr : REF LPAREN optional_whitespace RPAREN
+call_expression : REF LPAREN optional_whitespace RPAREN
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
@@ -281,11 +281,11 @@ nodes_with_commas_and_optional_block : expr
 
 nonempty_nodes_with_commas : single_node
   { $$ = append($$, $1); }
-| callexpr
+| call_expression
   { $$ = append($$, $1); }
 | nonempty_nodes_with_commas optional_whitespace COMMA optional_whitespace single_node
   { $$ = append($$, $5); }
-| nonempty_nodes_with_commas optional_whitespace COMMA optional_whitespace callexpr
+| nonempty_nodes_with_commas optional_whitespace COMMA optional_whitespace call_expression
   { $$ = append($$, $5); }
 | nonempty_nodes_with_commas optional_whitespace COMMA optional_whitespace block
   { $$ = append($$, $5); };
@@ -579,7 +579,7 @@ if_block : IF optional_whitespace expr list END
       Body: []ast.Node{$1},
     }
   }
-| callexpr optional_whitespace IF optional_whitespace single_node
+| call_expression optional_whitespace IF optional_whitespace single_node
   {
     $$ = ast.IfBlock{
       Condition: $5,
