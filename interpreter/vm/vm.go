@@ -84,8 +84,8 @@ func NewVM(name string) VM {
 			}
 		}
 
-		err := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
-		return nil, builtins.NewLoadError(err)
+		errorMessage := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
+		return nil, builtins.NewLoadError(errorMessage)
 	}))
 	main.AddMethod(builtins.NewMethod("puts", func(args ...builtins.Value) (builtins.Value, error) {
 		for _, arg := range args {
