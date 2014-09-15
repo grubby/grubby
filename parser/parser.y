@@ -263,6 +263,16 @@ call_expression : REF LPAREN optional_whitespace RPAREN
     }
   }
 
+// hash / array retrieval at index
+| REF optional_whitespace LBRACKET optional_whitespace single_node optional_whitespace RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$5},
+    }
+  }
+
 // hash assignment
 | REF optional_whitespace LBRACKET optional_whitespace single_node optional_whitespace RBRACKET optional_whitespace EQUALTO optional_whitespace expr
   {
