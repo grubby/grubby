@@ -114,6 +114,7 @@ var Statements []ast.Node
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
+%type <genericValue> default_value_arg
 
 // unary operator nodes
 %type <genericValue> negation   // !
@@ -145,6 +146,7 @@ var Statements []ast.Node
 %type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nonempty_nodes_with_commas
 %type <genericSlice> nodes_with_commas_and_optional_block
+%type <genericSlice> comma_delimited_args_with_default_values
 %type <stringSlice> namespaced_modules
 
 %%
@@ -340,10 +342,25 @@ func_declaration :
     }
   };
 
-function_args : comma_delimited_refs
+function_args : comma_delimited_args_with_default_values
   { $$ = $1 }
-| LPAREN optional_whitespace comma_delimited_refs optional_whitespace RPAREN
+| LPAREN optional_whitespace comma_delimited_args_with_default_values optional_whitespace RPAREN
   { $$ = $3 };
+
+default_value_arg : REF optional_whitespace
+  { $$ = ast.MethodParam{Name: $1.(ast.BareReference)} }
+| REF optional_whitespace EQUALTO optional_whitespace expr
+  { $$ = ast.MethodParam{Name: $1.(ast.BareReference), DefaultValue: $5} };
+
+comma_delimited_args_with_default_values : /* empty */ { $$ = ast.Nodes{} }
+| default_value_arg
+  {
+    $$ = append($$, $1)
+  }
+| comma_delimited_args_with_default_values optional_whitespace COMMA optional_whitespace default_value_arg
+  {
+    $$ = append($$, $5)
+  };
 
 class_declaration : CLASS optional_whitespace class_name_with_modules optional_whitespace NEWLINE list END
   {

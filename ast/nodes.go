@@ -159,3 +159,8 @@ type RescueException struct {
 	Var   BareReference
 	Class BareReference
 }
+
+type MethodParam struct {
+	Name         BareReference
+	DefaultValue Node
+}

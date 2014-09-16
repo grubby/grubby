@@ -437,6 +437,30 @@ end
 				})
 			})
 
+			Context("with parameters with default values", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def foo(a = 123)
+end
+`)
+				})
+
+				It("returns a function declaration with the default values set", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Name: ast.BareReference{"foo"},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name:         ast.BareReference{Name: "a"},
+									DefaultValue: ast.ConstantInt{Value: 123},
+								},
+							},
+							Body: []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("with parameters surrounded by parens", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
@@ -452,8 +476,8 @@ end
 						ast.FuncDecl{
 							Name: ast.BareReference{Name: "multi_put"},
 							Args: []ast.Node{
-								ast.BareReference{Name: "str1"},
-								ast.BareReference{Name: "str2"},
+								ast.MethodParam{Name: ast.BareReference{Name: "str1"}},
+								ast.MethodParam{Name: ast.BareReference{Name: "str2"}},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
@@ -484,8 +508,8 @@ end
 						ast.FuncDecl{
 							Name: ast.BareReference{Name: "multi_put"},
 							Args: []ast.Node{
-								ast.BareReference{Name: "str1"},
-								ast.BareReference{Name: "str2"},
+								ast.MethodParam{Name: ast.BareReference{Name: "str1"}},
+								ast.MethodParam{Name: ast.BareReference{Name: "str2"}},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
