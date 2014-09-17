@@ -248,7 +248,7 @@ call_expression : REF LPAREN optional_whitespace RPAREN
     };
   }
 
-// e.g.: `puts 'whatever' do ; end;`
+// e.g.: `puts 'whatever' do ; end;` or with_a_block { puts 'foo' }
 | REF optional_whitespace nodes_with_commas_and_optional_block
   {
     $$ = ast.CallExpression{
@@ -616,16 +616,25 @@ class_variable : ATSIGN ATSIGN REF
 
 block : DO list END
   { $$ = ast.Block{Body: $2} }
-| DO optional_whitespace block_args optional_whitespace one_or_more_newlines list END
+| DO optional_whitespace block_args optional_whitespace list END
   {
     $$ = ast.Block{
-    Body: $6,
+    Body: $5,
     Args: $3,
     }
-  };
+  }
+| LBRACE optional_whitespace block_args list RBRACE
+  {
+    $$ = ast.Block{
+      Body: $4,
+      Args: $3,
+    }
+  }
+| LBRACE list RBRACE
+  { $$ = ast.Block{Body: $2} };
 
-block_args : PIPE comma_delimited_refs PIPE
-  { $$ = $2 };
+block_args : PIPE optional_whitespace comma_delimited_refs optional_whitespace PIPE
+  { $$ = $3 };
 
 comma_delimited_refs : /* empty */ { $$ = ast.Nodes{} }
 | REF
@@ -701,9 +710,9 @@ elsif_block : /* nothing */ { $$ = []ast.Node{} };
       };
 
 lines : /* empty */ { }
-| expr { $$ = []ast.Node{$1} }
 | SEMICOLON { };
-| optional_whitespace { };
+| WHITESPACE { };
+| expr { $$ = []ast.Node{$1} }
 | lines expr { $$ = append($$, $2) }
 | lines SEMICOLON { }
 | lines optional_whitespace { };

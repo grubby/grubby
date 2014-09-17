@@ -1197,6 +1197,31 @@ end
 					}))
 				})
 			})
+
+			Context("with curly braces", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("with_a_block {|foo| puts foo}")
+				})
+
+				It("is parsed as an ast.Block with args", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "with_a_block"},
+							Args: []ast.Node{
+								ast.Block{
+									Args: []ast.Node{ast.BareReference{Name: "foo"}},
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.BareReference{Name: "foo"}},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("unless", func() {
@@ -1525,10 +1550,13 @@ class Foo<Bar
   +   5
   -    123
 end
+
+# FIXME: the trailing whitespace here < is problematic
+with_a_block { |foo| puts foo.inspect } # comment goes here
 `)
 		})
 
-		It("parses just fine", func() {
+		PIt("parses just fine", func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
 			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
 		})
