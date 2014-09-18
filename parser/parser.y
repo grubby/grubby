@@ -239,6 +239,14 @@ call_expression : REF LPAREN optional_whitespace RPAREN
       Func: $3.(ast.BareReference),
     };
   }
+| single_node DOT REF optional_whitespace nodes_with_commas_and_optional_block
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+      Args: $5,
+    }
+  }
 | single_node DOT REF optional_whitespace call_args
   {
     $$ = ast.CallExpression{
@@ -306,11 +314,11 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $5); };
 
 // FIXME: this should ONLY have a block at the end (not in the middle)
-nodes_with_commas_and_optional_block : expr
+nodes_with_commas_and_optional_block : single_node
   { $$ = append($$, $1); }
 | block
   { $$ = append($$, $1); }
-| nodes_with_commas_and_optional_block optional_whitespace COMMA optional_whitespace expr
+| nodes_with_commas_and_optional_block optional_whitespace COMMA optional_whitespace single_node
   { $$ = append($$, $5); }
 | nodes_with_commas_and_optional_block optional_whitespace COMMA optional_whitespace block
   { $$ = append($$, $5); };

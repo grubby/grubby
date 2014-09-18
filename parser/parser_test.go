@@ -1200,13 +1200,14 @@ end
 
 			Context("with curly braces", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("with_a_block {|foo| puts foo}")
+					lexer = parser.NewLexer("with.a_block {|foo| puts foo}")
 				})
 
 				It("is parsed as an ast.Block with args", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Func: ast.BareReference{Name: "with_a_block"},
+							Target: ast.BareReference{Name: "with"},
+							Func:   ast.BareReference{Name: "a_block"},
 							Args: []ast.Node{
 								ast.Block{
 									Args: []ast.Node{ast.BareReference{Name: "foo"}},
