@@ -155,10 +155,12 @@ func (vm *vm) Classes() map[string]builtins.Class {
 	return vm.CurrentClasses
 }
 
-type ParseError struct{}
+type ParseError struct {
+	Filename string
+}
 
-func NewParseError() *ParseError {
-	return &ParseError{}
+func NewParseError(filename string) *ParseError {
+	return &ParseError{Filename: filename}
 }
 
 func (err *ParseError) Error() string {
@@ -169,7 +171,7 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
 	if result != 0 {
-		return nil, NewParseError()
+		return nil, NewParseError(vm.currentFilename)
 	}
 
 	main := vm.ObjectSpace["main"]

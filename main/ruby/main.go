@@ -34,7 +34,8 @@ func main() {
 
 	switch err.(type) {
 	case *vm.ParseError:
-		println(fmt.Sprintf("Error parsing ruby script %s", file.Name()))
+		offendingFilename := err.(*vm.ParseError).Filename
+		println(fmt.Sprintf("Error parsing ruby script %s", offendingFilename))
 		println("last ten statements from the parser:")
 		println("")
 
