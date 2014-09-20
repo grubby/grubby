@@ -617,6 +617,46 @@ end
 					}))
 				})
 			})
+
+			Context("with a method defined", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+class Whatever < ThisShouldWork
+  def initialize
+    super
+
+    config[:files] = []
+  end
+end
+`)
+				})
+
+				It("should parse a class with a single method defined", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.ClassDecl{
+							Name:       "Whatever",
+							SuperClass: ast.Class{Name: "ThisShouldWork"},
+							Body: []ast.Node{
+								ast.FuncDecl{
+									Name: ast.BareReference{Name: "initialize"},
+									Args: []ast.Node{},
+									Body: []ast.Node{
+										ast.BareReference{Name: "super"},
+										ast.CallExpression{
+											Target: ast.BareReference{Name: "config"},
+											Func:   ast.BareReference{Name: "[]="},
+											Args: []ast.Node{
+												ast.Symbol{Name: "files"},
+												ast.Array{Nodes: []ast.Node{}},
+											},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("modules", func() {
@@ -1552,12 +1592,12 @@ class Foo<Bar
   -    123
 end
 
-# FIXME: the trailing whitespace here < is problematic
 with_a_block { |foo| puts foo.inspect } # comment goes here
+func.with_a_block { |foo | puts foo.inspect    } # all the comments # yep
 `)
 		})
 
-		PIt("parses just fine", func() {
+		It("parses just fine", func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
 			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
 		})
