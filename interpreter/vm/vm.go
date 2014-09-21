@@ -18,6 +18,8 @@ type vm struct {
 	CurrentGlobals  map[string]builtins.Value
 	CurrentSymbols  map[string]builtins.Value
 	CurrentClasses  map[string]builtins.Class
+
+	stack *CallStack
 }
 
 type VM interface {
@@ -35,6 +37,7 @@ type VM interface {
 func NewVM(name string) VM {
 	vm := &vm{
 		currentFilename: name,
+		stack:           NewCallStack(),
 		CurrentGlobals:  make(map[string]builtins.Value),
 		ObjectSpace:     make(map[string]builtins.Value),
 		CurrentSymbols:  make(map[string]builtins.Value),
@@ -85,7 +88,7 @@ func NewVM(name string) VM {
 		}
 
 		errorMessage := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
-		return nil, builtins.NewLoadError(errorMessage)
+		return nil, builtins.NewLoadError(errorMessage, vm.stack.String())
 	}))
 	main.AddMethod(builtins.NewMethod("puts", func(args ...builtins.Value) (builtins.Value, error) {
 		for _, arg := range args {
@@ -175,6 +178,9 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 	}
 
 	main := vm.ObjectSpace["main"]
+	vm.stack.Unshift("main")
+	defer vm.stack.Shift()
+
 	return vm.executeWithContext(parser.Statements, main)
 }
 
@@ -243,7 +249,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			if ok {
 				returnValue = maybe
 			} else {
-				returnErr = builtins.NewNameError(name, context.String(), context.Class().String())
+				returnErr = builtins.NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
 			}
 		case ast.CallExpression:
 			var method builtins.Method
@@ -263,12 +269,12 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 
 			if target == nil {
 				nilValue := vm.CurrentClasses["Nil"].New()
-				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String())
+				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
 			}
 			method, err := target.Method(callExpr.Func.Name)
 
 			if err != nil {
-				err := builtins.NewNameError(callExpr.Func.Name, target.String(), target.Class().String())
+				err := builtins.NewNameError(callExpr.Func.Name, target.String(), target.Class().String(), vm.stack.String())
 				return nil, err
 			}
 
@@ -281,6 +287,9 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 
 				args = append(args, arg)
 			}
+
+			vm.stack.Unshift(method.Name())
+			defer vm.stack.Shift()
 
 			returnValue, returnErr = method.Execute(args...)
 			if returnErr != nil {

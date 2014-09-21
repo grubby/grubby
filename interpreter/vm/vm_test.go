@@ -158,7 +158,7 @@ end`)
 			_, err := vm.Run("require 'something'")
 
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(BeAssignableToTypeOf(builtins.NewLoadError("")))
+			Expect(err).To(BeAssignableToTypeOf(builtins.NewLoadError("", "")))
 		})
 
 		Context("with a load path and a file to require", func() {
@@ -235,19 +235,20 @@ end`)
 				Expect(value.String()).To(ContainSubstring("foo.rb"))
 			})
 		})
+	})
 
-		Describe("ARGV", func() {
-			It("has a shift method", func() {
-				value, err := vm.Run("ARGV.shift")
+	Describe("ARGV", func() {
+		It("has a shift method", func() {
+			value, err := vm.Run("ARGV.shift")
 
-				Expect(err).ToNot(HaveOccurred())
-				Expect(value).To(Equal(builtins.Nil()))
-			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value).To(Equal(builtins.Nil()))
 		})
+	})
 
-		Describe("begin; rescue; end", func() {
-			It("can be used to prevent exceptions from bubbling up", func() {
-				_, err := vm.Run(`
+	Describe("begin; rescue; end", func() {
+		It("can be used to prevent exceptions from bubbling up", func() {
+			_, err := vm.Run(`
 foo = false
 bar = false
 begin
@@ -259,33 +260,56 @@ end
 bar = true
 `)
 
-				trueValue := builtins.NewTrueClass().(builtins.Class).New()
+			trueValue := builtins.NewTrueClass().(builtins.Class).New()
 
-				Expect(err).ToNot(HaveOccurred())
-				Expect(vm.MustGet("foo")).To(Equal(trueValue))
-				Expect(vm.MustGet("bar")).To(Equal(trueValue))
-			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(vm.MustGet("foo")).To(Equal(trueValue))
+			Expect(vm.MustGet("bar")).To(Equal(trueValue))
 		})
+	})
 
-		Describe("calling a method that does not exist", func() {
-			It("raises a NoMethodError", func() {
-				_, err := vm.Run("$foo.bar()")
-				Expect(err).To(BeAssignableToTypeOf(builtins.NewNoMethodError("", "", "")))
-			})
+	Describe("calling a method that does not exist", func() {
+		It("raises a NoMethodError", func() {
+			_, err := vm.Run("$foo.bar()")
+			Expect(err).To(BeAssignableToTypeOf(builtins.NewNoMethodError("", "", "", "")))
 		})
+	})
 
-		Context("when an error occurs in the middle of a series of statements", func() {
-			It("halts execution at the error", func() {
-				_, err := vm.Run(`
+	PDescribe("stack traces", func() {
+		It("is included with errors", func() {
+			_, err := vm.Run(`
+def foo
+  bar()
+end
+
+def bar
+  baz()
+end
+
+def baz
+  nil + 5 # whoops!
+end
+
+baz()
+`)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("baz"))
+			Expect(err.Error()).To(ContainSubstring("bar"))
+			Expect(err.Error()).To(ContainSubstring("foo"))
+		})
+	})
+
+	Context("when an error occurs in the middle of a series of statements", func() {
+		It("halts execution at the error", func() {
+			_, err := vm.Run(`
 foo = 1
 require 'some/file/that/does/not/exist/hopefully'
 foo = 0
 `)
-				Expect(err).To(HaveOccurred())
+			Expect(err).To(HaveOccurred())
 
-				value, _ := vm.Get("foo")
-				Expect(value).To(Equal(builtins.NewInt(1)))
-			})
+			value, _ := vm.Get("foo")
+			Expect(value).To(Equal(builtins.NewInt(1)))
 		})
 	})
 })
