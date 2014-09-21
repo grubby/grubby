@@ -415,7 +415,14 @@ namespaced_modules : CAPITAL_REF
     $$ = append($$, $4.(ast.BareReference).Name)
   };
 
-assignment : REF EQUALTO expr
+assignment : REF EQUALTO single_node
+  {
+    $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $3,
+    }
+  }
+| REF EQUALTO call_expression
   {
     $$ = ast.Assignment{
       LHS: $1,
@@ -661,14 +668,14 @@ if_block : IF expr list END
       Else: $4,
     }
   }
-| single_node IF single_node
+| expr IF expr
   {
     $$ = ast.IfBlock{
       Condition: $3,
       Body: []ast.Node{$1},
     }
   }
-| call_expression IF single_node
+| call_expression IF expr
   {
     $$ = ast.IfBlock{
       Condition: $3,
@@ -681,7 +688,14 @@ if_block : IF expr list END
       Condition: ast.Negation{Target: $3},
       Body: []ast.Node{$1},
     }
-  };
+  }
+| call_expression UNLESS expr
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $3},
+      Body: ast.Nodes{$1},
+    }
+  }
 
 elsif_block : /* nothing */ { $$ = []ast.Node{} };
 | elsif_block ELSIF expr list

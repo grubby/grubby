@@ -1308,7 +1308,10 @@ end`)
 
 			Context("at the end of an expression", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("exit(1) if false")
+					lexer = parser.NewLexer(`
+exit(1) if false
+foo = :bar if something.truthy_method
+`)
 				})
 
 				It("is parsed as an ast.IfBlock", func() {
@@ -1319,6 +1322,18 @@ end`)
 								ast.CallExpression{
 									Func: ast.BareReference{Name: "exit"},
 									Args: []ast.Node{ast.ConstantInt{Value: 1}},
+								},
+							},
+						},
+						ast.IfBlock{
+							Condition: ast.CallExpression{
+								Target: ast.BareReference{Name: "something"},
+								Func:   ast.BareReference{Name: "truthy_method"},
+							},
+							Body: []ast.Node{
+								ast.Assignment{
+									LHS: ast.BareReference{Name: "foo"},
+									RHS: ast.Symbol{Name: "bar"},
 								},
 							},
 						},
