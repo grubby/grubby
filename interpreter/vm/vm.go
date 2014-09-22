@@ -256,14 +256,12 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			callExpr := statement.(ast.CallExpression)
 
 			var target builtins.Value
-			switch callExpr.Target.(type) {
-			case ast.BareReference:
-				target = vm.ObjectSpace[callExpr.Target.(ast.BareReference).Name]
-			case ast.Class:
-				target = vm.CurrentClasses[callExpr.Target.(ast.Class).Name]
-			case ast.GlobalVariable:
-				target = vm.CurrentGlobals[callExpr.Target.(ast.GlobalVariable).Name]
-			case nil:
+			if callExpr.Target != nil {
+				target, returnErr = vm.executeWithContext(ast.Nodes{callExpr.Target}, context)
+				if returnErr != nil {
+					return nil, returnErr
+				}
+			} else {
 				target = context
 			}
 
@@ -280,7 +278,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 
 			args := []builtins.Value{}
 			for _, astArgument := range callExpr.Args {
-				arg, err := vm.executeWithContext([]ast.Node{astArgument}, context)
+				arg, err := vm.executeWithContext(ast.Nodes{astArgument}, context)
 				if err != nil {
 					return nil, err
 				}
