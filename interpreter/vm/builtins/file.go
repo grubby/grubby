@@ -5,13 +5,14 @@ import (
 	"path/filepath"
 )
 
-type file struct {
+type fileClass struct {
 	valueStub
 }
 
 func NewFileClass() Value {
-	f := &file{}
+	f := &fileClass{}
 	f.initialize()
+	f.class = NewClassValue() // FIXME: this should be a global reference
 	f.AddMethod(NewMethod("expand_path", func(args ...Value) (Value, error) {
 		arg1 := args[0].(*StringValue).String()
 
@@ -32,10 +33,10 @@ func NewFileClass() Value {
 	return f
 }
 
-func (file *file) String() string {
+func (file *fileClass) String() string {
 	return "File"
 }
 
-func (file *file) New() Value {
+func (file *fileClass) New() Value {
 	return file
 }
