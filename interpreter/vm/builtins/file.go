@@ -30,6 +30,12 @@ func NewFileClass() Value {
 		return NewString(path), nil
 	}))
 
+	f.AddMethod(NewMethod("dirname", func(args ...Value) (Value, error) {
+		filename := args[0].(*StringValue).String()
+
+		return NewString(filepath.Base(filename)), nil
+	}))
+
 	return f
 }
 
