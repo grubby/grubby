@@ -15,7 +15,7 @@ type processValue struct {
 	valueStub
 }
 
-func (class *processClass) New() Value {
+func (class *processClass) New(args ...Value) Value {
 	p := &processClass{}
 	p.initialize()
 	p.class = class

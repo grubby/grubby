@@ -19,7 +19,7 @@ type object struct {
 	valueStub
 }
 
-func (obj *objectClass) New() Value {
+func (obj *objectClass) New(args ...Value) Value {
 	o := &object{}
 	o.initialize()
 	o.class = obj

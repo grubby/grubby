@@ -1,7 +1,7 @@
 package builtins
 
 type Class interface {
-	New() Value
+	New(args ...Value) Value
 	Value
 }
 
@@ -16,7 +16,7 @@ func NewClassValue() Class {
 	return c
 }
 
-func (c ClassValue) New() Value {
+func (c ClassValue) New(args ...Value) Value {
 	return nil
 }
 

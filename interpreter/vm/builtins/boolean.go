@@ -19,7 +19,7 @@ type true struct {
 	valueStub
 }
 
-func (obj *trueClass) New() Value {
+func (obj *trueClass) New(args ...Value) Value {
 	o := &true{}
 	o.initialize()
 	o.class = obj
@@ -46,7 +46,7 @@ type false struct {
 	valueStub
 }
 
-func (obj *falseClass) New() Value {
+func (obj *falseClass) New(args ...Value) Value {
 	o := &false{}
 	o.initialize()
 	o.class = obj

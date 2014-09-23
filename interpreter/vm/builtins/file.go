@@ -43,6 +43,6 @@ func (file *fileClass) String() string {
 	return "File"
 }
 
-func (file *fileClass) New() Value {
+func (file *fileClass) New(args ...Value) Value {
 	return file
 }

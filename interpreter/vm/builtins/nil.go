@@ -23,7 +23,7 @@ func Nil() Value {
 	return NewNilClass().(Class).New()
 }
 
-func (class *NilClass) New() Value {
+func (class *NilClass) New(args ...Value) Value {
 	n := &nilInstance{}
 	n.initialize()
 	n.class = class

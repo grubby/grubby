@@ -11,7 +11,7 @@ func NewArrayClass() Value {
 	return a
 }
 
-func (klass *ArrayClass) New() Value {
+func (klass *ArrayClass) New(args ...Value) Value {
 	a := &Array{}
 	a.initialize()
 	a.class = klass
