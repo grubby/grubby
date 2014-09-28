@@ -696,6 +696,13 @@ if_block : IF expr list END
       Body: ast.Nodes{$1},
     }
   }
+| UNLESS single_node list END
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $2},
+      Body: $3,
+    }
+  };
 
 elsif_block : /* nothing */ { $$ = []ast.Node{} };
 | elsif_block ELSIF expr list

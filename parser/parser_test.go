@@ -1560,6 +1560,45 @@ Foo::Bar::Baz.method_call
 		})
 	})
 
+	Describe("memoizing methods", func() {
+		BeforeEach(func() {
+			lexer = parser.NewLexer(`
+def memoized_func
+  unless @value
+    @value = expensive_function_call()
+  end
+
+  @value
+end
+`)
+		})
+
+		It("should be parsed correctly", func() {
+			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+			Expect(parser.Statements).To(Equal([]ast.Node{
+				ast.FuncDecl{
+					Name: ast.BareReference{Name: "memoized_func"},
+					Args: []ast.Node{},
+					Body: []ast.Node{
+						ast.IfBlock{
+							Condition: ast.Negation{ast.InstanceVariable{Name: "value"}},
+							Body: []ast.Node{
+								ast.Assignment{
+									LHS: ast.InstanceVariable{Name: "value"},
+									RHS: ast.CallExpression{
+										Func: ast.BareReference{Name: "expensive_function_call"},
+										Args: []ast.Node{},
+									},
+								},
+							},
+						},
+						ast.InstanceVariable{Name: "value"},
+					},
+				},
+			}))
+		})
+	})
+
 	Describe("a normal file you might parse", func() {
 		BeforeEach(func() {
 			lexer = parser.NewLexer(`
