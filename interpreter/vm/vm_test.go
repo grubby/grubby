@@ -68,6 +68,13 @@ end`)
 			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
 			Expect(val.String()).To(Equal("nonrestricted-consonantize"))
 		})
+
+		It("has a + method", func() {
+			val, err := vm.Run("'foo' + 'bar'")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val.String()).To(Equal(builtins.NewString("foobar").String()))
+		})
 	})
 
 	Describe("interpreting a number", func() {
@@ -129,7 +136,7 @@ end`)
 				value, err := vm.Run("foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(value).To(Equal(builtins.NewString("superinquisitive-edacity")))
+				Expect(value.String()).To(Equal("superinquisitive-edacity"))
 			})
 		})
 
@@ -210,7 +217,7 @@ end`)
 
 			value, err := vm.Get("foo")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value).To(Equal(builtins.NewString("albitite-compotor")))
+			Expect(value.String()).To(Equal("albitite-compotor"))
 		})
 	})
 
@@ -220,7 +227,7 @@ end`)
 				value, err := vm.Run("__FILE__")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(value).To(Equal(builtins.NewString("fake-irb-under-test")))
+				Expect(value.String()).To(Equal("fake-irb-under-test"))
 			})
 
 			It("uses the relative path to the file if used in a require'd file", func() {

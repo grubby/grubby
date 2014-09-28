@@ -15,6 +15,11 @@ func (class *StringClass) New(args ...Value) Value {
 	str := &StringValue{}
 	str.initialize()
 	str.class = class
+	str.AddMethod(NewMethod("+", func(args ...Value) (Value, error) {
+		arg := args[0].(*StringValue)
+		return NewString(str.value + arg.value), nil
+	}))
+
 	return str
 }
 

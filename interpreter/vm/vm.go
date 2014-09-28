@@ -272,6 +272,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			method, err := target.Method(callExpr.Func.Name)
 
 			if err != nil {
+				fmt.Printf("name error with target %#v\n", target)
 				err := builtins.NewNameError(callExpr.Func.Name, target.String(), target.Class().String(), vm.stack.String())
 				return nil, err
 			}
