@@ -75,7 +75,6 @@ var Statements []ast.Node
 %token <genericValue> PIPE       // "|"
 %token <genericValue> SLASH      // "/"
 %token <genericValue> AMPERSAND  // "&"
-%token <genericValue> MODULO     // "%"
 %token <genericValue> CARET      // "^"
 %token <genericValue> LBRACKET   // "["
 %token <genericValue> RBRACKET   // "]"
