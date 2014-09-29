@@ -116,6 +116,8 @@ var Statements []ast.Node
 %type <genericValue> class_name_with_modules
 %type <genericValue> default_value_arg
 
+%type <genericValue> assignable_variables;
+
 // unary operator nodes
 %type <genericValue> negation   // !
 %type <genericValue> complement // ~
@@ -429,34 +431,61 @@ assignment : REF EQUALTO single_node
       RHS: $3,
     }
   }
-|  CAPITAL_REF EQUALTO expr
+| CAPITAL_REF EQUALTO expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $3,
     }
   }
-|  instance_variable EQUALTO expr
+| instance_variable EQUALTO expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $3,
     }
   }
-|  class_variable EQUALTO expr
+| class_variable EQUALTO expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $3,
     }
   }
-|  global EQUALTO expr
+| global EQUALTO expr
+  {
+    $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $3,
+    }
+  }
+| assignable_variables EQUALTO expr
   {
     $$ = ast.Assignment{
       LHS: $1,
       RHS: $3,
     }
   };
+
+global : DOLLARSIGN REF
+  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
+| DOLLARSIGN CAPITAL_REF
+  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} };
+
+instance_variable : ATSIGN REF
+  { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} }
+| ATSIGN CAPITAL_REF
+  { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} };
+
+class_variable : ATSIGN ATSIGN REF
+  { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} }
+| ATSIGN ATSIGN CAPITAL_REF
+  { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} };
+
+assignable_variables : REF COMMA REF
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| assignable_variables COMMA REF
+  { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
 
 negation : BANG expr { $$ = ast.Negation{Target: $2} };
 complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
@@ -588,42 +617,34 @@ key_value_pairs : /* empty */ { $$ = ast.Nodes{} }
     $$ = append($$, ast.HashKeyValuePair{Key: $4, Value: $6})
   };
 
-symbol_key_value_pairs : REF COLON expr
+symbol_key_value_pairs : REF COLON single_node
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $1.(ast.BareReference).Name},
       Value: $3,
     })
   }
-| symbol_key_value_pairs COMMA optional_newlines REF COLON expr optional_newlines
+| REF COLON single_node
+  {
+    $$ = append($$, ast.HashKeyValuePair{
+      Key: ast.Symbol{Name: $1.(ast.BareReference).Name},
+      Value: $3,
+    })
+  }
+| symbol_key_value_pairs COMMA optional_newlines REF COLON single_node optional_newlines
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $4.(ast.BareReference).Name},
       Value: $6,
     })
   }
-| symbol_key_value_pairs COMMA optional_newlines REF COLON expr COMMA optional_newlines
+| symbol_key_value_pairs COMMA optional_newlines REF COLON single_node COMMA optional_newlines
   {
     $$ = append($$, ast.HashKeyValuePair{
       Key: ast.Symbol{Name: $4.(ast.BareReference).Name},
       Value: $6,
     })
   };
-
-global : DOLLARSIGN REF
-  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
-| DOLLARSIGN CAPITAL_REF
-  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} };
-
-instance_variable : ATSIGN REF
-  { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} }
-| ATSIGN CAPITAL_REF
-  { $$ = ast.InstanceVariable{Name: $2.(ast.BareReference).Name} };
-
-class_variable : ATSIGN ATSIGN REF
-  { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} }
-| ATSIGN ATSIGN CAPITAL_REF
-  { $$ = ast.ClassVariable{Name: $3.(ast.BareReference).Name} };
 
 block : DO list END
   { $$ = ast.Block{Body: $2} }

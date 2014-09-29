@@ -368,8 +368,8 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("COMMA")
 			return COMMA
 		case tokenTypeWhitespace:
-			debug("WHITESPACE")
 			continue // whitespace is optional
+			debug("WHITESPACE")
 		case tokenTypeNewline:
 			debug("NEWLINE")
 			return NEWLINE

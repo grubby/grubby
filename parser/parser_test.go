@@ -684,18 +684,46 @@ end
 			})
 		})
 
-		Describe("assignment to a variable", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(`foo = 5`)
+		Describe("assignment", func() {
+			Context("to a single variable", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`foo = 5`)
+				})
+
+				It("returns an assignment expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.BareReference{Name: "foo"},
+							RHS: ast.ConstantInt{Value: 5},
+						},
+					}))
+				})
 			})
 
-			It("returns an assignment expression", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.Assignment{
-						LHS: ast.BareReference{Name: "foo"},
-						RHS: ast.ConstantInt{Value: 5},
-					},
-				}))
+			Context("with array dereferencing", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo, bar = [1,2,3]")
+				})
+
+				It("returns an assignment expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.BareReference{Name: "foo"},
+									ast.BareReference{Name: "bar"},
+								},
+							},
+							RHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.ConstantInt{Value: 1},
+									ast.ConstantInt{Value: 2},
+									ast.ConstantInt{Value: 3},
+								},
+							},
+						},
+					}))
+				})
 			})
 		})
 
