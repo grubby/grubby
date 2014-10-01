@@ -338,9 +338,17 @@ nonempty_nodes_with_commas : single_node
 // FIXME: this should use a different type than call_args
 // call args can be a list of expressions. This is just a list of REFs or NODEs
 func_declaration : DEF REF function_args optional_newlines list optional_newlines END
-{
+  {
 		$$ = ast.FuncDecl{
 			Name: $2.(ast.BareReference),
+      Args: $3,
+			Body: $5,
+    }
+  }
+| DEF OPERATOR function_args optional_newlines list optional_newlines END
+  {
+		$$ = ast.FuncDecl{
+			Name: ast.BareReference{Name: $2},
       Args: $3,
 			Body: $5,
     }

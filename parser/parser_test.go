@@ -442,6 +442,28 @@ ARGV.shift
 		})
 
 		Describe("method definitions", func() {
+			Context("with special names", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def <=>
+  0
+end
+`)
+				})
+
+				It("parses them as binary operators", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Name: ast.BareReference{Name: "<=>"},
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.ConstantInt{Value: 0},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("without parameters", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
