@@ -93,7 +93,6 @@ var Statements []ast.Node
 
 // single nodes
 %type <genericValue> expr
-%type <genericValue> line
 %type <genericValue> true
 %type <genericValue> hash
 %type <genericValue> block
@@ -163,11 +162,13 @@ capture_list : /* empty */
   { }
 | EOF
   { }
-| capture_list line
+| capture_list expr SEMICOLON
+  { Statements = append(Statements, $2) }
+| capture_list expr NEWLINE
+  { Statements = append(Statements, $2) }
+| capture_list expr EOF
   {
-		if $2 != nil {
-			Statements = append(Statements, $2)
-		}
+    Statements = append(Statements, $2)
 	}
 | capture_list NEWLINE
 | capture_list SEMICOLON
@@ -176,10 +177,6 @@ capture_list : /* empty */
 
 optional_newlines : /* empty */ { }
 | optional_newlines NEWLINE { }
-
-line :
-  single_node
-| expr { $$ = $1 };
 
 list : /* empty */
   { $$ = ast.Nodes{} }
@@ -220,13 +217,6 @@ call_expression : REF LPAREN RPAREN
       Args: $3,
     }
   }
-| REF LPAREN nodes_with_commas RPAREN
-  {
-    $$ = ast.CallExpression{
-      Func: $1.(ast.BareReference),
-      Args: $3,
-    }
-  }
 | REF call_args
   {
     $$ = ast.CallExpression{
@@ -256,6 +246,14 @@ call_expression : REF LPAREN RPAREN
       Func: $3.(ast.BareReference),
       Args: $4,
     };
+  }
+| group DOT REF
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+      Args: []ast.Node{},
+    }
   }
 
 // e.g.: `puts 'whatever' do ; end;` or with_a_block { puts 'foo' }
@@ -756,8 +754,6 @@ elsif_block : /* nothing */ { $$ = []ast.Node{} };
       };
 
 lines : /* empty */ { }
-| SEMICOLON { };
-| expr { $$ = []ast.Node{$1} }
 | lines expr { $$ = append($$, $2) }
 | lines SEMICOLON { };
 

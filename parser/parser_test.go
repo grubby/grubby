@@ -220,6 +220,36 @@ FOO
 		})
 
 		Describe("call expressions", func() {
+			Context("with an expression wrapped in parentheses", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`('hello %s world' % ['cruel']).inspect`)
+				})
+
+				It("is parsed with the expression group as the target", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.Group{
+								Body: []ast.Node{
+									ast.CallExpression{
+										Target: ast.SimpleString{Value: "hello %s world"},
+										Func:   ast.BareReference{Name: "%"},
+										Args: []ast.Node{
+											ast.Array{
+												Nodes: []ast.Node{
+													ast.SimpleString{Value: "cruel"},
+												},
+											},
+										},
+									},
+								},
+							},
+							Func: ast.BareReference{Name: "inspect"},
+							Args: []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("with methods containing ! and ?", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("5.even?;5.taint!")
@@ -311,7 +341,7 @@ FOO
 				})
 			})
 
-			Context("on an object", func() {
+			Context("on an object with args in parentheses", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
 foo.send(:catalecta_coassistant)
@@ -1520,7 +1550,7 @@ end
 				lexer = parser.NewLexer(";;a; b; c;;")
 			})
 
-			It("is treated as a line separator", func() {
+			It("are treated as a line separator", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.BareReference{Name: "a"},
 					ast.BareReference{Name: "b"},
@@ -1535,6 +1565,7 @@ end
 (1)
 ('hey'; 'this'; 'works!')
 ([].unshift)
+('hello %s world' % 'grubby')
 `)
 			})
 
@@ -1555,6 +1586,15 @@ end
 							ast.CallExpression{
 								Target: ast.Array{Nodes: []ast.Node{}},
 								Func:   ast.BareReference{Name: "unshift"},
+							},
+						},
+					},
+					ast.Group{
+						Body: []ast.Node{
+							ast.CallExpression{
+								Target: ast.SimpleString{Value: "hello %s world"},
+								Func:   ast.BareReference{Name: "%"},
+								Args:   []ast.Node{ast.SimpleString{Value: "grubby"}},
 							},
 						},
 					},
