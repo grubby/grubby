@@ -157,28 +157,29 @@ var Statements []ast.Node
 
 capture_list : /* empty */
   { Statements = []ast.Node{} }
+| NEWLINE
+  { }
+| SEMICOLON
+  { }
 | EOF
-  { Statements = []ast.Node{} }
+  { }
 | capture_list line
   {
 		if $2 != nil {
 			Statements = append(Statements, $2)
 		}
 	}
-| capture_list line EOF
-  {
-		if $2 != nil {
-			Statements = append(Statements, $2)
-		}
-	};
+| capture_list NEWLINE
+| capture_list SEMICOLON
+| capture_list EOF
+  { };
 
 optional_newlines : /* empty */ { }
 | optional_newlines NEWLINE { }
 
-line : NEWLINE { $$ = nil }
-| SEMICOLON { $$ = nil }
-| single_node { $$ = $1 };
-| expr { $$ = $1 }
+line :
+  single_node
+| expr { $$ = $1 };
 
 list : /* empty */
   { $$ = ast.Nodes{} }
