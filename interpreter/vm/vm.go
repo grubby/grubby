@@ -171,6 +171,7 @@ func (err *ParseError) Error() string {
 }
 
 func (vm *vm) Run(input string) (builtins.Value, error) {
+	parser.Statements = []ast.Node{}
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
 	if result != 0 {
