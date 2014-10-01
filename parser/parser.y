@@ -203,6 +203,13 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: $3,
     }
   }
+| CAPITAL_REF LPAREN nodes_with_commas RPAREN
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: $3,
+    }
+  }
 | REF call_args
   {
     $$ = ast.CallExpression{

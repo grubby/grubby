@@ -220,6 +220,24 @@ FOO
 		})
 
 		Describe("call expressions", func() {
+			Context("with a static method", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo = String(bar)")
+				})
+
+				It("is parsed like a regular method call", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.BareReference{Name: "foo"},
+							RHS: ast.CallExpression{
+								Func: ast.BareReference{Name: "String"},
+								Args: []ast.Node{ast.BareReference{Name: "bar"}},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with an expression wrapped in parentheses", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`('hello %s world' % ['cruel']).inspect`)
