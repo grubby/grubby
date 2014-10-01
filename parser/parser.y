@@ -196,21 +196,7 @@ binary_expression : binary_addition | binary_subtraction | binary_multiplication
 
 expr : single_node | call_expression | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | group | begin_block | binary_expression;
 
-call_expression : REF LPAREN RPAREN
-  {
-    $$ = ast.CallExpression{
-      Func: $1.(ast.BareReference),
-      Args: []ast.Node{},
-    }
-  }
-| REF LPAREN single_node RPAREN
-  {
-    $$ = ast.CallExpression{
-      Func: $1.(ast.BareReference),
-      Args: []ast.Node{$3},
-    }
-  }
-| REF LPAREN nodes_with_commas RPAREN
+call_expression : REF LPAREN nodes_with_commas RPAREN
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),

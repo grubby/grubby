@@ -135,7 +135,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:807
+//line parser.y:793
 
 //line yacctab:1
 var RubyExca = []int{
@@ -143,13 +143,14 @@ var RubyExca = []int{
 	1, -1,
 	-2, 0,
 	-1, 25,
-	43, 93,
+	43, 91,
 	-2, 20,
 	-1, 76,
-	10, 65,
-	-2, 157,
+	9, 63,
+	10, 63,
+	-2, 155,
 	-1, 87,
-	43, 93,
+	43, 91,
 	-2, 20,
 	-1, 92,
 	8, 13,
@@ -166,199 +167,189 @@ var RubyExca = []int{
 	42, 13,
 	-2, 11,
 	-1, 101,
-	43, 93,
-	-2, 91,
-	-1, 196,
-	9, 65,
-	10, 65,
-	-2, 157,
-	-1, 233,
-	43, 94,
-	-2, 92,
+	43, 91,
+	-2, 89,
+	-1, 194,
+	9, 63,
+	10, 63,
+	-2, 155,
+	-1, 230,
+	43, 92,
+	-2, 90,
 }
 
-const RubyNprod = 166
+const RubyNprod = 164
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
 var RubyStates []string
 
-const RubyLast = 1303
+const RubyLast = 1206
 
 var RubyAct = []int{
 
-	9, 120, 33, 162, 84, 153, 164, 161, 78, 77,
-	188, 2, 3, 62, 114, 115, 186, 238, 64, 254,
-	154, 255, 75, 184, 278, 83, 4, 232, 22, 193,
-	126, 188, 271, 72, 235, 214, 274, 97, 100, 102,
-	60, 59, 168, 224, 110, 96, 273, 10, 62, 95,
-	188, 104, 237, 94, 225, 61, 187, 122, 63, 20,
-	64, 253, 116, 185, 188, 129, 130, 188, 133, 134,
-	135, 136, 85, 138, 188, 103, 73, 144, 145, 74,
-	147, 148, 285, 252, 93, 123, 246, 83, 248, 247,
-	259, 186, 283, 65, 66, 67, 62, 146, 155, 72,
-	63, 70, 68, 69, 124, 123, 201, 166, 123, 242,
-	212, 230, 277, 131, 179, 212, 93, 151, 233, 180,
-	139, 5, 62, 101, 124, 93, 191, 124, 149, 83,
-	198, 186, 93, 165, 85, 163, 93, 194, 195, 93,
-	93, 182, 183, 117, 118, 276, 93, 199, 99, 261,
-	98, 200, 202, 179, 165, 208, 204, 179, 105, 106,
-	107, 108, 109, 171, 150, 142, 128, 213, 179, 226,
-	179, 217, 269, 179, 179, 231, 85, 58, 23, 86,
-	87, 44, 127, 82, 91, 190, 132, 227, 93, 119,
-	207, 137, 181, 140, 141, 64, 189, 122, 234, 203,
-	1, 220, 125, 54, 55, 112, 51, 179, 71, 50,
-	179, 93, 49, 48, 157, 158, 159, 160, 26, 241,
-	47, 46, 56, 170, 92, 123, 53, 52, 65, 66,
-	67, 18, 174, 258, 17, 63, 70, 68, 69, 16,
-	15, 179, 37, 88, 124, 179, 179, 13, 12, 27,
-	11, 179, 179, 21, 14, 19, 93, 31, 30, 32,
-	29, 0, 88, 0, 0, 0, 0, 179, 179, 179,
-	0, 0, 0, 0, 89, 88, 179, 0, 0, 281,
-	179, 0, 0, 88, 88, 0, 88, 88, 88, 88,
-	0, 88, 0, 89, 0, 88, 0, 0, 88, 88,
-	0, 0, 0, 0, 0, 88, 89, 0, 0, 0,
-	0, 0, 0, 0, 89, 89, 0, 89, 89, 89,
-	89, 0, 89, 0, 0, 0, 89, 0, 0, 89,
-	89, 0, 0, 0, 243, 0, 89, 0, 0, 0,
-	0, 249, 0, 28, 88, 0, 0, 88, 0, 0,
-	0, 257, 113, 0, 0, 260, 0, 0, 23, 86,
-	87, 44, 143, 0, 211, 88, 0, 265, 90, 215,
-	88, 0, 0, 0, 270, 89, 0, 0, 89, 0,
-	0, 0, 0, 54, 55, 0, 0, 90, 0, 0,
-	0, 0, 228, 229, 0, 0, 89, 280, 0, 0,
-	90, 89, 56, 0, 57, 88, 53, 52, 90, 90,
-	0, 90, 90, 90, 90, 88, 90, 0, 0, 0,
-	90, 0, 0, 90, 90, 0, 0, 0, 0, 0,
-	90, 0, 0, 256, 0, 0, 89, 0, 0, 0,
-	0, 0, 0, 262, 152, 156, 89, 263, 0, 0,
-	0, 88, 0, 167, 0, 169, 0, 0, 0, 64,
-	272, 0, 172, 173, 197, 0, 0, 0, 0, 90,
-	0, 0, 90, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 89, 282, 284, 0, 286, 0, 287, 0,
-	90, 0, 65, 66, 67, 90, 0, 88, 0, 63,
-	70, 68, 69, 0, 0, 0, 206, 0, 209, 0,
-	0, 23, 24, 25, 44, 0, 0, 0, 34, 219,
-	42, 222, 221, 43, 35, 36, 0, 0, 89, 45,
-	90, 0, 0, 0, 0, 0, 54, 55, 0, 64,
-	90, 38, 39, 40, 41, 0, 0, 177, 178, 0,
-	0, 0, 0, 0, 0, 56, 0, 57, 0, 53,
-	52, 0, 0, 0, 240, 0, 0, 0, 244, 0,
-	245, 0, 65, 66, 67, 250, 90, 0, 251, 63,
-	70, 68, 69, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 266, 267, 0, 0, 268, 0, 23, 24, 25,
-	44, 0, 0, 0, 34, 0, 42, 0, 275, 43,
-	35, 36, 90, 0, 0, 45, 0, 0, 0, 279,
-	0, 0, 54, 55, 0, 0, 0, 38, 39, 40,
-	41, 0, 0, 6, 7, 0, 0, 0, 0, 0,
-	0, 56, 0, 57, 0, 53, 52, 0, 8, 23,
-	24, 25, 44, 0, 0, 0, 34, 264, 42, 0,
-	0, 43, 35, 36, 0, 0, 0, 45, 0, 0,
-	0, 0, 0, 0, 54, 55, 0, 0, 0, 38,
-	39, 40, 41, 0, 0, 177, 178, 23, 24, 25,
-	44, 0, 0, 56, 34, 57, 42, 53, 52, 43,
+	9, 120, 162, 160, 78, 22, 159, 84, 151, 33,
+	77, 186, 62, 2, 3, 114, 115, 125, 251, 64,
+	152, 184, 252, 235, 182, 83, 75, 275, 4, 229,
+	191, 126, 268, 186, 72, 232, 211, 97, 96, 60,
+	59, 95, 166, 280, 110, 100, 102, 62, 62, 186,
+	23, 86, 87, 76, 61, 81, 91, 122, 234, 63,
+	250, 185, 123, 116, 183, 129, 130, 186, 133, 134,
+	135, 136, 271, 138, 270, 54, 55, 122, 143, 80,
+	145, 146, 123, 94, 104, 123, 73, 83, 243, 74,
+	245, 244, 221, 282, 79, 178, 92, 5, 53, 52,
+	186, 153, 186, 222, 144, 274, 164, 10, 103, 72,
+	227, 256, 184, 209, 177, 62, 239, 209, 195, 184,
+	149, 163, 273, 161, 180, 181, 189, 117, 118, 83,
+	249, 230, 85, 192, 105, 106, 107, 108, 109, 193,
+	101, 99, 258, 98, 163, 196, 205, 169, 148, 142,
+	199, 177, 197, 128, 26, 177, 223, 201, 127, 266,
+	228, 58, 132, 82, 124, 210, 177, 137, 177, 140,
+	141, 177, 177, 131, 188, 119, 214, 208, 204, 88,
+	139, 179, 212, 187, 124, 224, 1, 124, 147, 217,
+	155, 156, 157, 158, 85, 122, 231, 112, 88, 168,
+	123, 51, 50, 49, 177, 225, 226, 177, 172, 48,
+	47, 88, 238, 46, 18, 17, 16, 15, 37, 88,
+	88, 13, 88, 88, 88, 88, 12, 88, 11, 21,
+	255, 88, 14, 19, 88, 88, 85, 31, 177, 30,
+	32, 88, 177, 177, 29, 253, 0, 0, 177, 177,
+	0, 0, 0, 0, 0, 259, 0, 200, 113, 260,
+	0, 27, 0, 0, 177, 177, 177, 23, 86, 87,
+	44, 0, 269, 177, 0, 0, 278, 177, 0, 0,
+	88, 0, 0, 88, 0, 0, 89, 0, 0, 0,
+	0, 0, 54, 55, 0, 279, 281, 0, 283, 88,
+	284, 0, 124, 0, 88, 89, 0, 240, 28, 0,
+	0, 56, 0, 57, 246, 53, 52, 0, 89, 0,
+	0, 0, 0, 0, 254, 0, 89, 89, 257, 89,
+	89, 89, 89, 90, 89, 0, 0, 0, 89, 88,
+	262, 89, 89, 0, 0, 0, 0, 267, 89, 88,
+	150, 154, 90, 0, 0, 0, 0, 0, 0, 165,
+	0, 167, 0, 0, 0, 90, 0, 20, 170, 171,
+	277, 0, 0, 90, 90, 0, 90, 90, 90, 90,
+	0, 90, 0, 0, 88, 90, 0, 89, 90, 90,
+	89, 0, 93, 0, 0, 90, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 89, 0, 0, 0,
+	203, 89, 206, 23, 86, 87, 44, 0, 0, 91,
+	0, 0, 0, 0, 93, 0, 23, 86, 87, 194,
+	88, 0, 91, 93, 90, 0, 0, 90, 54, 55,
+	93, 0, 0, 0, 93, 0, 89, 93, 93, 0,
+	0, 54, 55, 90, 93, 0, 89, 56, 90, 92,
+	0, 53, 52, 23, 86, 87, 76, 237, 0, 91,
+	56, 241, 92, 242, 53, 52, 0, 0, 247, 0,
+	0, 248, 0, 0, 0, 0, 0, 0, 54, 55,
+	0, 89, 0, 90, 0, 0, 93, 0, 0, 0,
+	0, 0, 0, 90, 263, 264, 0, 79, 265, 92,
+	0, 53, 52, 0, 0, 0, 0, 93, 0, 0,
+	0, 272, 0, 0, 0, 0, 0, 121, 86, 87,
+	44, 0, 276, 23, 24, 25, 44, 89, 90, 0,
+	34, 216, 42, 219, 218, 43, 35, 36, 0, 0,
+	0, 45, 54, 55, 0, 0, 0, 0, 54, 55,
+	0, 0, 93, 38, 39, 40, 41, 0, 0, 175,
+	176, 56, 0, 57, 0, 53, 52, 56, 0, 57,
+	0, 53, 52, 0, 90, 23, 24, 25, 44, 0,
+	0, 0, 34, 0, 42, 0, 0, 43, 35, 36,
+	0, 0, 0, 45, 0, 0, 0, 0, 0, 0,
+	54, 55, 0, 0, 0, 38, 39, 40, 41, 0,
+	0, 6, 7, 0, 0, 0, 0, 0, 0, 56,
+	0, 57, 0, 53, 52, 0, 8, 23, 24, 25,
+	44, 0, 0, 0, 34, 261, 42, 0, 0, 43,
 	35, 36, 0, 0, 0, 45, 0, 0, 0, 0,
 	0, 0, 54, 55, 0, 0, 0, 38, 39, 40,
-	41, 0, 0, 177, 178, 0, 0, 0, 0, 0,
-	0, 56, 0, 57, 239, 53, 52, 23, 24, 25,
-	44, 0, 0, 0, 34, 236, 42, 0, 0, 43,
-	35, 36, 0, 0, 0, 45, 0, 0, 0, 0,
-	0, 0, 54, 55, 0, 0, 0, 38, 39, 40,
-	41, 0, 0, 177, 178, 0, 0, 0, 0, 0,
-	0, 56, 0, 57, 0, 53, 52, 23, 24, 25,
-	44, 0, 0, 0, 34, 223, 42, 0, 0, 43,
-	35, 36, 0, 0, 0, 45, 0, 0, 0, 0,
-	0, 0, 54, 55, 0, 0, 0, 38, 39, 40,
-	41, 0, 0, 177, 178, 0, 0, 0, 0, 0,
-	0, 56, 0, 57, 0, 53, 52, 23, 24, 25,
-	44, 0, 0, 0, 34, 218, 42, 0, 0, 43,
-	35, 36, 0, 0, 0, 45, 0, 0, 0, 0,
-	0, 0, 54, 55, 0, 0, 0, 38, 39, 40,
-	41, 0, 0, 177, 178, 0, 0, 0, 0, 0,
-	0, 56, 0, 57, 0, 53, 52, 23, 24, 25,
-	44, 0, 0, 0, 34, 216, 42, 0, 0, 43,
-	35, 36, 0, 0, 0, 45, 0, 0, 0, 0,
-	0, 0, 54, 55, 0, 0, 0, 38, 39, 40,
-	41, 0, 0, 177, 178, 23, 24, 25, 44, 0,
+	41, 0, 0, 175, 176, 23, 24, 25, 44, 0,
 	0, 56, 34, 57, 42, 53, 52, 43, 35, 36,
 	0, 0, 0, 45, 0, 0, 0, 0, 0, 0,
 	54, 55, 0, 0, 0, 38, 39, 40, 41, 0,
-	0, 177, 178, 0, 0, 0, 0, 0, 0, 56,
-	0, 57, 210, 53, 52, 23, 24, 25, 44, 0,
-	0, 0, 34, 205, 42, 0, 0, 43, 35, 36,
+	0, 175, 176, 0, 0, 0, 0, 0, 0, 56,
+	0, 57, 236, 53, 52, 23, 24, 25, 44, 0,
+	0, 0, 34, 233, 42, 0, 0, 43, 35, 36,
 	0, 0, 0, 45, 0, 0, 0, 0, 0, 0,
 	54, 55, 0, 0, 0, 38, 39, 40, 41, 0,
-	0, 177, 178, 23, 24, 25, 44, 0, 0, 56,
+	0, 175, 176, 0, 0, 0, 0, 0, 0, 56,
+	0, 57, 0, 53, 52, 23, 24, 25, 44, 0,
+	0, 0, 34, 220, 42, 0, 0, 43, 35, 36,
+	0, 0, 0, 45, 0, 0, 0, 0, 0, 0,
+	54, 55, 0, 0, 0, 38, 39, 40, 41, 0,
+	0, 175, 176, 0, 0, 0, 0, 0, 0, 56,
+	0, 57, 0, 53, 52, 23, 24, 25, 44, 0,
+	0, 0, 34, 215, 42, 0, 0, 43, 35, 36,
+	0, 0, 0, 45, 0, 0, 0, 0, 0, 0,
+	54, 55, 0, 0, 0, 38, 39, 40, 41, 0,
+	0, 175, 176, 0, 0, 0, 0, 0, 0, 56,
+	0, 57, 0, 53, 52, 23, 24, 25, 44, 0,
+	0, 0, 34, 213, 42, 0, 0, 43, 35, 36,
+	0, 0, 0, 45, 0, 0, 0, 0, 0, 0,
+	54, 55, 0, 0, 0, 38, 39, 40, 41, 0,
+	0, 175, 176, 23, 24, 25, 44, 0, 0, 56,
 	34, 57, 42, 53, 52, 43, 35, 36, 0, 0,
 	0, 45, 0, 0, 0, 0, 0, 0, 54, 55,
-	0, 0, 0, 38, 39, 40, 41, 0, 0, 177,
-	178, 23, 24, 25, 44, 176, 0, 56, 34, 57,
+	0, 0, 0, 38, 39, 40, 41, 0, 0, 175,
+	176, 0, 0, 0, 0, 0, 0, 56, 0, 57,
+	207, 53, 52, 23, 24, 25, 44, 0, 0, 0,
+	34, 202, 42, 0, 0, 43, 35, 36, 0, 0,
+	0, 45, 0, 0, 0, 0, 0, 0, 54, 55,
+	0, 0, 0, 38, 39, 40, 41, 0, 0, 175,
+	176, 23, 24, 25, 44, 0, 0, 56, 34, 57,
 	42, 53, 52, 43, 35, 36, 0, 0, 0, 45,
 	0, 0, 0, 0, 0, 0, 54, 55, 0, 0,
-	0, 38, 39, 40, 41, 0, 0, 0, 175, 23,
-	24, 25, 44, 0, 0, 56, 34, 57, 42, 53,
+	0, 38, 39, 40, 41, 0, 0, 175, 176, 23,
+	24, 25, 44, 174, 0, 56, 34, 57, 42, 53,
 	52, 43, 35, 36, 0, 0, 0, 45, 0, 0,
 	0, 0, 0, 0, 54, 55, 0, 0, 0, 38,
-	39, 40, 41, 23, 86, 87, 76, 0, 81, 91,
-	0, 0, 0, 56, 0, 57, 0, 53, 52, 23,
-	86, 87, 196, 0, 0, 91, 0, 0, 54, 55,
-	0, 0, 80, 23, 86, 87, 76, 0, 0, 91,
-	0, 0, 0, 0, 54, 55, 0, 79, 0, 92,
-	0, 53, 52, 0, 0, 0, 0, 0, 54, 55,
-	23, 111, 87, 56, 0, 92, 91, 53, 52, 23,
-	86, 87, 44, 0, 0, 0, 0, 79, 0, 92,
-	0, 53, 52, 0, 0, 54, 55, 0, 0, 0,
-	0, 0, 0, 0, 54, 55, 23, 192, 87, 0,
-	0, 0, 0, 0, 56, 0, 92, 0, 53, 52,
-	23, 111, 87, 56, 0, 57, 0, 53, 52, 0,
-	0, 54, 55, 121, 86, 87, 44, 0, 0, 0,
-	0, 0, 188, 0, 0, 54, 55, 0, 0, 0,
-	56, 0, 57, 0, 53, 52, 0, 0, 54, 55,
-	0, 0, 0, 0, 56, 0, 57, 0, 53, 52,
-	0, 0, 0, 0, 0, 0, 0, 56, 0, 57,
-	0, 53, 52,
+	39, 40, 41, 0, 0, 0, 173, 23, 24, 25,
+	44, 0, 0, 56, 34, 57, 42, 53, 52, 43,
+	35, 36, 23, 111, 87, 45, 0, 0, 91, 0,
+	0, 0, 54, 55, 0, 0, 0, 38, 39, 40,
+	41, 0, 0, 0, 64, 0, 0, 54, 55, 0,
+	0, 56, 0, 57, 0, 53, 52, 23, 190, 87,
+	0, 0, 0, 23, 111, 87, 56, 0, 92, 0,
+	53, 52, 0, 0, 0, 0, 0, 65, 66, 67,
+	0, 64, 54, 55, 63, 70, 68, 69, 54, 55,
+	198, 0, 64, 186, 71, 0, 0, 0, 0, 0,
+	0, 56, 0, 57, 0, 53, 52, 56, 0, 57,
+	0, 53, 52, 0, 65, 66, 67, 0, 0, 0,
+	0, 63, 70, 68, 69, 65, 66, 67, 0, 0,
+	0, 0, 63, 70, 68, 69,
 }
 var RubyPact = []int{
 
-	-30, 602, -1000, -1000, -1000, -1, -1000, -1000, -1000, 191,
-	62, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-22, -1000, -1000, -1000, 1128, 19, 15, 11, 3, -1000,
-	-1000, -1000, -1000, -1000, 144, 116, 116, 41, 1094, 1094,
-	1094, 1094, 1094, 1235, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, 8, 137, -1000, -1000, 1248, -1000, -13, -1000,
-	-1000, -1000, 1094, 160, 1235, 1194, 1094, 1235, 1235, 1235,
-	1235, 1094, 1194, 1094, 1094, 159, 353, -1000, 87, 1248,
-	1194, 158, 107, 14, -1000, -1000, 1158, -1000, -1000, -1000,
-	-1000, -25, -25, -22, 1094, 1094, 1094, 1094, 127, 127,
-	10, -1000, -1000, 1094, 157, 34, 34, 34, 34, 34,
-	-1000, -1000, 1056, 1018, -1000, -1000, 135, -1000, -1000, 13,
-	6, -1000, 535, -1000, -4, 1221, -14, 34, 1144, -1000,
-	14, -1000, 34, -1000, -1000, -1000, -1000, 34, 14, -1000,
-	34, 34, -1000, -1000, 455, 121, 1185, 56, 14, -1000,
-	-1000, 173, 980, -1000, 149, -1000, 930, 34, 34, 34,
-	34, -1000, 105, 148, -1000, 1, -1000, 892, 116, 842,
-	34, -1000, 506, 792, 34, -1000, -1000, -1000, -1000, 191,
-	34, 30, -1000, -1000, 164, -1000, 1235, -1000, -1000, -1000,
-	101, 171, -16, 111, 87, -1000, 1194, -1000, -1000, -1000,
-	-1000, 0, 14, -1000, -1000, -1000, 742, 7, -1000, 692,
-	-1000, -10, 148, 100, 1094, -10, -1000, -1000, -1000, -1000,
-	73, 1094, -1000, -1000, -1000, 76, -1000, -1000, 9, -31,
-	-1000, 1094, 1235, -1000, 81, 1094, -1000, -1000, 143, -1000,
-	1018, -1000, -1000, 34, 1018, 654, -1000, 1094, -1000, 34,
-	1018, 1018, 168, -1000, 1094, -1000, 26, 34, -1000, -1000,
-	34, -1000, 33, 23, -1000, 34, 1018, 1018, 1018, 139,
-	108, -19, -10, -1000, -1000, 1018, -1000, 1094, 1235, 1018,
-	82, 72, -10, -1000, -10, -1000, -10, -10,
+	-28, 580, -1000, -1000, -1000, -2, -1000, -1000, -1000, 1147,
+	72, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-18, -1000, -1000, -1000, 45, 49, 7, 4, 3, -1000,
+	-1000, -1000, -1000, -1000, 137, 133, 133, 74, 1072, 1072,
+	1072, 1072, 1072, 1128, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, 9, 121, -1000, -1000, 522, -1000, -12, -1000,
+	-1000, -1000, 1072, 147, 1128, 262, 1072, 1128, 1128, 1128,
+	1128, 1072, 262, 1072, 1072, 143, 262, -1000, 94, 522,
+	262, 142, 110, 15, -1000, -1000, 458, -1000, -1000, -1000,
+	-1000, -25, -25, -18, 1072, 1072, 1072, 1072, 115, 115,
+	10, -1000, -1000, 1072, 141, 34, 34, 34, 34, 34,
+	-1000, -1000, 1034, 996, -1000, -1000, 118, -1000, -1000, 14,
+	11, -1000, 1158, -1000, -3, 1122, -13, 34, 421, -1000,
+	15, -1000, 34, -1000, -1000, -1000, -1000, 34, 15, -1000,
+	34, 34, -1000, 109, 1087, 1110, 15, -1000, -1000, 408,
+	958, -1000, 140, -1000, 908, 34, 34, 34, 34, -1000,
+	103, 138, -1000, 2, -1000, 870, 133, 820, 34, -1000,
+	528, 770, 34, -1000, -1000, -1000, -1000, 1147, 34, 79,
+	-1000, -1000, 151, -1000, 1128, -1000, -1000, -1000, 100, 156,
+	-14, 124, 94, -1000, 262, -1000, -1000, -1000, 1, 15,
+	-1000, -1000, -1000, 720, 13, -1000, 670, -1000, -8, 138,
+	107, 1072, -8, -1000, -1000, -1000, -1000, 75, 1072, -1000,
+	-1000, -1000, 123, -1000, -1000, 8, -30, -1000, 1072, 1128,
+	-1000, 102, 1072, -1000, -1000, 136, -1000, 996, -1000, -1000,
+	34, 996, 632, -1000, 1072, -1000, 34, 996, 996, 155,
+	-1000, 1072, -1000, 26, 34, -1000, -1000, 34, -1000, 61,
+	59, -1000, 34, 996, 996, 996, 116, 101, -16, -8,
+	-1000, -1000, 996, -1000, 1072, 1128, 996, 33, 83, -8,
+	-1000, -8, -1000, -8, -8,
 }
 var RubyPgo = []int{
 
-	0, 119, 260, 259, 4, 258, 257, 59, 343, 255,
-	254, 253, 0, 249, 47, 250, 28, 248, 218, 247,
-	2, 6, 242, 240, 239, 234, 231, 221, 220, 213,
-	212, 209, 206, 352, 205, 9, 5, 201, 200, 7,
-	196, 192, 1, 190, 189, 185, 183, 8, 3, 177,
-	202,
+	0, 95, 244, 240, 7, 239, 237, 367, 308, 233,
+	232, 229, 0, 261, 107, 228, 5, 226, 154, 221,
+	9, 2, 218, 217, 216, 215, 214, 213, 210, 209,
+	203, 202, 201, 258, 197, 10, 8, 189, 186, 6,
+	183, 181, 1, 178, 175, 174, 163, 4, 3, 161,
+	17,
 }
 var RubyR1 = []int{
 
@@ -367,18 +358,18 @@ var RubyR1 = []int{
 	12, 12, 12, 12, 12, 12, 12, 12, 12, 16,
 	16, 16, 16, 16, 16, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 14,
-	14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
-	14, 35, 35, 44, 44, 42, 42, 42, 42, 42,
-	47, 47, 47, 47, 46, 46, 46, 46, 46, 15,
-	15, 39, 39, 21, 21, 48, 48, 48, 17, 17,
-	19, 20, 20, 49, 49, 10, 10, 10, 10, 10,
-	10, 10, 8, 8, 18, 18, 13, 13, 22, 22,
-	23, 24, 25, 26, 27, 27, 27, 27, 28, 29,
-	30, 31, 32, 2, 5, 6, 6, 3, 3, 40,
-	40, 40, 40, 45, 45, 45, 45, 4, 4, 4,
-	4, 36, 43, 43, 43, 9, 9, 9, 9, 9,
-	9, 9, 37, 37, 37, 37, 37, 34, 34, 34,
-	7, 11, 41, 41, 41, 41,
+	14, 14, 14, 14, 14, 14, 14, 14, 14, 35,
+	35, 44, 44, 42, 42, 42, 42, 42, 47, 47,
+	47, 47, 46, 46, 46, 46, 46, 15, 15, 39,
+	39, 21, 21, 48, 48, 48, 17, 17, 19, 20,
+	20, 49, 49, 10, 10, 10, 10, 10, 10, 10,
+	8, 8, 18, 18, 13, 13, 22, 22, 23, 24,
+	25, 26, 27, 27, 27, 27, 28, 29, 30, 31,
+	32, 2, 5, 6, 6, 3, 3, 40, 40, 40,
+	40, 45, 45, 45, 45, 4, 4, 4, 4, 36,
+	43, 43, 43, 9, 9, 9, 9, 9, 9, 9,
+	37, 37, 37, 37, 37, 34, 34, 34, 7, 11,
+	41, 41, 41, 41,
 }
 var RubyR2 = []int{
 
@@ -386,19 +377,19 @@ var RubyR2 = []int{
 	2, 0, 2, 0, 2, 2, 2, 2, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
-	4, 4, 2, 3, 4, 4, 3, 2, 3, 4,
-	6, 3, 1, 1, 3, 0, 1, 1, 1, 3,
-	1, 1, 3, 3, 1, 1, 3, 3, 3, 7,
-	7, 1, 3, 1, 3, 0, 1, 3, 4, 6,
-	4, 1, 4, 1, 4, 3, 3, 3, 3, 3,
-	3, 3, 2, 2, 2, 2, 3, 3, 3, 3,
-	2, 2, 2, 2, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 1, 1, 3, 3, 5, 5, 0,
-	4, 7, 8, 3, 3, 7, 8, 3, 4, 4,
-	3, 3, 0, 1, 3, 4, 5, 3, 3, 3,
-	3, 4, 0, 4, 3, 3, 2, 0, 2, 2,
-	3, 4, 0, 3, 4, 6,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 4,
+	2, 3, 4, 4, 3, 2, 3, 4, 6, 3,
+	1, 1, 3, 0, 1, 1, 1, 3, 1, 1,
+	3, 3, 1, 1, 3, 3, 3, 7, 7, 1,
+	3, 1, 3, 0, 1, 3, 4, 6, 4, 1,
+	4, 1, 4, 3, 3, 3, 3, 3, 3, 3,
+	2, 2, 2, 2, 3, 3, 3, 3, 2, 2,
+	2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 1, 1, 3, 3, 5, 5, 0, 4, 7,
+	8, 3, 3, 7, 8, 3, 4, 4, 3, 3,
+	0, 1, 3, 4, 5, 3, 3, 3, 3, 4,
+	0, 4, 3, 3, 2, 0, 2, 2, 3, 4,
+	0, 3, 4, 6,
 }
 var RubyChk = []int{
 
@@ -416,21 +407,21 @@ var RubyChk = []int{
 	-12, 6, -34, -33, 6, 7, 54, 6, 7, -44,
 	-42, 5, -12, -16, -14, -50, 43, -1, 6, -12,
 	-12, -14, -1, -12, -12, -12, -12, -1, -12, -14,
-	-1, -1, 6, 9, -12, -42, 10, -12, -12, -14,
-	6, 10, -33, -36, 45, -36, -33, -1, -1, -1,
-	-1, -39, -48, 8, -21, 6, -39, -33, 32, -33,
-	-1, 6, -33, -33, -1, 42, 9, 41, 42, -12,
-	-1, -41, 6, 7, 10, 50, 10, 50, 41, -40,
-	-45, -12, 6, 43, -47, -35, 8, 9, 9, -12,
-	-4, 50, -12, -14, -4, 13, -33, -43, 6, -33,
-	52, -50, 10, -48, 34, -50, 13, -20, 13, 13,
-	-37, 16, 15, 13, 13, 24, 5, -12, -50, -50,
-	10, 4, 43, 7, -42, 34, 13, 45, 10, 52,
-	-33, -21, 9, -1, -33, -33, 13, 16, 15, -1,
-	-33, -33, 7, 52, 10, 52, -50, -1, -12, 9,
-	-1, 6, -50, -50, 13, -1, -33, -33, -33, 4,
-	-1, 6, -50, 13, 13, -33, 6, 4, 43, -33,
-	-1, -12, -50, 10, -50, 10, -50, -50,
+	-1, -1, 6, -42, 10, -12, -12, -14, 6, 10,
+	-33, -36, 45, -36, -33, -1, -1, -1, -1, -39,
+	-48, 8, -21, 6, -39, -33, 32, -33, -1, 6,
+	-33, -33, -1, 42, 9, 41, 42, -12, -1, -41,
+	6, 7, 10, 50, 10, 50, 41, -40, -45, -12,
+	6, 43, -47, -35, 8, 9, -12, -4, 50, -12,
+	-14, -4, 13, -33, -43, 6, -33, 52, -50, 10,
+	-48, 34, -50, 13, -20, 13, 13, -37, 16, 15,
+	13, 13, 24, 5, -12, -50, -50, 10, 4, 43,
+	7, -42, 34, 13, 45, 10, 52, -33, -21, 9,
+	-1, -33, -33, 13, 16, 15, -1, -33, -33, 7,
+	52, 10, 52, -50, -1, -12, 9, -1, 6, -50,
+	-50, 13, -1, -33, -33, -33, 4, -1, 6, -50,
+	13, 13, -33, 6, 4, 43, -33, -1, -12, -50,
+	10, -50, 10, -50, -50,
 }
 var RubyDef = []int{
 
@@ -438,31 +429,31 @@ var RubyDef = []int{
 	36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
 	46, 47, 48, 18, 19, -2, 21, 22, 23, 24,
 	25, 26, 27, 28, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 157, 13, 29, 30, 31, 32,
-	33, 34, 0, 0, 123, 124, 65, 11, 0, 5,
+	0, 0, 0, 0, 155, 13, 29, 30, 31, 32,
+	33, 34, 0, 0, 121, 122, 63, 11, 0, 5,
 	6, 7, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, -2, 52, 57, 65,
-	0, 0, 62, 70, 71, 75, 19, -2, 21, 22,
-	23, 13, -2, 0, 0, 0, 0, 0, 85, 85,
-	13, -2, 13, 0, 0, 110, 111, 112, 113, 13,
-	13, 19, 0, 162, 104, 105, 0, 102, 103, 0,
-	0, 18, 66, 67, 68, 129, 0, 147, 53, 58,
-	114, 116, 118, 119, 120, 121, 122, 149, 115, 117,
-	148, 150, 56, 49, 66, 0, 0, 66, 95, 96,
-	108, 0, 0, 13, 142, 13, 0, 97, 98, 99,
-	100, 11, 81, 85, 86, 83, 11, 0, 0, 0,
-	101, 109, 0, 0, 158, 159, 160, 14, 15, 16,
-	17, 0, 106, 107, 0, 125, 0, 126, 12, 11,
-	11, 0, 19, 0, 54, 55, -2, 50, 51, 72,
-	73, 59, 76, 77, 78, 137, 0, 0, 143, 0,
-	140, 13, 0, 0, 0, 13, 88, 13, 90, 145,
-	0, 0, 13, 151, 161, 13, 64, 69, 0, 0,
-	11, 0, 0, -2, 0, 0, 138, 141, 0, 139,
-	11, 87, 82, 84, 11, 0, 146, 0, 13, 13,
-	156, 163, 13, 127, 0, 128, 0, 11, 133, 61,
-	60, 144, 0, 0, 89, 13, 154, 155, 164, 0,
-	0, 0, 130, 79, 80, 153, 13, 0, 0, 165,
-	11, 11, 131, 11, 135, 11, 132, 136,
+	0, 0, 0, 0, 0, 0, -2, 50, 55, 63,
+	0, 0, 60, 68, 69, 73, 19, -2, 21, 22,
+	23, 13, -2, 0, 0, 0, 0, 0, 83, 83,
+	13, -2, 13, 0, 0, 108, 109, 110, 111, 13,
+	13, 19, 0, 160, 102, 103, 0, 100, 101, 0,
+	0, 18, 64, 65, 66, 127, 0, 145, 51, 56,
+	112, 114, 116, 117, 118, 119, 120, 147, 113, 115,
+	146, 148, 54, 0, 0, 64, 93, 94, 106, 0,
+	0, 13, 140, 13, 0, 95, 96, 97, 98, 11,
+	79, 83, 84, 81, 11, 0, 0, 0, 99, 107,
+	0, 0, 156, 157, 158, 14, 15, 16, 17, 0,
+	104, 105, 0, 123, 0, 124, 12, 11, 11, 0,
+	19, 0, 52, 53, -2, 49, 70, 71, 57, 74,
+	75, 76, 135, 0, 0, 141, 0, 138, 13, 0,
+	0, 0, 13, 86, 13, 88, 143, 0, 0, 13,
+	149, 159, 13, 62, 67, 0, 0, 11, 0, 0,
+	-2, 0, 0, 136, 139, 0, 137, 11, 85, 80,
+	82, 11, 0, 144, 0, 13, 13, 154, 161, 13,
+	125, 0, 126, 0, 11, 131, 59, 58, 142, 0,
+	0, 87, 13, 152, 153, 162, 0, 0, 0, 128,
+	77, 78, 151, 13, 0, 0, 163, 11, 11, 129,
+	11, 133, 11, 130, 134,
 }
 var RubyTok1 = []int{
 
@@ -843,62 +834,46 @@ Rubydefault:
 		//line parser.y:200
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func: RubyS[Rubypt-2].genericValue.(ast.BareReference),
-				Args: []ast.Node{},
+				Func: RubyS[Rubypt-3].genericValue.(ast.BareReference),
+				Args: RubyS[Rubypt-1].genericSlice,
 			}
 		}
 	case 50:
 		//line parser.y:207
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func: RubyS[Rubypt-3].genericValue.(ast.BareReference),
-				Args: []ast.Node{RubyS[Rubypt-1].genericValue},
+				Func: RubyS[Rubypt-1].genericValue.(ast.BareReference),
+				Args: RubyS[Rubypt-0].genericSlice,
 			}
 		}
 	case 51:
 		//line parser.y:214
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func: RubyS[Rubypt-3].genericValue.(ast.BareReference),
-				Args: RubyS[Rubypt-1].genericSlice,
+				Target: RubyS[Rubypt-2].genericValue,
+				Func:   RubyS[Rubypt-0].genericValue.(ast.BareReference),
 			}
 		}
 	case 52:
 		//line parser.y:221
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func: RubyS[Rubypt-1].genericValue.(ast.BareReference),
-				Args: RubyS[Rubypt-0].genericSlice,
+				Target: RubyS[Rubypt-3].genericValue,
+				Func:   RubyS[Rubypt-1].genericValue.(ast.BareReference),
+				Args:   RubyS[Rubypt-0].genericSlice,
 			}
 		}
 	case 53:
-		//line parser.y:228
+		//line parser.y:229
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   RubyS[Rubypt-0].genericValue.(ast.BareReference),
+				Target: RubyS[Rubypt-3].genericValue,
+				Func:   RubyS[Rubypt-1].genericValue.(ast.BareReference),
+				Args:   RubyS[Rubypt-0].genericSlice,
 			}
 		}
 	case 54:
-		//line parser.y:235
-		{
-			RubyVAL.genericValue = ast.CallExpression{
-				Target: RubyS[Rubypt-3].genericValue,
-				Func:   RubyS[Rubypt-1].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-0].genericSlice,
-			}
-		}
-	case 55:
-		//line parser.y:243
-		{
-			RubyVAL.genericValue = ast.CallExpression{
-				Target: RubyS[Rubypt-3].genericValue,
-				Func:   RubyS[Rubypt-1].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-0].genericSlice,
-			}
-		}
-	case 56:
-		//line parser.y:251
+		//line parser.y:237
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -906,16 +881,16 @@ Rubydefault:
 				Args:   []ast.Node{},
 			}
 		}
-	case 57:
-		//line parser.y:261
+	case 55:
+		//line parser.y:247
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func: RubyS[Rubypt-1].genericValue.(ast.BareReference),
 				Args: RubyS[Rubypt-0].genericSlice,
 			}
 		}
-	case 58:
-		//line parser.y:268
+	case 56:
+		//line parser.y:254
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func:   ast.BareReference{Name: RubyS[Rubypt-1].operator},
@@ -923,8 +898,8 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 59:
-		//line parser.y:278
+	case 57:
+		//line parser.y:264
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func:   ast.BareReference{Name: "[]"},
@@ -932,8 +907,8 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
 			}
 		}
-	case 60:
-		//line parser.y:288
+	case 58:
+		//line parser.y:274
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Func:   ast.BareReference{Name: "[]="},
@@ -941,98 +916,98 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-3].genericValue, RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 61:
-		//line parser.y:297
+	case 59:
+		//line parser.y:283
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
 		}
-	case 62:
-		//line parser.y:299
+	case 60:
+		//line parser.y:285
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
 		}
-	case 63:
-		//line parser.y:302
+	case 61:
+		//line parser.y:288
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
+	case 62:
+		//line parser.y:290
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 63:
+		//line parser.y:292
+		{
+			RubyVAL.genericSlice = ast.Nodes{}
+		}
 	case 64:
-		//line parser.y:304
+		//line parser.y:294
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 65:
-		//line parser.y:306
+		//line parser.y:296
 		{
-			RubyVAL.genericSlice = ast.Nodes{}
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 66:
-		//line parser.y:308
+		//line parser.y:298
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 67:
-		//line parser.y:310
+		//line parser.y:300
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 68:
-		//line parser.y:312
+		//line parser.y:304
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 69:
-		//line parser.y:314
+		//line parser.y:306
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 70:
-		//line parser.y:318
+		//line parser.y:308
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 71:
-		//line parser.y:320
+		//line parser.y:310
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 72:
-		//line parser.y:322
+		//line parser.y:313
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 73:
-		//line parser.y:324
+		//line parser.y:315
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 74:
-		//line parser.y:327
+		//line parser.y:317
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 75:
-		//line parser.y:329
+		//line parser.y:319
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 76:
-		//line parser.y:331
+		//line parser.y:321
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 77:
-		//line parser.y:333
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
-	case 78:
-		//line parser.y:335
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
-	case 79:
-		//line parser.y:341
+		//line parser.y:327
 		{
 			RubyVAL.genericValue = ast.FuncDecl{
 				Name: RubyS[Rubypt-5].genericValue.(ast.BareReference),
@@ -1040,8 +1015,8 @@ Rubydefault:
 				Body: RubyS[Rubypt-2].genericSlice,
 			}
 		}
-	case 80:
-		//line parser.y:349
+	case 78:
+		//line parser.y:335
 		{
 			RubyVAL.genericValue = ast.FuncDecl{
 				Name: ast.BareReference{Name: RubyS[Rubypt-5].operator},
@@ -1049,51 +1024,51 @@ Rubydefault:
 				Body: RubyS[Rubypt-2].genericSlice,
 			}
 		}
-	case 81:
-		//line parser.y:358
+	case 79:
+		//line parser.y:344
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
 		}
-	case 82:
-		//line parser.y:360
+	case 80:
+		//line parser.y:346
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
 		}
-	case 83:
-		//line parser.y:363
+	case 81:
+		//line parser.y:349
 		{
 			RubyVAL.genericValue = ast.MethodParam{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference)}
 		}
-	case 84:
-		//line parser.y:365
+	case 82:
+		//line parser.y:351
 		{
 			RubyVAL.genericValue = ast.MethodParam{Name: RubyS[Rubypt-2].genericValue.(ast.BareReference), DefaultValue: RubyS[Rubypt-0].genericValue}
 		}
-	case 85:
-		//line parser.y:367
+	case 83:
+		//line parser.y:353
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
+	case 84:
+		//line parser.y:355
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 85:
+		//line parser.y:359
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
 	case 86:
-		//line parser.y:369
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
-	case 87:
-		//line parser.y:373
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
-	case 88:
-		//line parser.y:378
+		//line parser.y:364
 		{
 			RubyVAL.genericValue = ast.ClassDecl{
 				Name: RubyS[Rubypt-2].genericValue.(ast.Class).Name,
 				Body: RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 89:
-		//line parser.y:385
+	case 87:
+		//line parser.y:371
 		{
 			RubyVAL.genericValue = ast.ClassDecl{
 				Name:       RubyS[Rubypt-4].genericValue.(ast.Class).Name,
@@ -1102,8 +1077,8 @@ Rubydefault:
 				Body:       RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 90:
-		//line parser.y:395
+	case 88:
+		//line parser.y:381
 		{
 			RubyVAL.genericValue = ast.ModuleDecl{
 				Name:      RubyS[Rubypt-2].genericValue.(ast.Class).Name,
@@ -1111,30 +1086,46 @@ Rubydefault:
 				Body:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 91:
-		//line parser.y:404
+	case 89:
+		//line parser.y:390
 		{
 			RubyVAL.genericValue = ast.Class{
 				Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name,
 			}
 		}
-	case 92:
-		//line parser.y:410
+	case 90:
+		//line parser.y:396
 		{
 			RubyVAL.genericValue = ast.Class{
 				Name:      RubyS[Rubypt-0].genericValue.(ast.BareReference).Name,
 				Namespace: strings.Join(RubyS[Rubypt-3].stringSlice, "::"),
 			}
 		}
-	case 93:
-		//line parser.y:418
+	case 91:
+		//line parser.y:404
 		{
 			RubyVAL.stringSlice = append(RubyVAL.stringSlice, RubyS[Rubypt-0].genericValue.(ast.BareReference).Name)
 		}
-	case 94:
-		//line parser.y:422
+	case 92:
+		//line parser.y:408
 		{
 			RubyVAL.stringSlice = append(RubyVAL.stringSlice, RubyS[Rubypt-0].genericValue.(ast.BareReference).Name)
+		}
+	case 93:
+		//line parser.y:413
+		{
+			RubyVAL.genericValue = ast.Assignment{
+				LHS: RubyS[Rubypt-2].genericValue,
+				RHS: RubyS[Rubypt-0].genericValue,
+			}
+		}
+	case 94:
+		//line parser.y:420
+		{
+			RubyVAL.genericValue = ast.Assignment{
+				LHS: RubyS[Rubypt-2].genericValue,
+				RHS: RubyS[Rubypt-0].genericValue,
+			}
 		}
 	case 95:
 		//line parser.y:427
@@ -1177,83 +1168,85 @@ Rubydefault:
 			}
 		}
 	case 100:
-		//line parser.y:462
+		//line parser.y:463
 		{
-			RubyVAL.genericValue = ast.Assignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
-			}
+			RubyVAL.genericValue = ast.GlobalVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 		}
 	case 101:
-		//line parser.y:469
+		//line parser.y:465
 		{
-			RubyVAL.genericValue = ast.Assignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
-			}
+			RubyVAL.genericValue = ast.GlobalVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 		}
 	case 102:
-		//line parser.y:477
+		//line parser.y:468
 		{
-			RubyVAL.genericValue = ast.GlobalVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
+			RubyVAL.genericValue = ast.InstanceVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 		}
 	case 103:
-		//line parser.y:479
+		//line parser.y:470
 		{
-			RubyVAL.genericValue = ast.GlobalVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
+			RubyVAL.genericValue = ast.InstanceVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 		}
 	case 104:
-		//line parser.y:482
+		//line parser.y:473
 		{
-			RubyVAL.genericValue = ast.InstanceVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
+			RubyVAL.genericValue = ast.ClassVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 		}
 	case 105:
-		//line parser.y:484
+		//line parser.y:475
 		{
-			RubyVAL.genericValue = ast.InstanceVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
+			RubyVAL.genericValue = ast.ClassVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 		}
 	case 106:
-		//line parser.y:487
-		{
-			RubyVAL.genericValue = ast.ClassVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
-		}
-	case 107:
-		//line parser.y:489
-		{
-			RubyVAL.genericValue = ast.ClassVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
-		}
-	case 108:
-		//line parser.y:492
+		//line parser.y:478
 		{
 			RubyVAL.genericValue = ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
 		}
-	case 109:
-		//line parser.y:494
+	case 107:
+		//line parser.y:480
 		{
 			RubyVAL.genericValue = ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyS[Rubypt-0].genericValue)}
 		}
-	case 110:
-		//line parser.y:496
+	case 108:
+		//line parser.y:482
 		{
 			RubyVAL.genericValue = ast.Negation{Target: RubyS[Rubypt-0].genericValue}
 		}
-	case 111:
-		//line parser.y:497
+	case 109:
+		//line parser.y:483
 		{
 			RubyVAL.genericValue = ast.Complement{Target: RubyS[Rubypt-0].genericValue}
 		}
-	case 112:
-		//line parser.y:498
+	case 110:
+		//line parser.y:484
 		{
 			RubyVAL.genericValue = ast.Positive{Target: RubyS[Rubypt-0].genericValue}
 		}
-	case 113:
-		//line parser.y:499
+	case 111:
+		//line parser.y:485
 		{
 			RubyVAL.genericValue = ast.Negative{Target: RubyS[Rubypt-0].genericValue}
 		}
+	case 112:
+		//line parser.y:488
+		{
+			RubyVAL.genericValue = ast.CallExpression{
+				Target: RubyS[Rubypt-2].genericValue,
+				Func:   ast.BareReference{Name: "+"},
+				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+			}
+		}
+	case 113:
+		//line parser.y:496
+		{
+			RubyVAL.genericValue = ast.CallExpression{
+				Target: RubyS[Rubypt-2].genericValue,
+				Func:   ast.BareReference{Name: "+"},
+				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+			}
+		}
 	case 114:
-		//line parser.y:502
+		//line parser.y:504
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -1262,7 +1255,7 @@ Rubydefault:
 			}
 		}
 	case 115:
-		//line parser.y:510
+		//line parser.y:512
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -1271,25 +1264,7 @@ Rubydefault:
 			}
 		}
 	case 116:
-		//line parser.y:518
-		{
-			RubyVAL.genericValue = ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Name: "+"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
-			}
-		}
-	case 117:
-		//line parser.y:526
-		{
-			RubyVAL.genericValue = ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Name: "+"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
-			}
-		}
-	case 118:
-		//line parser.y:535
+		//line parser.y:521
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -1297,8 +1272,8 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 119:
-		//line parser.y:544
+	case 117:
+		//line parser.y:530
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -1306,8 +1281,8 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 120:
-		//line parser.y:553
+	case 118:
+		//line parser.y:539
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -1315,8 +1290,8 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 121:
-		//line parser.y:562
+	case 119:
+		//line parser.y:548
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -1324,8 +1299,8 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 122:
-		//line parser.y:571
+	case 120:
+		//line parser.y:557
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -1333,161 +1308,161 @@ Rubydefault:
 				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 123:
-		//line parser.y:579
+	case 121:
+		//line parser.y:565
 		{
 			RubyVAL.genericValue = ast.Boolean{Value: true}
 		}
-	case 124:
-		//line parser.y:580
+	case 122:
+		//line parser.y:566
 		{
 			RubyVAL.genericValue = ast.Boolean{Value: false}
 		}
-	case 125:
-		//line parser.y:582
+	case 123:
+		//line parser.y:568
 		{
 			RubyVAL.genericValue = ast.Array{Nodes: RubyS[Rubypt-1].genericSlice}
+		}
+	case 124:
+		//line parser.y:570
+		{
+			RubyVAL.genericValue = ast.Array{Nodes: RubyS[Rubypt-1].genericSlice}
+		}
+	case 125:
+		//line parser.y:573
+		{
+			pairs := []ast.HashKeyValuePair{}
+			for _, node := range RubyS[Rubypt-2].genericSlice {
+				pairs = append(pairs, node.(ast.HashKeyValuePair))
+			}
+			RubyVAL.genericValue = ast.Hash{Pairs: pairs}
 		}
 	case 126:
-		//line parser.y:584
+		//line parser.y:581
 		{
-			RubyVAL.genericValue = ast.Array{Nodes: RubyS[Rubypt-1].genericSlice}
+			pairs := []ast.HashKeyValuePair{}
+			for _, node := range RubyS[Rubypt-2].genericSlice {
+				pairs = append(pairs, node.(ast.HashKeyValuePair))
+			}
+			RubyVAL.genericValue = ast.Hash{Pairs: pairs}
 		}
 	case 127:
-		//line parser.y:587
-		{
-			pairs := []ast.HashKeyValuePair{}
-			for _, node := range RubyS[Rubypt-2].genericSlice {
-				pairs = append(pairs, node.(ast.HashKeyValuePair))
-			}
-			RubyVAL.genericValue = ast.Hash{Pairs: pairs}
-		}
-	case 128:
-		//line parser.y:595
-		{
-			pairs := []ast.HashKeyValuePair{}
-			for _, node := range RubyS[Rubypt-2].genericSlice {
-				pairs = append(pairs, node.(ast.HashKeyValuePair))
-			}
-			RubyVAL.genericValue = ast.Hash{Pairs: pairs}
-		}
-	case 129:
-		//line parser.y:603
+		//line parser.y:589
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
+	case 128:
+		//line parser.y:591
+		{
+			if RubyS[Rubypt-2].operator != "=>" {
+				panic("FREAKOUT")
+			}
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{Key: RubyS[Rubypt-3].genericValue, Value: RubyS[Rubypt-1].genericValue})
+		}
+	case 129:
+		//line parser.y:598
+		{
+			if RubyS[Rubypt-2].operator != "=>" {
+				panic("FREAKOUT")
+			}
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{Key: RubyS[Rubypt-3].genericValue, Value: RubyS[Rubypt-1].genericValue})
+		}
 	case 130:
 		//line parser.y:605
-		{
-			if RubyS[Rubypt-2].operator != "=>" {
-				panic("FREAKOUT")
-			}
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{Key: RubyS[Rubypt-3].genericValue, Value: RubyS[Rubypt-1].genericValue})
-		}
-	case 131:
-		//line parser.y:612
-		{
-			if RubyS[Rubypt-2].operator != "=>" {
-				panic("FREAKOUT")
-			}
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{Key: RubyS[Rubypt-3].genericValue, Value: RubyS[Rubypt-1].genericValue})
-		}
-	case 132:
-		//line parser.y:619
 		{
 			if RubyS[Rubypt-3].operator != "=>" {
 				panic("FREAKOUT")
 			}
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{Key: RubyS[Rubypt-4].genericValue, Value: RubyS[Rubypt-2].genericValue})
 		}
+	case 131:
+		//line parser.y:613
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
+				Key:   ast.Symbol{Name: RubyS[Rubypt-2].genericValue.(ast.BareReference).Name},
+				Value: RubyS[Rubypt-0].genericValue,
+			})
+		}
+	case 132:
+		//line parser.y:620
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
+				Key:   ast.Symbol{Name: RubyS[Rubypt-2].genericValue.(ast.BareReference).Name},
+				Value: RubyS[Rubypt-0].genericValue,
+			})
+		}
 	case 133:
 		//line parser.y:627
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
-				Key:   ast.Symbol{Name: RubyS[Rubypt-2].genericValue.(ast.BareReference).Name},
-				Value: RubyS[Rubypt-0].genericValue,
-			})
-		}
-	case 134:
-		//line parser.y:634
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
-				Key:   ast.Symbol{Name: RubyS[Rubypt-2].genericValue.(ast.BareReference).Name},
-				Value: RubyS[Rubypt-0].genericValue,
-			})
-		}
-	case 135:
-		//line parser.y:641
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
 				Key:   ast.Symbol{Name: RubyS[Rubypt-3].genericValue.(ast.BareReference).Name},
 				Value: RubyS[Rubypt-1].genericValue,
 			})
 		}
-	case 136:
-		//line parser.y:648
+	case 134:
+		//line parser.y:634
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
 				Key:   ast.Symbol{Name: RubyS[Rubypt-4].genericValue.(ast.BareReference).Name},
 				Value: RubyS[Rubypt-2].genericValue,
 			})
 		}
-	case 137:
-		//line parser.y:656
+	case 135:
+		//line parser.y:642
 		{
 			RubyVAL.genericValue = ast.Block{Body: RubyS[Rubypt-1].genericSlice}
+		}
+	case 136:
+		//line parser.y:644
+		{
+			RubyVAL.genericValue = ast.Block{
+				Body: RubyS[Rubypt-1].genericSlice,
+				Args: RubyS[Rubypt-2].genericSlice,
+			}
+		}
+	case 137:
+		//line parser.y:651
+		{
+			RubyVAL.genericValue = ast.Block{
+				Body: RubyS[Rubypt-1].genericSlice,
+				Args: RubyS[Rubypt-2].genericSlice,
+			}
 		}
 	case 138:
 		//line parser.y:658
 		{
-			RubyVAL.genericValue = ast.Block{
-				Body: RubyS[Rubypt-1].genericSlice,
-				Args: RubyS[Rubypt-2].genericSlice,
-			}
-		}
-	case 139:
-		//line parser.y:665
-		{
-			RubyVAL.genericValue = ast.Block{
-				Body: RubyS[Rubypt-1].genericSlice,
-				Args: RubyS[Rubypt-2].genericSlice,
-			}
-		}
-	case 140:
-		//line parser.y:672
-		{
 			RubyVAL.genericValue = ast.Block{Body: RubyS[Rubypt-1].genericSlice}
 		}
-	case 141:
-		//line parser.y:675
+	case 139:
+		//line parser.y:661
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
 		}
-	case 142:
-		//line parser.y:677
+	case 140:
+		//line parser.y:663
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
+	case 141:
+		//line parser.y:665
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 142:
+		//line parser.y:667
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
 	case 143:
-		//line parser.y:679
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
-	case 144:
-		//line parser.y:681
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
-	case 145:
-		//line parser.y:684
+		//line parser.y:670
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Condition: RubyS[Rubypt-2].genericValue,
 				Body:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 146:
-		//line parser.y:691
+	case 144:
+		//line parser.y:677
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Condition: RubyS[Rubypt-3].genericValue,
@@ -1495,11 +1470,27 @@ Rubydefault:
 				Else:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
+	case 145:
+		//line parser.y:685
+		{
+			RubyVAL.genericValue = ast.IfBlock{
+				Condition: RubyS[Rubypt-0].genericValue,
+				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+			}
+		}
+	case 146:
+		//line parser.y:692
+		{
+			RubyVAL.genericValue = ast.IfBlock{
+				Condition: RubyS[Rubypt-0].genericValue,
+				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+			}
+		}
 	case 147:
 		//line parser.y:699
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Condition: RubyS[Rubypt-0].genericValue,
+				Condition: ast.Negation{Target: RubyS[Rubypt-0].genericValue},
 				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
 			}
 		}
@@ -1507,38 +1498,38 @@ Rubydefault:
 		//line parser.y:706
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Condition: RubyS[Rubypt-0].genericValue,
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+				Condition: ast.Negation{Target: RubyS[Rubypt-0].genericValue},
+				Body:      ast.Nodes{RubyS[Rubypt-2].genericValue},
 			}
 		}
 	case 149:
 		//line parser.y:713
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Condition: ast.Negation{Target: RubyS[Rubypt-0].genericValue},
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+				Condition: ast.Negation{Target: RubyS[Rubypt-2].genericValue},
+				Body:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
 	case 150:
 		//line parser.y:720
 		{
-			RubyVAL.genericValue = ast.IfBlock{
-				Condition: ast.Negation{Target: RubyS[Rubypt-0].genericValue},
-				Body:      ast.Nodes{RubyS[Rubypt-2].genericValue},
-			}
+			RubyVAL.genericSlice = []ast.Node{}
 		}
 	case 151:
-		//line parser.y:727
+		//line parser.y:722
 		{
-			RubyVAL.genericValue = ast.IfBlock{
-				Condition: ast.Negation{Target: RubyS[Rubypt-2].genericValue},
-				Body:      RubyS[Rubypt-1].genericSlice,
-			}
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
+				Condition: RubyS[Rubypt-1].genericValue,
+				Body:      RubyS[Rubypt-0].genericSlice,
+			})
 		}
 	case 152:
-		//line parser.y:734
+		//line parser.y:729
 		{
-			RubyVAL.genericSlice = []ast.Node{}
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
+				Condition: ast.Boolean{Value: true},
+				Body:      RubyS[Rubypt-0].genericSlice,
+			})
 		}
 	case 153:
 		//line parser.y:736
@@ -1559,57 +1550,41 @@ Rubydefault:
 	case 155:
 		//line parser.y:750
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Condition: RubyS[Rubypt-1].genericValue,
-				Body:      RubyS[Rubypt-0].genericSlice,
-			})
 		}
 	case 156:
-		//line parser.y:757
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Condition: ast.Boolean{Value: true},
-				Body:      RubyS[Rubypt-0].genericSlice,
-			})
-		}
-	case 157:
-		//line parser.y:764
-		{
-		}
-	case 158:
-		//line parser.y:765
+		//line parser.y:751
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
-	case 159:
-		//line parser.y:766
+	case 157:
+		//line parser.y:752
 		{
 		}
-	case 160:
-		//line parser.y:769
+	case 158:
+		//line parser.y:755
 		{
 			RubyVAL.genericValue = ast.Group{Body: RubyS[Rubypt-1].genericSlice}
 		}
-	case 161:
-		//line parser.y:772
+	case 159:
+		//line parser.y:758
 		{
 			RubyVAL.genericValue = ast.Begin{
 				Body:   RubyS[Rubypt-2].genericSlice,
 				Rescue: RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 162:
-		//line parser.y:780
+	case 160:
+		//line parser.y:766
 		{
 			RubyVAL.genericSlice = []ast.Node{}
 		}
-	case 163:
-		//line parser.y:782
+	case 161:
+		//line parser.y:768
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.Rescue{Body: RubyS[Rubypt-0].genericSlice})
 		}
-	case 164:
-		//line parser.y:784
+	case 162:
+		//line parser.y:770
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.Rescue{
 				Body: RubyS[Rubypt-0].genericSlice,
@@ -1618,8 +1593,8 @@ Rubydefault:
 				},
 			})
 		}
-	case 165:
-		//line parser.y:793
+	case 163:
+		//line parser.y:779
 		{
 			if RubyS[Rubypt-2].operator != "=>" {
 				panic("FREAKOUT")
