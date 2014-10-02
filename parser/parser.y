@@ -224,6 +224,13 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Func: $3.(ast.BareReference),
     };
   }
+| call_expression DOT REF
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+    };
+  }
 | single_node DOT REF nodes_with_commas_and_optional_block
   {
     $$ = ast.CallExpression{

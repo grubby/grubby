@@ -238,6 +238,30 @@ FOO
 				})
 			})
 
+			Context("chained together with dots and parentheses", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("SpecVersion.new(String(other)).to_i")
+				})
+
+				It("is parsed as a nested call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.CallExpression{
+								Target: ast.BareReference{Name: "SpecVersion"},
+								Func:   ast.BareReference{Name: "new"},
+								Args: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "String"},
+										Args: []ast.Node{ast.BareReference{Name: "other"}},
+									},
+								},
+							},
+							Func: ast.BareReference{Name: "to_i"},
+						},
+					}))
+				})
+			})
+
 			Context("with an expression wrapped in parentheses", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`('hello %s world' % ['cruel']).inspect`)
