@@ -488,7 +488,7 @@ ARGV.shift
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
 def <=>
-  0
+  self.to_i <=> other
 end
 `)
 				})
@@ -499,7 +499,14 @@ end
 							Name: ast.BareReference{Name: "<=>"},
 							Args: []ast.Node{},
 							Body: []ast.Node{
-								ast.ConstantInt{Value: 0},
+								ast.CallExpression{
+									Target: ast.CallExpression{
+										Target: ast.BareReference{Name: "self"},
+										Func:   ast.BareReference{Name: "to_i"},
+									},
+									Func: ast.BareReference{Name: "<=>"},
+									Args: []ast.Node{ast.BareReference{Name: "other"}},
+								},
 							},
 						},
 					}))

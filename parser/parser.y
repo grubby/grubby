@@ -272,6 +272,14 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
+| call_expression OPERATOR single_node
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: $2},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
 
 // hash / array retrieval at index
 | REF LBRACKET single_node RBRACKET
