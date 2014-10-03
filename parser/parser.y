@@ -731,6 +731,13 @@ if_block : IF expr list END
       Body: ast.Nodes{$1},
     }
   }
+| assignment UNLESS expr
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $3},
+      Body: ast.Nodes{$1},
+    }
+  }
 | UNLESS single_node list END
   {
     $$ = ast.IfBlock{

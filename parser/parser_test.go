@@ -1409,6 +1409,45 @@ end
 					}))
 				})
 			})
+
+			Context("inside another unless", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+unless @zomg
+  no_wai = 9999 unless yes_wai
+  yes_wai = 9999 unless no_wai
+end
+`)
+				})
+
+				It("is parsed as a nested IfBlock", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.IfBlock{
+							Condition: ast.Negation{Target: ast.InstanceVariable{Name: "zomg"}},
+							Body: []ast.Node{
+								ast.IfBlock{
+									Condition: ast.Negation{Target: ast.BareReference{Name: "yes_wai"}},
+									Body: []ast.Node{
+										ast.Assignment{
+											LHS: ast.BareReference{Name: "no_wai"},
+											RHS: ast.ConstantInt{Value: 9999},
+										},
+									},
+								},
+								ast.IfBlock{
+									Condition: ast.Negation{Target: ast.BareReference{Name: "no_wai"}},
+									Body: []ast.Node{
+										ast.Assignment{
+											LHS: ast.BareReference{Name: "yes_wai"},
+											RHS: ast.ConstantInt{Value: 9999},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("if else blocks", func() {
