@@ -261,13 +261,18 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			var method builtins.Method
 			callExpr := statement.(ast.CallExpression)
 
-			var target builtins.Value
+			var (
+				target           builtins.Value
+				usePrivateMethod bool
+			)
+
 			if callExpr.Target != nil {
 				target, returnErr = vm.executeWithContext(ast.Nodes{callExpr.Target}, context)
 				if returnErr != nil {
 					return nil, returnErr
 				}
 			} else {
+				usePrivateMethod = true
 				target = context
 			}
 
@@ -275,7 +280,11 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 				nilValue := vm.CurrentClasses["Nil"].New()
 				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
 			}
+
 			method, err := target.Method(callExpr.Func.Name)
+			if err != nil && usePrivateMethod {
+				method, err = target.PrivateMethod(callExpr.Func.Name)
+			}
 
 			if err != nil {
 				fmt.Printf("name error with target %#v\n", target)

@@ -48,8 +48,9 @@ end`)
 		})
 
 		// FIXME: to fix this, methods should know about
-		// * super class methods (ideally the entire chain)
+		// * superclass methods (ideally the entire chain)
 		// * included modules
+		// * extended modules
 		// (((   and Object needs to "include" Kernel   )))
 		PIt("is also available in Object", func() {
 			object, err := vm.Get("Object")
