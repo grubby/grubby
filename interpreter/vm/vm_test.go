@@ -319,4 +319,22 @@ foo = 0
 			Expect(value).To(Equal(builtins.NewInt(1)))
 		})
 	})
+
+	Describe("defining a class", func() {
+		It("makes it available to create an instance of it", func() {
+			_, err := vm.Run(`
+class Foo
+end
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+
+			classNames := []string{}
+			for _, class := range vm.Classes() {
+				classNames = append(classNames, class.String())
+			}
+
+			Expect(classNames).To(ContainElement("Foo"))
+		})
+	})
 })

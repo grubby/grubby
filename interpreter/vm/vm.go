@@ -105,7 +105,8 @@ func NewVM(name string) VM {
 
 func (vm *vm) registerClasses() {
 	vm.CurrentClasses = map[string]builtins.Class{
-		"Array":   builtins.NewArrayClass().(builtins.Class),
+		"Class":   builtins.NewClassValue(),
+		"Array":   builtins.NewArrayClass(),
 		"Object":  builtins.NewGlobalObjectClass(),
 		"Process": builtins.NewProcessClass(),
 		"True":    builtins.NewTrueClass(),
@@ -209,6 +210,10 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			} else {
 				returnValue, returnErr = vm.executeWithContext(ifBlock.Else, context)
 			}
+		case ast.ClassDecl:
+			classNode := statement.(ast.ClassDecl)
+			vm.CurrentClasses[classNode.Name] = builtins.NewUserDefinedClass(classNode.Name)
+			return nil, nil
 		case ast.FuncDecl:
 			// FIXME: assumes for now this will only ever be at the top level
 			// it seems like this should be replaced with context, but that's really context for calling methods, not

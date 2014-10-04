@@ -4,9 +4,9 @@ type ArrayClass struct {
 	valueStub
 }
 
-func NewArrayClass() Value {
+func NewArrayClass() Class {
 	a := &ArrayClass{}
-	a.class = NewClassValue().(Class)
+	a.class = NewClassValue()
 	a.initialize()
 	return a
 }
