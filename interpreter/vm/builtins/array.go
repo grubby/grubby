@@ -44,6 +44,10 @@ func (klass *ArrayClass) New(args ...Value) Value {
 	return a
 }
 
+func (array *ArrayClass) Name() string {
+	return "Array"
+}
+
 func (array *ArrayClass) String() string {
 	return "Array"
 }

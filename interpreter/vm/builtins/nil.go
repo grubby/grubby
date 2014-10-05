@@ -15,6 +15,10 @@ func (n *NilClass) String() string {
 	return "NilClass"
 }
 
+func (n *NilClass) Name() string {
+	return "NilClass"
+}
+
 type nilInstance struct {
 	valueStub
 }

@@ -11,6 +11,14 @@ func NewStringClass() Class {
 	return s
 }
 
+func (c *StringClass) String() string {
+	return "String"
+}
+
+func (c *StringClass) Name() string {
+	return "String"
+}
+
 func (class *StringClass) New(args ...Value) Value {
 	str := &StringValue{}
 	str.initialize()

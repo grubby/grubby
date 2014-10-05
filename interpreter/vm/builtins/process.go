@@ -11,6 +11,14 @@ func NewProcessClass() Class {
 	return f
 }
 
+func (c *processClass) String() string {
+	return "Process"
+}
+
+func (c *processClass) Name() string {
+	return "Process"
+}
+
 type processValue struct {
 	valueStub
 }

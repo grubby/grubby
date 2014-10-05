@@ -50,7 +50,6 @@ func NewVM(name string) VM {
 
 	objectClass := vm.CurrentClasses["Object"]
 	vm.ObjectSpace["Object"] = objectClass
-	vm.ObjectSpace["Kernel"] = builtins.NewGlobalKernelClass()
 	vm.ObjectSpace["File"] = builtins.NewFileClass()
 	vm.ObjectSpace["ARGV"] = vm.CurrentClasses["Array"].New()
 
@@ -112,6 +111,7 @@ func (vm *vm) registerClasses() {
 		"True":    builtins.NewTrueClass(),
 		"False":   builtins.NewFalseClass(),
 		"Nil":     builtins.NewNilClass(),
+		"Kernel":  builtins.NewGlobalKernelClass(),
 	}
 }
 
@@ -212,18 +212,28 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 		case ast.ClassDecl:
 			classNode := statement.(ast.ClassDecl)
-			vm.CurrentClasses[classNode.Name] = builtins.NewUserDefinedClass(classNode.Name)
-			return nil, nil
+			theClass := builtins.NewUserDefinedClass(classNode.Name)
+			vm.CurrentClasses[classNode.Name] = theClass
+
+			_, err := vm.executeWithContext(classNode.Body, theClass)
+			if err != nil {
+				returnErr = err
+			}
+
 		case ast.FuncDecl:
-			// FIXME: assumes for now this will only ever be at the top level
-			// it seems like this should be replaced with context, but that's really context for calling methods, not
-			// necessarily for defining new methods
 			funcNode := statement.(ast.FuncDecl)
 			method := builtins.NewMethod(funcNode.Name.Name, func(args ...builtins.Value) (builtins.Value, error) {
-				return nil, nil
+				// FIXME: should conditionally assert on number of args
+				return vm.executeWithContext(funcNode.Body, context)
 			})
 			returnValue = method
-			vm.ObjectSpace["Kernel"].AddPrivateMethod(method)
+
+			if context == vm.ObjectSpace["main"] {
+				vm.CurrentClasses["Kernel"].AddPrivateMethod(method)
+			} else {
+				context.AddMethod(method)
+			}
+
 		case ast.SimpleString:
 			returnValue = builtins.NewString(statement.(ast.SimpleString).Value)
 		case ast.InterpolatedString:

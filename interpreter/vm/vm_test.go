@@ -40,7 +40,7 @@ end`)
 		})
 
 		It("creates a private method on Kernel", func() {
-			kernel := vm.MustGet("Kernel")
+			kernel := vm.Classes()["Kernel"]
 			method, err := kernel.PrivateMethod("foo")
 
 			Expect(err).ToNot(HaveOccurred())
@@ -178,7 +178,7 @@ end`)
 				_, err := vm.Run("require 'foo'")
 				Expect(err).ToNot(HaveOccurred())
 
-				kernel := vm.MustGet("Kernel")
+				kernel := vm.Classes()["Kernel"]
 				method, err := kernel.PrivateMethod("foo")
 
 				Expect(err).ToNot(HaveOccurred())
@@ -337,5 +337,38 @@ end
 
 			Expect(classNames).To(ContainElement("Foo"))
 		})
+	})
+
+	It("adds instance methods", func() {
+		_, err := vm.Run(`
+class Foo
+  def hello
+    "world"
+  end
+end
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+
+		var fooClass builtins.Class
+		for _, class := range vm.Classes() {
+			if class.Name() == "Foo" {
+				fooClass = class
+				break
+			}
+		}
+
+		Expect(fooClass).ToNot(BeNil())
+
+		fooInstance := fooClass.New()
+		Expect(fooInstance).ToNot(BeNil())
+
+		method, err := fooInstance.Method("hello")
+		Expect(err).ToNot(HaveOccurred())
+
+		val, err := method.Execute()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
+		Expect(val.String()).To(Equal("world"))
 	})
 })

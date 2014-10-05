@@ -15,6 +15,10 @@ func (obj *trueClass) String() string {
 	return "True"
 }
 
+func (obj *trueClass) Name() string {
+	return "True"
+}
+
 type true struct {
 	valueStub
 }
@@ -39,6 +43,10 @@ func NewFalseClass() Class {
 }
 
 func (obj *falseClass) String() string {
+	return "False"
+}
+
+func (obj *falseClass) Name() string {
 	return "False"
 }
 

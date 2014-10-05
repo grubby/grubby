@@ -15,6 +15,10 @@ func (obj *objectClass) String() string {
 	return "Object"
 }
 
+func (obj *objectClass) Name() string {
+	return "Object"
+}
+
 type object struct {
 	valueStub
 }
