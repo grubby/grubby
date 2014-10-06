@@ -2,6 +2,7 @@ package builtins
 
 type kernel struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewGlobalKernelClass() Class {
@@ -21,4 +22,8 @@ func (kernel *kernel) Name() string {
 
 func (kernel *kernel) New(args ...Value) Value {
 	return nil
+}
+
+func (kernel *kernel) AddInstanceMethod(m Method) {
+	kernel.instanceMethods = append(kernel.instanceMethods, m)
 }

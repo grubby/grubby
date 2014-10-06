@@ -2,6 +2,7 @@ package builtins
 
 type trueClass struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewTrueClass() Class {
@@ -11,11 +12,15 @@ func NewTrueClass() Class {
 	return o
 }
 
-func (obj *trueClass) String() string {
+func (t *trueClass) AddInstanceMethod(m Method) {
+	t.instanceMethods = append(t.instanceMethods, m)
+}
+
+func (t *trueClass) String() string {
 	return "True"
 }
 
-func (obj *trueClass) Name() string {
+func (t *trueClass) Name() string {
 	return "True"
 }
 
@@ -33,6 +38,7 @@ func (obj *trueClass) New(args ...Value) Value {
 
 type falseClass struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewFalseClass() Class {
@@ -42,11 +48,15 @@ func NewFalseClass() Class {
 	return o
 }
 
-func (obj *falseClass) String() string {
+func (f *falseClass) AddInstanceMethod(m Method) {
+	f.instanceMethods = append(f.instanceMethods, m)
+}
+
+func (f *falseClass) String() string {
 	return "False"
 }
 
-func (obj *falseClass) Name() string {
+func (f *falseClass) Name() string {
 	return "False"
 }
 

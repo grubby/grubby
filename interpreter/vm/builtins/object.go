@@ -2,6 +2,7 @@ package builtins
 
 type objectClass struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewGlobalObjectClass() Class {
@@ -17,6 +18,10 @@ func (obj *objectClass) String() string {
 
 func (obj *objectClass) Name() string {
 	return "Object"
+}
+
+func (obj *objectClass) AddInstanceMethod(method Method) {
+	obj.instanceMethods = append(obj.instanceMethods, method)
 }
 
 type object struct {

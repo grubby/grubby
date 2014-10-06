@@ -18,6 +18,7 @@ type vm struct {
 	CurrentGlobals  map[string]builtins.Value
 	CurrentSymbols  map[string]builtins.Value
 	CurrentClasses  map[string]builtins.Class
+	CurrentModules  map[string]builtins.Module
 
 	stack *CallStack
 }
@@ -26,6 +27,9 @@ type VM interface {
 	Run(string) (builtins.Value, error)
 	Get(string) (builtins.Value, error)
 	MustGet(string) builtins.Value
+
+	GetClass(string) (builtins.Class, error)
+	MustGetClass(string) builtins.Class
 
 	Set(string, builtins.Value)
 
@@ -41,6 +45,7 @@ func NewVM(name string) VM {
 		CurrentGlobals:  make(map[string]builtins.Value),
 		ObjectSpace:     make(map[string]builtins.Value),
 		CurrentSymbols:  make(map[string]builtins.Value),
+		CurrentModules:  make(map[string]builtins.Module),
 	}
 	vm.registerClasses()
 
@@ -143,6 +148,26 @@ func (vm *vm) Get(key string) (builtins.Value, error) {
 	return nil, errors.New(fmt.Sprintf("'%s' is undefined", key))
 }
 
+func (vm *vm) GetClass(name string) (builtins.Class, error) {
+	for _, class := range vm.CurrentClasses {
+		if class.Name() == name {
+			return class, nil
+		}
+	}
+
+	return nil, errors.New(fmt.Sprintf("Class '%s' not found", name))
+}
+
+func (vm *vm) MustGetClass(name string) builtins.Class {
+	for _, class := range vm.CurrentClasses {
+		if class.Name() == name {
+			return class
+		}
+	}
+
+	panic(fmt.Sprintf("class '%s' requested, but does not exist", name))
+}
+
 func (vm *vm) Set(key string, value builtins.Value) {
 	vm.ObjectSpace[key] = value
 }
@@ -210,6 +235,16 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			} else {
 				returnValue, returnErr = vm.executeWithContext(ifBlock.Else, context)
 			}
+		case ast.ModuleDecl:
+			moduleNode := statement.(ast.ModuleDecl)
+			theModule := builtins.NewUserDefinedModule(moduleNode.Name)
+			vm.CurrentModules[moduleNode.Name] = theModule
+
+			_, err := vm.executeWithContext(moduleNode.Body, theModule)
+			if err != nil {
+				returnErr = err
+			}
+
 		case ast.ClassDecl:
 			classNode := statement.(ast.ClassDecl)
 			theClass := builtins.NewUserDefinedClass(classNode.Name)
@@ -231,7 +266,14 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			if context == vm.ObjectSpace["main"] {
 				vm.CurrentClasses["Kernel"].AddPrivateMethod(method)
 			} else {
-				context.AddMethod(method)
+				switch context.(type) {
+				case builtins.Class:
+					context.(builtins.Class).AddInstanceMethod(method)
+				case builtins.Module:
+					context.(builtins.Module).AddInstanceMethod(method)
+				default:
+					panic(fmt.Sprintf("unknown type of context: %#T", context))
+				}
 			}
 
 		case ast.SimpleString:
@@ -265,7 +307,17 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			if ok {
 				returnValue = maybe
 			} else {
-				returnErr = builtins.NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+				maybe, ok := vm.CurrentClasses[name]
+				if ok {
+					returnValue = maybe
+				} else {
+					maybe, ok := vm.CurrentModules[name]
+					if ok {
+						returnValue = maybe
+					} else {
+						returnErr = builtins.NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+					}
+				}
 			}
 		case ast.CallExpression:
 			var method builtins.Method
@@ -297,7 +349,6 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 
 			if err != nil {
-				fmt.Printf("name error with target %#v\n", target)
 				err := builtins.NewNameError(callExpr.Func.Name, target.String(), target.Class().String(), vm.stack.String())
 				return nil, err
 			}

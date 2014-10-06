@@ -2,6 +2,7 @@ package builtins
 
 type ArrayClass struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewArrayClass() Class {
@@ -9,6 +10,10 @@ func NewArrayClass() Class {
 	a.class = NewClassValue()
 	a.initialize()
 	return a
+}
+
+func (klass *ArrayClass) AddInstanceMethod(m Method) {
+	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
 func (klass *ArrayClass) New(args ...Value) Value {

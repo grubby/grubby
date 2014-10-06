@@ -322,7 +322,7 @@ foo = 0
 	})
 
 	Describe("defining a class", func() {
-		It("makes it available to create an instance of it", func() {
+		It("is available to create an instance of", func() {
 			_, err := vm.Run(`
 class Foo
 end
@@ -337,10 +337,10 @@ end
 
 			Expect(classNames).To(ContainElement("Foo"))
 		})
-	})
 
-	It("adds instance methods", func() {
-		_, err := vm.Run(`
+		Context("when there are instance methods defined", func() {
+			It("makes instance methods available on new instances of the class", func() {
+				_, err := vm.Run(`
 class Foo
   def hello
     "world"
@@ -348,27 +348,49 @@ class Foo
 end
 `)
 
-		Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
 
-		var fooClass builtins.Class
-		for _, class := range vm.Classes() {
-			if class.Name() == "Foo" {
-				fooClass = class
-				break
-			}
-		}
+				fooClass, err := vm.GetClass("Foo")
+				Expect(fooClass).ToNot(BeNil())
 
-		Expect(fooClass).ToNot(BeNil())
+				fooInstance := fooClass.New()
+				Expect(fooInstance).ToNot(BeNil())
 
-		fooInstance := fooClass.New()
-		Expect(fooInstance).ToNot(BeNil())
+				method, err := fooInstance.Method("hello")
+				Expect(err).ToNot(HaveOccurred())
 
-		method, err := fooInstance.Method("hello")
-		Expect(err).ToNot(HaveOccurred())
+				val, err := method.Execute()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
+				Expect(val.String()).To(Equal("world"))
+			})
+		})
+	})
 
-		val, err := method.Execute()
-		Expect(err).ToNot(HaveOccurred())
-		Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
-		Expect(val.String()).To(Equal("world"))
+	Context("when it includes a module", func() {
+		It("makes the modules methods available on its instances", func() {
+			_, err := vm.Run(`
+module Foo
+  def superinquisitive
+    "tumescent-wasty"
+  end
+end
+
+class Bar
+  include Foo
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+
+			barClass := vm.MustGetClass("Bar")
+			bar := barClass.New()
+
+			method, err := bar.Method("superinquisitive")
+			Expect(err).ToNot(HaveOccurred())
+
+			val, err := method.Execute()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val.String()).To(Equal("tumescent-wasty"))
+		})
 	})
 })

@@ -2,6 +2,7 @@ package builtins
 
 type processClass struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewProcessClass() Class {
@@ -17,6 +18,10 @@ func (c *processClass) String() string {
 
 func (c *processClass) Name() string {
 	return "Process"
+}
+
+func (c *processClass) AddInstanceMethod(method Method) {
+	c.instanceMethods = append(c.instanceMethods, method)
 }
 
 type processValue struct {

@@ -2,6 +2,7 @@ package builtins
 
 type NilClass struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewNilClass() Class {
@@ -17,6 +18,10 @@ func (n *NilClass) String() string {
 
 func (n *NilClass) Name() string {
 	return "NilClass"
+}
+
+func (n *NilClass) AddInstanceMethod(method Method) {
+	n.instanceMethods = append(n.instanceMethods, method)
 }
 
 type nilInstance struct {

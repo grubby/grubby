@@ -2,6 +2,7 @@ package builtins
 
 type StringClass struct {
 	valueStub
+	instanceMethods []Method
 }
 
 func NewStringClass() Class {
@@ -29,6 +30,10 @@ func (class *StringClass) New(args ...Value) Value {
 	}))
 
 	return str
+}
+
+func (class *StringClass) AddInstanceMethod(method Method) {
+	class.instanceMethods = append(class.instanceMethods, method)
 }
 
 type StringValue struct {
