@@ -322,20 +322,30 @@ foo = 0
 	})
 
 	Describe("defining a class", func() {
-		It("is available to create an instance of", func() {
+		It("adds it to the global class cache", func() {
 			_, err := vm.Run(`
 class Foo
 end
 `)
 
 			Expect(err).ToNot(HaveOccurred())
+			_, err = vm.GetClass("Foo")
+			Expect(err).ToNot(HaveOccurred())
+		})
 
-			classNames := []string{}
-			for _, class := range vm.Classes() {
-				classNames = append(classNames, class.String())
-			}
+		It("allows a user to construct an instance of the class", func() {
+			_, err := vm.Run(`
+class Foo
+end
+`)
 
-			Expect(classNames).To(ContainElement("Foo"))
+			fooClass := vm.MustGetClass("Foo")
+			method, err := fooClass.Method("new")
+			Expect(err).ToNot(HaveOccurred())
+
+			instance, err := method.Execute(fooClass)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(instance.Class()).To(Equal(fooClass))
 		})
 
 		Context("when there are instance methods defined", func() {

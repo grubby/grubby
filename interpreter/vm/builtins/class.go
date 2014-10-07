@@ -67,6 +67,15 @@ func NewUserDefinedClass(name string) Class {
 
 		return c, nil
 	}))
+	c.AddMethod(NewMethod("new", func(self Value, args ...Value) (Value, error) {
+		instance := c.New(args...)
+		method, err := instance.Method("initialize")
+		if err == nil {
+			method.Execute(instance, args...)
+		}
+
+		return instance, nil
+	}))
 
 	return c
 }
@@ -99,4 +108,8 @@ func (c UserDefinedClass) String() string {
 
 func (c *UserDefinedClass) AddInstanceMethod(m Method) {
 	c.instanceMethods[m.Name()] = m
+}
+
+func (c *UserDefinedClass) Class() Class {
+	return c.class
 }
