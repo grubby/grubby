@@ -44,7 +44,7 @@ func (c *ModuleClass) InstanceMethods() []Method {
 }
 
 // user defined module type
-type UserDefinedModule struct {
+type RubyModule struct {
 	name string
 	valueStub
 
@@ -52,8 +52,8 @@ type UserDefinedModule struct {
 	instanceMethods []Method
 }
 
-func NewUserDefinedModule(name string) Module {
-	c := &UserDefinedModule{
+func NewModule(name string) Module {
+	c := &RubyModule{
 		name:            name,
 		includedModules: make([]Value, 0),
 		instanceMethods: make([]Method, 0),
@@ -71,14 +71,14 @@ func NewUserDefinedModule(name string) Module {
 	return c
 }
 
-func (m UserDefinedModule) Name() string {
+func (m RubyModule) Name() string {
 	return m.name
 }
 
-func (m *UserDefinedModule) AddInstanceMethod(method Method) {
+func (m *RubyModule) AddInstanceMethod(method Method) {
 	m.instanceMethods = append(m.instanceMethods, method)
 }
 
-func (m *UserDefinedModule) InstanceMethods() []Method {
+func (m *RubyModule) InstanceMethods() []Method {
 	return m.instanceMethods
 }

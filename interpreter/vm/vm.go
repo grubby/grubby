@@ -237,7 +237,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 		case ast.ModuleDecl:
 			moduleNode := statement.(ast.ModuleDecl)
-			theModule := builtins.NewUserDefinedModule(moduleNode.Name)
+			theModule := builtins.NewModule(moduleNode.Name)
 			vm.CurrentModules[moduleNode.Name] = theModule
 
 			_, err := vm.executeWithContext(moduleNode.Body, theModule)
