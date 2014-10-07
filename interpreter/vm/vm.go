@@ -47,7 +47,8 @@ func NewVM(name string) VM {
 		CurrentSymbols:  make(map[string]builtins.Value),
 		CurrentModules:  make(map[string]builtins.Module),
 	}
-	vm.registerClasses()
+	vm.registerBuiltinClasses()
+	vm.registerBuiltinModules()
 
 	loadPath := vm.CurrentClasses["Array"].New()
 	vm.CurrentGlobals["LOAD_PATH"] = loadPath
@@ -107,7 +108,11 @@ func NewVM(name string) VM {
 	return vm
 }
 
-func (vm *vm) registerClasses() {
+func (vm *vm) registerBuiltinModules() {
+	vm.CurrentModules["Comparable"] = builtins.NewComparableModule()
+}
+
+func (vm *vm) registerBuiltinClasses() {
 	vm.CurrentClasses = map[string]builtins.Class{
 		"Class":   builtins.NewClassValue(),
 		"Array":   builtins.NewArrayClass(),
