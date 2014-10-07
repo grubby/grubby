@@ -60,10 +60,10 @@ func NewVM(name string) VM {
 	vm.ObjectSpace["ARGV"] = vm.CurrentClasses["Array"].New()
 
 	main := objectClass.New()
-	main.AddMethod(builtins.NewMethod("to_s", func(args ...builtins.Value) (builtins.Value, error) {
+	main.AddMethod(builtins.NewMethod("to_s", func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 		return builtins.NewString("main"), nil
 	}))
-	main.AddMethod(builtins.NewMethod("require", func(args ...builtins.Value) (builtins.Value, error) {
+	main.AddMethod(builtins.NewMethod("require", func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 		fileName := args[0].(*builtins.StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
@@ -95,7 +95,7 @@ func NewVM(name string) VM {
 		errorMessage := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
 		return nil, builtins.NewLoadError(errorMessage, vm.stack.String())
 	}))
-	main.AddMethod(builtins.NewMethod("puts", func(args ...builtins.Value) (builtins.Value, error) {
+	main.AddMethod(builtins.NewMethod("puts", func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 		for _, arg := range args {
 			os.Stdout.Write([]byte(arg.String() + "\n"))
 		}
@@ -262,7 +262,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 
 		case ast.FuncDecl:
 			funcNode := statement.(ast.FuncDecl)
-			method := builtins.NewMethod(funcNode.Name.Name, func(args ...builtins.Value) (builtins.Value, error) {
+			method := builtins.NewMethod(funcNode.Name.Name, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 				// FIXME: should conditionally assert on number of args
 				return vm.executeWithContext(funcNode.Body, context)
 			})
@@ -371,7 +371,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			vm.stack.Unshift(method.Name())
 			defer vm.stack.Shift()
 
-			returnValue, returnErr = method.Execute(args...)
+			returnValue, returnErr = method.Execute(target, args...)
 			if returnErr != nil {
 				return returnValue, returnErr
 			}

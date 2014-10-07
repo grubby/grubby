@@ -13,7 +13,7 @@ func NewFileClass() Value {
 	f := &fileClass{}
 	f.initialize()
 	f.class = NewClassValue() // FIXME: this should be a global reference
-	f.AddMethod(NewMethod("expand_path", func(args ...Value) (Value, error) {
+	f.AddMethod(NewMethod("expand_path", func(self Value, args ...Value) (Value, error) {
 		arg1 := args[0].(*StringValue).String()
 
 		if arg1[0] == '~' {
@@ -30,7 +30,7 @@ func NewFileClass() Value {
 		return NewString(path), nil
 	}))
 
-	f.AddMethod(NewMethod("dirname", func(args ...Value) (Value, error) {
+	f.AddMethod(NewMethod("dirname", func(self Value, args ...Value) (Value, error) {
 		filename := args[0].(*StringValue).String()
 
 		return NewString(filepath.Base(filename)), nil

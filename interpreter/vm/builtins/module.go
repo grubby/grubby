@@ -60,7 +60,7 @@ func NewModule(name string) Module {
 	}
 	c.initialize()
 	c.class = NewModuleClass() // FIXME: should only be one in existence
-	c.AddMethod(NewMethod("include", func(args ...Value) (Value, error) {
+	c.AddMethod(NewMethod("include", func(self Value, args ...Value) (Value, error) {
 		for _, module := range args {
 			c.includedModules = append(c.includedModules, module)
 		}

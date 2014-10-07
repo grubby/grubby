@@ -205,7 +205,7 @@ end`)
 			method, err := fileClass.Method("expand_path")
 			Expect(err).ToNot(HaveOccurred())
 
-			result, err := method.Execute(builtins.NewString("~/foobar"))
+			result, err := method.Execute(fileClass, builtins.NewString("~/foobar"))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result.String()).To(Equal(os.Getenv("HOME") + "/foobar"))
 		})
@@ -359,17 +359,16 @@ end
 				method, err := fooInstance.Method("hello")
 				Expect(err).ToNot(HaveOccurred())
 
-				val, err := method.Execute()
+				val, err := method.Execute(fooInstance)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
 				Expect(val.String()).To(Equal("world"))
 			})
 		})
-	})
 
-	Context("when it includes a module", func() {
-		It("makes the modules methods available on its instances", func() {
-			_, err := vm.Run(`
+		Context("when it includes a module", func() {
+			It("makes the modules methods available on its instances", func() {
+				_, err := vm.Run(`
 module Foo
   def superinquisitive
     "tumescent-wasty"
@@ -380,17 +379,42 @@ class Bar
   include Foo
 end
 `)
+				Expect(err).ToNot(HaveOccurred())
+
+				barClass := vm.MustGetClass("Bar")
+				bar := barClass.New()
+
+				method, err := bar.Method("superinquisitive")
+				Expect(err).ToNot(HaveOccurred())
+
+				val, err := method.Execute(bar)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val.String()).To(Equal("tumescent-wasty"))
+			})
+		})
+	})
+
+	Describe("methods", func() {
+		It("has a reference to self", func() {
+			_, err := vm.Run(`
+class Foo
+end
+`)
+
 			Expect(err).ToNot(HaveOccurred())
 
-			barClass := vm.MustGetClass("Bar")
-			bar := barClass.New()
+			var capturedSelf builtins.Value
+			foo := vm.MustGetClass("Foo").New()
+			foo.AddMethod(builtins.NewMethod("fasciculated_stripe", func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+				capturedSelf = self
+				return nil, nil
+			}))
 
-			method, err := bar.Method("superinquisitive")
+			m, err := foo.Method("fasciculated_stripe")
 			Expect(err).ToNot(HaveOccurred())
+			m.Execute(foo)
 
-			val, err := method.Execute()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal("tumescent-wasty"))
+			Expect(capturedSelf).To(Equal(foo))
 		})
 	})
 })

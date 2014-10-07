@@ -21,7 +21,7 @@ func (klass *ArrayClass) New(args ...Value) Value {
 	a.initialize()
 	a.class = klass
 
-	a.AddMethod(NewMethod("shift", func(args ...Value) (Value, error) {
+	a.AddMethod(NewMethod("shift", func(self Value, args ...Value) (Value, error) {
 		if len(a.members) == 0 {
 			return Nil(), nil
 		}
@@ -31,12 +31,12 @@ func (klass *ArrayClass) New(args ...Value) Value {
 		return val, nil
 	}))
 
-	a.AddMethod(NewMethod("unshift", func(args ...Value) (Value, error) {
+	a.AddMethod(NewMethod("unshift", func(self Value, args ...Value) (Value, error) {
 		a.members = append([]Value{args[0]}, a.members[0:]...)
 		return a, nil
 	}))
 
-	a.AddMethod(NewMethod("include?", func(args ...Value) (Value, error) {
+	a.AddMethod(NewMethod("include?", func(self Value, args ...Value) (Value, error) {
 		for _, m := range a.members {
 			if m == args[0] {
 				return NewTrueClass().(Class).New(), nil
