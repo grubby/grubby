@@ -502,6 +502,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeRETURN:
 			debug("RETURN")
 			return RETURN
+		case tokenTypeYIELD:
+			debug("YIELD")
+			return YIELD
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
