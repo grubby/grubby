@@ -6,11 +6,19 @@ import (
 )
 
 func lexReference(l *StatefulRubyLexer) stateFn {
-	l.acceptRun(alphaNumericUnderscore + "!")
+	l.acceptRun(alphaNumericUnderscore)
 
 	switch l.input[l.start:l.pos] {
 	case "def":
 		l.emit(tokenTypeDEF)
+
+		l.acceptRun(whitespace)
+		l.emit(tokenTypeWhitespace)
+
+		if l.accept(validMethodNameRunes) {
+			l.acceptRun(validMethodNameRunes)
+			l.emit(tokenTypeReference)
+		}
 	case "do":
 		l.emit(tokenTypeDO)
 	case "end":

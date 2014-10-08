@@ -513,6 +513,39 @@ end
 				})
 			})
 
+			Context("with ? or ! in the name", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def foo!
+  raise
+end
+
+def foo?
+  false
+end
+`)
+				})
+
+				It("is parsed with the correct method name", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Name: ast.BareReference{Name: "foo!"},
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.BareReference{Name: "raise"},
+							},
+						},
+						ast.FuncDecl{
+							Name: ast.BareReference{Name: "foo?"},
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.Boolean{Value: false},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("without parameters", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
