@@ -28,6 +28,7 @@ const (
 	tokenTypeFloat
 	tokenTypeString
 	tokenTypeDoubleQuoteString
+	tokenTypeCharacter
 	tokenTypeSymbol
 	tokenTypeReference
 	tokenTypeGlobal
@@ -127,6 +128,12 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			return lexSingleQuoteString
 		case r == '"':
 			return lexDoubleQuoteString
+		case r == '?':
+			if l.accept(validMethodNameRunes + "-") {
+				l.start += 1 // skip past the ?
+				l.acceptRun(validMethodNameRunes + "-")
+			}
+			l.emit(tokenTypeCharacter)
 		case r == ':':
 			l.start += 1 // skip past the colon
 			return lexSymbol
@@ -341,6 +348,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeDoubleQuoteString:
 			debug("string: '%s'", token.value)
 			lval.genericValue = ast.InterpolatedString{Value: token.value}
+			return NODE
+		case tokenTypeCharacter:
+			debug("char: '%s'", token.value)
+			lval.genericValue = ast.CharacterLiteral{Value: token.value}
 			return NODE
 		case tokenTypeSymbol:
 			debug("symbol: %s", token.value)

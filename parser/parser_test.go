@@ -128,6 +128,24 @@ var _ = Describe("goyacc parser", func() {
 						}))
 					})
 				})
+
+				Context("using ascii character literals", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
+?-
+?A
+??
+`)
+					})
+
+					It("is parsed as a string", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.CharacterLiteral{Value: "-"},
+							ast.CharacterLiteral{Value: "A"},
+							ast.CharacterLiteral{Value: "?"},
+						}))
+					})
+				})
 			})
 
 			Describe("heredoc", func() {

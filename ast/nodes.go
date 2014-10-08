@@ -21,6 +21,10 @@ type InterpolatedString struct {
 	Value string
 }
 
+type CharacterLiteral struct {
+	Value string
+}
+
 type Symbol struct {
 	Name string
 }
