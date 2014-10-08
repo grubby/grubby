@@ -245,7 +245,21 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == eof:
 			break
 		default:
-			msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d') (current parse is '%s')", l.pos, string(r), r, l.input[l.start:l.pos])
+			var min, max int
+			runesToShowNearByte := 100
+			if l.start-runesToShowNearByte < 0 {
+				min = 0
+			} else {
+				min = l.start - runesToShowNearByte
+			}
+
+			if l.pos+runesToShowNearByte >= len(l.input) {
+				max = len(l.input) - 1
+			} else {
+				max = l.pos + runesToShowNearByte
+			}
+
+			msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d') (current parse is '%s')\nsurrounding context:\n\n==========\n%s\n==========", l.pos, string(r), r, l.input[l.start:l.pos], l.input[min:max])
 			panic(msg)
 		}
 
