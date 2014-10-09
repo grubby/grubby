@@ -1202,23 +1202,41 @@ false
 		})
 
 		Describe("arrays", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer("[1,2,3,   4,5,6 ]")
+			Context("of simple built-in types", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("[1,2,3,   4,5,6 ]")
+				})
+
+				It("is parsed as an Array node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Array{
+							Nodes: []ast.Node{
+								ast.ConstantInt{Value: 1},
+								ast.ConstantInt{Value: 2},
+								ast.ConstantInt{Value: 3},
+								ast.ConstantInt{Value: 4},
+								ast.ConstantInt{Value: 5},
+								ast.ConstantInt{Value: 6},
+							},
+						},
+					}))
+				})
 			})
 
-			It("returns an Array node", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.Array{
-						Nodes: []ast.Node{
-							ast.ConstantInt{Value: 1},
-							ast.ConstantInt{Value: 2},
-							ast.ConstantInt{Value: 3},
-							ast.ConstantInt{Value: 4},
-							ast.ConstantInt{Value: 5},
-							ast.ConstantInt{Value: 6},
-						},
-					},
-				}))
+			Context("of arrays", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("[[], [], []]")
+				})
+
+				It("is parsed as an Array node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Array{Nodes: []ast.Node{
+							ast.Array{Nodes: []ast.Node{}},
+							ast.Array{Nodes: []ast.Node{}},
+							ast.Array{Nodes: []ast.Node{}},
+						}},
+					}))
+				})
 			})
 		})
 

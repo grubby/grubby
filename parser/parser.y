@@ -308,9 +308,9 @@ call_args : LPAREN nodes_with_commas RPAREN
 | nonempty_nodes_with_commas
   { $$ = $1; };
 
-comma_delimited_nodes : NODE
+comma_delimited_nodes : single_node
   { $$ = append($$, $1); }
-| comma_delimited_nodes COMMA NODE
+| comma_delimited_nodes COMMA single_node
   { $$ = append($$, $3); };
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
