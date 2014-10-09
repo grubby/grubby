@@ -640,13 +640,6 @@ symbol_key_value_pairs : REF COLON single_node
       Value: $3,
     })
   }
-| REF COLON single_node
-  {
-    $$ = append($$, ast.HashKeyValuePair{
-      Key: ast.Symbol{Name: $1.(ast.BareReference).Name},
-      Value: $3,
-    })
-  }
 | symbol_key_value_pairs COMMA optional_newlines REF COLON single_node optional_newlines
   {
     $$ = append($$, ast.HashKeyValuePair{
