@@ -748,8 +748,7 @@ if_block : IF expr list END
     }
   };
 
-elsif_block : /* nothing */ { $$ = []ast.Node{} };
-| elsif_block ELSIF expr list
+elsif_block : elsif_block ELSIF expr list
   {
     $$ = append($$, ast.IfBlock{
       Condition: $3,
