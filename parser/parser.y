@@ -111,10 +111,11 @@ var Statements []ast.Node
 %type <genericValue> yield_expression
 %type <genericValue> binary_expression
 %type <genericValue> class_declaration
+%type <genericValue> default_value_arg
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
-%type <genericValue> default_value_arg
+%type <genericValue> single_node_or_call_expression
 
 %type <genericValue> assignable_variables;
 
@@ -333,13 +334,11 @@ nodes_with_commas_and_optional_block : single_node
 | nodes_with_commas_and_optional_block COMMA block
   { $$ = append($$, $3); };
 
-nonempty_nodes_with_commas : single_node
+single_node_or_call_expression: single_node | call_expression;
+
+nonempty_nodes_with_commas : single_node_or_call_expression
   { $$ = append($$, $1); }
-| call_expression
-  { $$ = append($$, $1); }
-| nonempty_nodes_with_commas COMMA single_node
-  { $$ = append($$, $3); }
-| nonempty_nodes_with_commas COMMA call_expression
+| nonempty_nodes_with_commas COMMA single_node_or_call_expression
   { $$ = append($$, $3); }
 | nonempty_nodes_with_commas COMMA block
   { $$ = append($$, $3); };
