@@ -432,14 +432,7 @@ namespaced_modules : CAPITAL_REF
     $$ = append($$, $4.(ast.BareReference).Name)
   };
 
-assignment : REF EQUALTO single_node
-  {
-    $$ = ast.Assignment{
-      LHS: $1,
-      RHS: $3,
-    }
-  }
-| REF EQUALTO call_expression
+assignment : REF EQUALTO single_node_or_call_expression
   {
     $$ = ast.Assignment{
       LHS: $1,
