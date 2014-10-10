@@ -531,6 +531,30 @@ end
 				})
 			})
 
+			Context("with splat-args", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def on(*args)
+end
+`)
+				})
+
+				It("marks the param as being splatted", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Name: ast.BareReference{Name: "on"},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name:  ast.BareReference{Name: "args"},
+									Splat: true,
+								},
+							},
+							Body: []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("with ? or ! in the name", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
