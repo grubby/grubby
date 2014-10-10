@@ -1158,6 +1158,8 @@ false
 			Describe("operators for sorting", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
+0 < 1
+1 > 0
 5 <= 55
 12 >= 21
 22 <=> 22
@@ -1166,6 +1168,16 @@ false
 
 				It("is parsed as an call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 0},
+							Func:   ast.BareReference{Name: "<"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+						},
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 1},
+							Func:   ast.BareReference{Name: ">"},
+							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+						},
 						ast.CallExpression{
 							Target: ast.ConstantInt{Value: 5},
 							Func:   ast.BareReference{Name: "<="},
@@ -1599,6 +1611,7 @@ end`)
 					lexer = parser.NewLexer(`
 exit(1) if false
 foo = :bar if something.truthy_method
+raise OptionError, "description" if args.size < 2
 `)
 				})
 
@@ -1622,6 +1635,25 @@ foo = :bar if something.truthy_method
 								ast.Assignment{
 									LHS: ast.BareReference{Name: "foo"},
 									RHS: ast.Symbol{Name: "bar"},
+								},
+							},
+						},
+						ast.IfBlock{
+							Condition: ast.CallExpression{
+								Target: ast.CallExpression{
+									Target: ast.BareReference{Name: "args"},
+									Func:   ast.BareReference{Name: "size"},
+								},
+								Func: ast.BareReference{Name: "<"},
+								Args: []ast.Node{ast.ConstantInt{Value: 2}},
+							},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "raise"},
+									Args: []ast.Node{
+										ast.BareReference{Name: "OptionError"},
+										ast.InterpolatedString{Value: "description"},
+									},
 								},
 							},
 						},

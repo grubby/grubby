@@ -267,6 +267,38 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: $2,
     };
   }
+| single_node LESSTHAN single_node
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "<"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+| call_expression LESSTHAN single_node
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "<"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+| single_node GREATERTHAN single_node
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: ">"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+| call_expression GREATERTHAN single_node
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: ">"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
 | single_node OPERATOR single_node
   {
     $$ = ast.CallExpression{
