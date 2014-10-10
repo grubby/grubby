@@ -167,5 +167,6 @@ type RescueException struct {
 type MethodParam struct {
 	Name         BareReference
 	DefaultValue Node
-	Splat        bool
+	IsSplat      bool
+	IsProc       bool
 }

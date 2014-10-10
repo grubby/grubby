@@ -545,8 +545,35 @@ end
 							Name: ast.BareReference{Name: "on"},
 							Args: []ast.Node{
 								ast.MethodParam{
-									Name:  ast.BareReference{Name: "args"},
-									Splat: true,
+									Name:    ast.BareReference{Name: "args"},
+									IsSplat: true,
+								},
+							},
+							Body: []ast.Node{},
+						},
+					}))
+				})
+			})
+
+			Context("with a named proc parameter", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def test(*args, &block)
+end
+`)
+				})
+				It("marks the param as a proc", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Name: ast.BareReference{Name: "test"},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name:    ast.BareReference{Name: "args"},
+									IsSplat: true,
+								},
+								ast.MethodParam{
+									Name:   ast.BareReference{Name: "block"},
+									IsProc: true,
 								},
 							},
 							Body: []ast.Node{},

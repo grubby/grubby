@@ -371,9 +371,11 @@ function_args : comma_delimited_args_with_default_values
 default_value_arg : REF
   { $$ = ast.MethodParam{Name: $1.(ast.BareReference)} }
 | STAR REF
-  { $$ = ast.MethodParam{Name: $2.(ast.BareReference), Splat: true} }
+  { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsSplat: true} }
 | REF EQUALTO expr
   { $$ = ast.MethodParam{Name: $1.(ast.BareReference), DefaultValue: $3} }
+| AMPERSAND REF
+  { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsProc: true} };
 
 comma_delimited_args_with_default_values : /* empty */ { $$ = ast.Nodes{} }
 | default_value_arg
