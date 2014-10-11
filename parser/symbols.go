@@ -9,8 +9,9 @@ const validMethodNameRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 
 func lexSymbol(l *StatefulRubyLexer) stateFn {
 	if !l.accept(alpha + "_") {
-		l.emit(tokenTypeColon)
-		for l.accept(":") {
+		if l.accept(":") {
+			l.emit(tokenTypeDoubleColon)
+		} else {
 			l.emit(tokenTypeColon)
 		}
 

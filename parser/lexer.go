@@ -52,6 +52,7 @@ const (
 	tokenTypeLessThan
 	tokenTypeGreaterThan
 	tokenTypeColon
+	tokenTypeDoubleColon
 	tokenTypeSemicolon
 	tokenTypeEqual
 	tokenTypeBang
@@ -71,6 +72,7 @@ const (
 	tokenTypeAmpersand
 	tokenTypeSubshell
 	tokenTypeOperator
+	tokenTypeQuestionMark
 	tokenTypeFOR
 	tokenTypeWHILE
 	tokenTypeUNTIL
@@ -132,8 +134,10 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			if l.accept(validMethodNameRunes + "-") {
 				l.start += 1 // skip past the ?
 				l.acceptRun(validMethodNameRunes + "-")
+				l.emit(tokenTypeCharacter)
+			} else {
+				l.emit(tokenTypeQuestionMark)
 			}
-			l.emit(tokenTypeCharacter)
 		case r == ':':
 			l.start += 1 // skip past the colon
 			return lexSymbol
@@ -443,6 +447,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeColon:
 			debug(":")
 			return COLON
+		case tokenTypeDoubleColon:
+			debug("::")
+			return DOUBLECOLON
 		case tokenTypeSemicolon:
 			debug(";")
 			return SEMICOLON
@@ -530,6 +537,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeYIELD:
 			debug("YIELD")
 			return YIELD
+		case tokenTypeQuestionMark:
+			debug("?")
+			return QUESTIONMARK
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

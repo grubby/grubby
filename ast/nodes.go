@@ -1,7 +1,6 @@
 package ast
 
-type Node interface {
-}
+type Node interface{}
 
 type Nodes []Node
 
@@ -169,4 +168,10 @@ type MethodParam struct {
 	DefaultValue Node
 	IsSplat      bool
 	IsProc       bool
+}
+
+type Ternary struct {
+	Condition Node
+	True      Node
+	False     Node
 }

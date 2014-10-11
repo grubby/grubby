@@ -72,17 +72,19 @@ var Statements []ast.Node
 %token <genericValue> NEWLINE
 %token <genericValue> SEMICOLON
 %token <genericValue> COLON
+%token <genericValue> DOUBLECOLON
 %token <genericValue> DOT
-%token <genericValue> PIPE       // "|"
-%token <genericValue> SLASH      // "/"
-%token <genericValue> AMPERSAND  // "&"
-%token <genericValue> CARET      // "^"
-%token <genericValue> LBRACKET   // "["
-%token <genericValue> RBRACKET   // "]"
-%token <genericValue> LBRACE     // "{"
-%token <genericValue> RBRACE     // "}"
-%token <genericValue> DOLLARSIGN // "$"
-%token <genericValue> ATSIGN     // "@"
+%token <genericValue> PIPE          // "|"
+%token <genericValue> SLASH         // "/"
+%token <genericValue> AMPERSAND     // "&"
+%token <genericValue> QUESTIONMARK  // "?"
+%token <genericValue> CARET         // "^"
+%token <genericValue> LBRACKET      // "["
+%token <genericValue> RBRACKET      // "]"
+%token <genericValue> LBRACE        // "{"
+%token <genericValue> RBRACE        // "}"
+%token <genericValue> DOLLARSIGN    // "$"
+%token <genericValue> ATSIGN        // "@"
 %token <genericValue> FILE_CONST_REF // __FILE__
 %token <genericValue> EOF
 
@@ -101,6 +103,7 @@ var Statements []ast.Node
 %type <genericValue> array
 %type <genericValue> group
 %type <genericValue> global
+%type <genericValue> ternary
 %type <genericValue> if_block
 %type <genericValue> assignment
 %type <genericValue> begin_block
@@ -197,7 +200,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | call_expression | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | group | begin_block | binary_expression | yield_expression;
+expr : single_node | call_expression | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | group | begin_block | binary_expression | yield_expression | ternary;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -451,10 +454,10 @@ class_name_with_modules : CAPITAL_REF
       Name: $1.(ast.BareReference).Name,
     }
   }
-| namespaced_modules COLON COLON CAPITAL_REF
+| namespaced_modules DOUBLECOLON CAPITAL_REF
   {
     $$ = ast.Class{
-       Name: $4.(ast.BareReference).Name,
+       Name: $3.(ast.BareReference).Name,
        Namespace: strings.Join($1, "::"),
     }
   };
@@ -463,9 +466,9 @@ namespaced_modules : CAPITAL_REF
   {
     $$ = append($$, $1.(ast.BareReference).Name)
   }
-|  namespaced_modules COLON COLON CAPITAL_REF
+|  namespaced_modules DOUBLECOLON CAPITAL_REF
   {
-    $$ = append($$, $4.(ast.BareReference).Name)
+    $$ = append($$, $3.(ast.BareReference).Name)
   };
 
 assignment : REF EQUALTO single_node_or_call_expression
@@ -842,5 +845,14 @@ optional_rescues : /* empty */
   };
 
 yield_expression : YIELD;
+
+ternary : single_node QUESTIONMARK single_node COLON call_expression
+  {
+    $$ = ast.Ternary{
+      Condition: $1,
+      True: $3,
+      False: $5,
+    }
+  }
 
 %%

@@ -1807,6 +1807,25 @@ end
 			})
 		})
 
+		Describe("ternary ?", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("true ? 'hey' : there()")
+			})
+
+			It("should be parsed as a Ternary node", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Ternary{
+						Condition: ast.Boolean{Value: true},
+						True:      ast.SimpleString{Value: "hey"},
+						False: ast.CallExpression{
+							Func: ast.BareReference{Name: "there"},
+							Args: []ast.Node{},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("semicolons", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(";;a; b; c;;")
