@@ -209,6 +209,16 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: $3,
     }
   }
+| REF QUESTIONMARK
+  {
+    name := $1.(ast.BareReference).Name
+    $$ = ast.CallExpression{Func: ast.BareReference{Name: name + "?"}}
+  }
+| REF BANG
+  {
+    name := $1.(ast.BareReference).Name
+    $$ = ast.CallExpression{Func: ast.BareReference{Name: name + "!"}}
+  }
 | CAPITAL_REF LPAREN nodes_with_commas RPAREN
   {
     $$ = ast.CallExpression{

@@ -312,7 +312,7 @@ FOO
 
 			Context("with methods containing ! and ?", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("5.even?;5.taint!")
+					lexer = parser.NewLexer("5.even?;5.taint!; block_given?; search_and_destroy!")
 				})
 
 				It("is parsed just fine", func() {
@@ -324,6 +324,12 @@ FOO
 						ast.CallExpression{
 							Target: ast.ConstantInt{Value: 5},
 							Func:   ast.BareReference{Name: "taint!"},
+						},
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "block_given?"},
+						},
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "search_and_destroy!"},
 						},
 					}))
 				})
