@@ -1814,6 +1814,30 @@ end
 		})
 
 		Describe("ternary ?", func() {
+			Context("as the right hand side of an assignment expression", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+s = short ? short.dup : "  "
+`)
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.BareReference{Name: "s"},
+							RHS: ast.Ternary{
+								Condition: ast.BareReference{Name: "short"},
+								True: ast.CallExpression{
+									Target: ast.BareReference{Name: "short"},
+									Func:   ast.BareReference{Name: "dup"},
+								},
+								False: ast.InterpolatedString{Value: "  "},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with simple values", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("true ? 'string' : 5")

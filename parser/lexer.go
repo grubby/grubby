@@ -31,6 +31,7 @@ const (
 	tokenTypeCharacter
 	tokenTypeSymbol
 	tokenTypeReference
+	tokenTypeMethodName
 	tokenTypeGlobal
 	tokenTypeCapitalizedReference
 	tokenTypeWhitespace
@@ -540,6 +541,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeQuestionMark:
 			debug("?")
 			return QUESTIONMARK
+		case tokenTypeMethodName:
+			debug("Method: '%s'", token.value)
+			lval.genericValue = ast.BareReference{Name: token.value}
+			return SPECIAL_CHAR_REF
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

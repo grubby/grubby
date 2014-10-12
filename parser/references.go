@@ -69,7 +69,10 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeYIELD)
 	default:
 		r, _ := utf8.DecodeRuneInString(l.input[l.start:])
-		if unicode.IsUpper(r) {
+
+		if l.accept("?!") {
+			l.emit(tokenTypeMethodName)
+		} else if unicode.IsUpper(r) {
 			l.emit(tokenTypeCapitalizedReference)
 		} else {
 			l.emit(tokenTypeReference)

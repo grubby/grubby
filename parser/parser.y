@@ -26,6 +26,7 @@ var Statements []ast.Node
 // really a field name in the above union struct
 %token <genericValue> NODE
 %token <genericValue> REF
+%token <genericValue> SPECIAL_CHAR_REF
 %token <genericValue> CAPITAL_REF
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
@@ -118,7 +119,6 @@ var Statements []ast.Node
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
-%type <genericValue> single_node_or_call_expression
 
 %type <genericValue> assignable_variables;
 
@@ -196,11 +196,11 @@ list : /* empty */
   {  $$ = append($$, $2) };
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules;
+single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules | ternary | call_expression;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | call_expression | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | group | begin_block | binary_expression | yield_expression | ternary;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | group | begin_block | binary_expression | yield_expression;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -209,15 +209,9 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: $3,
     }
   }
-| REF QUESTIONMARK
+| SPECIAL_CHAR_REF
   {
-    name := $1.(ast.BareReference).Name
-    $$ = ast.CallExpression{Func: ast.BareReference{Name: name + "?"}}
-  }
-| REF BANG
-  {
-    name := $1.(ast.BareReference).Name
-    $$ = ast.CallExpression{Func: ast.BareReference{Name: name + "!"}}
+    $$ = ast.CallExpression{Func: $1.(ast.BareReference)}
   }
 | CAPITAL_REF LPAREN nodes_with_commas RPAREN
   {
@@ -364,8 +358,6 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $1); }
 | binary_expression
   { $$ = append($$, $1); }
-| call_expression
-  { $$ = append($$, $1); }
 | nodes_with_commas COMMA single_node
   { $$ = append($$, $3); };
 
@@ -379,11 +371,9 @@ nodes_with_commas_and_optional_block : single_node
 | nodes_with_commas_and_optional_block COMMA block
   { $$ = append($$, $3); };
 
-single_node_or_call_expression: single_node | call_expression;
-
-nonempty_nodes_with_commas : single_node_or_call_expression
+nonempty_nodes_with_commas : single_node
   { $$ = append($$, $1); }
-| nonempty_nodes_with_commas COMMA single_node_or_call_expression
+| nonempty_nodes_with_commas COMMA single_node
   { $$ = append($$, $3); }
 | nonempty_nodes_with_commas COMMA block
   { $$ = append($$, $3); };
@@ -481,7 +471,7 @@ namespaced_modules : CAPITAL_REF
     $$ = append($$, $3.(ast.BareReference).Name)
   };
 
-assignment : REF EQUALTO single_node_or_call_expression
+assignment : REF EQUALTO single_node
   {
     $$ = ast.Assignment{
       LHS: $1,
@@ -550,30 +540,6 @@ positive : POSITIVE expr { $$ = ast.Positive{Target: $2} };
 negative : NEGATIVE expr { $$ = ast.Negative{Target: $2} };
 
 binary_addition : single_node POSITIVE single_node
-  {
-    $$ = ast.CallExpression{
-      Target: $1,
-      Func: ast.BareReference{Name: "+"},
-      Args: []ast.Node{$3},
-    }
-  }
-| call_expression POSITIVE single_node
-  {
-    $$ = ast.CallExpression{
-      Target: $1,
-      Func: ast.BareReference{Name: "+"},
-      Args: []ast.Node{$3},
-    }
-  }
-| single_node POSITIVE call_expression
-  {
-    $$ = ast.CallExpression{
-      Target: $1,
-      Func: ast.BareReference{Name: "+"},
-      Args: []ast.Node{$3},
-    }
-  }
-| call_expression POSITIVE call_expression
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -856,7 +822,7 @@ optional_rescues : /* empty */
 
 yield_expression : YIELD;
 
-ternary : expr QUESTIONMARK expr COLON expr
+ternary : single_node QUESTIONMARK single_node COLON single_node
   {
     $$ = ast.Ternary{
       Condition: $1,
