@@ -2058,6 +2058,33 @@ s << (short ? ", " : "  ") if long
 				}))
 			})
 		})
+
+		Context("conditionals around assignment to a call expression", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+unless option = match?(opt)
+end`)
+			})
+
+			It("is parsed correctly", func() {
+				Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+				Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.IfBlock{
+						Condition: ast.Negation{
+							Target: ast.Assignment{
+								LHS: ast.BareReference{Name: "option"},
+								RHS: ast.CallExpression{
+									Func: ast.BareReference{Name: "match?"},
+									Args: []ast.Node{ast.BareReference{Name: "opt"}},
+								},
+							},
+						},
+						Body: []ast.Node{},
+					},
+				}))
+			})
+		})
 	})
 
 	Describe("having tons of optional whitespace", func() {

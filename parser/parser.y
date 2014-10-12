@@ -213,6 +213,13 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
   {
     $$ = ast.CallExpression{Func: $1.(ast.BareReference)}
   }
+| SPECIAL_CHAR_REF LPAREN nodes_with_commas RPAREN
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: $3,
+    }
+  }
 | CAPITAL_REF LPAREN nodes_with_commas RPAREN
   {
     $$ = ast.CallExpression{
@@ -732,13 +739,21 @@ if_block : IF expr list END
       Body: ast.Nodes{$1},
     }
   }
-| UNLESS single_node list END
+| UNLESS expr NEWLINE list END
   {
     $$ = ast.IfBlock{
       Condition: ast.Negation{Target: $2},
-      Body: $3,
+      Body: $4,
+    }
+  }
+| UNLESS expr SEMICOLON list END
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $2},
+      Body: $4,
     }
   };
+
 
 elsif_block : elsif_block ELSIF expr list
   {
