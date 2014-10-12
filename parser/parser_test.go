@@ -1814,21 +1814,45 @@ end
 		})
 
 		Describe("ternary ?", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer("true ? 'hey' : there()")
+			Context("with simple values", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("true ? 'string' : 5")
+				})
+
+				It("should be parsed as a Ternary node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Ternary{
+							Condition: ast.Boolean{Value: true},
+							True:      ast.SimpleString{Value: "string"},
+							False:     ast.ConstantInt{Value: 5},
+						},
+					}))
+				})
 			})
 
-			It("should be parsed as a Ternary node", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.Ternary{
-						Condition: ast.Boolean{Value: true},
-						True:      ast.SimpleString{Value: "hey"},
-						False: ast.CallExpression{
-							Func: ast.BareReference{Name: "there"},
-							Args: []ast.Node{},
+			Context("with call expressions", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("what() ? mm.hmm : thats_cool()")
+				})
+
+				It("should be parsed as a Ternary node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Ternary{
+							Condition: ast.CallExpression{
+								Func: ast.BareReference{Name: "what"},
+								Args: []ast.Node{},
+							},
+							True: ast.CallExpression{
+								Target: ast.BareReference{Name: "mm"},
+								Func:   ast.BareReference{Name: "hmm"},
+							},
+							False: ast.CallExpression{
+								Func: ast.BareReference{Name: "thats_cool"},
+								Args: []ast.Node{},
+							},
 						},
-					},
-				}))
+					}))
+				})
 			})
 		})
 

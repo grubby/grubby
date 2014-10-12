@@ -856,7 +856,7 @@ optional_rescues : /* empty */
 
 yield_expression : YIELD;
 
-ternary : single_node QUESTIONMARK single_node COLON call_expression
+ternary : expr QUESTIONMARK expr COLON expr
   {
     $$ = ast.Ternary{
       Condition: $1,
