@@ -196,11 +196,11 @@ list : /* empty */
   {  $$ = append($$, $2) };
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules | ternary | call_expression;
+single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules | ternary | call_expression | group;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | group | begin_block | binary_expression | yield_expression;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -307,14 +307,6 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     }
   }
 | single_node OPERATOR single_node
-  {
-    $$ = ast.CallExpression{
-      Func: ast.BareReference{Name: $2},
-      Target: $1,
-      Args: []ast.Node{$3},
-    }
-  }
-| call_expression OPERATOR single_node
   {
     $$ = ast.CallExpression{
       Func: ast.BareReference{Name: $2},

@@ -2019,6 +2019,44 @@ MSpecRun.main
 		It("is parsed just fine", func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
 			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+			Expect(len(parser.Statements)).To(Equal(4))
+		})
+	})
+
+	Describe("more complicated expressions", func() {
+		Context("bit shift, ternary and trailing 'if'", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+s << (short ? ", " : "  ") if long
+`)
+			})
+
+			It("is parsed correctly", func() {
+				Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+				Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.IfBlock{
+						Condition: ast.BareReference{Name: "long"},
+						Body: []ast.Node{
+							ast.CallExpression{
+								Target: ast.BareReference{Name: "s"},
+								Func:   ast.BareReference{Name: "<<"},
+								Args: []ast.Node{
+									ast.Group{
+										Body: []ast.Node{
+											ast.Ternary{
+												Condition: ast.BareReference{Name: "short"},
+												True:      ast.InterpolatedString{Value: ", "},
+												False:     ast.InterpolatedString{Value: "  "},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}))
+			})
 		})
 	})
 
