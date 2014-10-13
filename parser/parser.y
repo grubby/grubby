@@ -113,6 +113,7 @@ var Statements []ast.Node
 %type <genericValue> call_expression
 %type <genericValue> func_declaration
 %type <genericValue> yield_expression
+%type <genericValue> return_expression
 %type <genericValue> binary_expression
 %type <genericValue> class_declaration
 %type <genericValue> default_value_arg
@@ -200,7 +201,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -746,6 +747,14 @@ if_block : IF expr list END
       Body: $4,
     }
   }
+| UNLESS expr NEWLINE list elsif_block END
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $2},
+      Body: $4,
+      Else: $5,
+    }
+  }
 | UNLESS expr SEMICOLON list END
   {
     $$ = ast.IfBlock{
@@ -827,7 +836,22 @@ optional_rescues : /* empty */
     })
   };
 
-yield_expression : YIELD;
+yield_expression : YIELD comma_delimited_nodes
+  {
+    if len($2) == 1 {
+      $$ = ast.Yield{Value: $2[0]}
+    } else {
+      $$ = ast.Yield{Value: $2}
+    }
+  };
+return_expression : RETURN comma_delimited_nodes
+  {
+    if len($2) == 1 {
+      $$ = ast.Return{Value: $2[0]}
+    } else {
+      $$ = ast.Return{Value: $2}
+    }
+  };
 
 ternary : single_node QUESTIONMARK single_node COLON single_node
   {

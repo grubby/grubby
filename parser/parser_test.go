@@ -1447,6 +1447,40 @@ foo: bar,
 			})
 		})
 
+		Describe("with expressions that return a value", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+def with_a_block()
+  yield 'nonrestricted-consonantize'
+  return 'albitite-compotor', 'catalecta-coassistant', 'semiannual-pomfret'
+end
+`)
+			})
+
+			It("should parse the expressions correctly", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.FuncDecl{
+						Name: ast.BareReference{Name: "with_a_block"},
+						Args: []ast.Node{},
+						Body: []ast.Node{
+							ast.Yield{
+								Value: ast.SimpleString{
+									Value: "nonrestricted-consonantize",
+								},
+							},
+							ast.Return{
+								Value: ast.Nodes{
+									ast.SimpleString{Value: "albitite-compotor"},
+									ast.SimpleString{Value: "catalecta-coassistant"},
+									ast.SimpleString{Value: "semiannual-pomfret"},
+								},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("blocks", func() {
 			Context("without any args", func() {
 				BeforeEach(func() {

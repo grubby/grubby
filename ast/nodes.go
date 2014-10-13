@@ -175,3 +175,11 @@ type Ternary struct {
 	True      Node
 	False     Node
 }
+
+type Yield struct {
+	Value Node
+}
+
+type Return struct {
+	Value Node
+}
