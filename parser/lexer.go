@@ -81,6 +81,7 @@ const (
 	tokenTypeRESCUE
 	tokenTypeENSURE
 	tokenTypeBREAK
+	tokenTypeNEXT
 	tokenTypeREDO
 	tokenTypeRETRY
 	tokenTypeRETURN
@@ -526,6 +527,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeBREAK:
 			debug("BREAK")
 			return BREAK
+		case tokenTypeNEXT:
+			debug("NEXT")
+			return NEXT
 		case tokenTypeREDO:
 			debug("REDO")
 			return REDO

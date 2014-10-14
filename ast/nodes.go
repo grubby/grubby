@@ -184,6 +184,9 @@ type Return struct {
 	Value Node
 }
 
+type Break struct{}
+type Next struct{}
+
 type Loop struct {
 	Condition Node
 	Body      []Node

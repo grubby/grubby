@@ -59,6 +59,8 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeENSURE)
 	case "break":
 		l.emit(tokenTypeBREAK)
+	case "next":
+		l.emit(tokenTypeNEXT)
 	case "redo":
 		l.emit(tokenTypeREDO)
 	case "retry":

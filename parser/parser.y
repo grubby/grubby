@@ -49,6 +49,7 @@ var Statements []ast.Node
 %token <genericValue> RESCUE
 %token <genericValue> ENSURE
 %token <genericValue> BREAK
+%token <genericValue> NEXT
 %token <genericValue> REDO
 %token <genericValue> RETRY
 %token <genericValue> RETURN
@@ -111,6 +112,7 @@ var Statements []ast.Node
 %type <genericValue> begin_block
 %type <genericValue> single_node
 %type <genericValue> class_variable
+%type <genericValue> loop_statement
 %type <genericValue> call_expression
 %type <genericValue> func_declaration
 %type <genericValue> yield_expression
@@ -202,7 +204,12 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression | while_loop;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression | while_loop | loop_statement;
+
+loop_statement: BREAK
+  { $$ = ast.Break{} }
+| NEXT
+  { $$ = ast.Next{} };
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {

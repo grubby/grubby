@@ -2039,6 +2039,8 @@ end
 						lexer = parser.NewLexer(`
 while foo = bar.baz
   puts 'welp'
+  break if false
+  next if false
 end
 `)
 					})
@@ -2057,6 +2059,14 @@ end
 									ast.CallExpression{
 										Func: ast.BareReference{Name: "puts"},
 										Args: []ast.Node{ast.SimpleString{Value: "welp"}},
+									},
+									ast.IfBlock{
+										Condition: ast.Boolean{Value: false},
+										Body:      []ast.Node{ast.Break{}},
+									},
+									ast.IfBlock{
+										Condition: ast.Boolean{Value: false},
+										Body:      []ast.Node{ast.Next{}},
 									},
 								},
 							},
