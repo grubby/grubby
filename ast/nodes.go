@@ -183,3 +183,8 @@ type Yield struct {
 type Return struct {
 	Value Node
 }
+
+type Loop struct {
+	Condition Node
+	Body      []Node
+}

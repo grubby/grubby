@@ -107,6 +107,7 @@ var Statements []ast.Node
 %type <genericValue> ternary
 %type <genericValue> if_block
 %type <genericValue> assignment
+%type <genericValue> while_loop
 %type <genericValue> begin_block
 %type <genericValue> single_node
 %type <genericValue> class_variable
@@ -201,7 +202,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression | while_loop;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -861,5 +862,8 @@ ternary : single_node QUESTIONMARK single_node COLON single_node
       False: $5,
     }
   }
+
+while_loop : WHILE expr NEWLINE list END
+  { $$ = ast.Loop{Condition: $2, Body: $4} };
 
 %%

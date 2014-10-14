@@ -545,6 +545,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("Method: '%s'", token.value)
 			lval.genericValue = ast.BareReference{Name: token.value}
 			return SPECIAL_CHAR_REF
+		case tokenTypeWHILE:
+			debug("WHILE")
+			return WHILE
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

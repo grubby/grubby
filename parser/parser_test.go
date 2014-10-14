@@ -1995,11 +1995,10 @@ Foo::Bar::Baz.method_call
 				}))
 			})
 		})
-	})
 
-	Describe("memoizing methods", func() {
-		BeforeEach(func() {
-			lexer = parser.NewLexer(`
+		Describe("memoizing methods", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
 def memoized_func
   unless @value
     @value = expensive_function_call()
@@ -2008,31 +2007,63 @@ def memoized_func
   @value
 end
 `)
-		})
+			})
 
-		It("should be parsed correctly", func() {
-			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(parser.Statements).To(Equal([]ast.Node{
-				ast.FuncDecl{
-					Name: ast.BareReference{Name: "memoized_func"},
-					Args: []ast.Node{},
-					Body: []ast.Node{
-						ast.IfBlock{
-							Condition: ast.Negation{ast.InstanceVariable{Name: "value"}},
-							Body: []ast.Node{
-								ast.Assignment{
-									LHS: ast.InstanceVariable{Name: "value"},
-									RHS: ast.CallExpression{
-										Func: ast.BareReference{Name: "expensive_function_call"},
-										Args: []ast.Node{},
+			It("should be parsed correctly", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.FuncDecl{
+						Name: ast.BareReference{Name: "memoized_func"},
+						Args: []ast.Node{},
+						Body: []ast.Node{
+							ast.IfBlock{
+								Condition: ast.Negation{ast.InstanceVariable{Name: "value"}},
+								Body: []ast.Node{
+									ast.Assignment{
+										LHS: ast.InstanceVariable{Name: "value"},
+										RHS: ast.CallExpression{
+											Func: ast.BareReference{Name: "expensive_function_call"},
+											Args: []ast.Node{},
+										},
 									},
 								},
 							},
+							ast.InstanceVariable{Name: "value"},
 						},
-						ast.InstanceVariable{Name: "value"},
 					},
-				},
-			}))
+				}))
+			})
+
+			Describe("loops", func() {
+				Context("with a while statement", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
+while foo = bar.baz
+  puts 'welp'
+end
+`)
+					})
+
+					It("is parsed into a Loop struct", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.Loop{
+								Condition: ast.Assignment{
+									LHS: ast.BareReference{Name: "foo"},
+									RHS: ast.CallExpression{
+										Target: ast.BareReference{Name: "bar"},
+										Func:   ast.BareReference{Name: "baz"},
+									},
+								},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.SimpleString{Value: "welp"}},
+									},
+								},
+							},
+						}))
+					})
+				})
+			})
 		})
 	})
 
