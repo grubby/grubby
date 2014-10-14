@@ -149,6 +149,7 @@ var Statements []ast.Node
 %type <genericSlice> capture_list
 %type <genericSlice> function_args
 %type <genericSlice> key_value_pairs
+%type <genericSlice> loop_expressions
 %type <genericSlice> optional_rescues
 %type <genericSlice> nodes_with_commas
 %type <genericSlice> comma_delimited_refs
@@ -204,12 +205,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression | while_loop | loop_statement;
-
-loop_statement: BREAK
-  { $$ = ast.Break{} }
-| NEXT
-  { $$ = ast.Next{} };
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression | while_loop;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -870,7 +866,35 @@ ternary : single_node QUESTIONMARK single_node COLON single_node
     }
   }
 
-while_loop : WHILE expr NEWLINE list END
+while_loop : WHILE expr NEWLINE loop_expressions END
   { $$ = ast.Loop{Condition: $2, Body: $4} };
+
+loop_expressions : /* empty */
+  { $$ = ast.Nodes{} }
+| loop_expressions NEWLINE
+  {  }
+| loop_expressions SEMICOLON
+  {  }
+| loop_expressions single_node
+  {  $$ = append($$, $2) };
+| loop_expressions expr
+  {  $$ = append($$, $2) }
+| loop_expressions loop_statement
+  {  $$ = append($$, $2) };
+
+loop_statement: /* empty */ {}
+| BREAK
+{ $$ = ast.Break{} }
+| BREAK IF expr
+{ $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{ast.Break{}}} }
+| BREAK UNLESS expr
+{ $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Break{}}} }
+| NEXT
+{ $$ = ast.Next{} }
+| NEXT IF expr
+{ $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{ast.Next{}}} }
+| NEXT UNLESS expr
+{ $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Next{}}} };
+
 
 %%

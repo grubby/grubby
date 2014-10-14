@@ -23,14 +23,14 @@ var _ = Describe("goyacc parser", func() {
 		It("succeeds without any errors", func() {
 			lexer = parser.NewLexer("")
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).ToNot(HaveOccurred())
 		})
 	})
 
 	Context("when the code parsed is syntactically valid", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).ToNot(HaveOccurred())
 		})
 
 		Describe("parsing an integer", func() {
@@ -2200,10 +2200,10 @@ func.with_a_block { |foo | puts foo.inspect    } # all the comments # yep
 		})
 	})
 
-	Describe("invalid syntax", func() {
+	Describe("invalid ruby", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).ToNot(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).ToNot(BeNil())
+			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(HaveOccurred())
 		})
 
 		Context("given a class name that starts with a lowercase character", func() {
@@ -2215,6 +2215,26 @@ end
 			})
 
 			It("fails and returns a useful parse error", func() {
+				Expect(parser.Statements).To(BeEmpty())
+			})
+		})
+
+		Context("when the 'break' keyword is outside of a loop", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("break")
+			})
+
+			It("fails to parse", func() {
+				Expect(parser.Statements).To(BeEmpty())
+			})
+		})
+
+		Context("when the 'next' keyword is outside of a loop", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("next")
+			})
+
+			It("fails to parse", func() {
 				Expect(parser.Statements).To(BeEmpty())
 			})
 		})
