@@ -2238,5 +2238,15 @@ end
 				Expect(parser.Statements).To(BeEmpty())
 			})
 		})
+
+		Context("when the 'return' keyword is outside of a method", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("return 5")
+			})
+
+			It("fails to parse", func() {
+				Expect(parser.Statements).To(BeEmpty())
+			})
+		})
 	})
 })

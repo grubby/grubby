@@ -123,6 +123,7 @@ var Statements []ast.Node
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
+%type <genericValue> function_body_statement
 
 %type <genericValue> assignable_variables;
 
@@ -152,6 +153,7 @@ var Statements []ast.Node
 %type <genericSlice> loop_expressions
 %type <genericSlice> optional_rescues
 %type <genericSlice> nodes_with_commas
+%type <genericSlice> function_body_list
 %type <genericSlice> comma_delimited_refs
 %type <genericSlice> comma_delimited_nodes
 %type <genericSlice> symbol_key_value_pairs
@@ -205,7 +207,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | return_expression | while_loop;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -385,7 +387,7 @@ nonempty_nodes_with_commas : single_node
 
 // FIXME: this should use a different type than call_args
 // call args can be a list of expressions. This is just a list of REFs or NODEs
-func_declaration : DEF REF function_args optional_newlines list optional_newlines END
+func_declaration : DEF REF function_args optional_newlines function_body_list optional_newlines END
   {
 		$$ = ast.FuncDecl{
 			Name: $2.(ast.BareReference),
@@ -393,7 +395,7 @@ func_declaration : DEF REF function_args optional_newlines list optional_newline
 			Body: $5,
     }
   }
-| DEF OPERATOR function_args optional_newlines list optional_newlines END
+| DEF OPERATOR function_args optional_newlines function_body_list optional_newlines END
   {
 		$$ = ast.FuncDecl{
 			Name: ast.BareReference{Name: $2},
@@ -401,6 +403,32 @@ func_declaration : DEF REF function_args optional_newlines list optional_newline
 			Body: $5,
     }
   };
+
+function_body_statement: /* empty */ {}
+| return_expression
+  { $$ = $1 }
+| return_expression IF expr
+  { $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{$1}} }
+| return_expression UNLESS expr
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $3},
+      Body: []ast.Node{ast.Break{}},
+    }
+  };
+
+function_body_list : /* empty */
+  { $$ = ast.Nodes{} }
+| function_body_list NEWLINE
+  {  }
+| function_body_list SEMICOLON
+  {  }
+| function_body_list single_node
+  {  $$ = append($$, $2) };
+| function_body_list expr
+  {  $$ = append($$, $2) }
+| function_body_list function_body_statement
+  {  $$ = append($$, $2) };
 
 function_args : comma_delimited_args_with_default_values
   { $$ = $1 }
@@ -848,6 +876,7 @@ yield_expression : YIELD comma_delimited_nodes
       $$ = ast.Yield{Value: $2}
     }
   };
+
 return_expression : RETURN comma_delimited_nodes
   {
     if len($2) == 1 {
