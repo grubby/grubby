@@ -108,11 +108,9 @@ var Statements []ast.Node
 %type <genericValue> ternary
 %type <genericValue> if_block
 %type <genericValue> assignment
-%type <genericValue> while_loop
 %type <genericValue> begin_block
 %type <genericValue> single_node
 %type <genericValue> class_variable
-%type <genericValue> loop_statement
 %type <genericValue> call_expression
 %type <genericValue> func_declaration
 %type <genericValue> yield_expression
@@ -124,6 +122,12 @@ var Statements []ast.Node
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
 %type <genericValue> function_body_statement
+
+// loops and expressions that can be inside a loop
+%type <genericValue> while_loop
+%type <genericValue> loop_statement;
+%type <genericValue> loop_if_block;
+%type <genericSlice> loop_elsif_block;
 
 %type <genericValue> assignable_variables;
 
@@ -908,6 +912,8 @@ loop_expressions : /* empty */
   {  $$ = append($$, $2) };
 | loop_expressions expr
   {  $$ = append($$, $2) }
+| loop_expressions loop_if_block
+  {  $$ = append($$, $2) }
 | loop_expressions loop_statement
   {  $$ = append($$, $2) };
 
@@ -925,5 +931,71 @@ loop_statement: /* empty */ {}
 | NEXT UNLESS expr
 { $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Next{}}} };
 
+loop_if_block : IF expr NEWLINE loop_expressions END
+  {
+    $$ = ast.IfBlock{
+      Condition: $2,
+      Body: $4,
+    }
+  }
+| IF expr NEWLINE loop_expressions loop_elsif_block END
+  {
+    $$ = ast.IfBlock{
+      Condition: $2,
+      Body: $4,
+      Else: $5,
+    }
+  }
+| UNLESS expr NEWLINE loop_expressions END
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $2},
+      Body: $4,
+    }
+  }
+| UNLESS expr NEWLINE loop_expressions loop_elsif_block END
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $2},
+      Body: $4,
+      Else: $5,
+    }
+  }
+| UNLESS expr SEMICOLON loop_expressions END
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $2},
+      Body: $4,
+    }
+  };
+
+loop_elsif_block : loop_elsif_block ELSIF expr loop_expressions
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: $3,
+      Body: $4,
+    })
+  }
+| loop_elsif_block ELSE loop_expressions
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: ast.Boolean{Value: true},
+      Body: $3,
+    })
+      }
+| ELSIF expr loop_expressions
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: $2,
+      Body: $3,
+    })
+  }
+| ELSE loop_expressions
+  {
+    $$ = append($$, ast.IfBlock{
+      Condition: ast.Boolean{Value: true},
+      Body: $2,
+    })
+   };
 
 %%

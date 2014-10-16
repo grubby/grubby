@@ -2032,46 +2032,82 @@ end
 					},
 				}))
 			})
+		})
 
-			Describe("loops", func() {
-				Context("with a while statement", func() {
-					BeforeEach(func() {
-						lexer = parser.NewLexer(`
+		Describe("loops", func() {
+			Context("with a while statement", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
 while foo = bar.baz
   puts 'welp'
   break if false
   next if false
 end
 `)
-					})
+				})
 
-					It("is parsed into a Loop struct", func() {
-						Expect(parser.Statements).To(Equal([]ast.Node{
-							ast.Loop{
-								Condition: ast.Assignment{
-									LHS: ast.BareReference{Name: "foo"},
-									RHS: ast.CallExpression{
-										Target: ast.BareReference{Name: "bar"},
-										Func:   ast.BareReference{Name: "baz"},
-									},
+				It("is parsed into a Loop struct", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Loop{
+							Condition: ast.Assignment{
+								LHS: ast.BareReference{Name: "foo"},
+								RHS: ast.CallExpression{
+									Target: ast.BareReference{Name: "bar"},
+									Func:   ast.BareReference{Name: "baz"},
 								},
-								Body: []ast.Node{
-									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "welp"}},
-									},
-									ast.IfBlock{
-										Condition: ast.Boolean{Value: false},
-										Body:      []ast.Node{ast.Break{}},
-									},
-									ast.IfBlock{
-										Condition: ast.Boolean{Value: false},
-										Body:      []ast.Node{ast.Next{}},
+							},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "welp"}},
+								},
+								ast.IfBlock{
+									Condition: ast.Boolean{Value: false},
+									Body:      []ast.Node{ast.Break{}},
+								},
+								ast.IfBlock{
+									Condition: ast.Boolean{Value: false},
+									Body:      []ast.Node{ast.Next{}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
+			Context("with a deeply nested next keyword", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+while true
+  if false
+    if false
+      next
+    end
+  end
+end
+`)
+				})
+
+				It("parses correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Loop{
+							Condition: ast.Boolean{Value: true},
+							Body: []ast.Node{
+								ast.IfBlock{
+									Condition: ast.Boolean{Value: false},
+									Body: []ast.Node{
+										ast.IfBlock{
+											Condition: ast.Boolean{Value: false},
+											Body: []ast.Node{
+
+												ast.Next{},
+											},
+										},
 									},
 								},
 							},
-						}))
-					})
+						},
+					}))
 				})
 			})
 		})
