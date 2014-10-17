@@ -86,6 +86,8 @@ const (
 	tokenTypeRETRY
 	tokenTypeRETURN
 	tokenTypeYIELD
+	tokenTypeAND
+	tokenTypeOR
 	tokenType__FILE__
 	tokenType__LINE__
 	tokenType__ENCODING__
@@ -552,6 +554,12 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeWHILE:
 			debug("WHILE")
 			return WHILE
+		case tokenTypeAND:
+			debug("AND")
+			return AND
+		case tokenTypeOR:
+			debug("OR")
+			return OR
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

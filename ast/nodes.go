@@ -191,3 +191,13 @@ type Loop struct {
 	Condition Node
 	Body      []Node
 }
+
+type WeakLogicalAnd struct {
+	LHS Node
+	RHS Node
+}
+
+type WeakLogicalOr struct {
+	LHS Node
+	RHS Node
+}

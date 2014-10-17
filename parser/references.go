@@ -69,6 +69,10 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeRETURN)
 	case "yield":
 		l.emit(tokenTypeYIELD)
+	case "and":
+		l.emit(tokenTypeAND)
+	case "or":
+		l.emit(tokenTypeOR)
 	default:
 		r, _ := utf8.DecodeRuneInString(l.input[l.start:])
 

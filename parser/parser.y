@@ -54,6 +54,8 @@ var Statements []ast.Node
 %token <genericValue> RETRY
 %token <genericValue> RETURN
 %token <genericValue> YIELD
+%token <genericValue> AND
+%token <genericValue> OR
 
 // booleans
 %token <genericValue> TRUE
@@ -122,6 +124,9 @@ var Statements []ast.Node
 %type <genericValue> module_declaration
 %type <genericValue> class_name_with_modules
 %type <genericValue> function_body_statement
+
+%type <genericValue> logical_or;
+%type <genericValue> logical_and;
 
 // loops and expressions that can be inside a loop
 %type <genericValue> while_loop
@@ -211,7 +216,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -997,5 +1002,12 @@ loop_elsif_block : loop_elsif_block ELSIF expr loop_expressions
       Body: $2,
     })
    };
+
+logical_and : single_node AND single_node
+  { $$ = ast.WeakLogicalAnd{LHS: $1, RHS: $3} };
+
+logical_or : single_node OR single_node
+  { $$ = ast.WeakLogicalOr{LHS: $1, RHS: $3} };
+
 
 %%

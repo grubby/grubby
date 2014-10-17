@@ -1208,9 +1208,12 @@ false
 					lexer = parser.NewLexer(`
 1 && 0
 1 || 0
+1 and 0
+1 or 0
 `)
 				})
 
+				// FIXME: these first two should NOT be call expressions
 				It("is parsed as a call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
@@ -1222,6 +1225,14 @@ false
 							Target: ast.ConstantInt{Value: 1},
 							Func:   ast.BareReference{Name: "||"},
 							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+						},
+						ast.WeakLogicalAnd{
+							LHS: ast.ConstantInt{Value: 1},
+							RHS: ast.ConstantInt{Value: 0},
+						},
+						ast.WeakLogicalOr{
+							LHS: ast.ConstantInt{Value: 1},
+							RHS: ast.ConstantInt{Value: 0},
 						},
 					}))
 				})
@@ -1513,7 +1524,7 @@ end
 			Context("with args", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
-with_a_block do |and, with, some, args|
+with_a_block do |with, some, args|
 'aww yiss'
 end
 `)
@@ -1526,7 +1537,6 @@ end
 							Args: []ast.Node{
 								ast.Block{
 									Args: []ast.Node{
-										ast.BareReference{Name: "and"},
 										ast.BareReference{Name: "with"},
 										ast.BareReference{Name: "some"},
 										ast.BareReference{Name: "args"},
