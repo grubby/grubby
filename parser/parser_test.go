@@ -1458,6 +1458,87 @@ foo: bar,
 			})
 		})
 
+		Describe("lambdas", func() {
+			Context("without any frills", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("lambda { puts 'hai'; exit }")
+				})
+
+				It("is parsed as an ast.Lambda", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Lambda{
+							Body: ast.Block{
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.SimpleString{Value: "hai"}},
+									},
+									ast.BareReference{Name: "exit"},
+								},
+							},
+						},
+					}))
+				})
+			})
+		})
+
+		Describe("a method with rescue statements at the end", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+def samsonic_obey
+  raise 'whoopsie-daisy'
+  rescue Nope
+    puts 'unlikely'
+  rescue NotThisEither => e
+    puts 'contrived'
+  rescue
+    puts 'aww yisss'
+  end
+end
+`)
+			})
+
+			It("is parsed as rescue statements", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.FuncDecl{
+						Name: ast.BareReference{Name: "samsonic_obey"},
+						Args: []ast.Node{},
+						Body: []ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "raise"},
+								Args: []ast.Node{ast.SimpleString{Value: "whoopsie-daisy"}},
+							},
+							ast.Rescue{
+								Exception: ast.RescueException{
+									Class: ast.BareReference{Name: "Nope"},
+								},
+								Body: []ast.Node{ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "unlikely"}},
+								}},
+							},
+							ast.Rescue{
+								Exception: ast.RescueException{
+									Class: ast.BareReference{Name: "NotThisEither"},
+									Var:   ast.BareReference{Name: "e"},
+								},
+								Body: []ast.Node{ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "contrived"}},
+								}},
+							},
+							ast.Rescue{
+								Exception: ast.RescueException{},
+								Body: []ast.Node{ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "aww yisss"}},
+								}}},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("with expressions that return a value", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`

@@ -56,6 +56,7 @@ var Statements []ast.Node
 %token <genericValue> YIELD
 %token <genericValue> AND
 %token <genericValue> OR
+%token <genericValue> LAMBDA
 
 // booleans
 %token <genericValue> TRUE
@@ -107,6 +108,8 @@ var Statements []ast.Node
 %type <genericValue> array
 %type <genericValue> group
 %type <genericValue> global
+%type <genericValue> lambda
+%type <genericValue> rescue
 %type <genericValue> ternary
 %type <genericValue> if_block
 %type <genericValue> assignment
@@ -153,6 +156,7 @@ var Statements []ast.Node
 // slice nodes
 %type <genericSlice> list
 %type <genericSlice> lines
+%type <genericSlice> rescues
 %type <genericSlice> call_args
 %type <genericSlice> block_args
 %type <genericSlice> elsif_block
@@ -216,7 +220,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | lambda;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -409,7 +413,7 @@ func_declaration : DEF REF function_args optional_newlines function_body_list op
 		$$ = ast.FuncDecl{
 			Name: ast.BareReference{Name: $2},
       Args: $3,
-			Body: $5,
+      Body: $5,
     }
   };
 
@@ -437,7 +441,9 @@ function_body_list : /* empty */
 | function_body_list expr
   {  $$ = append($$, $2) }
 | function_body_list function_body_statement
-  {  $$ = append($$, $2) };
+  {  $$ = append($$, $2) }
+| function_body_list rescues END
+  { $$ = append($$, $2...) };
 
 function_args : comma_delimited_args_with_default_values
   { $$ = $1 }
@@ -849,33 +855,41 @@ begin_block : BEGIN list optional_rescues END
     }
   };
 
-optional_rescues : /* empty */
-  { $$ = []ast.Node{} }
-| optional_rescues RESCUE list
-  { $$ = append($$, ast.Rescue{Body: $3}) }
-| optional_rescues RESCUE CAPITAL_REF list
+rescue: RESCUE list
+  { $$ = ast.Rescue{Body: $2} }
+| RESCUE CAPITAL_REF list
   {
-    $$ = append($$, ast.Rescue{
-      Body: $4,
+    $$ = ast.Rescue{
+      Body: $3,
       Exception: ast.RescueException{
-        Class: $3.(ast.BareReference),
+        Class: $2.(ast.BareReference),
       },
-    })
+    }
   }
-| optional_rescues RESCUE CAPITAL_REF OPERATOR REF list
+| RESCUE CAPITAL_REF OPERATOR REF list
   {
-    if $4 != "=>" {
+    if $3 != "=>" {
       panic("FREAKOUT")
     }
 
-    $$ = append($$, ast.Rescue{
-      Body: $6,
+    $$ = ast.Rescue{
+      Body: $5,
       Exception: ast.RescueException{
-        Var: $5.(ast.BareReference),
-        Class: $3.(ast.BareReference),
+        Var: $4.(ast.BareReference),
+        Class: $2.(ast.BareReference),
       },
-    })
+    }
   };
+
+optional_rescues : /* empty */
+  { $$ = []ast.Node{} }
+| optional_rescues rescue
+  { $$ = append($$, $2) };
+
+rescues : rescue
+  { $$ = append($$, $1) }
+| rescues rescue
+  { $$ = append($$, $2) };
 
 yield_expression : YIELD comma_delimited_nodes
   {
@@ -1009,5 +1023,6 @@ logical_and : single_node AND single_node
 logical_or : single_node OR single_node
   { $$ = ast.WeakLogicalOr{LHS: $1, RHS: $3} };
 
+lambda : LAMBDA block { $$ = ast.Lambda{Body: $2.(ast.Block)} };
 
 %%

@@ -88,6 +88,7 @@ const (
 	tokenTypeYIELD
 	tokenTypeAND
 	tokenTypeOR
+	tokenTypeLAMBDA
 	tokenType__FILE__
 	tokenType__LINE__
 	tokenType__ENCODING__
@@ -560,6 +561,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeOR:
 			debug("OR")
 			return OR
+		case tokenTypeLAMBDA:
+			debug("LAMBDA")
+			return LAMBDA
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

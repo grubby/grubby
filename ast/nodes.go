@@ -201,3 +201,7 @@ type WeakLogicalOr struct {
 	LHS Node
 	RHS Node
 }
+
+type Lambda struct {
+	Body Block
+}
