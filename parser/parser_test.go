@@ -1461,19 +1461,22 @@ foo: bar,
 		Describe("lambdas", func() {
 			Context("without any frills", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("lambda { puts 'hai'; exit }")
+					lexer = parser.NewLexer("something = lambda { puts 'hai'; exit }")
 				})
 
 				It("is parsed as an ast.Lambda", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.Lambda{
-							Body: ast.Block{
-								Body: []ast.Node{
-									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "hai"}},
+						ast.Assignment{
+							LHS: ast.BareReference{Name: "something"},
+							RHS: ast.Lambda{
+								Body: ast.Block{
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Value: "hai"}},
+										},
+										ast.BareReference{Name: "exit"},
 									},
-									ast.BareReference{Name: "exit"},
 								},
 							},
 						},
