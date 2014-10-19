@@ -238,6 +238,46 @@ FOO
 		})
 
 		Describe("call expressions", func() {
+			Context("with a proc argument", func() {
+				Context("inside parens", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer("takes_a_proc('foo', 'bar', &baz)")
+					})
+
+					It("is parsed with an ast.ProcArg argument", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "takes_a_proc"},
+								Args: []ast.Node{
+									ast.SimpleString{Value: "foo"},
+									ast.SimpleString{Value: "bar"},
+									ast.ProcArg{Value: ast.BareReference{Name: "baz"}},
+								},
+							},
+						}))
+					})
+				})
+
+				Context("without parens", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer("takes_a_proc 'foo', 'bar', &baz")
+					})
+
+					It("is parsed with an ast.ProcArg argument", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "takes_a_proc"},
+								Args: []ast.Node{
+									ast.SimpleString{Value: "foo"},
+									ast.SimpleString{Value: "bar"},
+									ast.ProcArg{Value: ast.BareReference{Name: "baz"}},
+								},
+							},
+						}))
+					})
+				})
+			})
+
 			Context("with a static method", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("foo = String(bar)")
@@ -2375,6 +2415,20 @@ end
 			})
 
 			It("fails to parse", func() {
+				Expect(parser.Statements).To(BeEmpty())
+			})
+		})
+
+		PContext("when a method is provided two blocks", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+takes_a_block(&baz) do
+  puts 'FAIL'
+end
+`)
+			})
+
+			It("is fails to parser", func() {
 				Expect(parser.Statements).To(BeEmpty())
 			})
 		})

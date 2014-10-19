@@ -205,3 +205,7 @@ type WeakLogicalOr struct {
 type Lambda struct {
 	Body Block
 }
+
+type ProcArg struct {
+	Value Node
+}

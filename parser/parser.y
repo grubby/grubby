@@ -363,9 +363,13 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
   };
 
 call_args : LPAREN nodes_with_commas RPAREN
-  { $$ = $2; }
+  { $$ = $2 }
+| LPAREN nodes_with_commas COMMA AMPERSAND REF RPAREN
+  { $$ = append($2, ast.ProcArg{Value: $5}) }
 | nonempty_nodes_with_commas
-  { $$ = $1; };
+  { $$ = $1 }
+| nonempty_nodes_with_commas COMMA AMPERSAND REF
+  { $$ = append($1, ast.ProcArg{Value: $4}) }
 
 comma_delimited_nodes : single_node
   { $$ = append($$, $1); }
@@ -378,6 +382,8 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | binary_expression
   { $$ = append($$, $1); }
 | nodes_with_commas COMMA single_node
+  { $$ = append($$, $3); }
+| nodes_with_commas COMMA binary_expression
   { $$ = append($$, $3); };
 
 // FIXME: this should ONLY have a block at the end (not in the middle)
@@ -388,7 +394,9 @@ nodes_with_commas_and_optional_block : single_node
 | nodes_with_commas_and_optional_block COMMA single_node
   { $$ = append($$, $3); }
 | nodes_with_commas_and_optional_block COMMA block
-  { $$ = append($$, $3); };
+  { $$ = append($$, $3); }
+| nodes_with_commas_and_optional_block COMMA AMPERSAND REF
+  { $$ = append($$, ast.ProcArg{Value: $4}) }
 
 nonempty_nodes_with_commas : single_node
   { $$ = append($$, $1); }
