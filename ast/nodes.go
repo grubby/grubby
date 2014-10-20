@@ -209,3 +209,14 @@ type Lambda struct {
 type ProcArg struct {
 	Value Node
 }
+
+type SwitchStatement struct {
+	Condition Node
+	Cases     []SwitchCase
+	Else      []Node
+}
+
+type SwitchCase struct {
+	Conditions []Node
+	Body       []Node
+}

@@ -75,6 +75,10 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeOR)
 	case "lambda":
 		l.emit(tokenTypeLAMBDA)
+	case "case":
+		l.emit(tokenTypeCASE)
+	case "when":
+		l.emit(tokenTypeWHEN)
 	default:
 		r, _ := utf8.DecodeRuneInString(l.input[l.start:])
 
