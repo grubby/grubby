@@ -238,6 +238,31 @@ FOO
 		})
 
 		Describe("call expressions", func() {
+			Context("with arguments split across newlines", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+method_with_lots_of_args('foo',
+                         'bar',
+                         'baz',
+                         &buz)
+`)
+				})
+
+				It("should be parsed as though the newlines were not present", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "method_with_lots_of_args"},
+							Args: []ast.Node{
+								ast.SimpleString{Value: "foo"},
+								ast.SimpleString{Value: "bar"},
+								ast.SimpleString{Value: "baz"},
+								ast.ProcArg{Value: ast.BareReference{Name: "buz"}},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with a proc argument", func() {
 				Context("inside parens", func() {
 					BeforeEach(func() {
