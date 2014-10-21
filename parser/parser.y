@@ -235,6 +235,13 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: $3,
     }
   }
+| REF LPAREN nodes_with_commas RPAREN block
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: append($3, $5),
+    }
+  }
 | SPECIAL_CHAR_REF
   {
     $$ = ast.CallExpression{Func: $1.(ast.BareReference)}

@@ -320,6 +320,40 @@ method_with_lots_of_args('foo',
 				})
 			})
 
+			Context("with args and a block split across newlines", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+method_with_lots_of_args('foo',
+                         'bar',
+                         'baz') do |foo|
+  puts foo
+end
+`)
+				})
+
+				It("should be parsed as though the newlines were not present", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "method_with_lots_of_args"},
+							Args: []ast.Node{
+								ast.SimpleString{Value: "foo"},
+								ast.SimpleString{Value: "bar"},
+								ast.SimpleString{Value: "baz"},
+								ast.Block{
+									Args: []ast.Node{ast.BareReference{Name: "foo"}},
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.BareReference{Name: "foo"}},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with a proc argument", func() {
 				Context("inside parens", func() {
 					BeforeEach(func() {
