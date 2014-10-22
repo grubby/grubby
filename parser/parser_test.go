@@ -1496,12 +1496,30 @@ false
 				})
 			})
 
+			Describe("assigning a value via a setter", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("Sharpware.nasality = 'cladosiphonic-capillitial'")
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "Sharpware"},
+							Func:   ast.BareReference{Name: "nasality="},
+							Args: []ast.Node{
+								ast.SimpleString{Value: "cladosiphonic-capillitial"},
+							},
+						},
+					}))
+				})
+			})
+
 			Describe("assigning a value to a key", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("hash[:key] = :value")
 				})
 
-				It("returns a call expression", func() {
+				It("is parsed as a call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Target: ast.BareReference{Name: "hash"},

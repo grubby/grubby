@@ -305,6 +305,15 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{},
     }
   }
+| single_node DOT REF EQUALTO expr
+  {
+    methodName := $3.(ast.BareReference).Name + "="
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: methodName},
+      Target: $1,
+      Args: []ast.Node{$5},
+    }
+  }
 
 // e.g.: `puts 'whatever' do ; end;` or with_a_block { puts 'foo' }
 | REF nodes_with_commas_and_optional_block
@@ -373,7 +382,7 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Target: $1,
       Args: []ast.Node{$3, $6},
     }
-  };
+  }
 
 call_args : LPAREN nodes_with_commas RPAREN
   { $$ = $2 }
