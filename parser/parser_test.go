@@ -185,14 +185,26 @@ FOO
 		})
 
 		Describe("symbols", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(":foo")
+			Context("without any special characters", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(":foo")
+				})
+
+				It("returns an ast.Symbol", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Symbol{Name: "foo"},
+					}))
+				})
 			})
 
-			It("returns an ast.Symbol", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.Symbol{Name: "foo"},
-				}))
+			Context("with an @ following the :", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(":@foo")
+				})
+
+				It("is parsed just like a regular symbol", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{ast.Symbol{Name: "@foo"}}))
+				})
 			})
 		})
 

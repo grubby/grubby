@@ -8,7 +8,7 @@ const alphaNumericUnderscore = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV
 const validMethodNameRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!?"
 
 func lexSymbol(l *StatefulRubyLexer) stateFn {
-	if !l.accept(alpha + "_") {
+	if !l.accept(alpha + "_@") {
 		if l.accept(":") {
 			l.emit(tokenTypeDoubleColon)
 		} else {
@@ -18,6 +18,7 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 		return lexAnything
 	}
 
+	l.accept("@") // symbols can start with an @
 	l.acceptRun(alphaNumericUnderscore)
 	l.emit(tokenTypeSymbol)
 	return lexAnything
