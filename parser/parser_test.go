@@ -664,6 +664,34 @@ ARGV.shift
 		})
 
 		Describe("method definitions", func() {
+			Context("on an object at runtime", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+obj = Object.new
+def obj.start
+end
+`)
+				})
+
+				It("is parsed as a method declaration", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.BareReference{Name: "obj"},
+							RHS: ast.CallExpression{
+								Target: ast.BareReference{Name: "Object"},
+								Func:   ast.BareReference{Name: "new"},
+							},
+						},
+						ast.FuncDecl{
+							Target: ast.BareReference{Name: "obj"},
+							Name:   ast.BareReference{Name: "start"},
+							Body:   []ast.Node{},
+							Args:   []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("with special names", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`

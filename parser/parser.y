@@ -438,6 +438,15 @@ func_declaration : DEF REF function_args optional_newlines function_body_list op
 			Body: $5,
     }
   }
+| DEF REF DOT REF function_args optional_newlines function_body_list optional_newlines END
+  {
+		$$ = ast.FuncDecl{
+      Target: $2,
+			Name: $4.(ast.BareReference),
+      Args: $5,
+			Body: $7,
+    }
+  }
 | DEF OPERATOR function_args optional_newlines function_body_list optional_newlines END
   {
 		$$ = ast.FuncDecl{

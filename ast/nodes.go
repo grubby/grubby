@@ -39,9 +39,10 @@ type CallExpression struct {
 }
 
 type FuncDecl struct {
-	Name BareReference
-	Args []Node
-	Body []Node
+	Target Node
+	Name   BareReference
+	Args   []Node
+	Body   []Node
 }
 
 type ClassDecl struct {
