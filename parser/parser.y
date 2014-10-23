@@ -184,6 +184,9 @@ var Statements []ast.Node
 // misc
 %type <genericValue> optional_newlines
 
+%left DOT
+%left QUESTIONMARK
+
 %%
 
 capture_list : /* empty */
@@ -222,9 +225,9 @@ list : /* empty */
   {  $$ = append($$, $2) };
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules | ternary | call_expression | group | lambda;
+single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules | call_expression | group | lambda;
 
-binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
+binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
 expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement;
 
@@ -274,13 +277,6 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Func: $3.(ast.BareReference),
     };
   }
-| call_expression DOT REF
-  {
-    $$ = ast.CallExpression{
-      Target: $1,
-      Func: $3.(ast.BareReference),
-    };
-  }
 | single_node DOT REF nodes_with_commas_and_optional_block
   {
     $$ = ast.CallExpression{
@@ -296,6 +292,14 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Func: $3.(ast.BareReference),
       Args: $4,
     };
+  }
+| single_node DOT REF call_args block
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+      Args: append($4, $5),
+    }
   }
 | group DOT REF
   {
@@ -563,6 +567,10 @@ assignment : REF EQUALTO single_node
       LHS: $1,
       RHS: $3,
     }
+  }
+| REF EQUALTO ternary
+  {
+     $$ = ast.Assignment{LHS: $1, RHS: $3}
   }
 | CAPITAL_REF EQUALTO expr
   {

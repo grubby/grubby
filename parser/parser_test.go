@@ -412,6 +412,55 @@ end
 				})
 			})
 
+			Context("chained together with a block at the end", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+MSpec.retrieve(:files).inject(0) { |max, f| f.size > max ? f.size : max }
+`)
+				})
+
+				It("is parsed as nested call expressions", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.CallExpression{
+								Target: ast.BareReference{Name: "MSpec"},
+								Func:   ast.BareReference{Name: "retrieve"},
+								Args: []ast.Node{
+									ast.Symbol{Name: "files"},
+								},
+							},
+							Func: ast.BareReference{Name: "inject"},
+							Args: []ast.Node{
+								ast.ConstantInt{Value: 0},
+								ast.Block{
+									Args: []ast.Node{
+										ast.BareReference{Name: "max"},
+										ast.BareReference{Name: "f"},
+									},
+									Body: []ast.Node{
+										ast.Ternary{
+											Condition: ast.CallExpression{
+												Target: ast.CallExpression{
+													Target: ast.BareReference{Name: "f"},
+													Func:   ast.BareReference{Name: "size"},
+												},
+												Func: ast.BareReference{Name: ">"},
+												Args: []ast.Node{ast.BareReference{Name: "max"}},
+											},
+											True: ast.CallExpression{
+												Target: ast.BareReference{Name: "f"},
+												Func:   ast.BareReference{Name: "size"},
+											},
+											False: ast.BareReference{Name: "max"},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("chained together with dots and parentheses", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("SpecVersion.new(String(other)).to_i")
