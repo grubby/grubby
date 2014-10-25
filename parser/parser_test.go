@@ -1753,13 +1753,12 @@ foo: bar,
 				lexer = parser.NewLexer(`
 def samsonic_obey
   raise 'whoopsie-daisy'
-  rescue Nope
-    puts 'unlikely'
-  rescue NotThisEither => e
-    puts 'contrived'
-  rescue
-    puts 'aww yisss'
-  end
+rescue Nope
+  puts 'unlikely'
+rescue NotThisEither => e
+  puts 'contrived'
+rescue
+  puts 'aww yisss'
 end
 `)
 			})
@@ -1774,6 +1773,8 @@ end
 								Func: ast.BareReference{Name: "raise"},
 								Args: []ast.Node{ast.SimpleString{Value: "whoopsie-daisy"}},
 							},
+						},
+						Rescues: []ast.Node{
 							ast.Rescue{
 								Exception: ast.RescueException{
 									Class: ast.BareReference{Name: "Nope"},
@@ -1798,7 +1799,8 @@ end
 								Body: []ast.Node{ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
 									Args: []ast.Node{ast.SimpleString{Value: "aww yisss"}},
-								}}},
+								}},
+							},
 						},
 					},
 				}))

@@ -434,31 +434,60 @@ nonempty_nodes_with_commas : single_node
 
 // FIXME: this should use a different type than call_args
 // call args can be a list of expressions. This is just a list of REFs or NODEs
-func_declaration : DEF REF function_args optional_newlines function_body_list optional_newlines END
+func_declaration : DEF REF function_args function_body_list END
   {
 		$$ = ast.FuncDecl{
 			Name: $2.(ast.BareReference),
       Args: $3,
-			Body: $5,
+			Body: $4,
     }
   }
-| DEF REF DOT REF function_args optional_newlines function_body_list optional_newlines END
+| DEF REF function_args function_body_list rescues END
+  {
+		$$ = ast.FuncDecl{
+			Name: $2.(ast.BareReference),
+      Args: $3,
+			Body: $4,
+      Rescues: $5,
+    }
+  }
+| DEF REF DOT REF function_args function_body_list END
   {
 		$$ = ast.FuncDecl{
       Target: $2,
 			Name: $4.(ast.BareReference),
       Args: $5,
-			Body: $7,
+			Body: $6,
     }
   }
-| DEF OPERATOR function_args optional_newlines function_body_list optional_newlines END
+| DEF REF DOT REF function_args function_body_list rescues END
+  {
+		$$ = ast.FuncDecl{
+      Target: $2,
+			Name: $4.(ast.BareReference),
+      Args: $5,
+			Body: $6,
+      Rescues: $7,
+    }
+  }
+| DEF OPERATOR function_args function_body_list END
   {
 		$$ = ast.FuncDecl{
 			Name: ast.BareReference{Name: $2},
       Args: $3,
-      Body: $5,
+      Body: $4,
+    }
+  }
+| DEF OPERATOR function_args function_body_list rescues END
+  {
+		$$ = ast.FuncDecl{
+			Name: ast.BareReference{Name: $2},
+      Args: $3,
+      Body: $4,
+      Rescues: $5,
     }
   };
+
 
 function_body_statement: /* empty */ {}
 | return_expression
@@ -485,8 +514,8 @@ function_body_list : /* empty */
   {  $$ = append($$, $2) }
 | function_body_list function_body_statement
   {  $$ = append($$, $2) }
-| function_body_list rescues END
-  { $$ = append($$, $2...) };
+/* | function_body_list rescues */
+/*   { $$ = append($$, $2...) }; */
 
 function_args : comma_delimited_args_with_default_values
   { $$ = $1 }
