@@ -405,6 +405,28 @@ end
 	})
 
 	Describe("class attribute methods", func() {
+		Describe(".attr_reader :symbol", func() {
+			It("creates a getter and setter on instances of the class", func() {
+				_, err := vm.Run(`
+class Foo
+  attr_reader :quaternion_vinic
+end
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				fooClass := vm.MustGetClass("Foo")
+				foo := fooClass.New()
+
+				reader, err := foo.Method("quaternion_vinic")
+				Expect(err).ToNot(HaveOccurred())
+
+				val, err := reader.Execute(foo)
+				Expect(val).To(Equal(builtins.Nil()))
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+
 		Describe(".attr_accessor :some_symbol", func() {
 			It("creates a getter and setter on instances of the class", func() {
 				_, err := vm.Run(`
