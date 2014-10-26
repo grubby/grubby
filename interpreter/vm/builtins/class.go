@@ -1,5 +1,7 @@
 package builtins
 
+import "errors"
+
 // abstract class interface
 type Class interface {
 	New(args ...Value) Value
@@ -46,10 +48,15 @@ type UserDefinedClass struct {
 
 	includedModules []Value
 	instanceMethods map[string]Method
+
+	attr_readers []string
+	attr_writers []string
 }
 
 type UserDefinedClassInstance struct {
 	valueStub
+
+	attrs map[string]Value
 }
 
 func NewUserDefinedClass(name string) Class {
@@ -76,6 +83,20 @@ func NewUserDefinedClass(name string) Class {
 
 		return instance, nil
 	}))
+	c.AddMethod(NewMethod("attr_accessor", func(self Value, args ...Value) (Value, error) {
+		for _, arg := range args {
+			symbol, ok := arg.(*SymbolValue)
+			if !ok {
+				return nil, errors.New("not a symbol or a string")
+			}
+
+			class := self.(*UserDefinedClass)
+			class.attr_readers = append(class.attr_readers, symbol.Name())
+			class.attr_writers = append(class.attr_writers, symbol.Name())
+		}
+
+		return nil, nil
+	}))
 
 	return c
 }
@@ -83,6 +104,7 @@ func NewUserDefinedClass(name string) Class {
 func (c *UserDefinedClass) New(args ...Value) Value {
 	instance := &UserDefinedClassInstance{}
 	instance.initialize()
+	instance.attrs = make(map[string]Value)
 	instance.class = c
 
 	for _, m := range c.instanceMethods {
@@ -93,6 +115,26 @@ func (c *UserDefinedClass) New(args ...Value) Value {
 		for _, method := range module.(Module).InstanceMethods() {
 			instance.AddMethod(method)
 		}
+	}
+
+	for _, attr := range c.attr_readers {
+		instance.AddMethod(NewMethod(attr, func(self Value, args ...Value) (Value, error) {
+			this := self.(*UserDefinedClassInstance)
+			value, ok := this.attrs[attr]
+			if !ok {
+				return Nil(), nil
+			}
+
+			return value, nil
+		}))
+	}
+
+	for _, attr := range c.attr_writers {
+		instance.AddMethod(NewMethod(attr+"=", func(self Value, args ...Value) (Value, error) {
+			this := self.(*UserDefinedClassInstance)
+			this.attrs[attr] = args[0]
+			return nil, nil
+		}))
 	}
 
 	return instance

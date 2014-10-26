@@ -14,3 +14,7 @@ func NewSymbol(val string) Value {
 func (symbolValue *SymbolValue) String() string {
 	return symbolValue.value
 }
+
+func (symbolValue *SymbolValue) Name() string {
+	return symbolValue.value
+}

@@ -404,6 +404,40 @@ end
 		})
 	})
 
+	Describe("class attribute methods", func() {
+		Describe(".attr_accessor :some_symbol", func() {
+			It("creates a getter and setter on instances of the class", func() {
+				_, err := vm.Run(`
+class Foo
+  attr_accessor :pieless_bothlike
+end
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				fooClass := vm.MustGetClass("Foo")
+				foo := fooClass.New()
+
+				reader, err := foo.Method("pieless_bothlike")
+				Expect(err).ToNot(HaveOccurred())
+
+				val, err := reader.Execute(foo)
+				Expect(val).To(Equal(builtins.Nil()))
+				Expect(err).ToNot(HaveOccurred())
+
+				writer, err := foo.Method("pieless_bothlike=")
+				Expect(err).ToNot(HaveOccurred())
+
+				_, err = writer.Execute(foo, builtins.NewString("unordainable-luthier"))
+				Expect(err).ToNot(HaveOccurred())
+
+				val, err = reader.Execute(foo)
+				Expect(val.String()).To(Equal("unordainable-luthier"))
+				Expect(err).ToNot(HaveOccurred())
+			})
+		})
+	})
+
 	Describe("methods", func() {
 		It("has a reference to self", func() {
 			_, err := vm.Run(`
