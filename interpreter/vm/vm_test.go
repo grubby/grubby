@@ -427,6 +427,29 @@ end
 			})
 		})
 
+		Describe(".attr_writer :some_symbol", func() {
+			It("creates a setter on instances of the class", func() {
+				_, err := vm.Run(`
+class Foo
+  attr_writer :chrysobull_nonmonarchist
+end
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				fooClass := vm.MustGetClass("Foo")
+				foo := fooClass.New()
+
+				reader, err := foo.Method("chrysobull_nonmonarchist=")
+				Expect(err).ToNot(HaveOccurred())
+
+				_, err = reader.Execute(foo, builtins.NewString("lyncher-mudslinger"))
+				Expect(err).ToNot(HaveOccurred())
+
+				// TODO: assert on the instance variable via instance_variable_get
+			})
+		})
+
 		Describe(".attr_accessor :some_symbol", func() {
 			It("creates a getter and setter on instances of the class", func() {
 				_, err := vm.Run(`

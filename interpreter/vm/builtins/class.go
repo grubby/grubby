@@ -110,6 +110,19 @@ func NewUserDefinedClass(name string) Class {
 
 		return nil, nil
 	}))
+	c.AddMethod(NewMethod("attr_writer", func(self Value, args ...Value) (Value, error) {
+		for _, arg := range args {
+			symbol, ok := arg.(*SymbolValue)
+			if !ok {
+				return nil, errors.New("not a symbol or a string")
+			}
+
+			class := self.(*UserDefinedClass)
+			class.attr_writers = append(class.attr_writers, symbol.Name())
+		}
+
+		return nil, nil
+	}))
 
 	return c
 }
