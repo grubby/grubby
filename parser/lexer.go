@@ -69,6 +69,7 @@ const (
 	tokenTypeAtSign
 	tokenTypeDot
 	tokenTypePipe
+	tokenTypeOrEquals
 	tokenTypeForwardSlash
 	tokenTypeAmpersand
 	tokenTypeSubshell
@@ -235,7 +236,11 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			}
 		case r == '|':
 			if l.accept("|") {
-				l.emit(tokenTypeOperator)
+				if l.accept("=") {
+					l.emit(tokenTypeOrEquals)
+				} else {
+					l.emit(tokenTypeOperator)
+				}
 			} else {
 				l.emit(tokenTypePipe)
 			}
@@ -572,6 +577,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeWHEN:
 			debug("WHEN")
 			return WHEN
+		case tokenTypeOrEquals:
+			debug("||=")
+			return OR_EQUALS
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

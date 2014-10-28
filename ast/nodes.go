@@ -222,3 +222,8 @@ type SwitchCase struct {
 	Conditions []Node
 	Body       []Node
 }
+
+type ConditionalAssignment struct {
+	LHS Node
+	RHS Node
+}

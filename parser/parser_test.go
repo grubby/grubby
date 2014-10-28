@@ -1138,6 +1138,21 @@ end
 			})
 		})
 
+		Describe("conditional assignment", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("a ||= 'aftergrass-Dowieite'")
+			})
+
+			It("returns a ConditionalAssignment expression", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.ConditionalAssignment{
+						LHS: ast.BareReference{Name: "a"},
+						RHS: ast.SimpleString{Value: "aftergrass-Dowieite"},
+					},
+				}))
+			})
+		})
+
 		Describe("assignment", func() {
 			Context("to a single variable", func() {
 				BeforeEach(func() {

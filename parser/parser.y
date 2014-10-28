@@ -75,6 +75,8 @@ var Statements []ast.Node
 %token <genericValue> NEGATIVE
 %token <genericValue> STAR
 
+%token <genericValue> OR_EQUALS
+
 // misc
 %token <genericValue> WHITESPACE
 %token <genericValue> NEWLINE
@@ -128,6 +130,7 @@ var Statements []ast.Node
 %type <genericValue> default_value_arg
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
+%type <genericValue> conditional_assignment
 %type <genericValue> class_name_with_modules
 %type <genericValue> function_body_statement
 
@@ -229,7 +232,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | conditional_assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -632,6 +635,46 @@ assignment : REF EQUALTO single_node
 | assignable_variables EQUALTO expr
   {
     $$ = ast.Assignment{
+      LHS: $1,
+      RHS: $3,
+    }
+  };
+
+conditional_assignment : REF OR_EQUALS single_node
+  {
+    $$ = ast.ConditionalAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+  }
+| REF OR_EQUALS ternary
+  {
+     $$ = ast.ConditionalAssignment{LHS: $1, RHS: $3}
+  }
+| CAPITAL_REF OR_EQUALS expr
+  {
+    $$ = ast.ConditionalAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+  }
+| instance_variable OR_EQUALS expr
+  {
+    $$ = ast.ConditionalAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+  }
+| class_variable OR_EQUALS expr
+  {
+    $$ = ast.ConditionalAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+  }
+| global OR_EQUALS expr
+  {
+    $$ = ast.ConditionalAssignment{
       LHS: $1,
       RHS: $3,
     }
