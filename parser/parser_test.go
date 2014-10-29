@@ -1581,6 +1581,53 @@ false
 		})
 
 		Describe("hashes", func() {
+			Context("with each key-value pair on a newline and no comma on the last line", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+# these two hashes are the same
+{
+  :foo => :bar,
+  :bar => :foo
+}
+
+{
+  :foo => :bar,
+  :bar => :foo,
+}
+
+`)
+				})
+
+				It("returns a Hash node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Hash{
+							Pairs: []ast.HashKeyValuePair{
+								{
+									Key:   ast.Symbol{Name: "foo"},
+									Value: ast.Symbol{Name: "bar"},
+								},
+								{
+									Key:   ast.Symbol{Name: "bar"},
+									Value: ast.Symbol{Name: "foo"},
+								},
+							},
+						},
+						ast.Hash{
+							Pairs: []ast.HashKeyValuePair{
+								{
+									Key:   ast.Symbol{Name: "foo"},
+									Value: ast.Symbol{Name: "bar"},
+								},
+								{
+									Key:   ast.Symbol{Name: "bar"},
+									Value: ast.Symbol{Name: "foo"},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with hashrockets", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("{:foo => bar}")

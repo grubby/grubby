@@ -185,6 +185,7 @@ var Statements []ast.Node
 %type <stringSlice> namespaced_modules
 
 // misc
+%type <genericValue> optional_comma
 %type <genericValue> optional_newlines
 
 %left DOT
@@ -212,6 +213,9 @@ capture_list : /* empty */
 | capture_list SEMICOLON
 | capture_list EOF
   { };
+
+optional_comma : /* empty */ { }
+| COMMA { };
 
 optional_newlines : /* empty */ { }
 | optional_newlines NEWLINE { }
@@ -784,21 +788,16 @@ hash : LBRACE optional_newlines key_value_pairs optional_newlines RBRACE
   };
 
 key_value_pairs : /* empty */ { $$ = ast.Nodes{} }
-| single_node OPERATOR expr optional_newlines
+| optional_newlines
+  {  }
+| single_node OPERATOR expr
   {
     if $2 != "=>" {
       panic("FREAKOUT")
     }
     $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $3})
   }
-| key_value_pairs optional_newlines COMMA expr OPERATOR expr optional_newlines
-  {
-  if $5 != "=>" {
-      panic("FREAKOUT")
-    }
-    $$ = append($$, ast.HashKeyValuePair{Key: $4, Value: $6})
-  }
-| key_value_pairs optional_newlines COMMA expr OPERATOR expr COMMA optional_newlines
+| key_value_pairs COMMA optional_newlines single_node OPERATOR expr optional_comma
   {
     if $5 != "=>" {
       panic("FREAKOUT")
