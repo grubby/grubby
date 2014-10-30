@@ -74,6 +74,7 @@ var Statements []ast.Node
 %token <genericValue> POSITIVE
 %token <genericValue> NEGATIVE
 %token <genericValue> STAR
+%token <genericValue> RANGE
 
 %token <genericValue> OR_EQUALS
 
@@ -108,6 +109,7 @@ var Statements []ast.Node
 %type <genericValue> expr
 %type <genericValue> true
 %type <genericValue> hash
+%type <genericValue> range
 %type <genericValue> block
 %type <genericValue> false
 %type <genericValue> array
@@ -236,7 +238,7 @@ single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | gl
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | conditional_assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | conditional_assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement | range;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -707,7 +709,7 @@ assignable_variables : REF COMMA REF
 negation : BANG expr { $$ = ast.Negation{Target: $2} };
 complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
 positive : POSITIVE expr { $$ = ast.Positive{Target: $2} };
-negative : NEGATIVE expr { $$ = ast.Negative{Target: $2} };
+negative : NEGATIVE single_node { $$ = ast.Negative{Target: $2} };
 
 binary_addition : single_node POSITIVE single_node
   {
@@ -1152,5 +1154,7 @@ switch_cases : WHEN comma_delimited_nodes list optional_newlines
   { $$ = append($$, ast.SwitchCase{Conditions: $2, Body: $3}) }
 | switch_cases WHEN comma_delimited_nodes list optional_newlines
   { $$ = append($$, ast.SwitchCase{Conditions: $3, Body: $4}) };
+
+range : expr RANGE expr { $$ = ast.Range{Start: $1, End: $3} };
 
 %%

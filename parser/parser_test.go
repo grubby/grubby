@@ -1987,6 +1987,23 @@ end
 			})
 		})
 
+		Describe("ranges", func() {
+			Context("of integers", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("-1..-5")
+				})
+
+				It("should be parsed as a Range", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Range{
+							Start: ast.Negative{Target: ast.ConstantInt{Value: 1}},
+							End:   ast.Negative{Target: ast.ConstantInt{Value: 5}},
+						},
+					}))
+				})
+			})
+		})
+
 		Describe("unless", func() {
 			Context("at the end of an expression", func() {
 				BeforeEach(func() {

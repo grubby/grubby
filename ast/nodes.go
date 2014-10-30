@@ -227,3 +227,8 @@ type ConditionalAssignment struct {
 	LHS Node
 	RHS Node
 }
+
+type Range struct {
+	Start Node
+	End   Node
+}
