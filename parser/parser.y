@@ -526,8 +526,6 @@ function_body_list : /* empty */
   {  $$ = append($$, $2) }
 | function_body_list function_body_statement
   {  $$ = append($$, $2) }
-/* | function_body_list rescues */
-/*   { $$ = append($$, $2...) }; */
 
 function_args : comma_delimited_args_with_default_values
   { $$ = $1 }
