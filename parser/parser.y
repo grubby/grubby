@@ -122,6 +122,7 @@ var Statements []ast.Node
 %type <genericValue> assignment
 %type <genericValue> begin_block
 %type <genericValue> single_node
+%type <genericValue> simple_node
 %type <genericValue> class_variable
 %type <genericValue> call_expression
 %type <genericValue> func_declaration
@@ -231,14 +232,16 @@ list : /* empty */
 | list single_node
   {  $$ = append($$, $2) };
 | list expr
-  {  $$ = append($$, $2) };
+{  $$ = append($$, $2) };
+
+simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | array | hash | class_name_with_modules | call_expression | group | lambda;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | range;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | func_declaration | class_declaration | module_declaration | assignment | conditional_assignment | negation | complement | positive | negative | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement | range;
+expr : single_node | func_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement;
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -706,10 +709,10 @@ assignable_variables : REF COMMA REF
 | assignable_variables COMMA REF
   { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
 
-negation : BANG expr { $$ = ast.Negation{Target: $2} };
-complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
-positive : POSITIVE expr { $$ = ast.Positive{Target: $2} };
-negative : NEGATIVE single_node { $$ = ast.Negative{Target: $2} };
+negation : BANG simple_node { $$ = ast.Negation{Target: $2} };
+complement : COMPLEMENT simple_node { $$ = ast.Complement{Target: $2} };
+positive : POSITIVE simple_node { $$ = ast.Positive{Target: $2} };
+negative : NEGATIVE simple_node { $$ = ast.Negative{Target: $2} };
 
 binary_addition : single_node POSITIVE single_node
   {
@@ -1155,6 +1158,6 @@ switch_cases : WHEN comma_delimited_nodes list optional_newlines
 | switch_cases WHEN comma_delimited_nodes list optional_newlines
   { $$ = append($$, ast.SwitchCase{Conditions: $3, Body: $4}) };
 
-range : expr RANGE expr { $$ = ast.Range{Start: $1, End: $3} };
+range : single_node RANGE single_node { $$ = ast.Range{Start: $1, End: $3} };
 
 %%

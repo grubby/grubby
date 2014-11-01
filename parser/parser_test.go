@@ -2020,6 +2020,45 @@ end
 				})
 			})
 
+			Context("with a comparision of call expressions", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+unless target[-6..-1] == config[:config_ext]
+end
+`)
+				})
+
+				It("is parsed as an IfBlock", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.IfBlock{
+							Condition: ast.Negation{
+								ast.CallExpression{
+									Target: ast.CallExpression{
+										Target: ast.BareReference{Name: "target"},
+										Func:   ast.BareReference{Name: "[]"},
+										Args: []ast.Node{
+											ast.Range{
+												Start: ast.Negative{Target: ast.ConstantInt{Value: 6}},
+												End:   ast.Negative{Target: ast.ConstantInt{Value: 1}},
+											},
+										},
+									},
+									Func: ast.BareReference{Name: "=="},
+									Args: []ast.Node{
+										ast.CallExpression{
+											Target: ast.BareReference{Name: "config"},
+											Func:   ast.BareReference{Name: "[]"},
+											Args:   []ast.Node{ast.Symbol{Name: "config_ext"}},
+										},
+									},
+								},
+							},
+							Body: []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("inside another unless", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
