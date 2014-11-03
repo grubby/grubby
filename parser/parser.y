@@ -363,14 +363,6 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
-| call_expression GREATERTHAN single_node
-  {
-    $$ = ast.CallExpression{
-      Func: ast.BareReference{Name: ">"},
-      Target: $1,
-      Args: []ast.Node{$3},
-    }
-  }
 | single_node OPERATOR single_node
   {
     $$ = ast.CallExpression{
@@ -1048,8 +1040,6 @@ loop_expressions : /* empty */
   {  }
 | loop_expressions SEMICOLON
   {  }
-| loop_expressions single_node
-  {  $$ = append($$, $2) };
 | loop_expressions expr
   {  $$ = append($$, $2) }
 | loop_expressions loop_if_block
