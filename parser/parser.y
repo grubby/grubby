@@ -119,6 +119,7 @@ var Statements []ast.Node
 %type <genericValue> rescue
 %type <genericValue> ternary
 %type <genericValue> if_block
+%type <genericValue> splat_arg
 %type <genericValue> assignment
 %type <genericValue> begin_block
 %type <genericValue> single_node
@@ -135,7 +136,6 @@ var Statements []ast.Node
 %type <genericValue> module_declaration
 %type <genericValue> conditional_assignment
 %type <genericValue> class_name_with_modules
-%type <genericValue> method_body_statement
 
 %type <switchCaseSlice> switch_cases;
 %type <genericValue> switch_statement;
@@ -178,7 +178,6 @@ var Statements []ast.Node
 %type <genericSlice> loop_expressions
 %type <genericSlice> optional_rescues
 %type <genericSlice> nodes_with_commas
-%type <genericSlice> method_body_list
 %type <genericSlice> comma_delimited_refs
 %type <genericSlice> comma_delimited_nodes
 %type <genericSlice> symbol_key_value_pairs
@@ -237,11 +236,14 @@ list : /* empty */
 simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | range;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | range | splat_arg;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement;
+expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement | return_expression;
+
+splat_arg : STAR single_node
+  { $$ = ast.StarSplat{Value: $2} };
 
 call_expression : REF LPAREN nodes_with_commas RPAREN
   {
@@ -438,7 +440,7 @@ nonempty_nodes_with_commas : single_node
 
 // FIXME: this should use a different type than call_args
 // call args can be a list of expressions. This is just a list of REFs or NODEs
-method_declaration : DEF REF method_args method_body_list END
+method_declaration : DEF REF method_args list END
   {
 		$$ = ast.FuncDecl{
 			Name: $2.(ast.BareReference),
@@ -446,7 +448,7 @@ method_declaration : DEF REF method_args method_body_list END
 			Body: $4,
     }
   }
-| DEF REF method_args method_body_list rescues END
+| DEF REF method_args list rescues END
   {
 		$$ = ast.FuncDecl{
 			Name: $2.(ast.BareReference),
@@ -455,7 +457,7 @@ method_declaration : DEF REF method_args method_body_list END
       Rescues: $5,
     }
   }
-| DEF REF DOT REF method_args method_body_list END
+| DEF REF DOT REF method_args list END
   {
 		$$ = ast.FuncDecl{
       Target: $2,
@@ -464,7 +466,7 @@ method_declaration : DEF REF method_args method_body_list END
 			Body: $6,
     }
   }
-| DEF REF DOT REF method_args method_body_list rescues END
+| DEF REF DOT REF method_args list rescues END
   {
 		$$ = ast.FuncDecl{
       Target: $2,
@@ -474,7 +476,7 @@ method_declaration : DEF REF method_args method_body_list END
       Rescues: $7,
     }
   }
-| DEF OPERATOR method_args method_body_list END
+| DEF OPERATOR method_args list END
   {
 		$$ = ast.FuncDecl{
 			Name: ast.BareReference{Name: $2},
@@ -482,7 +484,7 @@ method_declaration : DEF REF method_args method_body_list END
       Body: $4,
     }
   }
-| DEF OPERATOR method_args method_body_list rescues END
+| DEF OPERATOR method_args list rescues END
   {
 		$$ = ast.FuncDecl{
 			Name: ast.BareReference{Name: $2},
@@ -492,32 +494,6 @@ method_declaration : DEF REF method_args method_body_list END
     }
   };
 
-
-method_body_statement: /* empty */ {}
-| return_expression
-  { $$ = $1 }
-| return_expression IF expr
-  { $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{$1}} }
-| return_expression UNLESS expr
-  {
-    $$ = ast.IfBlock{
-      Condition: ast.Negation{Target: $3},
-      Body: []ast.Node{ast.Break{}},
-    }
-  };
-
-method_body_list : /* empty */
-  { $$ = ast.Nodes{} }
-| method_body_list NEWLINE
-  {  }
-| method_body_list SEMICOLON
-  {  }
-| method_body_list single_node
-  {  $$ = append($$, $2) };
-| method_body_list expr
-  {  $$ = append($$, $2) }
-| method_body_list method_body_statement
-  {  $$ = append($$, $2) }
 
 method_args : comma_delimited_args_with_default_values
   { $$ = $1 }

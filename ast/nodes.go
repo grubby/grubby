@@ -232,3 +232,7 @@ type Range struct {
 	Start Node
 	End   Node
 }
+
+type StarSplat struct {
+	Value Node
+}

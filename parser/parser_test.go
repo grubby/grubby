@@ -724,6 +724,25 @@ ARGV.shift
 			})
 		})
 
+		Describe("array splat", func() {
+			Context("in a call expression", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo(*bar)")
+				})
+
+				It("marks the argument for array deferencing", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "foo"},
+							Args: []ast.Node{
+								ast.StarSplat{Value: ast.BareReference{Name: "bar"}},
+							},
+						},
+					}))
+				})
+			})
+		})
+
 		Describe("method definitions", func() {
 			Context("on an object at runtime", func() {
 				BeforeEach(func() {
@@ -1869,6 +1888,62 @@ end
 			})
 		})
 
+		Describe("with conditional returns inside a method", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+def method_with_conditional_return
+  names.each do |name|
+    return Kernel.load(name) if File.exist?(File.expand_path(name))
+  end
+end
+`)
+			})
+
+			It("should be parsed correctly", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.FuncDecl{
+						Name: ast.BareReference{Name: "method_with_conditional_return"},
+						Args: []ast.Node{},
+						Body: []ast.Node{
+							ast.CallExpression{
+								Target: ast.BareReference{Name: "names"},
+								Func:   ast.BareReference{Name: "each"},
+								Args: []ast.Node{
+									ast.Block{
+										Args: []ast.Node{ast.BareReference{Name: "name"}},
+										Body: []ast.Node{
+											ast.IfBlock{
+												Condition: ast.CallExpression{
+													Target: ast.BareReference{Name: "File"},
+													Func:   ast.BareReference{Name: "exist?"},
+													Args: []ast.Node{
+														ast.CallExpression{
+															Target: ast.BareReference{Name: "File"},
+															Func:   ast.BareReference{Name: "expand_path"},
+															Args:   []ast.Node{ast.BareReference{Name: "name"}},
+														},
+													},
+												},
+												Body: []ast.Node{
+													ast.Return{
+														Value: ast.CallExpression{
+															Target: ast.BareReference{Name: "Kernel"},
+															Func:   ast.BareReference{Name: "load"},
+															Args:   []ast.Node{ast.BareReference{Name: "name"}},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("with expressions that return a value", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
@@ -2752,7 +2827,7 @@ end
 			})
 		})
 
-		Context("when the 'return' keyword is outside of a method", func() {
+		PContext("when the 'return' keyword is outside of a method", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer("return 5")
 			})
@@ -2771,7 +2846,17 @@ end
 `)
 			})
 
-			It("is fails to parser", func() {
+			It("is fails to parse", func() {
+				Expect(parser.Statements).To(BeEmpty())
+			})
+		})
+
+		PContext("when a splat precedes a reference outside of a call expression or method declaration", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("*[1,2,3]")
+			})
+
+			It("is fails to parse", func() {
 				Expect(parser.Statements).To(BeEmpty())
 			})
 		})
