@@ -143,6 +143,8 @@ var Statements []ast.Node
 %type <genericValue> logical_or;
 %type <genericValue> logical_and;
 
+%type <genericValue> rescue_modifier;
+
 // loops and expressions that can be inside a loop
 %type <genericValue> while_loop
 %type <genericValue> loop_statement;
@@ -240,7 +242,10 @@ single_node : simple_node | array | hash | class_name_with_modules | call_expres
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement | return_expression;
+expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement | return_expression | rescue_modifier;
+
+rescue_modifier : single_node RESCUE single_node
+  { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
 
 splat_arg : STAR single_node
   { $$ = ast.StarSplat{Value: $2} };
@@ -282,6 +287,13 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
       Args: $2,
+    }
+  }
+| REF call_args block
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: append($2, $3),
     }
   }
 | single_node DOT REF
@@ -425,8 +437,8 @@ nodes_with_commas_and_optional_block : single_node
   { $$ = append($$, $1); }
 | nodes_with_commas_and_optional_block COMMA optional_newlines single_node
   { $$ = append($$, $4); }
-| nodes_with_commas_and_optional_block COMMA optional_newlines block
-  { $$ = append($$, $3); }
+| nodes_with_commas_and_optional_block block
+  { $$ = append($$, $2); }
 | nodes_with_commas_and_optional_block COMMA optional_newlines AMPERSAND REF
   { $$ = append($$, ast.ProcArg{Value: $5}) }
 
@@ -574,6 +586,10 @@ assignment : REF EQUALTO single_node
       LHS: $1,
       RHS: $3,
     }
+  }
+| REF EQUALTO rescue_modifier
+  {
+    $$ = ast.Assignment{LHS: $1, RHS: $3}
   }
 | REF EQUALTO ternary
   {

@@ -236,3 +236,8 @@ type Range struct {
 type StarSplat struct {
 	Value Node
 }
+
+type RescueModifier struct {
+	Statement Node
+	Rescue    Node
+}

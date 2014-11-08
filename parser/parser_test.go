@@ -332,6 +332,38 @@ method_with_lots_of_args('foo',
 				})
 			})
 
+			Context("with args and a block, but no parens", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+Signal.trap "INT", "TERM" do
+  MSpec.actions :abort
+end
+`)
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "Signal"},
+							Func:   ast.BareReference{Name: "trap"},
+							Args: []ast.Node{
+								ast.InterpolatedString{Value: "INT"},
+								ast.InterpolatedString{Value: "TERM"},
+								ast.Block{
+									Body: []ast.Node{
+										ast.CallExpression{
+											Target: ast.BareReference{Name: "MSpec"},
+											Func:   ast.BareReference{Name: "actions"},
+											Args:   []ast.Node{ast.Symbol{Name: "abort"}},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with args and a block split across newlines", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
@@ -2334,6 +2366,27 @@ end
 						},
 					}))
 				})
+			})
+		})
+
+		Describe("an expression that can fail followed by rescue", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("value = can_raise() rescue 'whoops'")
+			})
+
+			It("uses the provided value as a fall back for assignment", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Assignment{
+						LHS: ast.BareReference{Name: "value"},
+						RHS: ast.RescueModifier{
+							Statement: ast.CallExpression{
+								Args: []ast.Node{},
+								Func: ast.BareReference{Name: "can_raise"},
+							},
+							Rescue: ast.SimpleString{Value: "whoops"},
+						},
+					},
+				}))
 			})
 		})
 
