@@ -140,9 +140,10 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == '"':
 			return lexDoubleQuoteString
 		case r == '?':
-			if l.accept(validMethodNameRunes + "-") {
+			// FIXME: this is not an exhaustive list of character literals
+			if l.accept(validMethodNameRunes + "-^") {
 				l.start += 1 // skip past the ?
-				l.acceptRun(validMethodNameRunes + "-")
+				l.acceptRun(validMethodNameRunes + "-^")
 				l.emit(tokenTypeCharacter)
 			} else {
 				l.emit(tokenTypeQuestionMark)

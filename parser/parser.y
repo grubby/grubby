@@ -230,8 +230,6 @@ list : /* empty */
   {  }
 | list SEMICOLON
   {  }
-| list single_node
-  {  $$ = append($$, $2) };
 | list expr
 {  $$ = append($$, $2) };
 

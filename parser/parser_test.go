@@ -257,6 +257,8 @@ when 1, 3
   puts 'even'
 when 2, 4
   puts 'odd'
+when ?^
+  puts 'a single character (^) literal'
 else
   puts 'whoops'
 end
@@ -289,6 +291,17 @@ end
 									ast.CallExpression{
 										Func: ast.BareReference{Name: "puts"},
 										Args: []ast.Node{ast.SimpleString{Value: "odd"}},
+									},
+								},
+							},
+							ast.SwitchCase{
+								Conditions: []ast.Node{
+									ast.CharacterLiteral{Value: "^"},
+								},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.SimpleString{Value: "a single character (^) literal"}},
 									},
 								},
 							},
