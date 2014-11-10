@@ -320,6 +320,44 @@ end
 		})
 
 		Describe("call expressions", func() {
+			Context("with inline assignment of binary operators", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+a += 5
+b -= [1]
+c /= 'x'
+d *= nil
+`)
+				})
+
+				It("is parsed with the operator as the method name", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "a"},
+							Func:   ast.BareReference{Name: "+="},
+							Args:   []ast.Node{ast.ConstantInt{Value: 5}},
+						},
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "b"},
+							Func:   ast.BareReference{Name: "-="},
+							Args: []ast.Node{ast.Array{
+								Nodes: []ast.Node{ast.ConstantInt{Value: 1}},
+							}},
+						},
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "c"},
+							Func:   ast.BareReference{Name: "/="},
+							Args:   []ast.Node{ast.SimpleString{Value: "x"}},
+						},
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "d"},
+							Func:   ast.BareReference{Name: "*="},
+							Args:   []ast.Node{ast.BareReference{Name: "nil"}},
+						},
+					}))
+				})
+			})
+
 			Context("with arguments split across newlines", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
