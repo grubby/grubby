@@ -840,6 +840,45 @@ ARGV.shift
 		})
 
 		Describe("method definitions", func() {
+			Context("for setter methods", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def foo=(bar)
+end
+
+def self.bar=(foo)
+end
+`)
+				})
+
+				It("should be parsed with the equals sign in the name", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Target: nil,
+							Name:   ast.BareReference{Name: "foo="},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name:    ast.BareReference{Name: "bar"},
+									IsSplat: false,
+								},
+							},
+							Body: []ast.Node{},
+						},
+						ast.FuncDecl{
+							Target: ast.BareReference{Name: "self"},
+							Name:   ast.BareReference{Name: "bar="},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name:    ast.BareReference{Name: "foo"},
+									IsSplat: false,
+								},
+							},
+							Body: []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("on an object at runtime", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`

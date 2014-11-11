@@ -15,8 +15,16 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.acceptRun(whitespace)
 		l.emit(tokenTypeWhitespace)
 
+		if l.input[l.start:l.start+5] == "self." {
+			l.acceptRun("self")
+			l.emit(tokenTypeReference)
+			l.accept(".")
+			l.emit(tokenTypeDot)
+		}
+
 		if l.accept(validMethodNameRunes) {
 			l.acceptRun(validMethodNameRunes)
+			l.accept("=")
 			l.emit(tokenTypeReference)
 		}
 	case "do":
