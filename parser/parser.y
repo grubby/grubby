@@ -236,11 +236,11 @@ list : /* empty */
 simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | range | splat_arg;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | range | splat_arg | logical_and | logical_or;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | logical_and | logical_or | switch_statement | return_expression | rescue_modifier;
+expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | rescue_modifier;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -1118,11 +1118,11 @@ loop_elsif_block : loop_elsif_block ELSIF expr loop_expressions
     })
    };
 
-logical_and : single_node AND single_node
-  { $$ = ast.WeakLogicalAnd{LHS: $1, RHS: $3} };
+logical_and : single_node AND optional_newlines single_node
+  { $$ = ast.WeakLogicalAnd{LHS: $1, RHS: $4} };
 
-logical_or : single_node OR single_node
-  { $$ = ast.WeakLogicalOr{LHS: $1, RHS: $3} };
+logical_or : single_node OR optional_newlines single_node
+  { $$ = ast.WeakLogicalOr{LHS: $1, RHS: $4} };
 
 lambda : LAMBDA block { $$ = ast.Lambda{Body: $2.(ast.Block)} };
 

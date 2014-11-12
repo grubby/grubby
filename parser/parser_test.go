@@ -2931,6 +2931,11 @@ class Foo<Bar
   ~    true
   +   5
   -    123
+
+  a = 5 or
+    false
+  b = a and
+    true
 end
 
 with_a_block { |foo| puts foo.inspect } # comment goes here
