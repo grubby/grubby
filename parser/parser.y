@@ -236,11 +236,11 @@ list : /* empty */
 simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | range | splat_arg | logical_and | logical_or;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | rescue_modifier;
+expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | rescue_modifier | range;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -393,6 +393,15 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
+| REF LBRACKET range RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+
 
 // hash assignment
 | REF LBRACKET single_node RBRACKET EQUALTO expr
@@ -689,10 +698,10 @@ assignable_variables : REF COMMA REF
 | assignable_variables COMMA REF
   { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
 
-negation : BANG simple_node { $$ = ast.Negation{Target: $2} };
-complement : COMPLEMENT simple_node { $$ = ast.Complement{Target: $2} };
-positive : POSITIVE simple_node { $$ = ast.Positive{Target: $2} };
-negative : NEGATIVE simple_node { $$ = ast.Negative{Target: $2} };
+negation : BANG expr { $$ = ast.Negation{Target: $2} };
+complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
+positive : POSITIVE single_node { $$ = ast.Positive{Target: $2} };
+negative : NEGATIVE single_node { $$ = ast.Negative{Target: $2} };
 
 binary_addition : single_node POSITIVE single_node
   {

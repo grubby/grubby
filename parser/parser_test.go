@@ -1369,13 +1369,15 @@ false
 		Describe("unary operators", func() {
 			Describe("unary NOT", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer(`!true`)
+					lexer = parser.NewLexer(`!!true`)
 				})
 
 				It("returns a Negation expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Negation{
-							Target: ast.Boolean{Value: true},
+							ast.Negation{
+								Target: ast.Boolean{Value: true},
+							},
 						},
 					}))
 				})
@@ -1383,13 +1385,15 @@ false
 
 			Describe("unary COMPLEMENT", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("~false")
+					lexer = parser.NewLexer("~~false")
 				})
 
 				It("returns a Complement expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Complement{
-							Target: ast.Boolean{Value: false},
+							ast.Complement{
+								Target: ast.Boolean{Value: false},
+							},
 						},
 					}))
 				})
@@ -1397,13 +1401,15 @@ false
 
 			Describe("unary plus", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("+foo")
+					lexer = parser.NewLexer("++foo")
 				})
 
 				It("returns a Positive expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Positive{
-							Target: ast.BareReference{Name: "foo"},
+							ast.Positive{
+								Target: ast.BareReference{Name: "foo"},
+							},
 						},
 					}))
 				})
@@ -1411,13 +1417,15 @@ false
 
 			Describe("unary minus", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("-867.5309")
+					lexer = parser.NewLexer("--867.5309")
 				})
 
 				It("returns a Negative expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Negative{
-							Target: ast.ConstantFloat{Value: 867.5309},
+							ast.Negative{
+								Target: ast.ConstantFloat{Value: 867.5309},
+							},
 						},
 					}))
 				})
@@ -2233,7 +2241,7 @@ end
 			Context("with a comparision of call expressions", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
-unless target[-6..-1] == config[:config_ext]
+unless target[0..1] == config[:config_ext]
 end
 `)
 				})
@@ -2248,8 +2256,8 @@ end
 										Func:   ast.BareReference{Name: "[]"},
 										Args: []ast.Node{
 											ast.Range{
-												Start: ast.Negative{Target: ast.ConstantInt{Value: 6}},
-												End:   ast.Negative{Target: ast.ConstantInt{Value: 1}},
+												Start: ast.ConstantInt{Value: 0},
+												End:   ast.ConstantInt{Value: 1},
 											},
 										},
 									},
