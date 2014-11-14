@@ -241,3 +241,7 @@ type RescueModifier struct {
 	Statement Node
 	Rescue    Node
 }
+
+type Regex struct {
+	Value string
+}

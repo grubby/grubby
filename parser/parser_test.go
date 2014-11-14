@@ -2222,6 +2222,18 @@ end
 			})
 		})
 
+		Describe("regex literals", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("/^foo.*bar$/")
+			})
+
+			It("is parsed as an ast.Regex", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Regex{Value: "^foo.*bar$"},
+				}))
+			})
+		})
+
 		Describe("unless", func() {
 			Context("at the end of an expression", func() {
 				BeforeEach(func() {

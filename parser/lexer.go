@@ -106,6 +106,7 @@ type StatefulRubyLexer struct {
 
 	tokens chan token
 
+	lastToken token
 	LastError error
 }
 
@@ -262,11 +263,7 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypePipe)
 			}
 		case r == '/':
-			if l.accept("=") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypeForwardSlash)
-			}
+			return lexSlash
 		case r == '&':
 			if l.accept("&") {
 				l.emit(tokenTypeOperator)
@@ -359,13 +356,15 @@ func (l *StatefulRubyLexer) acceptRun(valid string) {
 	l.backup()
 }
 
-func (lexer *StatefulRubyLexer) emit(t tokenType) {
-	lexer.tokens <- token{
+func (l *StatefulRubyLexer) emit(t tokenType) {
+	newToken := token{
 		typ:   t,
-		value: lexer.input[lexer.start:lexer.pos],
+		value: l.input[l.start:l.pos],
 	}
+	l.tokens <- newToken
+	l.lastToken = newToken
 
-	lexer.start = lexer.pos
+	l.start = l.pos
 }
 
 func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
@@ -601,6 +600,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeRange:
 			debug(".. (range)")
 			return RANGE
+		case tokenTypeRegex:
+			debug("regex: '%s'", token.value)
+			lval.genericValue = ast.Regex{Value: token.value}
+			return NODE
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
