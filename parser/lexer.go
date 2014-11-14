@@ -28,13 +28,13 @@ const (
 	tokenTypeFloat
 	tokenTypeString
 	tokenTypeDoubleQuoteString
+	tokenTypeRegex
 	tokenTypeCharacter
 	tokenTypeSymbol
 	tokenTypeReference
 	tokenTypeMethodName
 	tokenTypeGlobal
 	tokenTypeCapitalizedReference
-	tokenTypeWhitespace
 	tokenTypeNewline
 	tokenTypeLParen
 	tokenTypeRParen
@@ -154,8 +154,8 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case r == ';':
 			l.emit(tokenTypeSemicolon)
 		case r == ' ' || r == '\t':
-			l.backup()
-			return lexWhitespace
+			l.acceptRun(whitespace)
+			l.ignore()
 		case r == '\n':
 			l.backup()
 			return lexNewlines
@@ -429,9 +429,6 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeComma:
 			debug("COMMA")
 			return COMMA
-		case tokenTypeWhitespace:
-			continue // whitespace is optional
-			debug("WHITESPACE")
 		case tokenTypeNewline:
 			debug("NEWLINE")
 			return NEWLINE
