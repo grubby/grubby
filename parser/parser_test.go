@@ -1069,6 +1069,36 @@ end
 				})
 			})
 
+			Context("with default value args and a block", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def self.describe(mod, options=nil, &block)
+end
+`)
+				})
+
+				It("returns a function declaration with appropriate method parameters", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Target: ast.BareReference{Name: "self"},
+							Name:   ast.BareReference{Name: "describe"},
+							Args: []ast.Node{
+								ast.MethodParam{Name: ast.BareReference{Name: "mod"}},
+								ast.MethodParam{
+									Name:         ast.BareReference{Name: "options"},
+									DefaultValue: ast.BareReference{Name: "nil"},
+								},
+								ast.MethodParam{
+									Name:   ast.BareReference{Name: "block"},
+									IsProc: true,
+								},
+							},
+							Body: []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("with parameters surrounded by parens", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`

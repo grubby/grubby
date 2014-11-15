@@ -457,8 +457,6 @@ nonempty_nodes_with_commas : single_node
   { $$ = append($$, $3); };
 
 
-// FIXME: this should use a different type than call_args
-// call args can be a list of expressions. This is just a list of REFs or NODEs
 method_declaration : DEF REF method_args list END
   {
 		$$ = ast.FuncDecl{
@@ -519,24 +517,21 @@ method_args : comma_delimited_args_with_default_values
 | LPAREN comma_delimited_args_with_default_values RPAREN
   { $$ = $2 };
 
+comma_delimited_args_with_default_values : /* empty */ { $$ = ast.Nodes{} }
+| default_value_arg
+  { $$ = append($$, $1) }
+| comma_delimited_args_with_default_values COMMA default_value_arg
+  { $$ = append($$, $3) };
+
 default_value_arg : REF
   { $$ = ast.MethodParam{Name: $1.(ast.BareReference)} }
 | STAR REF
   { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsSplat: true} }
-| REF EQUALTO expr
+| REF EQUALTO single_node
   { $$ = ast.MethodParam{Name: $1.(ast.BareReference), DefaultValue: $3} }
 | AMPERSAND REF
   { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsProc: true} };
 
-comma_delimited_args_with_default_values : /* empty */ { $$ = ast.Nodes{} }
-| default_value_arg
-  {
-    $$ = append($$, $1)
-  }
-| comma_delimited_args_with_default_values COMMA default_value_arg
-  {
-    $$ = append($$, $3)
-  };
 
 class_declaration : CLASS class_name_with_modules list END
   {
