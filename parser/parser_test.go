@@ -333,6 +333,26 @@ end
 		})
 
 		Describe("call expressions", func() {
+			Context("with a value that should be converted to a proc", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("describe(&block)")
+				})
+
+				It("converts the argument to a proc", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "describe"},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "block"},
+									Func:   ast.BareReference{Name: "to_proc"},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with inline assignment of binary operators", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`

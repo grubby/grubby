@@ -432,10 +432,19 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $1) }
 | binary_expression
   { $$ = append($$, $1) }
+| AMPERSAND single_node
+  { $$ = append($$, ast.CallExpression{Func: ast.BareReference{Name:"to_proc"}, Target: $2}) }
 | nodes_with_commas COMMA optional_newlines single_node
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines binary_expression
-  { $$ = append($$, $4) };
+  { $$ = append($$, $4) }
+| nodes_with_commas COMMA optional_newlines AMPERSAND single_node
+  {
+    $$ = append($$, ast.CallExpression{
+      Func: ast.BareReference{Name: "to_proc"},
+      Target: $5,
+    })
+  };
 
 // FIXME: this should ONLY have a block at the end (not in the middle)
 nodes_with_commas_and_optional_block : single_node
