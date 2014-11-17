@@ -2087,6 +2087,7 @@ end
 def method_with_conditional_return
   names.each do |name|
     return Kernel.load(name) if File.exist?(File.expand_path(name))
+    return unless false
   end
 end
 `)
@@ -2125,6 +2126,12 @@ end
 															Args:   []ast.Node{ast.BareReference{Name: "name"}},
 														},
 													},
+												},
+											},
+											ast.IfBlock{
+												Condition: ast.Negation{Target: ast.Boolean{Value: false}},
+												Body: []ast.Node{
+													ast.Return{},
 												},
 											},
 										},

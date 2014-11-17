@@ -924,6 +924,13 @@ if_block : IF expr list END
       Condition: ast.Negation{Target: $2},
       Body: $4,
     }
+  }
+| expr UNLESS expr
+  {
+    $$ = ast.IfBlock{
+      Condition: ast.Negation{Target: $3},
+      Body: []ast.Node{$1},
+    }
   };
 
 
@@ -1023,7 +1030,9 @@ return_expression : RETURN comma_delimited_nodes
     } else {
       $$ = ast.Return{Value: $2}
     }
-  };
+  }
+| RETURN
+  { $$ = ast.Return{} };
 
 ternary : single_node QUESTIONMARK single_node COLON single_node
   {
