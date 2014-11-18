@@ -349,7 +349,7 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
       Args: $2,
-    };
+    }
   }
 | single_node LESSTHAN single_node
   {
@@ -393,6 +393,14 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
+| instance_variable LBRACKET single_node RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
 | REF LBRACKET range RBRACKET
   {
     $$ = ast.CallExpression{
@@ -412,6 +420,15 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3, $6},
     }
   }
+| instance_variable LBRACKET single_node RBRACKET EQUALTO expr
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]="},
+      Target: $1,
+      Args: []ast.Node{$3, $6},
+    }
+  };
+
 
 call_args : LPAREN nodes_with_commas RPAREN
   { $$ = $2 }

@@ -1317,6 +1317,47 @@ end
 			})
 		})
 
+		// this is ambiguous because it is impossible to determine if you meant
+		// foo [:something] as a call expression (e.g.: foo([:an_array_literal]))
+		// ... or ...
+		// foo [:something] as a call expression on foo (e.g.: call .[] on `foo`)
+		Describe("ambiguous [] syntax", func() {
+			Context("calling [] and []= on an instance variable", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+@shared[state.to_s] = state
+@shared[state.to_s] # returns 'state'
+`)
+				})
+
+				It("should be parsed as a call expression for the []= operator", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.InstanceVariable{Name: "shared"},
+							Func:   ast.BareReference{Name: "[]="},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "state"},
+									Func:   ast.BareReference{Name: "to_s"},
+								},
+								ast.BareReference{Name: "state"},
+							},
+						},
+						ast.CallExpression{
+							Target: ast.InstanceVariable{Name: "shared"},
+							Func:   ast.BareReference{Name: "[]"},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "state"},
+									Func:   ast.BareReference{Name: "to_s"},
+								},
+							},
+						},
+					}))
+				})
+			})
+		})
+
 		Describe("modules", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
