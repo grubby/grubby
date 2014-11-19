@@ -427,6 +427,14 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Target: $1,
       Args: []ast.Node{$3, $6},
     }
+  }
+| call_expression LBRACKET single_node RBRACKET EQUALTO expr
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]="},
+      Target: $1,
+      Args: []ast.Node{$3, $6},
+    }
   };
 
 

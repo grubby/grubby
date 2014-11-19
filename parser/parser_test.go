@@ -1356,6 +1356,28 @@ end
 					}))
 				})
 			})
+
+			Context("calling [] or []= on a call expression", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("retrieve(:features)[feature] = true")
+				})
+
+				It("should be parsed as a call expression for the appropriate method", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.CallExpression{
+								Func: ast.BareReference{Name: "retrieve"},
+								Args: []ast.Node{ast.Symbol{Name: "features"}},
+							},
+							Func: ast.BareReference{Name: "[]="},
+							Args: []ast.Node{
+								ast.BareReference{Name: "feature"},
+								ast.Boolean{Value: true},
+							},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("modules", func() {
