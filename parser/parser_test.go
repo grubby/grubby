@@ -1380,6 +1380,28 @@ end
 			})
 		})
 
+		Describe("slicing of an array", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("'1.5.12'.split('.')[0,n]")
+			})
+
+			It("should be parsed as a call expression with an array arg", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.CallExpression{
+						Target: ast.CallExpression{
+							Target: ast.SimpleString{Value: "1.5.12"},
+							Func:   ast.BareReference{Name: "split"},
+							Args:   []ast.Node{ast.SimpleString{Value: "."}},
+						},
+						Func: ast.BareReference{Name: "[]"},
+						Args: []ast.Node{
+							ast.ConstantInt{Value: 0}, ast.BareReference{Name: "n"},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("modules", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`

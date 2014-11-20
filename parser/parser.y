@@ -409,6 +409,22 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
+| REF LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  }
+| call_expression LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  };
 
 
 // hash assignment
