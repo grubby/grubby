@@ -1761,37 +1761,62 @@ false
 			})
 
 			Describe("binary boolean operators", func() {
-				BeforeEach(func() {
-					lexer = parser.NewLexer(`
+				Context("with simple types on the left and right side", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
 1 && 0
 1 || 0
 1 and 0
 1 or 0
 `)
+					})
+
+					// FIXME: these first two should NOT be call expressions
+					It("is parsed as a call expression", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.CallExpression{
+								Target: ast.ConstantInt{Value: 1},
+								Func:   ast.BareReference{Name: "&&"},
+								Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+							},
+							ast.CallExpression{
+								Target: ast.ConstantInt{Value: 1},
+								Func:   ast.BareReference{Name: "||"},
+								Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+							},
+							ast.WeakLogicalAnd{
+								LHS: ast.ConstantInt{Value: 1},
+								RHS: ast.ConstantInt{Value: 0},
+							},
+							ast.WeakLogicalOr{
+								LHS: ast.ConstantInt{Value: 1},
+								RHS: ast.ConstantInt{Value: 0},
+							},
+						}))
+					})
 				})
 
-				// FIXME: these first two should NOT be call expressions
-				It("is parsed as a call expression", func() {
-					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "&&"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
-						},
-						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "||"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
-						},
-						ast.WeakLogicalAnd{
-							LHS: ast.ConstantInt{Value: 1},
-							RHS: ast.ConstantInt{Value: 0},
-						},
-						ast.WeakLogicalOr{
-							LHS: ast.ConstantInt{Value: 1},
-							RHS: ast.ConstantInt{Value: 0},
-						},
-					}))
+				Context("with complex types on the left and right side", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`retrieve(:features)[feature] || false`)
+					})
+
+					It("is parsed as a call expression", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.CallExpression{
+								Target: ast.CallExpression{
+									Target: ast.CallExpression{
+										Func: ast.BareReference{Name: "retrieve"},
+										Args: []ast.Node{ast.Symbol{Name: "features"}},
+									},
+									Func: ast.BareReference{Name: "[]"},
+									Args: []ast.Node{ast.BareReference{Name: "feature"}},
+								},
+								Func: ast.BareReference{Name: "||"},
+								Args: []ast.Node{ast.Boolean{Value: false}},
+							},
+						}))
+					})
 				})
 			})
 
