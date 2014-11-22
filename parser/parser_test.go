@@ -185,6 +185,21 @@ FOO
 		})
 
 		Describe("symbols", func() {
+			Describe("generated dynamically with strings using interpolation", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`instance_variable_get :"@#{symbol}"`)
+				})
+
+				It("is parsed as a regular Symbol with the interpolation template still present", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "instance_variable_get"},
+							Args: []ast.Node{ast.Symbol{Name: "@#{symbol}"}},
+						},
+					}))
+				})
+			})
+
 			Context("without any special characters", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(":foo")
