@@ -463,6 +463,38 @@ end
 				})
 			})
 
+			Context("with a block passed to a call expression targeting a group", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+    (@repeat || 1).times do
+      yield
+    end
+`)
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.Group{
+								Body: []ast.Node{
+									ast.CallExpression{
+										Target: ast.InstanceVariable{Name: "repeat"},
+										Func:   ast.BareReference{Name: "||"},
+										Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+									},
+								},
+							},
+							Func: ast.BareReference{Name: "times"},
+							Args: []ast.Node{
+								ast.Block{
+									Body: []ast.Node{ast.Yield{}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with args and a block split across newlines", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`

@@ -333,6 +333,14 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{},
     }
   }
+| group DOT REF block
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+      Args: []ast.Node{$4},
+    }
+  }
 | single_node DOT REF EQUALTO expr
   {
     methodName := $3.(ast.BareReference).Name + "="
@@ -1069,7 +1077,8 @@ yield_expression : YIELD comma_delimited_nodes
     } else {
       $$ = ast.Yield{Value: $2}
     }
-  };
+  }
+| YIELD { $$ = ast.Yield{} };
 
 return_expression : RETURN comma_delimited_nodes
   {
