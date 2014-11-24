@@ -384,12 +384,12 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
-| single_node OPERATOR single_node
+| single_node OPERATOR optional_newlines single_node
   {
     $$ = ast.CallExpression{
       Func: ast.BareReference{Name: $2},
       Target: $1,
-      Args: []ast.Node{$3},
+      Args: []ast.Node{$4},
     }
   }
 

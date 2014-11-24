@@ -3196,6 +3196,10 @@ class Foo<Bar
 	  end
 
 	    def something2(  foo  ,   bar   )
+        foo ||
+          bar
+        foo &&
+          bar
 
 
       	end
