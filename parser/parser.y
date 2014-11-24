@@ -184,6 +184,7 @@ var Statements []ast.Node
 %type <genericSlice> comma_delimited_nodes
 %type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nonempty_nodes_with_commas
+%type <genericSlice> two_or_more_call_expressions
 %type <genericSlice> nodes_with_commas_and_optional_block
 %type <genericSlice> comma_delimited_args_with_default_values
 %type <stringSlice> namespaced_modules
@@ -696,6 +697,34 @@ assignment : REF EQUALTO single_node
       LHS: $1,
       RHS: $3,
     }
+  }
+| two_or_more_call_expressions EQUALTO two_or_more_call_expressions
+  {
+    $$ = ast.Assignment{
+      LHS: ast.Array{Nodes: $1},
+      RHS: ast.Array{Nodes: $3},
+    }
+  };
+
+two_or_more_call_expressions : REF LBRACKET single_node RBRACKET COMMA REF LBRACKET single_node RBRACKET
+  {
+    $$ = []ast.Node{
+      ast.CallExpression{
+        Target: $1,
+        Func: ast.BareReference{Name: "[]="},
+        Args: []ast.Node{$3},
+      },
+      ast.CallExpression{
+        Target: $6,
+        Func: ast.BareReference{Name: "[]="},
+        Args: []ast.Node{$8},
+      },
+    }
+  }
+| two_or_more_call_expressions COMMA REF LBRACKET single_node RBRACKET
+  {
+    tail := ast.CallExpression{Target: $3, Func: ast.BareReference{Name: "[]="}, Args: []ast.Node{$5}}
+    $$ = append($1, tail)
   };
 
 conditional_assignment : REF OR_EQUALS single_node

@@ -1505,7 +1505,7 @@ end
 				})
 			})
 
-			Context("with array dereferencing", func() {
+			Context("to multiple variables", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("foo, bar = [1,2,3]")
 				})
@@ -1524,6 +1524,47 @@ end
 									ast.ConstantInt{Value: 1},
 									ast.ConstantInt{Value: 2},
 									ast.ConstantInt{Value: 3},
+								},
+							},
+						},
+					}))
+				})
+			})
+
+			Context("to indices in an array or hash", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("array[i], array[r] = array[r], array[i]")
+				})
+
+				It("be parsed as an assignment expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.CallExpression{
+										Target: ast.BareReference{Name: "array"},
+										Func:   ast.BareReference{Name: "[]="},
+										Args:   []ast.Node{ast.BareReference{Name: "i"}},
+									},
+									ast.CallExpression{
+										Target: ast.BareReference{Name: "array"},
+										Func:   ast.BareReference{Name: "[]="},
+										Args:   []ast.Node{ast.BareReference{Name: "r"}},
+									},
+								},
+							},
+							RHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.CallExpression{
+										Target: ast.BareReference{Name: "array"},
+										Func:   ast.BareReference{Name: "[]="},
+										Args:   []ast.Node{ast.BareReference{Name: "r"}},
+									},
+									ast.CallExpression{
+										Target: ast.BareReference{Name: "array"},
+										Func:   ast.BareReference{Name: "[]="},
+										Args:   []ast.Node{ast.BareReference{Name: "i"}},
+									},
 								},
 							},
 						},
