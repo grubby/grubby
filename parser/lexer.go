@@ -271,7 +271,31 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypeAmpersand)
 			}
 		case r == '%':
-			l.emit(tokenTypeOperator)
+			if l.accept("r") {
+				if l.accept("(") {
+					l.ignore()
+
+					var r, prev rune
+					for {
+						prev = r
+						switch r = l.next(); {
+						case r == ')' && prev != '\\':
+							l.backup()
+							l.emit(tokenTypeRegex)
+							l.next()
+							l.ignore() // ignore closing paren
+							return lexAnything
+						case r == eof:
+							l.emit(tokenTypeError)
+							return lexAnything
+						}
+					}
+				} else {
+					l.emit(tokenTypeOperator)
+				}
+			} else {
+				l.emit(tokenTypeOperator)
+			}
 		case r == '^':
 			l.emit(tokenTypeOperator)
 		case r == '`':

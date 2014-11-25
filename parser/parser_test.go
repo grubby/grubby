@@ -2477,6 +2477,20 @@ end
 			})
 		})
 
+		Describe("% notation", func() {
+			Describe("for regular expressions", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("%r(string/)")
+				})
+
+				It("should parse it as an ast.Regex", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Regex{Value: "string/"},
+					}))
+				})
+			})
+		})
+
 		Describe("regex literals", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer("/^foo.*bar$/")
