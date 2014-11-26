@@ -129,6 +129,8 @@ var Statements []ast.Node
 %type <genericValue> method_declaration
 %type <genericValue> yield_expression
 %type <genericValue> return_expression
+%type <genericValue> break_expression;
+%type <genericValue> next_expression;
 %type <genericValue> binary_expression
 %type <genericValue> class_declaration
 %type <genericValue> default_value_arg
@@ -147,7 +149,6 @@ var Statements []ast.Node
 
 // loops and expressions that can be inside a loop
 %type <genericValue> while_loop
-%type <genericValue> loop_statement;
 %type <genericValue> loop_if_block;
 %type <genericSlice> loop_elsif_block;
 
@@ -241,7 +242,7 @@ single_node : simple_node | array | hash | class_name_with_modules | call_expres
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | rescue_modifier | range;
+expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -1120,6 +1121,24 @@ return_expression : RETURN comma_delimited_nodes
 | RETURN
   { $$ = ast.Return{} };
 
+
+next_expression : NEXT
+  { $$ = ast.Next{} }
+| NEXT IF expr
+  { $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{ast.Next{}}} }
+| NEXT UNLESS expr
+  { $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Next{}}} };
+
+
+break_expression: /* empty */ {}
+| BREAK
+  { $$ = ast.Break{} }
+| BREAK IF expr
+  { $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{ast.Break{}}} }
+| BREAK UNLESS expr
+  { $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Break{}}} };
+
+
 ternary : single_node QUESTIONMARK single_node COLON single_node
   {
     $$ = ast.Ternary{
@@ -1141,23 +1160,7 @@ loop_expressions : /* empty */
 | loop_expressions expr
   {  $$ = append($$, $2) }
 | loop_expressions loop_if_block
-  {  $$ = append($$, $2) }
-| loop_expressions loop_statement
   {  $$ = append($$, $2) };
-
-loop_statement: /* empty */ {}
-| BREAK
-{ $$ = ast.Break{} }
-| BREAK IF expr
-{ $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{ast.Break{}}} }
-| BREAK UNLESS expr
-{ $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Break{}}} }
-| NEXT
-{ $$ = ast.Next{} }
-| NEXT IF expr
-{ $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{ast.Next{}}} }
-| NEXT UNLESS expr
-{ $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Next{}}} };
 
 loop_if_block : IF expr NEWLINE loop_expressions END
   {

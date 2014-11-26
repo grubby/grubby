@@ -3032,6 +3032,30 @@ end
 		})
 
 		Describe("loops", func() {
+			Context("with blocks", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+5.times do
+  next
+end
+`)
+				})
+
+				It("is parsed as a block, but the 'next' keyword is valid here", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.ConstantInt{Value: 5},
+							Func:   ast.BareReference{Name: "times"},
+							Args: []ast.Node{
+								ast.Block{
+									Body: []ast.Node{ast.Next{}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with a while statement", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
@@ -3261,9 +3285,9 @@ end
 			})
 		})
 
-		Context("when the 'break' keyword is outside of a loop", func() {
+		PContext("when the 'next' keyword is outside of a loop or block", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("break")
+				lexer = parser.NewLexer("next")
 			})
 
 			It("fails to parse", func() {
@@ -3271,9 +3295,9 @@ end
 			})
 		})
 
-		Context("when the 'next' keyword is outside of a loop", func() {
+		XContext("when the 'break' keyword is outside of a loop or block", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("next")
+				lexer = parser.NewLexer("break")
 			})
 
 			It("fails to parse", func() {
