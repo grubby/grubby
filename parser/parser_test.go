@@ -1476,7 +1476,10 @@ end
 
 		Describe("conditional assignment", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("a ||= 'aftergrass-Dowieite'")
+				lexer = parser.NewLexer(`
+a ||= 'aftergrass-Dowieite'
+@options[:shared] ||= false
+`)
 			})
 
 			It("returns a ConditionalAssignment expression", func() {
@@ -1484,6 +1487,14 @@ end
 					ast.ConditionalAssignment{
 						LHS: ast.BareReference{Name: "a"},
 						RHS: ast.SimpleString{Value: "aftergrass-Dowieite"},
+					},
+					ast.ConditionalAssignment{
+						LHS: ast.CallExpression{
+							Target: ast.InstanceVariable{Name: "options"},
+							Func:   ast.BareReference{Name: "[]"},
+							Args:   []ast.Node{ast.Symbol{Name: "shared"}},
+						},
+						RHS: ast.Boolean{Value: false},
 					},
 				}))
 			})

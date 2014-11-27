@@ -766,7 +766,9 @@ conditional_assignment : REF OR_EQUALS single_node
       LHS: $1,
       RHS: $3,
     }
-  };
+  }
+| call_expression OR_EQUALS expr
+  { $$ = ast.ConditionalAssignment{LHS: $1, RHS: $3} };
 
 global : DOLLARSIGN REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
