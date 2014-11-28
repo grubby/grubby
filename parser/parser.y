@@ -126,6 +126,7 @@ var Statements []ast.Node
 %type <genericValue> simple_node
 %type <genericValue> class_variable
 %type <genericValue> call_expression
+%type <genericValue> operator_expression;
 %type <genericValue> method_declaration
 %type <genericValue> yield_expression
 %type <genericValue> return_expression
@@ -238,7 +239,7 @@ list : /* empty */
 simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : simple_node | array | hash | class_name_with_modules | call_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
@@ -385,14 +386,6 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
-| single_node OPERATOR optional_newlines single_node
-  {
-    $$ = ast.CallExpression{
-      Func: ast.BareReference{Name: $2},
-      Target: $1,
-      Args: []ast.Node{$4},
-    }
-  }
 
 // hash / array retrieval at index
 | REF LBRACKET single_node RBRACKET
@@ -467,6 +460,16 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Func: ast.BareReference{Name: "[]="},
       Target: $1,
       Args: []ast.Node{$3, $6},
+    }
+  };
+
+
+operator_expression : single_node OPERATOR optional_newlines single_node
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: $2},
+      Target: $1,
+      Args: []ast.Node{$4},
     }
   };
 
@@ -856,7 +859,9 @@ array : LBRACKET comma_delimited_nodes RBRACKET
 | LBRACKET nodes_with_commas RBRACKET
   { $$ = ast.Array{Nodes: $2} };
 
-hash : LBRACE optional_newlines key_value_pairs optional_newlines RBRACE
+hash : LBRACE optional_newlines RBRACE
+  { $$ = ast.Hash{} }
+| LBRACE optional_newlines key_value_pairs optional_newlines RBRACE
   {
     pairs := []ast.HashKeyValuePair{}
     for _, node := range $3 {
@@ -871,12 +876,11 @@ hash : LBRACE optional_newlines key_value_pairs optional_newlines RBRACE
       pairs = append(pairs, node.(ast.HashKeyValuePair))
     }
     $$ = ast.Hash{Pairs: pairs}
-  };
+  }
+| LBRACE optional_newlines call_expression optional_newlines RBRACE
+  { $$ = ast.Block{Body: ast.Nodes{$3} } };
 
-key_value_pairs : /* empty */ { $$ = ast.Nodes{} }
-| optional_newlines
-  {  }
-| single_node OPERATOR expr
+key_value_pairs : single_node OPERATOR expr
   {
     if $2 != "=>" {
       panic("FREAKOUT")
@@ -922,15 +926,12 @@ block : DO list END
     Args: $2,
     }
   }
-| LBRACE block_args list RBRACE
+block : LBRACE optional_newlines block_args list RBRACE
   {
-    $$ = ast.Block{
-      Body: $3,
-      Args: $2,
-    }
+    $$ = ast.Block{Args: $3, Body: $4}
   }
-| LBRACE list RBRACE
-  { $$ = ast.Block{Body: $2} };
+| LBRACE optional_newlines list optional_newlines RBRACE
+  { $$ = ast.Block{Body: $3} };
 
 block_args : PIPE comma_delimited_refs PIPE
   { $$ = $2 };

@@ -347,6 +347,33 @@ end
 			})
 		})
 
+		Describe("Proc", func() {
+			Context("created with curly braces", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("Proc.new { Mock.verify_count }")
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "Proc"},
+							Func:   ast.BareReference{Name: "new"},
+							Args: []ast.Node{
+								ast.Block{
+									Body: []ast.Node{
+										ast.CallExpression{
+											Target: ast.BareReference{Name: "Mock"},
+											Func:   ast.BareReference{Name: "verify_count"},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+		})
+
 		Describe("call expressions", func() {
 			Context("with a value that should be converted to a proc", func() {
 				BeforeEach(func() {
@@ -2045,6 +2072,18 @@ false
 								},
 							},
 						},
+					}))
+				})
+			})
+
+			Context("without anything inside", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("{}")
+				})
+
+				It("is parsed as a hash", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Hash{},
 					}))
 				})
 			})
