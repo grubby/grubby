@@ -790,8 +790,31 @@ class_variable : ATSIGN ATSIGN REF
 
 assignable_variables : REF COMMA REF
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| REF COMMA instance_variable
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| REF COMMA class_variable
+{ $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+
+| instance_variable COMMA REF
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| instance_variable COMMA instance_variable
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| instance_variable COMMA class_variable
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+
+| class_variable COMMA REF
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| class_variable COMMA instance_variable
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| class_variable COMMA class_variable
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+
 | assignable_variables COMMA REF
   { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
+| assignable_variables COMMA instance_variable
+  { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
+| assignable_variables COMMA class_variable
+  { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} };
 
 negation : BANG expr { $$ = ast.Negation{Target: $2} };
 complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };

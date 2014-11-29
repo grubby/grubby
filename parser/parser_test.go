@@ -1569,6 +1569,48 @@ a ||= 'aftergrass-Dowieite'
 				})
 			})
 
+			Context("to multiple instance or class variables", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+@foo, @bar = [1, 2]
+@@foo, @@bar = [3, 4]
+`)
+				})
+
+				It("should be parsed as a multiple assignment as well", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.InstanceVariable{Name: "foo"},
+									ast.InstanceVariable{Name: "bar"},
+								},
+							},
+							RHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.ConstantInt{Value: 1},
+									ast.ConstantInt{Value: 2},
+								},
+							},
+						},
+						ast.Assignment{
+							LHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.ClassVariable{Name: "foo"},
+									ast.ClassVariable{Name: "bar"},
+								},
+							},
+							RHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.ConstantInt{Value: 3},
+									ast.ConstantInt{Value: 4},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to indices in an array or hash", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("array[i], array[r] = array[r], array[i]")
