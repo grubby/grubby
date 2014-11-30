@@ -135,6 +135,8 @@ var _ = Describe("goyacc parser", func() {
 ?-
 ?A
 ??
+?"
+?'
 `)
 					})
 
@@ -143,6 +145,8 @@ var _ = Describe("goyacc parser", func() {
 							ast.CharacterLiteral{Value: "-"},
 							ast.CharacterLiteral{Value: "A"},
 							ast.CharacterLiteral{Value: "?"},
+							ast.CharacterLiteral{Value: "\""},
+							ast.CharacterLiteral{Value: "'"},
 						}))
 					})
 				})
