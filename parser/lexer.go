@@ -130,6 +130,8 @@ func (lexer *StatefulRubyLexer) run() {
 	close(lexer.tokens)
 }
 
+var validCharRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567789`!@#$%^&*()-_=+\\|][{}/?;:'\",.<>~"
+
 func lexAnything(l *StatefulRubyLexer) stateFn {
 	for {
 		switch r := l.next(); {
@@ -142,9 +144,9 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 			return lexDoubleQuoteString
 		case r == '?':
 			// FIXME: this is not an exhaustive list of character literals
-			if l.accept(validMethodNameRunes + "-^:'\"") {
+			if l.accept(validCharRunes) {
 				l.start += 1 // skip past the ?
-				l.acceptRun(validMethodNameRunes + "-^:'\"")
+				// l.acceptRun(validCharRunes)
 				l.emit(tokenTypeCharacter)
 			} else {
 				l.emit(tokenTypeQuestionMark)

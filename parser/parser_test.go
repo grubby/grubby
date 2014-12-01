@@ -1,6 +1,8 @@
 package parser_test
 
 import (
+	"fmt"
+
 	"github.com/grubby/grubby/ast"
 	"github.com/grubby/grubby/parser"
 
@@ -128,28 +130,24 @@ var _ = Describe("goyacc parser", func() {
 						}))
 					})
 				})
+			})
 
-				Context("using ascii character literals", func() {
-					BeforeEach(func() {
-						lexer = parser.NewLexer(`
-?-
-?A
-??
-?"
-?'
-`)
-					})
+			Describe("ascii character literals", func() {
+				for asciiValue := 33; asciiValue <= 126; asciiValue++ {
+					func(ascii int) {
+						Context(fmt.Sprintf("?%s", string(ascii)), func() {
+							BeforeEach(func() {
+								lexer = parser.NewLexer("?" + string(ascii))
+							})
 
-					It("is parsed as a string", func() {
-						Expect(parser.Statements).To(Equal([]ast.Node{
-							ast.CharacterLiteral{Value: "-"},
-							ast.CharacterLiteral{Value: "A"},
-							ast.CharacterLiteral{Value: "?"},
-							ast.CharacterLiteral{Value: "\""},
-							ast.CharacterLiteral{Value: "'"},
-						}))
-					})
-				})
+							It("parses as a character literal", func() {
+								Expect(parser.Statements).To(Equal([]ast.Node{
+									ast.CharacterLiteral{Value: string(ascii)},
+								}))
+							})
+						})
+					}(asciiValue)
+				}
 			})
 
 			Describe("heredoc", func() {
