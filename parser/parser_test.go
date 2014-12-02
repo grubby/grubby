@@ -184,6 +184,18 @@ FOO
 					})
 				})
 			})
+
+			Context("with % notation", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("%[ain't life grand]")
+				})
+
+				It("is parsed as an interpolated string", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.InterpolatedString{Value: "ain't life grand"},
+					}))
+				})
+			})
 		})
 
 		Describe("symbols", func() {
