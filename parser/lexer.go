@@ -273,52 +273,7 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypeAmpersand)
 			}
 		case r == '%':
-			// FIXME: consolidate these next two rules together
-			if l.accept("r") {
-				if l.accept("(") {
-					l.ignore()
-
-					var r, prev rune
-					for {
-						prev = r
-						switch r = l.next(); {
-						case r == ')' && prev != '\\':
-							l.backup()
-							l.emit(tokenTypeRegex)
-							l.next()
-							l.ignore() // ignore closing paren
-							return lexAnything
-						case r == eof:
-							l.emit(tokenTypeError)
-							return lexAnything
-						}
-					}
-				} else {
-					l.emit(tokenTypeOperator)
-				}
-				// FIXME: this needs to match closing <>, () and [] too
-			} else if l.accept("`~!@#$%^&*-_=+[]{}\\|;:'\",./?") {
-				delimiter := l.input[l.start+1 : l.pos]
-				if delimiter == "[" {
-					delimiter = "]"
-				}
-				l.ignore()
-				for {
-					switch r := l.next(); {
-					case string(r) == delimiter:
-						l.backup()
-						l.emit(tokenTypeDoubleQuoteString)
-						l.next()
-						l.ignore() // ignore closing delimiter
-						return lexAnything
-					case r == eof:
-						l.emit(tokenTypeError)
-						return lexAnything
-					}
-				}
-			} else {
-				l.emit(tokenTypeOperator)
-			}
+			return lexPercentSign
 		case r == '^':
 			l.emit(tokenTypeOperator)
 		case r == '`':

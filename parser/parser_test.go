@@ -187,12 +187,20 @@ FOO
 
 			Context("with % notation", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("%[ain't life grand]")
+					lexer = parser.NewLexer(`
+%[ain't life grand]
+%<this is the worst>
+%{GET OUT}
+%(DONT EVER WRITE CODE LIKE THIS)
+`)
 				})
 
 				It("is parsed as an interpolated string", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.InterpolatedString{Value: "ain't life grand"},
+						ast.InterpolatedString{Value: "this is the worst"},
+						ast.InterpolatedString{Value: "GET OUT"},
+						ast.InterpolatedString{Value: "DONT EVER WRITE CODE LIKE THIS"},
 					}))
 				})
 			})
