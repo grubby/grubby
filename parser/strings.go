@@ -39,11 +39,7 @@ func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
 		switch r = l.next(); {
 		case r == '#':
 			if l.accept("{") {
-				for innerR := l.next(); innerR != '}'; innerR = l.next() {
-					if innerR == eof {
-						l.emit(tokenTypeError)
-					}
-				}
+				lexUntilClosingMatchingBraces('{', '}')(l)
 			}
 		case r == '"' && prev != '\\':
 			l.pos -= 1
@@ -58,4 +54,20 @@ func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
 	}
 
 	return lexAnything
+}
+
+func lexUntilClosingMatchingBraces(openingBrace, closingBrace rune) func(*StatefulRubyLexer) {
+	return func(l *StatefulRubyLexer) {
+		for {
+			switch r := l.next(); {
+			case r == openingBrace:
+				lexUntilClosingMatchingBraces(openingBrace, closingBrace)(l)
+			case r == closingBrace:
+				return
+			case r == eof:
+				l.emit(tokenTypeError)
+				return
+			}
+		}
+	}
 }

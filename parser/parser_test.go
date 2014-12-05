@@ -119,6 +119,22 @@ var _ = Describe("goyacc parser", func() {
 					})
 				})
 
+				Context("with string interpolation inside string interpolation", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
+"#{@tag}#{ "(#{@comment})" if @comment }:#{escape @description}"
+`)
+					})
+
+					It("returns an interpolated string", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.InterpolatedString{
+								Value: `#{@tag}#{ "(#{@comment})" if @comment }:#{escape @description}`,
+							},
+						}))
+					})
+				})
+
 				Context("with double quotes inside the interpolation", func() {
 					BeforeEach(func() {
 						lexer = parser.NewLexer(`"Raj-#{5 * " "}-Corin"`)
