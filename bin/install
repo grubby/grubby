@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+mkdir -p $HOME/.grubby
+ln -s $(pwd)/$(dirname $(dirname $0))/lib $HOME/.grubby
+ln -s $(pwd)/$(dirname $(dirname $0))/bin $HOME/.grubby

@@ -10,13 +10,10 @@ import (
 )
 
 func main() {
-	pathToExecutable, err := filepath.Abs(filepath.Dir(filepath.Dir(os.Args[0])))
+	home := os.Getenv("HOME")
+	grubbyHome := filepath.Join(home, ".grubby")
 
-	if err != nil {
-		panic(err)
-	}
-
-	vm := vm.NewVM(pathToExecutable, "(grubby irb")
+	vm := vm.NewVM(grubbyHome, "(grubby irb")
 
 	for {
 		result, err := vm.Run(readInput())

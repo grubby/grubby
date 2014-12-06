@@ -31,13 +31,10 @@ func main() {
 		panic(err)
 	}
 
-	pathToExecutable, err := filepath.Abs(filepath.Dir(filepath.Dir(flag.Args()[0])))
+	home := os.Getenv("HOME")
+	grubbyHome := filepath.Join(home, ".grubby")
 
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = vm.NewVM(pathToExecutable, flag.Args()[0]).Run(string(bytes))
+	_, err = vm.NewVM(grubbyHome, flag.Args()[0]).Run(string(bytes))
 
 	switch err.(type) {
 	case *vm.ParseError:
