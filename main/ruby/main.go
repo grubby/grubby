@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/grubby/grubby/interpreter/vm"
 	"github.com/grubby/grubby/parser"
@@ -30,7 +31,13 @@ func main() {
 		panic(err)
 	}
 
-	_, err = vm.NewVM(flag.Args()[0]).Run(string(bytes))
+	pathToExecutable, err := filepath.Abs(filepath.Dir(filepath.Dir(flag.Args()[0])))
+
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = vm.NewVM(pathToExecutable, flag.Args()[0]).Run(string(bytes))
 
 	switch err.(type) {
 	case *vm.ParseError:

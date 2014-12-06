@@ -38,7 +38,7 @@ type VM interface {
 	Classes() map[string]builtins.Class
 }
 
-func NewVM(name string) VM {
+func NewVM(rubyHome, name string) VM {
 	vm := &vm{
 		currentFilename: name,
 		stack:           NewCallStack(),
@@ -51,6 +51,8 @@ func NewVM(name string) VM {
 	vm.registerBuiltinModules()
 
 	loadPath := vm.CurrentClasses["Array"].New()
+	loadPath.(*builtins.Array).Append(builtins.NewString(filepath.Join(rubyHome, "lib")))
+
 	vm.CurrentGlobals["LOAD_PATH"] = loadPath
 	vm.CurrentGlobals[":"] = loadPath
 

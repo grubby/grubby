@@ -4,12 +4,19 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/grubby/grubby/interpreter/vm"
 )
 
 func main() {
-	vm := vm.NewVM("(grubby irb")
+	pathToExecutable, err := filepath.Abs(filepath.Dir(filepath.Dir(os.Args[0])))
+
+	if err != nil {
+		panic(err)
+	}
+
+	vm := vm.NewVM(pathToExecutable, "(grubby irb")
 
 	for {
 		result, err := vm.Run(readInput())

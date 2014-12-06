@@ -2,6 +2,7 @@ package vm_test
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 
 	"github.com/grubby/grubby/interpreter/vm/builtins"
@@ -16,7 +17,12 @@ var _ = Describe("VM", func() {
 	var vm VM
 
 	BeforeEach(func() {
-		vm = NewVM("fake-irb-under-test")
+		pathToExecutable, err := filepath.Abs(filepath.Dir(filepath.Dir(filepath.Dir(os.Args[0]))))
+		if err != nil {
+			panic(err)
+		}
+
+		vm = NewVM(pathToExecutable, "fake-irb-under-test")
 	})
 
 	Describe("the global Object", func() {
@@ -147,6 +153,13 @@ end`)
 
 				Expect(err).To(HaveOccurred())
 			})
+		})
+	})
+
+	Describe("the standard lib", func() {
+		It("is available to require", func() {
+			_, err := vm.Run("require 'fileutils'")
+			Expect(err).ToNot(BeAssignableToTypeOf(builtins.NewLoadError("", "")))
 		})
 	})
 
