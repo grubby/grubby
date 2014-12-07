@@ -396,6 +396,14 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
+| CAPITAL_REF LBRACKET single_node RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
 | instance_variable LBRACKET single_node RBRACKET
   {
     $$ = ast.CallExpression{
@@ -412,7 +420,23 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Args: []ast.Node{$3},
     }
   }
+| CAPITAL_REF LBRACKET range RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
 | REF LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  }
+| CAPITAL_REF LBRACKET nonempty_nodes_with_commas RBRACKET
   {
     $$ = ast.CallExpression{
       Func: ast.BareReference{Name: "[]"},
@@ -444,6 +468,17 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Func: ast.BareReference{Name: "[]="},
       Target: $1,
       Args: []ast.Node{$3, $6},
+    }
+  }
+| CAPITAL_REF LBRACKET single_node RBRACKET EQUALTO optional_newlines expr
+{
+  if $7 == nil {
+      panic("WHAT THE EVER COMPILING FUCK")
+    }
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "[]="},
+      Target: $1,
+      Args: []ast.Node{$3, $7},
     }
   }
 | instance_variable LBRACKET single_node RBRACKET EQUALTO expr
@@ -1156,8 +1191,7 @@ next_expression : NEXT
   { $$ = ast.IfBlock{Condition: ast.Negation{Target: $3}, Body: []ast.Node{ast.Next{}}} };
 
 
-break_expression: /* empty */ {}
-| BREAK
+break_expression: BREAK
   { $$ = ast.Break{} }
 | BREAK IF expr
   { $$ = ast.IfBlock{Condition: $3, Body: []ast.Node{ast.Break{}}} }

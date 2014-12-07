@@ -1566,6 +1566,37 @@ a ||= 'aftergrass-Dowieite'
 		})
 
 		Describe("assignment", func() {
+			Context("to multiple keys in a hash", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+HASH['first_key']    =
+HASH['second_key'] = [:something]
+`)
+				})
+
+				It("is parsed as nested call expressions", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "HASH"},
+							Func:   ast.BareReference{Name: "[]="},
+							Args: []ast.Node{
+								ast.SimpleString{Value: "first_key"},
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "HASH"},
+									Func:   ast.BareReference{Name: "[]="},
+									Args: []ast.Node{
+										ast.SimpleString{Value: "second_key"},
+										ast.Array{
+											Nodes: []ast.Node{ast.Symbol{Name: "something"}},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to a single variable", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`foo = 5`)
