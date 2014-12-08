@@ -259,6 +259,18 @@ FOO
 					Expect(parser.Statements).To(Equal([]ast.Node{ast.Symbol{Name: "@foo"}}))
 				})
 			})
+
+			Context("with special characters", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(":foo!bar?")
+				})
+
+				It("is parsed as a symbol", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Symbol{Name: "foo!bar?"},
+					}))
+				})
+			})
 		})
 
 		Describe("parsing multiple lines", func() {

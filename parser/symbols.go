@@ -53,7 +53,7 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 	}
 
 	l.accept("@")
-	l.acceptRun(alphaNumericUnderscore)
+	l.acceptRun(alphaNumericUnderscore + "?!")
 	l.emit(tokenTypeSymbol)
 	return lexAnything
 }
