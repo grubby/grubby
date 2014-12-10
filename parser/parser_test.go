@@ -1449,8 +1449,8 @@ end
 			Context("calling [] and []= on an instance variable", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
-@shared[state.to_s] = state
-@shared[state.to_s] # returns 'state'
+@shared [state.to_s] = state
+@shared [state.to_s] # returns 'state'
 `)
 				})
 
