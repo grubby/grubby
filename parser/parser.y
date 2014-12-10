@@ -121,6 +121,7 @@ var Statements []ast.Node
 %type <genericValue> if_block
 %type <genericValue> splat_arg
 %type <genericValue> assignment
+%type <genericValue> multiple_assignment;
 %type <genericValue> begin_block
 %type <genericValue> single_node
 %type <genericValue> simple_node
@@ -243,7 +244,7 @@ single_node : simple_node | array | hash | class_name_with_modules | call_expres
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range;
+expr : single_node | method_declaration | class_declaration | module_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -528,9 +529,18 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $1) }
 | binary_expression
   { $$ = append($$, $1) }
+| assignment
+  { $$ = append($$, $1) }
 | AMPERSAND single_node
-  { $$ = append($$, ast.CallExpression{Func: ast.BareReference{Name:"to_proc"}, Target: $2}) }
+  {
+    $$ = append($$, ast.CallExpression{
+      Func: ast.BareReference{Name:"to_proc"},
+      Target: $2,
+    })
+  }
 | nodes_with_commas COMMA optional_newlines single_node
+  { $$ = append($$, $4) }
+| nodes_with_commas COMMA optional_newlines assignment
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines binary_expression
   { $$ = append($$, $4) }
@@ -729,8 +739,9 @@ assignment : REF EQUALTO single_node
       LHS: $1,
       RHS: $3,
     }
-  }
-| assignable_variables EQUALTO expr
+  };
+
+multiple_assignment : assignable_variables EQUALTO expr
   {
     $$ = ast.Assignment{
       LHS: $1,

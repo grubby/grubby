@@ -1578,6 +1578,26 @@ a ||= 'aftergrass-Dowieite'
 		})
 
 		Describe("assignment", func() {
+			Context("inside of a method call", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("puts(hey = 'so what')")
+				})
+
+				It("is parsed as a call expression with assignment as an arg", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "puts"},
+							Args: []ast.Node{
+								ast.Assignment{
+									LHS: ast.BareReference{Name: "hey"},
+									RHS: ast.SimpleString{Value: "so what"},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to multiple keys in a hash", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
@@ -2118,7 +2138,7 @@ false
 					lexer = parser.NewLexer("[1,2,3,   4,5,6 ]")
 				})
 
-				It("is parsed as an Array node", func() {
+				It("is parsed as an Array", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Array{
 							Nodes: []ast.Node{
@@ -2134,12 +2154,31 @@ false
 				})
 			})
 
+			Context("of named variables", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("[cladosiphonic, capillitial, bicarbureted, argentose]")
+				})
+
+				It("is parsed as an Array", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Array{
+							Nodes: []ast.Node{
+								ast.BareReference{Name: "cladosiphonic"},
+								ast.BareReference{Name: "capillitial"},
+								ast.BareReference{Name: "bicarbureted"},
+								ast.BareReference{Name: "argentose"},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("of arrays", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("[[], [], []]")
 				})
 
-				It("is parsed as an Array node", func() {
+				It("is parsed as an Array", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Array{Nodes: []ast.Node{
 							ast.Array{Nodes: []ast.Node{}},
