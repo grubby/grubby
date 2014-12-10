@@ -21,7 +21,12 @@ func main() {
 			panic(err.Error())
 		}
 
-		fmt.Printf("=> %s", result.String())
+		if result != nil {
+			fmt.Printf("=> %s", result.String())
+		} else {
+			fmt.Printf("=> %#v", result)
+		}
+		println("")
 	}
 }
 
