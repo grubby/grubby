@@ -606,6 +606,9 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("regex: '%s'", token.value)
 			lval.genericValue = ast.Regex{Value: token.value}
 			return NODE
+		case tokenTypeUNTIL:
+			debug("UNTIL")
+			return UNTIL
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

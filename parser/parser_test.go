@@ -3229,6 +3229,36 @@ end
 				})
 			})
 
+			Context("with an until statement", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+until 1 == 2
+  puts 'INFINITE LOOP AHOY!!!!1'
+end
+`)
+				})
+
+				It("is parsed as a Loop", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Loop{
+							Condition: ast.Negation{
+								Target: ast.CallExpression{
+									Target: ast.ConstantInt{Value: 1},
+									Func:   ast.BareReference{Name: "=="},
+									Args:   []ast.Node{ast.ConstantInt{Value: 2}},
+								},
+							},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "INFINITE LOOP AHOY!!!!1"}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with a while statement", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
