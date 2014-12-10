@@ -22,7 +22,9 @@ _testmain.go
 *.exe
 *.test
 
+# yacc generated code
 **/y.output
+parser/parser.go
 
 bin/irb
 bin/ruby
