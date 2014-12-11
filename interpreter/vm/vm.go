@@ -403,13 +403,21 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			_, err := vm.executeWithContext(begin.Body, context)
 
 			if err != nil {
+				matchingRescue := false
 				rubyErr := err.(builtins.Value)
 				for _, rescue := range begin.Rescue {
+					if matchingRescue {
+						break
+					}
+
 					r := rescue.(ast.Rescue)
-					if r.Exception.Class.Name == rubyErr.String() {
-						_, err = vm.executeWithContext(r.Body, context)
-						if err == nil {
-							break
+					for _, exceptionClass := range r.Exception.Classes {
+						if exceptionClass.Name == rubyErr.String() {
+							_, err = vm.executeWithContext(r.Body, context)
+							if err == nil {
+								matchingRescue = true
+								break
+							}
 						}
 					}
 				}

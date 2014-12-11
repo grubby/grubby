@@ -161,8 +161,8 @@ type Rescue struct {
 }
 
 type RescueException struct {
-	Var   BareReference
-	Class BareReference
+	Var     BareReference
+	Classes []Class
 }
 
 type MethodParam struct {

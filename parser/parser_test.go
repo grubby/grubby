@@ -2441,6 +2441,8 @@ rescue Nope
   puts 'unlikely'
 rescue NotThisEither => e
   puts 'contrived'
+rescue Errno::ENOTEMPTY, Errno::ENOENT
+  puts 'less contrived'
 rescue
   puts 'aww yisss'
 end
@@ -2461,7 +2463,7 @@ end
 						Rescues: []ast.Node{
 							ast.Rescue{
 								Exception: ast.RescueException{
-									Class: ast.BareReference{Name: "Nope"},
+									Classes: []ast.Class{{Name: "Nope"}},
 								},
 								Body: []ast.Node{ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
@@ -2470,12 +2472,29 @@ end
 							},
 							ast.Rescue{
 								Exception: ast.RescueException{
-									Class: ast.BareReference{Name: "NotThisEither"},
-									Var:   ast.BareReference{Name: "e"},
+									Classes: []ast.Class{{Name: "NotThisEither"}},
+									Var:     ast.BareReference{Name: "e"},
 								},
 								Body: []ast.Node{ast.CallExpression{
 									Func: ast.BareReference{Name: "puts"},
 									Args: []ast.Node{ast.SimpleString{Value: "contrived"}},
+								}},
+							},
+							ast.Rescue{
+								Exception: ast.RescueException{
+									Classes: []ast.Class{
+										{
+											Name:      "ENOTEMPTY",
+											Namespace: "Errno",
+										}, {
+											Name:      "ENOENT",
+											Namespace: "Errno",
+										},
+									},
+								},
+								Body: []ast.Node{ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "less contrived"}},
 								}},
 							},
 							ast.Rescue{
@@ -3029,7 +3048,7 @@ end
 							},
 							ast.Rescue{
 								Exception: ast.RescueException{
-									Class: ast.BareReference{"LoadError"},
+									Classes: []ast.Class{{Name: "LoadError"}},
 								},
 								Body: []ast.Node{
 									ast.CallExpression{
@@ -3040,8 +3059,8 @@ end
 							},
 							ast.Rescue{
 								Exception: ast.RescueException{
-									Var:   ast.BareReference{Name: "e"},
-									Class: ast.BareReference{Name: "Exception"},
+									Var:     ast.BareReference{Name: "e"},
+									Classes: []ast.Class{{Name: "Exception"}},
 								},
 								Body: []ast.Node{
 									ast.CallExpression{

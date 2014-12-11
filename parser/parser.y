@@ -190,6 +190,7 @@ var Statements []ast.Node
 %type <genericSlice> two_or_more_call_expressions
 %type <genericSlice> nodes_with_commas_and_optional_block
 %type <genericSlice> comma_delimited_args_with_default_values
+%type <genericSlice> comma_delimited_class_names
 %type <stringSlice> namespaced_modules
 
 // misc
@@ -1134,31 +1135,45 @@ begin_block : BEGIN list optional_rescues END
     }
   };
 
-rescue: RESCUE list
+rescue : RESCUE list
   { $$ = ast.Rescue{Body: $2} }
-| RESCUE CAPITAL_REF list
+| RESCUE comma_delimited_class_names list
   {
+    classes := []ast.Class{}
+    for _, class := range $2 {
+      classes = append(classes, class.(ast.Class))
+    }
     $$ = ast.Rescue{
       Body: $3,
       Exception: ast.RescueException{
-        Class: $2.(ast.BareReference),
+        Classes: classes,
       },
     }
   }
-| RESCUE CAPITAL_REF OPERATOR REF list
+| RESCUE comma_delimited_class_names OPERATOR REF list
   {
     if $3 != "=>" {
       panic("FREAKOUT")
+    }
+
+    classes := []ast.Class{}
+    for _, class := range $2 {
+      classes = append(classes, class.(ast.Class))
     }
 
     $$ = ast.Rescue{
       Body: $5,
       Exception: ast.RescueException{
         Var: $4.(ast.BareReference),
-        Class: $2.(ast.BareReference),
+        Classes: classes,
       },
     }
   };
+
+comma_delimited_class_names : class_name_with_modules
+  { $$ = append($$, $1) }
+| comma_delimited_class_names COMMA class_name_with_modules
+  { $$ = append($$, $3) };
 
 optional_rescues : /* empty */
   { $$ = []ast.Node{} }
