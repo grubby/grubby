@@ -186,8 +186,10 @@ type Return struct {
 	Value Node
 }
 
-type Break struct{}
 type Next struct{}
+type Redo struct{}
+type Break struct{}
+type Retry struct{}
 
 type Loop struct {
 	Condition Node
