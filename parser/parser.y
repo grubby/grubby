@@ -841,7 +841,9 @@ assignable_variables : REF COMMA REF
 | REF COMMA instance_variable
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
 | REF COMMA class_variable
-{ $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| REF COMMA STAR REF
+  { $$ = ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}} }
 
 | instance_variable COMMA REF
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
@@ -849,6 +851,8 @@ assignable_variables : REF COMMA REF
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
 | instance_variable COMMA class_variable
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| instance_variable COMMA STAR REF
+  { $$ = ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}} }
 
 | class_variable COMMA REF
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
@@ -856,13 +860,18 @@ assignable_variables : REF COMMA REF
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
 | class_variable COMMA class_variable
   { $$ = ast.Array{Nodes: []ast.Node{$1, $3}} }
+| class_variable COMMA STAR REF
+  { $$ = ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}} }
 
 | assignable_variables COMMA REF
   { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
 | assignable_variables COMMA instance_variable
   { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
 | assignable_variables COMMA class_variable
-  { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} };
+  { $$ = ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)} }
+| assignable_variables COMMA STAR REF
+  { $$ = ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}} };
+
 
 negation : BANG expr { $$ = ast.Negation{Target: $2} };
 complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };

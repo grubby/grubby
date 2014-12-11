@@ -1670,6 +1670,28 @@ HASH['second_key'] = [:something]
 				})
 			})
 
+			Context("to multiple variables, with a splat", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("target, *actions = clause.split(/([=+-])/)")
+				})
+
+				It("is parsed as an assignment expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.Array{Nodes: []ast.Node{
+								ast.BareReference{Name: "target"},
+								ast.StarSplat{Value: ast.BareReference{Name: "actions"}},
+							}},
+							RHS: ast.CallExpression{
+								Target: ast.BareReference{Name: "clause"},
+								Func:   ast.BareReference{Name: "split"},
+								Args:   []ast.Node{ast.Regex{Value: "([=+-])"}},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to multiple instance or class variables", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
