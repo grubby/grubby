@@ -59,7 +59,7 @@ func lexSlash(l *StatefulRubyLexer) stateFn {
 	case tokenTypeLParen:
 		parseAsRegex()
 	case tokenTypeRParen:
-		parseAsRegex()
+		parseAsOperator()
 	case tokenTypeComma:
 		parseAsRegex()
 	case tokenTypeNewline:

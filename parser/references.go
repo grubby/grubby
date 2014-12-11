@@ -15,7 +15,7 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 		l.acceptRun(whitespace)
 		l.ignore()
 
-		if l.input[l.start:l.start+5] == "self." {
+		if (len(l.input) > l.start+5) && l.input[l.start:l.start+5] == "self." {
 			l.acceptRun("self")
 			l.emit(tokenTypeReference)
 			l.accept(".")
