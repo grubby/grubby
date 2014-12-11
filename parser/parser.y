@@ -191,6 +191,7 @@ var Statements []ast.Node
 %type <genericSlice> nodes_with_commas_and_optional_block
 %type <genericSlice> comma_delimited_args_with_default_values
 %type <genericSlice> comma_delimited_class_names
+%type <genericSlice> nodes_with_commas_and_optional_newlines
 %type <stringSlice> namespaced_modules
 
 // misc
@@ -924,8 +925,36 @@ bitwise_or: single_node PIPE single_node
 
 true : TRUE { $$ = ast.Boolean{Value: true} }
 false : FALSE { $$ = ast.Boolean{Value: false} }
-array : LBRACKET nodes_with_commas RBRACKET
-  { $$ = ast.Array{Nodes: $2} };
+array : LBRACKET optional_newlines nodes_with_commas_and_optional_newlines optional_newlines RBRACKET
+  { $$ = ast.Array{Nodes: $3} };
+
+nodes_with_commas_and_optional_newlines : /* empty */ { $$ = ast.Nodes{} }
+| single_node
+  { $$ = append($$, $1) }
+| binary_expression
+  { $$ = append($$, $1) }
+| assignment
+  { $$ = append($$, $1) }
+| AMPERSAND single_node
+  {
+    $$ = append($$, ast.CallExpression{
+      Func: ast.BareReference{Name:"to_proc"},
+      Target: $2,
+    })
+  }
+| nodes_with_commas_and_optional_newlines COMMA optional_newlines single_node
+  { $$ = append($$, $4) }
+| nodes_with_commas_and_optional_newlines COMMA optional_newlines assignment
+  { $$ = append($$, $4) }
+| nodes_with_commas_and_optional_newlines COMMA optional_newlines binary_expression
+  { $$ = append($$, $4) }
+| nodes_with_commas_and_optional_newlines COMMA optional_newlines AMPERSAND single_node
+  {
+    $$ = append($$, ast.CallExpression{
+      Func: ast.BareReference{Name: "to_proc"},
+      Target: $5,
+    })
+  };
 
 hash : LBRACE optional_newlines RBRACE
   { $$ = ast.Hash{} }
