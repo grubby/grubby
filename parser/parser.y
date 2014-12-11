@@ -923,9 +923,7 @@ bitwise_or: single_node PIPE single_node
 
 true : TRUE { $$ = ast.Boolean{Value: true} }
 false : FALSE { $$ = ast.Boolean{Value: false} }
-array : LBRACKET comma_delimited_nodes RBRACKET
-  { $$ = ast.Array{Nodes: $2} };
-| LBRACKET nodes_with_commas RBRACKET
+array : LBRACKET nodes_with_commas RBRACKET
   { $$ = ast.Array{Nodes: $2} };
 
 hash : LBRACE optional_newlines RBRACE
