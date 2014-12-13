@@ -32,6 +32,7 @@ var Statements []ast.Node
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
 %token <genericValue> COMMA
+%token <genericValue> NamespacedModule
 
 // keywords
 %token <genericValue> DO
@@ -83,7 +84,6 @@ var Statements []ast.Node
 %token <genericValue> NEWLINE
 %token <genericValue> SEMICOLON
 %token <genericValue> COLON
-%token <genericValue> DOUBLECOLON
 %token <genericValue> DOT
 %token <genericValue> PIPE          // "|"
 %token <genericValue> SLASH         // "/"
@@ -193,7 +193,6 @@ var Statements []ast.Node
 %type <genericSlice> comma_delimited_args_with_default_values
 %type <genericSlice> comma_delimited_class_names
 %type <genericSlice> nodes_with_commas_and_optional_newlines
-%type <stringSlice> namespaced_modules
 
 // misc
 %type <genericValue> optional_comma
@@ -681,24 +680,31 @@ class_name_with_modules : CAPITAL_REF
   {
     $$ = ast.Class{
       Name: $1.(ast.BareReference).Name,
+      IsGlobalNamespace: false,
     }
   }
-| namespaced_modules DOUBLECOLON CAPITAL_REF
+| CAPITAL_REF NamespacedModule
   {
-    $$ = ast.Class{
-       Name: $3.(ast.BareReference).Name,
-       Namespace: strings.Join($1, "::"),
-    }
-  };
+    firstPart := $1.(ast.BareReference).Name
+    fullName := strings.Join([]string{firstPart, $2.(string)}, "")
+    pieces := strings.Split(fullName, "::")
 
-namespaced_modules : CAPITAL_REF
-  {
-    $$ = append($$, $1.(ast.BareReference).Name)
+    $$ = ast.Class{
+       Name: pieces[len(pieces)-1],
+       Namespace: strings.Join(pieces[:len(pieces)-1], "::"),
+       IsGlobalNamespace: false,
+    }
   }
-|  namespaced_modules DOUBLECOLON CAPITAL_REF
+| NamespacedModule
   {
-    $$ = append($$, $3.(ast.BareReference).Name)
-  };
+    pieces := strings.Split($1.(string), "::")
+    namespace := strings.Join(pieces[:len(pieces)-1], "::")
+    $$ = ast.Class{
+       Name: pieces[len(pieces)-1],
+       Namespace: strings.TrimPrefix(namespace, "::"),
+       IsGlobalNamespace: true,
+    }
+  }
 
 assignment : REF EQUALTO single_node
   {

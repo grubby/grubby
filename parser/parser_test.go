@@ -1527,27 +1527,59 @@ end
 		})
 
 		Describe("modules", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(`
+			Describe("referred to with leading :: to indicate that it belongs to the global namespace", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+SomeModule::InThe::CurrentScope
+::SomeModule::InTheGlobalNamespace
+::AnotherModule
+`)
+				})
+
+				It("is parsed with the IsGlobalNamespace field set", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Class{
+							Name:              "CurrentScope",
+							Namespace:         "SomeModule::InThe",
+							IsGlobalNamespace: false,
+						},
+						ast.Class{
+							Name:              "InTheGlobalNamespace",
+							Namespace:         "SomeModule",
+							IsGlobalNamespace: true,
+						},
+						ast.Class{
+							Name:              "AnotherModule",
+							Namespace:         "",
+							IsGlobalNamespace: true,
+						},
+					}))
+				})
+			})
+
+			Context("with namespaces", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
 module Foo::Bar::Baz
 puts 'tumescent-wasty'
 end
 `)
-			})
+				})
 
-			It("returns a module declaration", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.ModuleDecl{
-						Name:      "Baz",
-						Namespace: "Foo::Bar",
-						Body: []ast.Node{
-							ast.CallExpression{
-								Func: ast.BareReference{Name: "puts"},
-								Args: []ast.Node{ast.SimpleString{Value: "tumescent-wasty"}},
+				It("returns a module declaration", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.ModuleDecl{
+							Name:      "Baz",
+							Namespace: "Foo::Bar",
+							Body: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Value: "tumescent-wasty"}},
+								},
 							},
 						},
-					},
-				}))
+					}))
+				})
 			})
 		})
 
