@@ -138,6 +138,8 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 		case '0' <= r && r <= '9':
 			l.backup()
 			return lexNumber
+		case r == '\\':
+			return lexWhiteSpaceIncludingNewlineAndComments
 		case r == '\'':
 			return lexSingleQuoteString
 		case r == '"':
