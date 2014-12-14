@@ -1909,7 +1909,10 @@ false
 
 			Describe("/", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("321 / 123")
+					lexer = parser.NewLexer(`
+321 / 123
+(abc) / (xyz)
+`)
 				})
 
 				It("returns a division call expression", func() {
@@ -1918,6 +1921,11 @@ false
 							Target: ast.ConstantInt{Value: 321},
 							Func:   ast.BareReference{Name: "/"},
 							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
+						},
+						ast.CallExpression{
+							Target: ast.Group{Body: []ast.Node{ast.BareReference{Name: "abc"}}},
+							Func:   ast.BareReference{Name: "/"},
+							Args:   []ast.Node{ast.Group{Body: []ast.Node{ast.BareReference{Name: "xyz"}}}},
 						},
 					}))
 				})
