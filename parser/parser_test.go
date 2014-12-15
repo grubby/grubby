@@ -315,8 +315,47 @@ FOO
 		})
 
 		Describe("case statements", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(`
+			Context("without a value to compare against", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+case
+  when truthy_method?
+    0
+  when falsey_method?
+    1
+end
+`)
+				})
+
+				It("should be parsed as an ast.SwitchStatement", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.SwitchStatement{
+							Cases: []ast.SwitchCase{
+								ast.SwitchCase{
+									Conditions: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "truthy_method?"},
+										},
+									},
+									Body: []ast.Node{ast.ConstantInt{Value: 0}},
+								},
+								ast.SwitchCase{
+									Conditions: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "falsey_method?"},
+										},
+									},
+									Body: []ast.Node{ast.ConstantInt{Value: 1}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
+			Context("with a value to compare against", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
 case some_integer
 when 1, 3
   puts 'even'
@@ -330,70 +369,71 @@ else
   puts 'whoops'
 end
 `)
-			})
+				})
 
-			It("should be parsed as an ast.SwitchStatement", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.SwitchStatement{
-						Condition: ast.BareReference{Name: "some_integer"},
-						Cases: []ast.SwitchCase{
-							ast.SwitchCase{
-								Conditions: []ast.Node{
-									ast.ConstantInt{Value: 1},
-									ast.ConstantInt{Value: 3},
+				It("should be parsed as an ast.SwitchStatement", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.SwitchStatement{
+							Condition: ast.BareReference{Name: "some_integer"},
+							Cases: []ast.SwitchCase{
+								ast.SwitchCase{
+									Conditions: []ast.Node{
+										ast.ConstantInt{Value: 1},
+										ast.ConstantInt{Value: 3},
+									},
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Value: "even"}},
+										},
+									},
 								},
-								Body: []ast.Node{
-									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "even"}},
+								ast.SwitchCase{
+									Conditions: []ast.Node{
+										ast.ConstantInt{Value: 2},
+										ast.ConstantInt{Value: 4},
+									},
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Value: "odd"}},
+										},
+									},
+								},
+								ast.SwitchCase{
+									Conditions: []ast.Node{
+										ast.CharacterLiteral{Value: "^"},
+									},
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Value: "a single character (^) literal"}},
+										},
+									},
+								},
+								ast.SwitchCase{
+									Conditions: []ast.Node{
+										ast.CharacterLiteral{Value: ":"},
+									},
+									Body: []ast.Node{
+										ast.CallExpression{
+											Func: ast.BareReference{Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Value: "a single character (:) literal"}},
+										},
 									},
 								},
 							},
-							ast.SwitchCase{
-								Conditions: []ast.Node{
-									ast.ConstantInt{Value: 2},
-									ast.ConstantInt{Value: 4},
-								},
-								Body: []ast.Node{
-									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "odd"}},
-									},
-								},
-							},
-							ast.SwitchCase{
-								Conditions: []ast.Node{
-									ast.CharacterLiteral{Value: "^"},
-								},
-								Body: []ast.Node{
-									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "a single character (^) literal"}},
-									},
-								},
-							},
-							ast.SwitchCase{
-								Conditions: []ast.Node{
-									ast.CharacterLiteral{Value: ":"},
-								},
-								Body: []ast.Node{
-									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "a single character (:) literal"}},
+							Else: []ast.Node{
+								ast.CallExpression{
+									Func: ast.BareReference{Name: "puts"},
+									Args: []ast.Node{
+										ast.SimpleString{Value: "whoops"},
 									},
 								},
 							},
 						},
-						Else: []ast.Node{
-							ast.CallExpression{
-								Func: ast.BareReference{Name: "puts"},
-								Args: []ast.Node{
-									ast.SimpleString{Value: "whoops"},
-								},
-							},
-						},
-					},
-				}))
+					}))
+				})
 			})
 		})
 

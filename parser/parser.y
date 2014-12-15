@@ -1374,6 +1374,10 @@ switch_statement : CASE single_node optional_newlines switch_cases END
   { $$ = ast.SwitchStatement{Condition: $2, Cases: $4} }
 | CASE single_node optional_newlines switch_cases ELSE list END
   { $$ = ast.SwitchStatement{Condition: $2, Cases: $4, Else: $6} }
+| CASE optional_newlines switch_cases END
+  { $$ = ast.SwitchStatement{Cases: $3} }
+| CASE optional_newlines switch_cases ELSE list END
+  { $$ = ast.SwitchStatement{Cases: $3, Else: $5} };
 
 switch_cases : WHEN comma_delimited_nodes list optional_newlines
   { $$ = append($$, ast.SwitchCase{Conditions: $2, Body: $3}) }
