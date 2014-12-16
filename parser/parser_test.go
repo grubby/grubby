@@ -2563,6 +2563,35 @@ end
 			})
 		})
 
+		Describe("the retry keyword", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+begin
+  retry if falsey_method()
+  retry
+end
+`)
+			})
+
+			It("should be parsed as a Retry node", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Begin{
+						Body: []ast.Node{
+							ast.IfBlock{
+								Condition: ast.CallExpression{
+									Args: []ast.Node{},
+									Func: ast.BareReference{Name: "falsey_method"},
+								},
+								Body: []ast.Node{ast.Retry{}},
+							},
+							ast.Retry{},
+						},
+						Rescue: []ast.Node{},
+					},
+				}))
+			})
+		})
+
 		Describe("with conditional returns inside a method", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
