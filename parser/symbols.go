@@ -10,7 +10,14 @@ const validMethodNameRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 func lexSymbol(l *StatefulRubyLexer) stateFn {
 	if !l.accept(alpha + "_@\"") {
 		if l.accept(":") {
-			l.emit(tokenTypeDoubleColon)
+			l.acceptRun(alphaNumericUnderscore)
+
+			for l.pos+2 < len(l.input) && l.input[l.pos:l.pos+2] == "::" {
+				l.pos += 2
+				l.acceptRun(alphaNumericUnderscore)
+			}
+
+			l.emit(tokenTypeNamespaceResolvedModule)
 		} else {
 			l.emit(tokenTypeColon)
 		}
@@ -18,6 +25,7 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 		return lexAnything
 	}
 
+	l.start += 1 // skip past the initial colon
 	// some dynamic symbols can start with " and '
 	if l.input[l.pos-1:l.pos] == "\"" {
 		var (

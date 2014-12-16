@@ -54,8 +54,9 @@ type ClassDecl struct {
 }
 
 type Class struct {
-	Name      string
-	Namespace string
+	Name              string
+	Namespace         string
+	IsGlobalNamespace bool
 }
 
 type ModuleDecl struct {

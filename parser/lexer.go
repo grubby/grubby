@@ -32,6 +32,7 @@ const (
 	tokenTypeCharacter
 	tokenTypeSymbol
 	tokenTypeReference
+	tokenTypeNamespaceResolvedModule
 	tokenTypeMethodName
 	tokenTypeGlobal
 	tokenTypeCapitalizedReference
@@ -53,7 +54,6 @@ const (
 	tokenTypeLessThan
 	tokenTypeGreaterThan
 	tokenTypeColon
-	tokenTypeDoubleColon
 	tokenTypeSemicolon
 	tokenTypeEqual
 	tokenTypeBang
@@ -152,7 +152,6 @@ func lexAnything(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypeQuestionMark)
 			}
 		case r == ':':
-			l.start += 1 // skip past the colon
 			return lexSymbol
 		case r == ';':
 			l.emit(tokenTypeSemicolon)
@@ -478,9 +477,6 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeColon:
 			debug(":")
 			return COLON
-		case tokenTypeDoubleColon:
-			debug("::")
-			return DOUBLECOLON
 		case tokenTypeSemicolon:
 			debug(";")
 			return SEMICOLON
@@ -609,6 +605,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeUNTIL:
 			debug("UNTIL")
 			return UNTIL
+		case tokenTypeNamespaceResolvedModule:
+			debug("NamespacedModule '%s'", token.value)
+			lval.genericValue = token.value
+			return NamespacedModule
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
