@@ -97,6 +97,7 @@ var Statements []ast.Node
 %token <genericValue> DOLLARSIGN    // "$"
 %token <genericValue> ATSIGN        // "@"
 %token <genericValue> FILE_CONST_REF // __FILE__
+%token <genericValue> LINE_CONST_REF // __LINE__
 %token <genericValue> EOF
 
 /*

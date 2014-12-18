@@ -312,6 +312,18 @@ FOO
 					}))
 				})
 			})
+
+			Context("__LINE__", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("__LINE__")
+				})
+
+				It("returns a line number reference", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.LineNumberConstReference{},
+					}))
+				})
+			})
 		})
 
 		Describe("case statements", func() {
