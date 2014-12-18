@@ -520,6 +520,10 @@ call_args : LPAREN nodes_with_commas RPAREN
   { $$ = $1 }
 | nonempty_nodes_with_commas COMMA optional_newlines AMPERSAND REF
   { $$ = append($1, ast.ProcArg{Value: $5}) }
+| binary_expression
+  { $$ = []ast.Node{$1} }
+| binary_expression COMMA REF
+  { $$ = []ast.Node{$1, $3} };
 
 comma_delimited_nodes : single_node
   { $$ = append($$, $1); }

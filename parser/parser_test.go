@@ -2086,6 +2086,7 @@ false
 1 & 0
 1 | 0
 1 ^ 5
+File.lchmod mode & 01777, path
 `)
 				})
 
@@ -2105,6 +2106,18 @@ false
 							Target: ast.ConstantInt{Value: 1},
 							Func:   ast.BareReference{Name: "^"},
 							Args:   []ast.Node{ast.ConstantInt{Value: 5}},
+						},
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "File"},
+							Func:   ast.BareReference{Name: "lchmod"},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "mode"},
+									Func:   ast.BareReference{Name: "&"},
+									Args:   []ast.Node{ast.ConstantInt{Value: 1777}},
+								},
+								ast.BareReference{Name: "path"},
+							},
 						},
 					}))
 				})
