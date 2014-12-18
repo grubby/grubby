@@ -1583,6 +1583,27 @@ end
 			})
 		})
 
+		Describe("preventing line breaks from terminating an expression", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+# all whitespace is ignored after the / until a nonwhitespace char is seen
+foo  \
+   # comments here are ignored, as are newlines
+   \
+   .inspect
+`)
+			})
+
+			It("can be done using a backslash at the end of a line", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.CallExpression{
+						Target: ast.BareReference{Name: "foo"},
+						Func:   ast.BareReference{Name: "inspect"},
+					},
+				}))
+			})
+		})
+
 		Describe("conditional assignment", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
