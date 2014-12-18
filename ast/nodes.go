@@ -154,6 +154,7 @@ type Group struct {
 type Begin struct {
 	Body   []Node
 	Rescue []Node
+	Else   []Node
 }
 
 type Rescue struct {
