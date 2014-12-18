@@ -3201,6 +3201,32 @@ end
 			})
 		})
 
+		Describe("rescuing without a class, and capturing the exception thrown", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+begin
+rescue => wat
+end
+`)
+			})
+
+			It("should be parsed as a BeginBlock struct", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Begin{
+						Body: []ast.Node{},
+						Rescue: []ast.Node{
+							ast.Rescue{
+								Body: []ast.Node{},
+								Exception: ast.RescueException{
+									Var: ast.BareReference{Name: "wat"},
+								},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("an else clause for begin / rescue / else / end", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
