@@ -1182,6 +1182,14 @@ begin_block : BEGIN list optional_rescues END
       Body: $2,
       Rescue: $3,
     }
+  }
+| BEGIN list optional_rescues ELSE list END
+  {
+    $$ = ast.Begin{
+      Body: $2,
+      Rescue: $3,
+      Else: $5,
+    }
   };
 
 rescue : RESCUE list

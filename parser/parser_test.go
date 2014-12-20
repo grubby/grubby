@@ -3201,6 +3201,38 @@ end
 			})
 		})
 
+		Describe("an else clause for begin / rescue / else / end", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+begin
+  'this always happens'
+rescue
+  'only when an exception occurs in the begin scope'
+else
+  'this only happens if there were no exceptions'
+end
+`)
+			})
+
+			It("should be parsed as a BeginBlock struct", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Begin{
+						Body: []ast.Node{ast.SimpleString{Value: "this always happens"}},
+						Rescue: []ast.Node{
+							ast.Rescue{Body: []ast.Node{
+								ast.SimpleString{
+									Value: "only when an exception occurs in the begin scope",
+								},
+							}},
+						},
+						Else: []ast.Node{
+							ast.SimpleString{Value: "this only happens if there were no exceptions"},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("begin followed by several rescue statements", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
