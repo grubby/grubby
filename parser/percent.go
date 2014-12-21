@@ -1,14 +1,14 @@
 package parser
 
-func lexPercentSign(l *StatefulRubyLexer) stateFn {
+func lexPercentSign(l StatefulRubyLexer) stateFn {
 	stringType := tokenTypeDoubleQuoteString
 	if l.accept("r") {
 		stringType = tokenTypeRegex
-		l.start += 1
+		l.moveCurrentTokenStartIndex(1)
 	}
 
 	if l.accept("`~!@#$%^&*-_=+()[]{}<>\\|;:'\",./?") {
-		delimiter := closingDelimiter(l.input[l.start+1 : l.pos])
+		delimiter := closingDelimiter(l.currentSlice()[1:])
 
 		l.ignore()
 		var r, prev rune

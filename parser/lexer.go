@@ -98,7 +98,36 @@ const (
 	tokenType__ENCODING__
 )
 
-type StatefulRubyLexer struct {
+type StatefulRubyLexer interface {
+	moveCurrentTokenStartIndex(int)
+	moveCurrentPositionIndex(int)
+	setCurrentPositionIndex(int)
+
+	next() rune
+	peek() rune
+
+	backup()
+	ignore()
+
+	accept(string) bool
+	acceptRun(string)
+
+	emit(tokenType)
+
+	lastToken() token
+
+	slice(int, int) string
+	currentSlice() string
+
+	currentIndex() int
+	startIndex() int
+
+	lengthOfInput() int
+
+	RubyLexer
+}
+
+type ConcreteStatefulRubyLexer struct {
 	input string
 	start int
 	pos   int
@@ -106,14 +135,14 @@ type StatefulRubyLexer struct {
 
 	tokens chan token
 
-	lastToken token
-	LastError error
+	lastTokenEmitted token
+	LastError        error
 }
 
-type stateFn func(*StatefulRubyLexer) stateFn
+type stateFn func(StatefulRubyLexer) stateFn
 
-func NewLexer(input string) *StatefulRubyLexer {
-	lexer := &StatefulRubyLexer{
+func NewLexer(input string) StatefulRubyLexer {
+	lexer := &ConcreteStatefulRubyLexer{
 		input:  input,
 		tokens: make(chan token),
 	}
@@ -122,7 +151,7 @@ func NewLexer(input string) *StatefulRubyLexer {
 	return lexer
 }
 
-func (lexer *StatefulRubyLexer) run() {
+func (lexer *ConcreteStatefulRubyLexer) run() {
 	for state := lexSomething; state != nil; {
 		state = state(lexer)
 	}
@@ -136,19 +165,7 @@ func (lexer *StatefulRubyLexer) run() {
 
 var validCharRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567789`!@#$%^&*()-_=+\\|][{}/?;:'\",.<>~"
 
-func lexUntilNewLine(l *StatefulRubyLexer) stateFn {
-	for {
-		switch r := l.next(); {
-		case r == '\n':
-			return nil
-		default:
-			l.backup()
-			lexSomething(l)
-		}
-	}
-}
-
-func lexSomething(l *StatefulRubyLexer) stateFn {
+func lexSomething(l StatefulRubyLexer) stateFn {
 	switch r := l.next(); {
 	case '0' <= r && r <= '9':
 		l.backup()
@@ -162,8 +179,8 @@ func lexSomething(l *StatefulRubyLexer) stateFn {
 	case r == '?':
 		// FIXME: this is not an exhaustive list of character literals
 		if l.accept(validCharRunes) {
-			l.start += 1 // skip past the ?
-			// l.acceptRun(validCharRunes)
+			// skip past the ? rune
+			l.moveCurrentTokenStartIndex(1)
 			l.emit(tokenTypeCharacter)
 		} else {
 			l.emit(tokenTypeQuestionMark)
@@ -290,26 +307,26 @@ func lexSomething(l *StatefulRubyLexer) stateFn {
 	default:
 		var min, max int
 		runesToShowNearByte := 100
-		if l.start-runesToShowNearByte < 0 {
+		if l.startIndex()-runesToShowNearByte < 0 {
 			min = 0
 		} else {
-			min = l.start - runesToShowNearByte
+			min = l.startIndex() - runesToShowNearByte
 		}
 
-		if l.pos+runesToShowNearByte >= len(l.input) {
-			max = len(l.input) - 1
+		if l.currentIndex()+runesToShowNearByte >= l.lengthOfInput() {
+			max = l.lengthOfInput() - 1
 		} else {
-			max = l.pos + runesToShowNearByte
+			max = l.currentIndex() + runesToShowNearByte
 		}
 
-		msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d') (current parse is '%s')\nsurrounding context:\n\n==========\n%s\n==========", l.pos, string(r), r, l.input[l.start:l.pos], l.input[min:max])
+		msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d') (current parse is '%s')\nsurrounding context:\n\n==========\n%s\n==========", l.currentIndex(), string(r), r, l.currentSlice(), l.slice(min, max))
 		panic(msg)
 	}
 
 	return lexSomething
 }
 
-func (l *StatefulRubyLexer) next() (r rune) {
+func (l *ConcreteStatefulRubyLexer) next() (r rune) {
 	if l.pos >= len(l.input) {
 		l.width = 0
 		return eof
@@ -322,25 +339,25 @@ func (l *StatefulRubyLexer) next() (r rune) {
 
 // backup steps back one rune.
 // Can be called only once per call of next.
-func (l *StatefulRubyLexer) backup() {
+func (l *ConcreteStatefulRubyLexer) backup() {
 	l.pos -= l.width
 }
 
 // ignore skips over the pending input before this point.
-func (l *StatefulRubyLexer) ignore() {
+func (l *ConcreteStatefulRubyLexer) ignore() {
 	l.start = l.pos
 }
 
 // peek returns but does not consume
 // the next rune in the input.
-func (l *StatefulRubyLexer) peek() rune {
+func (l *ConcreteStatefulRubyLexer) peek() rune {
 	rune := l.next()
 	l.backup()
 	return rune
 }
 
 // accepts a single rune from valid
-func (l *StatefulRubyLexer) accept(valid string) bool {
+func (l *ConcreteStatefulRubyLexer) accept(valid string) bool {
 	if strings.IndexRune(valid, l.next()) >= 0 {
 		return true
 	}
@@ -349,24 +366,62 @@ func (l *StatefulRubyLexer) accept(valid string) bool {
 }
 
 // acceptRun consumes a run of runes from the valid set.
-func (l *StatefulRubyLexer) acceptRun(valid string) {
+func (l *ConcreteStatefulRubyLexer) acceptRun(valid string) {
 	for strings.IndexRune(valid, l.next()) >= 0 {
 	}
 	l.backup()
 }
 
-func (l *StatefulRubyLexer) emit(t tokenType) {
-	newToken := token{
+func (l *ConcreteStatefulRubyLexer) lastToken() token {
+	return l.lastTokenEmitted
+}
+
+func (l *ConcreteStatefulRubyLexer) slice(start, end int) string {
+	return l.input[start:end]
+}
+
+func (l *ConcreteStatefulRubyLexer) currentSlice() string {
+	return l.input[l.start:l.pos]
+}
+
+func (l *ConcreteStatefulRubyLexer) startIndex() int {
+	return l.start
+}
+
+func (l *ConcreteStatefulRubyLexer) currentIndex() int {
+	return l.pos
+}
+
+func (l *ConcreteStatefulRubyLexer) setCurrentPositionIndex(val int) {
+	l.pos = val
+}
+
+func (l *ConcreteStatefulRubyLexer) lengthOfInput() int {
+	return len(l.input)
+}
+
+func (l *ConcreteStatefulRubyLexer) emit(t tokenType) {
+	l.emitToken(token{
 		typ:   t,
 		value: l.input[l.start:l.pos],
-	}
-	l.tokens <- newToken
-	l.lastToken = newToken
+	})
+}
 
+func (l *ConcreteStatefulRubyLexer) emitToken(t token) {
+	l.tokens <- t
+	l.lastTokenEmitted = t
 	l.start = l.pos
 }
 
-func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
+func (l *ConcreteStatefulRubyLexer) moveCurrentTokenStartIndex(val int) {
+	l.start += val
+}
+
+func (l *ConcreteStatefulRubyLexer) moveCurrentPositionIndex(val int) {
+	l.pos += val
+}
+
+func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 	debug("Called Lex()")
 	defer func() { debug("") }()
 
@@ -621,7 +676,7 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 	return 0
 }
 
-func (lexer *StatefulRubyLexer) Error(error string) {
+func (lexer *ConcreteStatefulRubyLexer) Error(error string) {
 	lexer.LastError = errors.New(fmt.Sprintf("syntax error: %s\n", error))
 }
 

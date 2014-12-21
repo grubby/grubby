@@ -5,17 +5,17 @@ import (
 	"unicode/utf8"
 )
 
-func lexReference(l *StatefulRubyLexer) stateFn {
+func lexReference(l StatefulRubyLexer) stateFn {
 	l.acceptRun(alphaNumericUnderscore)
 
-	switch l.input[l.start:l.pos] {
+	switch l.currentSlice() {
 	case "def":
 		l.emit(tokenTypeDEF)
 
 		l.acceptRun(whitespace)
 		l.ignore()
 
-		if (len(l.input) > l.start+5) && l.input[l.start:l.start+5] == "self." {
+		if l.lengthOfInput() > l.startIndex()+5 && l.slice(l.startIndex(), l.startIndex()+5) == "self." {
 			l.acceptRun("self")
 			l.emit(tokenTypeReference)
 			l.accept(".")
@@ -88,7 +88,7 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 	case "when":
 		l.emit(tokenTypeWHEN)
 	default:
-		r, _ := utf8.DecodeRuneInString(l.input[l.start:])
+		r, _ := utf8.DecodeRuneInString(l.slice(l.startIndex(), l.startIndex()+1))
 
 		if l.accept("?!") {
 			l.emit(tokenTypeMethodName)

@@ -1,6 +1,6 @@
 package parser
 
-func lexSingleQuoteString(l *StatefulRubyLexer) stateFn {
+func lexSingleQuoteString(l StatefulRubyLexer) stateFn {
 	var (
 		r    rune
 		prev rune
@@ -26,13 +26,13 @@ func lexSingleQuoteString(l *StatefulRubyLexer) stateFn {
 	return lexSomething
 }
 
-func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
+func lexDoubleQuoteString(l StatefulRubyLexer) stateFn {
 	var (
 		r    rune
 		prev rune
 	)
 
-	l.start += 1
+	l.moveCurrentTokenStartIndex(1)
 
 	for {
 		prev = r
@@ -42,7 +42,7 @@ func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
 				lexUntilClosingMatchingBraces('{', '}')(l)
 			}
 		case r == '"' && prev != '\\':
-			l.pos -= 1
+			l.moveCurrentPositionIndex(-1)
 			l.emit(tokenTypeDoubleQuoteString)
 			l.next()
 			l.ignore()
@@ -56,8 +56,8 @@ func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
 	return lexSomething
 }
 
-func lexUntilClosingMatchingBraces(openingBrace, closingBrace rune) func(*StatefulRubyLexer) {
-	return func(l *StatefulRubyLexer) {
+func lexUntilClosingMatchingBraces(openingBrace, closingBrace rune) func(StatefulRubyLexer) {
+	return func(l StatefulRubyLexer) {
 		for {
 			switch r := l.next(); {
 			case r == openingBrace:
