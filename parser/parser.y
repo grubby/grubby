@@ -1225,6 +1225,19 @@ rescue : RESCUE list
         Classes: classes,
       },
     }
+  }
+| RESCUE OPERATOR REF list
+  {
+    if $2 != "=>" {
+      panic("FREAKOUT")
+    }
+
+    $$ = ast.Rescue{
+      Body: $4,
+      Exception: ast.RescueException{
+        Var: $3.(ast.BareReference),
+      },
+    }
   };
 
 comma_delimited_class_names : class_name_with_modules
