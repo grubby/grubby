@@ -10,6 +10,9 @@ func lexLessThan(l *StatefulRubyLexer) stateFn {
 			l.start += 2
 		}
 
+		// here, need to parse as NORMAL until we see a newline
+		// then parse the heredoc until we think it should end
+
 		if l.accept(alphaNumericUnderscore) {
 			l.acceptRun(alphaNumericUnderscore)
 			heredocIdentifier := l.input[l.start:l.pos]
@@ -55,5 +58,5 @@ func lexLessThan(l *StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeLessThan)
 	}
 
-	return lexAnything
+	return lexSomething
 }

@@ -98,5 +98,5 @@ func lexReference(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeReference)
 		}
 	}
-	return lexAnything
+	return lexSomething
 }

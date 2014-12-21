@@ -123,8 +123,12 @@ func NewLexer(input string) *StatefulRubyLexer {
 }
 
 func (lexer *StatefulRubyLexer) run() {
-	for state := lexAnything; state != nil; {
+	for state := lexSomething; state != nil; {
 		state = state(lexer)
+	}
+
+	if lexer.start != len(lexer.input) {
+		lexer.emit(tokenTypeError)
 	}
 
 	close(lexer.tokens)
@@ -132,185 +136,177 @@ func (lexer *StatefulRubyLexer) run() {
 
 var validCharRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567789`!@#$%^&*()-_=+\\|][{}/?;:'\",.<>~"
 
-func lexAnything(l *StatefulRubyLexer) stateFn {
+func lexUntilNewLine(l *StatefulRubyLexer) stateFn {
 	for {
 		switch r := l.next(); {
-		case '0' <= r && r <= '9':
-			l.backup()
-			return lexNumber
-		case r == '\\':
-			return lexWhiteSpaceIncludingNewlineAndComments
-		case r == '\'':
-			return lexSingleQuoteString
-		case r == '"':
-			return lexDoubleQuoteString
-		case r == '?':
-			// FIXME: this is not an exhaustive list of character literals
-			if l.accept(validCharRunes) {
-				l.start += 1 // skip past the ?
-				// l.acceptRun(validCharRunes)
-				l.emit(tokenTypeCharacter)
-			} else {
-				l.emit(tokenTypeQuestionMark)
-			}
-		case r == ':':
-			return lexSymbol
-		case r == ';':
-			l.emit(tokenTypeSemicolon)
-		case r == ' ' || r == '\t':
-			l.acceptRun(whitespace)
-			l.ignore()
 		case r == '\n':
-			l.backup()
-			return lexNewlines
-		case ('a' <= r && r <= 'z') || r == '_' || ('A' <= r && r <= 'Z'):
-			l.backup()
-			return lexReference
-		case r == '(':
-			l.emit(tokenTypeLParen)
-		case r == ')':
-			l.emit(tokenTypeRParen)
-		case r == ',':
-			l.emit(tokenTypeComma)
-		case r == '#':
-			return lexComment
-		case r == '<':
-			return lexLessThan
-		case r == '>':
-			if l.accept("=") || l.accept(">") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypeGreaterThan)
-			}
-		case r == '=':
-			if l.accept("=") {
-				l.accept("=")
-				l.emit(tokenTypeOperator)
-			} else if l.accept("~") {
-				l.emit(tokenTypeOperator)
-			} else if l.accept(">") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypeEqual)
-			}
-		case r == '!':
-			if l.accept("=") {
-				l.emit(tokenTypeOperator)
-			} else if l.accept("~") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypeBang)
-			}
-		case r == '~':
-			l.emit(tokenTypeTilde)
-		case r == '+':
-			if l.accept("=") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypePlus)
-			}
-		case r == '-':
-			if l.accept("=") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypeMinus)
-			}
-		case r == '*':
-			if l.accept("=") {
-				l.emit(tokenTypeOperator)
-			} else if l.accept("*") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypeStar)
-			}
-		case r == '[':
-			l.emit(tokenTypeLBracket)
-		case r == ']':
-			l.emit(tokenTypeRBracket)
-		case r == '{':
-			l.emit(tokenTypeLBrace)
-		case r == '}':
-			l.emit(tokenTypeRBrace)
-		case r == '$':
-			validGlobalNameRunes := alphaNumericUnderscore + ":"
-			if l.accept(validGlobalNameRunes) {
-				l.backup()
-				l.ignore()
-				l.acceptRun(validGlobalNameRunes)
-				l.emit(tokenTypeGlobal)
-			} else {
-				l.emit(tokenTypeDollarSign)
-			}
-		case r == '@':
-			l.emit(tokenTypeAtSign)
-		case r == '.':
-			if l.accept(".") {
-				l.emit(tokenTypeRange)
-				return lexAnything
-			}
-
-			l.emit(tokenTypeDot)
-
-			if l.accept(validMethodNameRunes) {
-				l.acceptRun(validMethodNameRunes)
-				l.emit(tokenTypeReference)
-			}
-		case r == '|':
-			if l.accept("|") {
-				if l.accept("=") {
-					l.emit(tokenTypeOrEquals)
-				} else {
-					l.emit(tokenTypeOperator)
-				}
-			} else {
-				l.emit(tokenTypePipe)
-			}
-		case r == '/':
-			return lexSlash
-		case r == '&':
-			if l.accept("&") {
-				l.emit(tokenTypeOperator)
-			} else {
-				l.emit(tokenTypeAmpersand)
-			}
-		case r == '%':
-			return lexPercentSign
-		case r == '^':
-			l.emit(tokenTypeOperator)
-		case r == '`':
-			return lexBacktics
-		case r == eof:
-			break
+			return nil
 		default:
-			var min, max int
-			runesToShowNearByte := 100
-			if l.start-runesToShowNearByte < 0 {
-				min = 0
-			} else {
-				min = l.start - runesToShowNearByte
-			}
-
-			if l.pos+runesToShowNearByte >= len(l.input) {
-				max = len(l.input) - 1
-			} else {
-				max = l.pos + runesToShowNearByte
-			}
-
-			msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d') (current parse is '%s')\nsurrounding context:\n\n==========\n%s\n==========", l.pos, string(r), r, l.input[l.start:l.pos], l.input[min:max])
-			panic(msg)
-		}
-
-		if l.peek() == eof {
-			break
+			l.backup()
+			lexSomething(l)
 		}
 	}
+}
 
-	if l.start != len(l.input) {
-		l.emit(tokenTypeError)
+func lexSomething(l *StatefulRubyLexer) stateFn {
+	switch r := l.next(); {
+	case '0' <= r && r <= '9':
+		l.backup()
+		return lexNumber
+	case r == '\\':
+		return lexWhiteSpaceIncludingNewlineAndComments
+	case r == '\'':
+		return lexSingleQuoteString
+	case r == '"':
+		return lexDoubleQuoteString
+	case r == '?':
+		// FIXME: this is not an exhaustive list of character literals
+		if l.accept(validCharRunes) {
+			l.start += 1 // skip past the ?
+			// l.acceptRun(validCharRunes)
+			l.emit(tokenTypeCharacter)
+		} else {
+			l.emit(tokenTypeQuestionMark)
+		}
+	case r == ':':
+		return lexSymbol
+	case r == ';':
+		l.emit(tokenTypeSemicolon)
+	case r == ' ' || r == '\t':
+		l.acceptRun(whitespace)
+		l.ignore()
+	case r == '\n':
+		l.backup()
+		return lexNewlines
+	case ('a' <= r && r <= 'z') || r == '_' || ('A' <= r && r <= 'Z'):
+		l.backup()
+		return lexReference
+	case r == '(':
+		l.emit(tokenTypeLParen)
+	case r == ')':
+		l.emit(tokenTypeRParen)
+	case r == ',':
+		l.emit(tokenTypeComma)
+	case r == '#':
+		return lexComment
+	case r == '<':
+		return lexLessThan
+	case r == '>':
+		if l.accept("=") || l.accept(">") {
+			l.emit(tokenTypeOperator)
+		} else {
+			l.emit(tokenTypeGreaterThan)
+		}
+	case r == '=':
+		if l.accept("=") {
+			l.accept("=")
+			l.emit(tokenTypeOperator)
+		} else if l.accept("~") {
+			l.emit(tokenTypeOperator)
+		} else if l.accept(">") {
+			l.emit(tokenTypeOperator)
+		} else {
+			l.emit(tokenTypeEqual)
+		}
+	case r == '!':
+		if l.accept("=") {
+			l.emit(tokenTypeOperator)
+		} else if l.accept("~") {
+			l.emit(tokenTypeOperator)
+		} else {
+			l.emit(tokenTypeBang)
+		}
+	case r == '~':
+		l.emit(tokenTypeTilde)
+	case r == '+':
+		if l.accept("=") {
+			l.emit(tokenTypeOperator)
+		} else {
+			l.emit(tokenTypePlus)
+		}
+	case r == '-':
+		if l.accept("=") {
+			l.emit(tokenTypeOperator)
+		} else {
+			l.emit(tokenTypeMinus)
+		}
+	case r == '*':
+		if l.accept("=") {
+			l.emit(tokenTypeOperator)
+		} else if l.accept("*") {
+			l.emit(tokenTypeOperator)
+		} else {
+			l.emit(tokenTypeStar)
+		}
+	case r == '[':
+		l.emit(tokenTypeLBracket)
+	case r == ']':
+		l.emit(tokenTypeRBracket)
+	case r == '{':
+		l.emit(tokenTypeLBrace)
+	case r == '}':
+		l.emit(tokenTypeRBrace)
+	case r == '$':
+		validGlobalNameRunes := alphaNumericUnderscore + ":"
+		if l.accept(validGlobalNameRunes) {
+			l.backup()
+			l.ignore()
+			l.acceptRun(validGlobalNameRunes)
+			l.emit(tokenTypeGlobal)
+		} else {
+			l.emit(tokenTypeDollarSign)
+		}
+	case r == '@':
+		l.emit(tokenTypeAtSign)
+	case r == '.':
+		return lexDot
+	case r == '|':
+		if l.accept("|") {
+			if l.accept("=") {
+				l.emit(tokenTypeOrEquals)
+			} else {
+				l.emit(tokenTypeOperator)
+			}
+		} else {
+			l.emit(tokenTypePipe)
+		}
+	case r == '/':
+		return lexSlash
+	case r == '&':
+		if l.accept("&") {
+			l.emit(tokenTypeOperator)
+		} else {
+			l.emit(tokenTypeAmpersand)
+		}
+	case r == '%':
+		return lexPercentSign
+	case r == '^':
+		l.emit(tokenTypeOperator)
+	case r == '`':
+		return lexBacktics
+	case r == eof:
+		l.emit(tokenTypeEOF)
+		return nil
+	default:
+		var min, max int
+		runesToShowNearByte := 100
+		if l.start-runesToShowNearByte < 0 {
+			min = 0
+		} else {
+			min = l.start - runesToShowNearByte
+		}
+
+		if l.pos+runesToShowNearByte >= len(l.input) {
+			max = len(l.input) - 1
+		} else {
+			max = l.pos + runesToShowNearByte
+		}
+
+		msg := fmt.Sprintf("unknown rune encountered at byte %d: '%s' (aka '%d') (current parse is '%s')\nsurrounding context:\n\n==========\n%s\n==========", l.pos, string(r), r, l.input[l.start:l.pos], l.input[min:max])
+		panic(msg)
 	}
 
-	l.emit(tokenTypeEOF)
-	return nil
+	return lexSomething
 }
 
 func (l *StatefulRubyLexer) next() (r rune) {

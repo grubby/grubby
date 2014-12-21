@@ -8,14 +8,14 @@ func lexNumber(l *StatefulRubyLexer) stateFn {
 		if l.accept(digits) {
 			l.acceptRun(digits)
 			l.emit(tokenTypeFloat)
-			return lexAnything
+			return lexSomething
 		} else {
 			l.backup()
 			l.emit(tokenTypeInteger)
-			return lexAnything
+			return lexSomething
 		}
 	}
 
 	l.emit(tokenTypeInteger)
-	return lexAnything
+	return lexSomething
 }

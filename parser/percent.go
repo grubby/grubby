@@ -20,17 +20,17 @@ func lexPercentSign(l *StatefulRubyLexer) stateFn {
 				l.emit(stringType)
 				l.next()
 				l.ignore() // ignore closing delimiter
-				return lexAnything
+				return lexSomething
 			case r == eof:
 				l.emit(tokenTypeError)
-				return lexAnything
+				return lexSomething
 			}
 		}
 	} else {
 		l.emit(tokenTypeOperator)
 	}
 
-	return lexAnything
+	return lexSomething
 }
 
 func closingDelimiter(openingDelimiter string) string {
