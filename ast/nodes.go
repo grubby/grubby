@@ -131,6 +131,7 @@ type ClassVariable struct {
 }
 
 type FileNameConstReference struct{}
+type LineNumberConstReference struct{}
 
 type Block struct {
 	Args []Node

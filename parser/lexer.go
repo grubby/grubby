@@ -522,6 +522,10 @@ func (lexer *StatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("__FILE__")
 			lval.genericValue = ast.FileNameConstReference{}
 			return REF
+		case tokenType__LINE__:
+			debug("__LINE__")
+			lval.genericValue = ast.LineNumberConstReference{}
+			return REF
 		case tokenTypeDot:
 			debug(".")
 			return DOT
