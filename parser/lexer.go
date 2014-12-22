@@ -58,7 +58,8 @@ const (
 	tokenTypeEqual
 	tokenTypeBang
 	tokenTypeTilde
-	tokenTypePlus
+	tokenTypeUnaryPlus
+	tokenTypeBinaryPlus
 	tokenTypeMinus
 	tokenTypeStar
 	tokenTypeLBracket
@@ -236,11 +237,7 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 	case r == '~':
 		l.emit(tokenTypeTilde)
 	case r == '+':
-		if l.accept("=") {
-			l.emit(tokenTypeOperator)
-		} else {
-			l.emit(tokenTypePlus)
-		}
+		return lexPlus
 	case r == '-':
 		if l.accept("=") {
 			l.emit(tokenTypeOperator)
@@ -542,9 +539,12 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeTilde:
 			debug("~")
 			return COMPLEMENT
-		case tokenTypePlus:
-			debug("+")
-			return POSITIVE
+		case tokenTypeUnaryPlus:
+			debug("(unary) +")
+			return UNARY_PLUS
+		case tokenTypeBinaryPlus:
+			debug("(binary) +")
+			return BINARY_PLUS
 		case tokenTypeMinus:
 			debug("-")
 			return NEGATIVE
