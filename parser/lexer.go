@@ -60,7 +60,8 @@ const (
 	tokenTypeTilde
 	tokenTypeUnaryPlus
 	tokenTypeBinaryPlus
-	tokenTypeMinus
+	tokenTypeBinaryMinus
+	tokenTypeUnaryMinus
 	tokenTypeStar
 	tokenTypeLBracket
 	tokenTypeRBracket
@@ -239,11 +240,7 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 	case r == '+':
 		return lexPlus
 	case r == '-':
-		if l.accept("=") {
-			l.emit(tokenTypeOperator)
-		} else {
-			l.emit(tokenTypeMinus)
-		}
+		return lexMinus
 	case r == '*':
 		if l.accept("=") {
 			l.emit(tokenTypeOperator)
@@ -545,9 +542,12 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeBinaryPlus:
 			debug("(binary) +")
 			return BINARY_PLUS
-		case tokenTypeMinus:
-			debug("-")
-			return NEGATIVE
+		case tokenTypeBinaryMinus:
+			debug("(binary) -")
+			return BINARY_MINUS
+		case tokenTypeUnaryMinus:
+			debug("(unary) -")
+			return UNARY_MINUS
 		case tokenTypeStar:
 			debug("*")
 			return STAR
@@ -572,11 +572,11 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenType__FILE__:
 			debug("__FILE__")
 			lval.genericValue = ast.FileNameConstReference{}
-			return REF
+			return FILE_CONST_REF
 		case tokenType__LINE__:
 			debug("__LINE__")
 			lval.genericValue = ast.LineNumberConstReference{}
-			return REF
+			return LINE_CONST_REF
 		case tokenTypeDot:
 			debug(".")
 			return DOT

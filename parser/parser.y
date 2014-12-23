@@ -76,7 +76,9 @@ var Statements []ast.Node
 %token <genericValue> BINARY_PLUS
 %token <genericValue> UNARY_PLUS
 
-%token <genericValue> NEGATIVE
+%token <genericValue> BINARY_MINUS
+%token <genericValue> UNARY_MINUS
+
 %token <genericValue> STAR
 %token <genericValue> RANGE
 
@@ -243,14 +245,14 @@ list : /* empty */
 | list expr
 {  $$ = append($$, $2) };
 
-simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false;
+simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | LINE_CONST_REF | FILE_CONST_REF;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
-single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression;
 
-binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or | ternary;
+binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | binary_expression | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression;
+expr : single_node | method_declaration | class_declaration | module_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -523,11 +525,7 @@ call_args : LPAREN nodes_with_commas RPAREN
 | nonempty_nodes_with_commas
   { $$ = $1 }
 | nonempty_nodes_with_commas COMMA optional_newlines AMPERSAND REF
-  { $$ = append($1, ast.ProcArg{Value: $5}) }
-| binary_expression
-  { $$ = []ast.Node{$1} }
-| binary_expression COMMA REF
-  { $$ = []ast.Node{$1, $3} };
+  { $$ = append($1, ast.ProcArg{Value: $5}) };
 
 comma_delimited_nodes : single_node
   { $$ = append($$, $1); }
@@ -536,8 +534,6 @@ comma_delimited_nodes : single_node
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | single_node
-  { $$ = append($$, $1) }
-| binary_expression
   { $$ = append($$, $1) }
 | assignment
   { $$ = append($$, $1) }
@@ -551,8 +547,6 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | nodes_with_commas COMMA optional_newlines single_node
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines assignment
-  { $$ = append($$, $4) }
-| nodes_with_commas COMMA optional_newlines binary_expression
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines AMPERSAND single_node
   {
@@ -891,7 +885,7 @@ assignable_variables : REF COMMA REF
 negation : BANG expr { $$ = ast.Negation{Target: $2} };
 complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
 positive : UNARY_PLUS single_node { $$ = ast.Positive{Target: $2} };
-negative : NEGATIVE single_node { $$ = ast.Negative{Target: $2} };
+negative : UNARY_MINUS single_node { $$ = ast.Negative{Target: $2} };
 
 binary_addition : single_node BINARY_PLUS single_node
   {
@@ -902,7 +896,7 @@ binary_addition : single_node BINARY_PLUS single_node
     }
   };
 
-binary_subtraction : single_node NEGATIVE expr
+binary_subtraction : single_node BINARY_MINUS expr
   {
     $$ = ast.CallExpression{
       Target: $1,
@@ -955,8 +949,6 @@ array : LBRACKET optional_newlines nodes_with_commas_and_optional_newlines optio
 nodes_with_commas_and_optional_newlines : /* empty */ { $$ = ast.Nodes{} }
 | single_node
   { $$ = append($$, $1) }
-| binary_expression
-  { $$ = append($$, $1) }
 | assignment
   { $$ = append($$, $1) }
 | AMPERSAND single_node
@@ -969,8 +961,6 @@ nodes_with_commas_and_optional_newlines : /* empty */ { $$ = ast.Nodes{} }
 | nodes_with_commas_and_optional_newlines COMMA optional_newlines single_node
   { $$ = append($$, $4) }
 | nodes_with_commas_and_optional_newlines COMMA optional_newlines assignment
-  { $$ = append($$, $4) }
-| nodes_with_commas_and_optional_newlines COMMA optional_newlines binary_expression
   { $$ = append($$, $4) }
 | nodes_with_commas_and_optional_newlines COMMA optional_newlines AMPERSAND single_node
   {

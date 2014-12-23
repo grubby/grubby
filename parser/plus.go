@@ -71,7 +71,9 @@ func lexPlus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeBinaryPlus:
 		l.emit(tokenTypeUnaryPlus)
-	case tokenTypeMinus:
+	case tokenTypeBinaryMinus:
+		l.emit(tokenTypeUnaryPlus)
+	case tokenTypeUnaryMinus:
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeStar:
 		l.emit(tokenTypeUnaryPlus)
