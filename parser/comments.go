@@ -6,5 +6,5 @@ func lexComment(l *StatefulRubyLexer) stateFn {
 
 	l.backup()
 	l.ignore()
-	return lexAnything
+	return lexSomething
 }

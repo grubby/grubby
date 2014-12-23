@@ -9,7 +9,7 @@ func lexBacktics(l *StatefulRubyLexer) stateFn {
 
 		if r == eof {
 			l.emit(tokenTypeError)
-			return lexAnything
+			return lexSomething
 		}
 	}
 
@@ -18,5 +18,5 @@ func lexBacktics(l *StatefulRubyLexer) stateFn {
 	l.accept("`")
 	l.ignore()
 
-	return lexAnything
+	return lexSomething
 }

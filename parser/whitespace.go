@@ -7,7 +7,7 @@ func lexNewlines(l *StatefulRubyLexer) stateFn {
 	for l.accept(newline) {
 		l.emit(tokenTypeNewline)
 	}
-	return lexAnything
+	return lexSomething
 }
 
 func lexWhiteSpaceIncludingNewlineAndComments(l *StatefulRubyLexer) stateFn {
@@ -33,5 +33,5 @@ func lexWhiteSpaceIncludingNewlineAndComments(l *StatefulRubyLexer) stateFn {
 	}
 
 	l.ignore()
-	return lexAnything
+	return lexSomething
 }

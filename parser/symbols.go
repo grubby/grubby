@@ -22,7 +22,7 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeColon)
 		}
 
-		return lexAnything
+		return lexSomething
 	}
 
 	l.start += 1 // skip past the initial colon
@@ -52,10 +52,10 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 				l.emit(tokenTypeSymbol)
 				l.next()
 				l.ignore()
-				return lexAnything
+				return lexSomething
 			case r == eof:
 				l.emit(tokenTypeError)
-				return lexAnything
+				return lexSomething
 			}
 		}
 	}
@@ -63,5 +63,5 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 	l.accept("@")
 	l.acceptRun(alphaNumericUnderscore + "?!")
 	l.emit(tokenTypeSymbol)
-	return lexAnything
+	return lexSomething
 }

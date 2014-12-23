@@ -16,14 +16,14 @@ func lexSingleQuoteString(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeString)
 			l.accept("'")
 			l.ignore()
-			return lexAnything
+			return lexSomething
 		case r == eof:
 			l.emit(tokenTypeError)
-			return lexAnything
+			return lexSomething
 		}
 	}
 
-	return lexAnything
+	return lexSomething
 }
 
 func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
@@ -46,14 +46,14 @@ func lexDoubleQuoteString(l *StatefulRubyLexer) stateFn {
 			l.emit(tokenTypeDoubleQuoteString)
 			l.next()
 			l.ignore()
-			return lexAnything
+			return lexSomething
 		case r == eof:
 			l.emit(tokenTypeError)
-			return lexAnything
+			return lexSomething
 		}
 	}
 
-	return lexAnything
+	return lexSomething
 }
 
 func lexUntilClosingMatchingBraces(openingBrace, closingBrace rune) func(*StatefulRubyLexer) {
