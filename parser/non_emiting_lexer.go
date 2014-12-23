@@ -49,10 +49,11 @@ func (l *nonEmitingLexer) acceptRun(valid string) {
 
 func (l *nonEmitingLexer) emit(t tokenType) {
 	l.Tokens = append(l.Tokens, token{typ: t, value: l.lexer.currentSlice()})
+	l.lexer.ignore()
 }
 
 func (l *nonEmitingLexer) lastToken() token {
-	return l.lexer.lastToken()
+	return l.Tokens[len(l.Tokens)-1]
 }
 
 func (l *nonEmitingLexer) slice(start, end int) string {

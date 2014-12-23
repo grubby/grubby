@@ -198,7 +198,6 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 		l.backup()
 		return lexNewlines
 	case ('a' <= r && r <= 'z') || r == '_' || ('A' <= r && r <= 'Z'):
-		l.backup()
 		return lexReference
 	case r == '(':
 		l.emit(tokenTypeLParen)

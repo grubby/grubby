@@ -170,7 +170,7 @@ var _ = Describe("goyacc parser", func() {
 				Context("as an arg to a method call", func() {
 					BeforeEach(func() {
 						lexer = parser.NewLexer(`
-foo(<<-EOS, 'a', 'b', 'c')
+foo(<<-EOS, 'a', 'b', 'c', __LINE__ + 1)
 something
 goes
 here
@@ -187,6 +187,11 @@ EOS
 									ast.SimpleString{Value: "a"},
 									ast.SimpleString{Value: "b"},
 									ast.SimpleString{Value: "c"},
+									ast.CallExpression{
+										Target: ast.LineNumberConstReference{},
+										Func:   ast.BareReference{Name: "+"},
+										Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+									},
 								},
 							},
 						}))
