@@ -66,7 +66,9 @@ func lexSlash(l StatefulRubyLexer) stateFn {
 		parseAsRegex(l)
 	case tokenTypeBinaryPlus:
 		parseAsRegex(l)
-	case tokenTypeMinus:
+	case tokenTypeBinaryMinus:
+		parseAsRegex(l)
+	case tokenTypeUnaryMinus:
 		parseAsRegex(l)
 	case tokenTypeStar:
 		parseAsRegex(l)
