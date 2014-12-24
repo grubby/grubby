@@ -142,6 +142,7 @@ var Statements []ast.Node
 %type <genericValue> next_expression;
 %type <genericValue> binary_expression
 %type <genericValue> class_declaration
+%type <genericValue> eigenclass_declaration
 %type <genericValue> default_value_arg
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
@@ -252,7 +253,7 @@ single_node : simple_node | array | hash | class_name_with_modules | call_expres
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary;
+expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -666,6 +667,18 @@ class_declaration : CLASS class_name_with_modules list END
        SuperClass: $4.(ast.Class),
        Namespace: $2.(ast.Class).Namespace,
        Body: $5,
+    }
+  };
+
+eigenclass_declaration : CLASS OPERATOR single_node list END
+  {
+    if $2 != "<<" {
+      panic("FREAKOUT :: impossible operator after 'class' keyword (" + $2 + ")")
+    }
+
+    $$ = ast.EigenClass{
+      Target: $3,
+      Body: $4,
     }
   };
 
