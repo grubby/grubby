@@ -3,166 +3,170 @@ package parser
 import "fmt"
 
 func lexSlash(l StatefulRubyLexer) stateFn {
-	parseAsRegex := func() {
-		l.ignore() // ignore opening '/'
-
-		var r, prev rune
-		shouldBreak := false
-
-		for {
-			prev = r
-			switch r = l.next(); {
-			case r == '/' && prev != '\\':
-				l.backup()
-				l.emit(tokenTypeRegex)
-				l.accept("/")
-				l.ignore() // ignore closing slash
-				shouldBreak = true
-			case r == eof:
-				l.emit(tokenTypeError)
-				shouldBreak = true
-			}
-
-			if shouldBreak {
-				break
-			}
-		}
-	}
-
-	parseAsOperator := func() {
-		if l.accept("=") {
-			l.emit(tokenTypeOperator)
-		} else {
-			l.emit(tokenTypeForwardSlash)
-		}
-	}
-
 	switch l.lastToken().typ {
 	case tokenTypeInteger:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeFloat:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeString:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeDoubleQuoteString:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeCharacter:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeSymbol:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeReference:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeCapitalizedReference:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeGlobal:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeLParen:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeRParen:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeComma:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeNewline:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeDEF:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeDO:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeEND:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeIF:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeELSE:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeELSIF:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeUNLESS:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeTRUE:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeFALSE:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeLessThan:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeGreaterThan:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeColon:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeSemicolon:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeEqual:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeBang:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeTilde:
-		parseAsRegex()
-	case tokenTypePlus:
-		parseAsRegex()
+		parseAsRegex(l)
+	case tokenTypeUnaryPlus:
+		parseAsRegex(l)
+	case tokenTypeBinaryPlus:
+		parseAsRegex(l)
 	case tokenTypeMinus:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeStar:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeLBracket:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeRBracket:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeLBrace:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeRBrace:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenType__FILE__:
-		parseAsOperator()
+		parseAsOperator(l)
+	case tokenType__LINE__:
+		parseAsOperator(l)
 	case tokenTypeDot:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypePipe:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeSubshell:
-		parseAsOperator()
+		parseAsOperator(l)
 	case tokenTypeOperator:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeBEGIN:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeRESCUE:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeENSURE:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeBREAK:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeNEXT:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeREDO:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeRETRY:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeRETURN:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeYIELD:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeQuestionMark:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeMethodName:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeWHILE:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeAND:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeOR:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeLAMBDA:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeCASE:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeWHEN:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeOrEquals:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeRange:
-		parseAsRegex()
+		parseAsRegex(l)
 	case tokenTypeError:
-		parseAsRegex()
+		parseAsRegex(l)
 	default:
 		panic(fmt.Sprintf("Unknown node preceding '/' :: '%#v'", l.lastToken))
 	}
 
 	return lexSomething
+}
+
+func parseAsRegex(l StatefulRubyLexer) {
+	l.ignore() // ignore opening '/'
+
+	var r, prev rune
+	shouldBreak := false
+
+	for {
+		prev = r
+		switch r = l.next(); {
+		case r == '/' && prev != '\\':
+			l.backup()
+			l.emit(tokenTypeRegex)
+			l.accept("/")
+			l.ignore() // ignore closing slash
+			shouldBreak = true
+		case r == eof:
+			l.emit(tokenTypeError)
+			shouldBreak = true
+		}
+
+		if shouldBreak {
+			break
+		}
+	}
+}
+
+func parseAsOperator(l StatefulRubyLexer) {
+	if l.accept("=") {
+		l.emit(tokenTypeOperator)
+	} else {
+		l.emit(tokenTypeForwardSlash)
+	}
 }

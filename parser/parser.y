@@ -72,7 +72,10 @@ var Statements []ast.Node
 %token <genericValue> EQUALTO
 %token <genericValue> BANG
 %token <genericValue> COMPLEMENT
-%token <genericValue> POSITIVE
+
+%token <genericValue> BINARY_PLUS
+%token <genericValue> UNARY_PLUS
+
 %token <genericValue> NEGATIVE
 %token <genericValue> STAR
 %token <genericValue> RANGE
@@ -887,10 +890,10 @@ assignable_variables : REF COMMA REF
 
 negation : BANG expr { $$ = ast.Negation{Target: $2} };
 complement : COMPLEMENT expr { $$ = ast.Complement{Target: $2} };
-positive : POSITIVE single_node { $$ = ast.Positive{Target: $2} };
+positive : UNARY_PLUS single_node { $$ = ast.Positive{Target: $2} };
 negative : NEGATIVE single_node { $$ = ast.Negative{Target: $2} };
 
-binary_addition : single_node POSITIVE single_node
+binary_addition : single_node BINARY_PLUS single_node
   {
     $$ = ast.CallExpression{
       Target: $1,

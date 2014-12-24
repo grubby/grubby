@@ -349,6 +349,22 @@ FOO
 						ast.LineNumberConstReference{},
 					}))
 				})
+
+				Describe("as an object", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer("__LINE__ + 1")
+					})
+
+					It("can have methods called on it", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.CallExpression{
+								Target: ast.LineNumberConstReference{},
+								Func:   ast.BareReference{Name: "+"},
+								Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+							},
+						}))
+					})
+				})
 			})
 		})
 
