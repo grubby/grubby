@@ -1,7 +1,7 @@
 package parser
 
-func lexBacktics(l *StatefulRubyLexer) stateFn {
-	l.start += 1 // ignore the opening backtic
+func lexBacktics(l StatefulRubyLexer) stateFn {
+	l.moveCurrentTokenStartIndex(1) // ignore the opening backtic
 
 	isEscaped := false
 	for r := l.peek(); r != '`' && !isEscaped; r = l.next() {
@@ -13,7 +13,7 @@ func lexBacktics(l *StatefulRubyLexer) stateFn {
 		}
 	}
 
-	l.pos -= 1 // ignore closing backtic
+	l.moveCurrentPositionIndex(-1)
 	l.emit(tokenTypeSubshell)
 	l.accept("`")
 	l.ignore()

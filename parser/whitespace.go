@@ -3,14 +3,14 @@ package parser
 const whitespace = " \t"
 const newline = "\n"
 
-func lexNewlines(l *StatefulRubyLexer) stateFn {
+func lexNewlines(l StatefulRubyLexer) stateFn {
 	for l.accept(newline) {
 		l.emit(tokenTypeNewline)
 	}
 	return lexSomething
 }
 
-func lexWhiteSpaceIncludingNewlineAndComments(l *StatefulRubyLexer) stateFn {
+func lexWhiteSpaceIncludingNewlineAndComments(l StatefulRubyLexer) stateFn {
 	// accept any whitespace we might currently have at the end of the line
 	l.acceptRun(whitespace)
 

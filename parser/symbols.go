@@ -7,13 +7,13 @@ const alphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345
 const alphaNumericUnderscore = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 const validMethodNameRunes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!?"
 
-func lexSymbol(l *StatefulRubyLexer) stateFn {
+func lexSymbol(l StatefulRubyLexer) stateFn {
 	if !l.accept(alpha + "_@\"") {
 		if l.accept(":") {
 			l.acceptRun(alphaNumericUnderscore)
 
-			for l.pos+2 < len(l.input) && l.input[l.pos:l.pos+2] == "::" {
-				l.pos += 2
+			for l.currentIndex()+2 < l.lengthOfInput() && l.slice(l.currentIndex(), l.currentIndex()+2) == "::" {
+				l.moveCurrentPositionIndex(2)
 				l.acceptRun(alphaNumericUnderscore)
 			}
 
@@ -25,9 +25,11 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 		return lexSomething
 	}
 
-	l.start += 1 // skip past the initial colon
+	// skip past the initial colon
+	l.moveCurrentTokenStartIndex(1)
+
 	// some dynamic symbols can start with " and '
-	if l.input[l.pos-1:l.pos] == "\"" {
+	if l.slice(l.currentIndex()-1, l.currentIndex()) == "\"" {
 		var (
 			r    rune
 			prev rune
@@ -48,7 +50,7 @@ func lexSymbol(l *StatefulRubyLexer) stateFn {
 					}
 				}
 			case r == '"' && prev != '\\':
-				l.pos -= 1
+				l.moveCurrentPositionIndex(-1)
 				l.emit(tokenTypeSymbol)
 				l.next()
 				l.ignore()

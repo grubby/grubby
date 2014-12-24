@@ -2,7 +2,7 @@ package parser
 
 import "fmt"
 
-func lexSlash(l *StatefulRubyLexer) stateFn {
+func lexSlash(l StatefulRubyLexer) stateFn {
 	parseAsRegex := func() {
 		l.ignore() // ignore opening '/'
 
@@ -37,7 +37,7 @@ func lexSlash(l *StatefulRubyLexer) stateFn {
 		}
 	}
 
-	switch l.lastToken.typ {
+	switch l.lastToken().typ {
 	case tokenTypeInteger:
 		parseAsOperator()
 	case tokenTypeFloat:

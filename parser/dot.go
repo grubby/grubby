@@ -1,6 +1,6 @@
 package parser
 
-func lexDot(l *StatefulRubyLexer) stateFn {
+func lexDot(l StatefulRubyLexer) stateFn {
 	if l.accept(".") {
 		l.emit(tokenTypeRange)
 		return lexSomething

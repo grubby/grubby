@@ -25,14 +25,14 @@ var _ = Describe("goyacc parser", func() {
 		It("succeeds without any errors", func() {
 			lexer = parser.NewLexer("")
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).ToNot(HaveOccurred())
+			Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).ToNot(HaveOccurred())
 		})
 	})
 
 	Context("when the code parsed is syntactically valid", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).ToNot(HaveOccurred())
+			Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).ToNot(HaveOccurred())
 		})
 
 		Describe("parsing an integer", func() {
@@ -167,6 +167,32 @@ var _ = Describe("goyacc parser", func() {
 			})
 
 			Describe("heredoc", func() {
+				Context("as an arg to a method call", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
+foo(<<-EOS, 'a', 'b', 'c')
+something
+goes
+here
+EOS
+`)
+					})
+
+					It("should parse the heredoc around the method call", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.CallExpression{
+								Func: ast.BareReference{Name: "foo"},
+								Args: []ast.Node{
+									ast.InterpolatedString{Value: "something\ngoes\nhere"},
+									ast.SimpleString{Value: "a"},
+									ast.SimpleString{Value: "b"},
+									ast.SimpleString{Value: "c"},
+								},
+							},
+						}))
+					})
+				})
+
 				Context("with a dash", func() {
 					BeforeEach(func() {
 						lexer = parser.NewLexer(`
@@ -3669,7 +3695,7 @@ MSpecRun.main
 
 		It("is parsed just fine", func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+			Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
 			Expect(len(parser.Statements)).To(Equal(4))
 		})
 	})
@@ -3684,7 +3710,7 @@ s << (short ? ", " : "  ") if long
 
 			It("is parsed correctly", func() {
 				Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-				Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+				Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.IfBlock{
 						Condition: ast.BareReference{Name: "long"},
@@ -3719,7 +3745,7 @@ end`)
 
 			It("is parsed correctly", func() {
 				Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-				Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+				Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.IfBlock{
 						Condition: ast.Negation{
@@ -3781,14 +3807,14 @@ func.with_a_block { |foo | puts foo.inspect    } # all the comments # yep
 
 		It("parses just fine", func() {
 			Expect(parser.RubyParse(lexer)).To(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(BeNil())
+			Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
 		})
 	})
 
 	Describe("invalid ruby", func() {
 		JustBeforeEach(func() {
 			Expect(parser.RubyParse(lexer)).ToNot(BeSuccessful())
-			Expect(lexer.(*parser.StatefulRubyLexer).LastError).To(HaveOccurred())
+			Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(HaveOccurred())
 		})
 
 		Context("given a class name that starts with a lowercase character", func() {
