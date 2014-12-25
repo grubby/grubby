@@ -13,6 +13,7 @@ func lexLessThan(l StatefulRubyLexer) stateFn {
 		if l.accept(alphaNumericUnderscore) {
 			l.acceptRun(alphaNumericUnderscore)
 			heredocIdentifier := l.currentSlice()
+			l.ignore()
 
 			//            Were You Aware???
 			//            =================
@@ -23,17 +24,22 @@ func lexLessThan(l StatefulRubyLexer) stateFn {
 			// then read the heredoc until we see the closing identifier
 			readNewline := false
 			nonEmitingLexer := NewNonEmitingLexer(l)
+			stateFn := lexSomething(nonEmitingLexer)
+
 			for readNewline == false {
-				switch r := l.next(); {
-				case r == '\n':
+				var t tokenType
+				tokenLen := len(nonEmitingLexer.Tokens) - 1
+				if tokenLen >= 0 {
+					t = nonEmitingLexer.Tokens[len(nonEmitingLexer.Tokens)-1].typ
+				}
+
+				switch t {
+				case tokenTypeNewline:
 					readNewline = true
+					nonEmitingLexer.Tokens = nonEmitingLexer.Tokens[:len(nonEmitingLexer.Tokens)-1]
 					break
 				default:
-					l.backup()
-					stateFn := lexSomething(nonEmitingLexer)
-					if stateFn != nil {
-						stateFn(nonEmitingLexer)
-					}
+					stateFn = stateFn(nonEmitingLexer)
 				}
 			}
 
