@@ -213,7 +213,7 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 	}
 
 	main := vm.ObjectSpace["main"]
-	vm.stack.Unshift("main")
+	vm.stack.Unshift("main", vm.currentFilename)
 	defer vm.stack.Shift()
 
 	return vm.executeWithContext(parser.Statements, main)
@@ -371,7 +371,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 				args = append(args, arg)
 			}
 
-			vm.stack.Unshift(method.Name())
+			vm.stack.Unshift(method.Name(), vm.currentFilename)
 			defer vm.stack.Shift()
 
 			returnValue, returnErr = method.Execute(target, args...)
