@@ -10,6 +10,9 @@ import (
 	"github.com/grubby/grubby/ast"
 )
 
+// Load-bearing comment -- generates the parser when this is compiled
+//go:generate go tool yacc -o parser.go -p Ruby parser.y
+
 var DebugStatements = []string{}
 
 const eof = -1

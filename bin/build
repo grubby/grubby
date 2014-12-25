@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-pushd parser
-go tool yacc -o parser.go -p Ruby parser.y
-popd
+go generate github.com/grubby/grubby/parser
 
 rm bin/irb bin/ruby
 
