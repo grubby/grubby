@@ -1540,6 +1540,41 @@ end
 			})
 		})
 
+		Describe("eigenclasses", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+class Foo
+  class << self
+    puts 'this is evaluated inside the eigenclass for the Foo class'
+  end
+end
+`)
+			})
+
+			It("can be used to modify the unique singleton class for an object", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.ClassDecl{
+						Name: "Foo",
+						Body: []ast.Node{
+							ast.EigenClass{
+								Target: ast.BareReference{Name: "self"},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{
+											ast.SimpleString{
+												Value: "this is evaluated inside the eigenclass for the Foo class",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		// this is ambiguous because it is impossible to determine if you meant
 		// foo [:something] as a call expression (e.g.: foo([:an_array_literal]))
 		// ... or ...

@@ -250,3 +250,8 @@ type RescueModifier struct {
 type Regex struct {
 	Value string
 }
+
+type EigenClass struct {
+	Target Node
+	Body   []Node
+}
