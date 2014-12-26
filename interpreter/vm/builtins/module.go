@@ -1,5 +1,10 @@
 package builtins
 
+import (
+	"errors"
+	"fmt"
+)
+
 // abstract module interface
 type Module interface {
 	Name() string
@@ -20,6 +25,7 @@ func NewModuleClass() Class {
 	c.initialize()
 	c.instanceMethods = make([]Method, 0)
 	c.class = c
+
 	return c
 }
 
@@ -66,6 +72,33 @@ func NewModule(name string) Module {
 		}
 
 		return c, nil
+	}))
+
+	c.AddMethod(NewMethod("module_function", func(self Value, args ...Value) (Value, error) {
+		if len(args) != 1 {
+			return nil, errors.New("expected exactly one arg")
+		}
+
+		symbol, ok := args[0].(*SymbolValue)
+		if !ok {
+			return nil, errors.New("expected method name to be a symbol")
+		}
+
+		var instanceMethod Method
+		for _, m := range self.(*RubyModule).instanceMethods {
+			if m.Name() == symbol.String() {
+				instanceMethod = m
+				break
+			}
+		}
+
+		if instanceMethod == nil {
+			return nil, errors.New(fmt.Sprintf("method '%s' does not exist", symbol.String()))
+		}
+
+		self.(*RubyModule).AddMethod(instanceMethod)
+		// FIXME: this should mark the original instance method as private
+		return self, nil
 	}))
 
 	return c
