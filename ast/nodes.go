@@ -255,3 +255,8 @@ type EigenClass struct {
 	Target Node
 	Body   []Node
 }
+
+type Alias struct {
+	To   Symbol
+	From Symbol
+}

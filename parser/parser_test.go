@@ -2763,6 +2763,35 @@ end
 			})
 		})
 
+		Describe("the 'alias' keyword", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+module Foo
+  alias wat zomg
+  alias seriously? yes_srsly!
+end
+`)
+			})
+
+			It("does not allow commas and converts its 'args' to symbols", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.ModuleDecl{
+						Name: "Foo",
+						Body: []ast.Node{
+							ast.Alias{
+								To:   ast.Symbol{Name: "wat"},
+								From: ast.Symbol{Name: "zomg"},
+							},
+							ast.Alias{
+								To:   ast.Symbol{Name: "seriously?"},
+								From: ast.Symbol{Name: "yes_srsly!"},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("the retry keyword", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`

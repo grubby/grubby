@@ -87,6 +87,20 @@ func lexReference(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeCASE)
 	case "when":
 		l.emit(tokenTypeWHEN)
+	case "alias":
+		l.emit(tokenTypeALIAS)
+		// keep reading references as symbols until EOL
+
+		l.acceptRun(whitespace)
+		l.ignore()
+		for l.accept(alphaNumericUnderscore) {
+			l.acceptRun(alphaNumericUnderscore)
+			l.accept("?!")
+			l.emit(tokenTypeSymbol)
+			l.acceptRun(whitespace)
+			l.ignore()
+		}
+
 	default:
 		r, _ := utf8.DecodeRuneInString(l.slice(l.startIndex(), l.startIndex()+1))
 
