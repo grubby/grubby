@@ -1315,6 +1315,8 @@ while_loop : WHILE expr NEWLINE loop_expressions END
   { $$ = ast.Loop{Condition: $2, Body: $4} }
 | UNTIL expr NEWLINE loop_expressions END
   { $$ = ast.Loop{Condition: ast.Negation{Target:$2}, Body: $4} }
+| expr WHILE expr
+  { $$ = ast.Loop{Condition: $3, Body: []ast.Node{$1}} };
 
 loop_expressions : /* empty */
   { $$ = ast.Nodes{} }

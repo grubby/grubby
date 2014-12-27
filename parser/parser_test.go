@@ -3657,49 +3657,87 @@ end
 				})
 			})
 
-			Context("with a while statement", func() {
-				BeforeEach(func() {
-					lexer = parser.NewLexer(`
+			Describe("while statements", func() {
+				Context("at the end of an expression", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
+'check this out' while false
+
+begin
+  puts 'whaaat'
+end while true
+`)
+					})
+
+					It("are valid loops too", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.Loop{
+								Condition: ast.Boolean{Value: false},
+								Body: []ast.Node{
+									ast.SimpleString{Value: "check this out"},
+								},
+							},
+							ast.Loop{
+								Condition: ast.Boolean{Value: true},
+								Body: []ast.Node{
+									ast.Begin{
+										Body: []ast.Node{
+											ast.CallExpression{
+												Func: ast.BareReference{Name: "puts"},
+												Args: []ast.Node{ast.SimpleString{Value: "whaaat"}},
+											},
+										},
+										Rescue: []ast.Node{},
+									},
+								},
+							},
+						}))
+					})
+				})
+
+				Context("with a trailing end keyword", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
 while foo = bar.baz
   puts 'welp'
   break if false
   next if false
 end
 `)
-				})
+					})
 
-				It("is parsed into a Loop struct", func() {
-					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.Loop{
-							Condition: ast.Assignment{
-								LHS: ast.BareReference{Name: "foo"},
-								RHS: ast.CallExpression{
-									Target: ast.BareReference{Name: "bar"},
-									Func:   ast.BareReference{Name: "baz"},
+					It("is parsed into a Loop struct", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.Loop{
+								Condition: ast.Assignment{
+									LHS: ast.BareReference{Name: "foo"},
+									RHS: ast.CallExpression{
+										Target: ast.BareReference{Name: "bar"},
+										Func:   ast.BareReference{Name: "baz"},
+									},
+								},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.SimpleString{Value: "welp"}},
+									},
+									ast.IfBlock{
+										Condition: ast.Boolean{Value: false},
+										Body:      []ast.Node{ast.Break{}},
+									},
+									ast.IfBlock{
+										Condition: ast.Boolean{Value: false},
+										Body:      []ast.Node{ast.Next{}},
+									},
 								},
 							},
-							Body: []ast.Node{
-								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "welp"}},
-								},
-								ast.IfBlock{
-									Condition: ast.Boolean{Value: false},
-									Body:      []ast.Node{ast.Break{}},
-								},
-								ast.IfBlock{
-									Condition: ast.Boolean{Value: false},
-									Body:      []ast.Node{ast.Next{}},
-								},
-							},
-						},
-					}))
+						}))
+					})
 				})
-			})
 
-			Context("with a deeply nested next keyword", func() {
-				BeforeEach(func() {
-					lexer = parser.NewLexer(`
+				Context("with a deeply nested next keyword", func() {
+					BeforeEach(func() {
+						lexer = parser.NewLexer(`
 while true
   if false
     if false
@@ -3708,28 +3746,29 @@ while true
   end
 end
 `)
-				})
+					})
 
-				It("parses correctly", func() {
-					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.Loop{
-							Condition: ast.Boolean{Value: true},
-							Body: []ast.Node{
-								ast.IfBlock{
-									Condition: ast.Boolean{Value: false},
-									Body: []ast.Node{
-										ast.IfBlock{
-											Condition: ast.Boolean{Value: false},
-											Body: []ast.Node{
+					It("parses correctly", func() {
+						Expect(parser.Statements).To(Equal([]ast.Node{
+							ast.Loop{
+								Condition: ast.Boolean{Value: true},
+								Body: []ast.Node{
+									ast.IfBlock{
+										Condition: ast.Boolean{Value: false},
+										Body: []ast.Node{
+											ast.IfBlock{
+												Condition: ast.Boolean{Value: false},
+												Body: []ast.Node{
 
-												ast.Next{},
+													ast.Next{},
+												},
 											},
 										},
 									},
 								},
 							},
-						},
-					}))
+						}))
+					})
 				})
 			})
 		})
