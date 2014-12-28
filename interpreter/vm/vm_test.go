@@ -210,6 +210,53 @@ end`)
 		})
 	})
 
+	Describe("Hash class", func() {
+		It("it can be constructed from a hash literal", func() {
+			hash, err := vm.Run("{:key => :value}")
+			Expect(err).ToNot(HaveOccurred())
+
+			keysMethod, err := hash.Method("keys")
+			Expect(err).ToNot(HaveOccurred())
+
+			keys, err := keysMethod.Execute(hash)
+			Expect(err).ToNot(HaveOccurred())
+
+			keyArray, ok := keys.(*builtins.Array)
+			Expect(ok).To(BeTrue())
+			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("key")))
+
+			valuesMethod, err := hash.Method("values")
+			Expect(err).ToNot(HaveOccurred())
+
+			values, err := valuesMethod.Execute(hash)
+			Expect(err).ToNot(HaveOccurred())
+
+			valueArray, ok := values.(*builtins.Array)
+			Expect(ok).To(BeTrue())
+			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("value")))
+
+			method, err := hash.Method("[]=")
+			Expect(err).ToNot(HaveOccurred())
+
+			_, err = method.Execute(hash, builtins.NewSymbol("foo"), builtins.NewSymbol("bar"))
+			Expect(err).ToNot(HaveOccurred())
+
+			keys, err = keysMethod.Execute(hash)
+			Expect(err).ToNot(HaveOccurred())
+
+			keyArray, ok = keys.(*builtins.Array)
+			Expect(ok).To(BeTrue())
+			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("foo")))
+
+			values, err = valuesMethod.Execute(hash)
+			Expect(err).ToNot(HaveOccurred())
+
+			valueArray, ok = values.(*builtins.Array)
+			Expect(ok).To(BeTrue())
+			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("bar")))
+		})
+	})
+
 	Describe("File class", func() {
 		It("has a reasonable .expand_path method", func() {
 			fileClass, err := vm.Get("File")

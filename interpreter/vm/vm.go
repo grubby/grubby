@@ -118,6 +118,7 @@ func (vm *vm) registerBuiltinClasses() {
 	vm.CurrentClasses = map[string]builtins.Class{
 		"Class":   builtins.NewClassValue(),
 		"Array":   builtins.NewArrayClass(),
+		"Hash":    builtins.NewHashClass(),
 		"Object":  builtins.NewGlobalObjectClass(),
 		"Process": builtins.NewProcessClass(),
 		"True":    builtins.NewTrueClass(),
@@ -426,6 +427,25 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			if err != nil {
 				returnErr = err
 			}
+		case ast.Hash:
+			hash := vm.CurrentClasses["Hash"].New().(*builtins.Hash)
+			for _, keyPair := range statement.(ast.Hash).Pairs {
+				key, err := vm.executeWithContext(ast.Nodes{keyPair.Key}, context)
+				if err != nil {
+					returnErr = err
+					break
+				}
+
+				val, err := vm.executeWithContext(ast.Nodes{keyPair.Value}, context)
+				if err != nil {
+					returnErr = err
+					break
+				}
+
+				hash.Add(key, val)
+			}
+
+			returnValue = hash
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
