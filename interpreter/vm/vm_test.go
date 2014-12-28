@@ -271,37 +271,6 @@ end`)
 		})
 	})
 
-	Describe("modules", func() {
-		It("can be instantiated with the module keyword", func() {
-			_, err := vm.Run(`
-module Foo
-end
-`)
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(vm.Modules()["Foo"]).ToNot(BeNil())
-		})
-
-		It("has a .module_function method", func() {
-			// this (historical) method can be used to mark instance methods as module
-			// methods, so they can be included or extended elsewhere
-			// (it incidentally should mark the original instance method as private)
-			module, err := vm.Run(`
-module Foo
-  def whatever
-  end
-
-  module_function :whatever
-end
-`)
-
-			Expect(err).ToNot(HaveOccurred())
-
-			_, err = module.Method("whatever")
-			Expect(err).ToNot(HaveOccurred())
-		})
-	})
-
 	Describe("assignment to a variable", func() {
 		It("stores the value assigned", func() {
 			_, err := vm.Run("foo = 'albitite-compotor'")
