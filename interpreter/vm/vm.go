@@ -454,6 +454,19 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			if err != nil {
 				returnErr = err
 			}
+		case ast.Array:
+			array := vm.CurrentClasses["Array"].New().(*builtins.Array)
+			for _, node := range statement.(ast.Array).Nodes {
+				value, err := vm.executeWithContext([]ast.Node{node}, context)
+				if err != nil {
+					return nil, err
+				}
+
+				array.Append(value)
+			}
+
+			returnValue = array
+
 		case ast.Hash:
 			hash := vm.CurrentClasses["Hash"].New().(*builtins.Hash)
 			for _, keyPair := range statement.(ast.Hash).Pairs {
