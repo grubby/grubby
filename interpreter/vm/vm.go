@@ -221,10 +221,10 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 	vm.stack.Unshift("main", vm.currentFilename)
 	defer vm.stack.Shift()
 
-	return vm.executeWithContext(parser.Statements, main)
+	return vm.executeWithContext(main, parser.Statements...)
 }
 
-func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) (builtins.Value, error) {
+func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node) (builtins.Value, error) {
 	var (
 		returnValue builtins.Value
 		returnErr   error
@@ -244,9 +244,9 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			}
 
 			if truthy {
-				returnValue, returnErr = vm.executeWithContext(ifBlock.Body, context)
+				returnValue, returnErr = vm.executeWithContext(context, ifBlock.Body...)
 			} else {
-				returnValue, returnErr = vm.executeWithContext(ifBlock.Else, context)
+				returnValue, returnErr = vm.executeWithContext(context, ifBlock.Else...)
 			}
 		case ast.Alias:
 			// FIXME: assumes that the context will be a module, but could also be a class
@@ -268,7 +268,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			theModule := builtins.NewModule(moduleNode.Name)
 			vm.CurrentModules[moduleNode.Name] = theModule
 
-			_, err := vm.executeWithContext(moduleNode.Body, theModule)
+			_, err := vm.executeWithContext(theModule, moduleNode.Body...)
 			if err != nil {
 				returnErr = err
 			}
@@ -280,7 +280,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			theClass := builtins.NewUserDefinedClass(classNode.Name)
 			vm.CurrentClasses[classNode.Name] = theClass
 
-			_, err := vm.executeWithContext(classNode.Body, theClass)
+			_, err := vm.executeWithContext(theClass, classNode.Body...)
 			if err != nil {
 				returnErr = err
 			}
@@ -289,7 +289,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			funcNode := statement.(ast.FuncDecl)
 			method := builtins.NewMethod(funcNode.Name.Name, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 				// FIXME: should conditionally assert on number of args
-				return vm.executeWithContext(funcNode.Body, context)
+				return vm.executeWithContext(context, funcNode.Body...)
 			})
 			returnValue = method
 
@@ -364,7 +364,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			)
 
 			if callExpr.Target != nil {
-				target, returnErr = vm.executeWithContext(ast.Nodes{callExpr.Target}, context)
+				target, returnErr = vm.executeWithContext(context, callExpr.Target)
 				if returnErr != nil {
 					return nil, returnErr
 				}
@@ -390,7 +390,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 
 			args := []builtins.Value{}
 			for _, astArgument := range callExpr.Args {
-				arg, err := vm.executeWithContext(ast.Nodes{astArgument}, context)
+				arg, err := vm.executeWithContext(context, astArgument)
 				if err != nil {
 					return nil, err
 				}
@@ -408,7 +408,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 
 		case ast.Assignment:
 			assignment := statement.(ast.Assignment)
-			returnValue, err := vm.executeWithContext([]ast.Node{assignment.RHS}, context)
+			returnValue, err := vm.executeWithContext(context, assignment.RHS)
 			if err != nil {
 				return nil, err
 			}
@@ -428,7 +428,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			returnValue = builtins.NewString(vm.currentFilename)
 		case ast.Begin:
 			begin := statement.(ast.Begin)
-			_, err := vm.executeWithContext(begin.Body, context)
+			_, err := vm.executeWithContext(context, begin.Body...)
 
 			if err != nil {
 				matchingRescue := false
@@ -441,7 +441,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 					r := rescue.(ast.Rescue)
 					for _, exceptionClass := range r.Exception.Classes {
 						if exceptionClass.Name == rubyErr.String() {
-							_, err = vm.executeWithContext(r.Body, context)
+							_, err = vm.executeWithContext(context, r.Body...)
 							if err == nil {
 								matchingRescue = true
 								break
@@ -457,7 +457,7 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 		case ast.Array:
 			array := vm.CurrentClasses["Array"].New().(*builtins.Array)
 			for _, node := range statement.(ast.Array).Nodes {
-				value, err := vm.executeWithContext([]ast.Node{node}, context)
+				value, err := vm.executeWithContext(context, node)
 				if err != nil {
 					return nil, err
 				}
@@ -470,13 +470,13 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 		case ast.Hash:
 			hash := vm.CurrentClasses["Hash"].New().(*builtins.Hash)
 			for _, keyPair := range statement.(ast.Hash).Pairs {
-				key, err := vm.executeWithContext(ast.Nodes{keyPair.Key}, context)
+				key, err := vm.executeWithContext(context, keyPair.Key)
 				if err != nil {
 					returnErr = err
 					break
 				}
 
-				val, err := vm.executeWithContext(ast.Nodes{keyPair.Value}, context)
+				val, err := vm.executeWithContext(context, keyPair.Value)
 				if err != nil {
 					returnErr = err
 					break
