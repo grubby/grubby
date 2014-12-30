@@ -36,6 +36,7 @@ type VM interface {
 	Symbols() map[string]builtins.Value
 	Globals() map[string]builtins.Value
 	Classes() map[string]builtins.Class
+	Modules() map[string]builtins.Module
 }
 
 func NewVM(rubyHome, name string) VM {
@@ -192,6 +193,10 @@ func (vm *vm) Classes() map[string]builtins.Class {
 	return vm.CurrentClasses
 }
 
+func (vm *vm) Modules() map[string]builtins.Module {
+	return vm.CurrentModules
+}
+
 type ParseError struct {
 	Filename string
 }
@@ -252,6 +257,8 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			if err != nil {
 				returnErr = err
 			}
+
+			returnValue = theModule
 
 		case ast.ClassDecl:
 			classNode := statement.(ast.ClassDecl)
