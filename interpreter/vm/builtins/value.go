@@ -12,4 +12,6 @@ type Value interface {
 
 	String() string
 	Class() Class
+
+	eigenclassMethods() map[string]Method
 }

@@ -9,23 +9,65 @@ import (
 // all values will need to store the methods that are defined on them
 // (in addition to their class, and other information)
 type valueStub struct {
-	methods         map[string]Method
-	private_methods map[string]Method
-	class           Class
+	eigenclass_methods map[string]Method
+	private_methods    map[string]Method
+	class              Class
 }
 
 func (valueStub *valueStub) initialize() {
-	valueStub.methods = make(map[string]Method)
+	valueStub.eigenclass_methods = make(map[string]Method)
 	valueStub.private_methods = make(map[string]Method)
 }
 
+// Method Lookup //
+
+/*
+  1. Methods defined in the object's singleton class (i.e. the object itself)
+  2. Modules mixed into the singleton class in reverse order of inclusion
+  3. Methods defined by the object's class
+	4. Modules included into the object's class in reverse order of inclusion
+	5. Methods defined by the object's superclass, i.e. inherited methods
+  6. Once BasicObject is reached, start at 1 with "method_missing" method
+  7. Fail. Loudly.
+*/
+
 func (valueStub *valueStub) Method(name string) (Method, error) {
-	m, ok := valueStub.methods[name]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
+	//	  1. Methods defined in the object's singleton class (i.e. the object itself)
+	m, ok := valueStub.eigenclass_methods[name]
+	if ok {
+		return m, nil
 	}
 
-	return m, nil
+	//    2. Modules mixed into the singleton class in reverse order of inclusion
+	// FIXME: respect step 2 here
+
+	//	  3. Methods defined by the object's class
+	m, ok = valueStub.class.eigenclassMethods()[name]
+	if ok {
+		return m, nil
+	}
+
+	//		4. Modules included into the object's class in reverse order of inclusion
+	// FIXME: this should be reversed (should be fixed in Include method)
+	for _, module := range valueStub.class.includedModules() {
+		m, err := module.Method(name)
+		if err == nil {
+			return m, nil
+		}
+	}
+
+	//		5. Methods defined by the object's superclass, i.e. inherited methods
+	super := valueStub.Class().SuperClass()
+	for super != nil {
+		m, err := super.Method(name)
+		if err == nil {
+			return m, nil
+		}
+
+		super = super.SuperClass()
+	}
+
+	return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
 }
 
 func (valueStub *valueStub) PrivateMethod(name string) (Method, error) {
@@ -38,8 +80,8 @@ func (valueStub *valueStub) PrivateMethod(name string) (Method, error) {
 }
 
 func (valueStub *valueStub) Methods() []Method {
-	values := make([]Method, len(valueStub.methods))
-	for _, m := range valueStub.methods {
+	values := make([]Method, len(valueStub.eigenclass_methods))
+	for _, m := range valueStub.eigenclass_methods {
 		values = append(values, m)
 	}
 
@@ -56,7 +98,7 @@ func (valueStub *valueStub) PrivateMethods() []Method {
 }
 
 func (valueStub *valueStub) AddMethod(m Method) {
-	valueStub.methods[m.Name()] = m
+	valueStub.eigenclass_methods[m.Name()] = m
 }
 
 func (valueStub *valueStub) AddPrivateMethod(m Method) {
@@ -69,4 +111,8 @@ func (valueStub *valueStub) String() string {
 
 func (valueStub *valueStub) Class() Class {
 	return valueStub.class
+}
+
+func (valueStub *valueStub) eigenclassMethods() map[string]Method {
+	return valueStub.eigenclass_methods
 }

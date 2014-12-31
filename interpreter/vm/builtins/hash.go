@@ -2,13 +2,19 @@ package builtins
 
 type HashClass struct {
 	valueStub
+	classStub
+
+	provider ClassProvider
+
 	instanceMethods []Method
 }
 
-func NewHashClass() Class {
+func NewHashClass(provider ClassProvider) Class {
 	a := &HashClass{}
-	a.class = NewClassValue()
 	a.initialize()
+	a.class = provider.ClassWithName("Class")
+	a.superClass = provider.ClassWithName("Object")
+	a.provider = provider
 	return a
 }
 
@@ -16,22 +22,22 @@ func (klass *HashClass) AddInstanceMethod(m Method) {
 	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
-func (klass *HashClass) New(args ...Value) Value {
+func (klass *HashClass) New(provider ClassProvider, args ...Value) Value {
 	a := &Hash{}
 	a.initialize()
 	a.class = klass
 	a.hash = make(map[Value]Value)
 
-	a.AddMethod(NewMethod("keys", func(self Value, args ...Value) (Value, error) {
-		keys := NewArrayClass().New().(*Array)
+	a.AddMethod(NewMethod("keys", provider, func(self Value, args ...Value) (Value, error) {
+		keys := klass.provider.ClassWithName("Array").New(provider).(*Array)
 		for key := range self.(*Hash).hash {
 			keys.Append(key)
 		}
 
 		return keys, nil
 	}))
-	a.AddMethod(NewMethod("values", func(self Value, args ...Value) (Value, error) {
-		values := NewArrayClass().New().(*Array)
+	a.AddMethod(NewMethod("values", provider, func(self Value, args ...Value) (Value, error) {
+		values := klass.provider.ClassWithName("Array").New(provider).(*Array)
 		for key := range self.(*Hash).hash {
 			values.Append(self.(*Hash).hash[key])
 		}
@@ -39,7 +45,7 @@ func (klass *HashClass) New(args ...Value) Value {
 		return values, nil
 	}))
 
-	a.AddMethod(NewMethod("[]=", func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewMethod("[]=", provider, func(self Value, args ...Value) (Value, error) {
 		self.(*Hash).hash[args[0]] = args[1]
 		return args[1], nil
 	}))

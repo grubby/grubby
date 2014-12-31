@@ -7,13 +7,16 @@ import (
 
 type fileClass struct {
 	valueStub
+	classStub
+	instanceMethods []Method
 }
 
-func NewFileClass() Value {
+func NewFileClass(provider ClassProvider) Class {
 	f := &fileClass{}
 	f.initialize()
-	f.class = NewClassValue() // FIXME: this should be a global reference
-	f.AddMethod(NewMethod("expand_path", func(self Value, args ...Value) (Value, error) {
+	f.class = provider.ClassWithName("Class")
+	f.superClass = provider.ClassWithName("IO")
+	f.AddMethod(NewMethod("expand_path", provider, func(self Value, args ...Value) (Value, error) {
 		arg1 := args[0].(*StringValue).String()
 
 		if arg1[0] == '~' {
@@ -27,22 +30,30 @@ func NewFileClass() Value {
 			path, _ = filepath.Abs(arg1)
 		}
 
-		return NewString(path), nil
+		return NewString(path, provider), nil
 	}))
 
-	f.AddMethod(NewMethod("dirname", func(self Value, args ...Value) (Value, error) {
+	f.AddMethod(NewMethod("dirname", provider, func(self Value, args ...Value) (Value, error) {
 		filename := args[0].(*StringValue).String()
 
-		return NewString(filepath.Base(filename)), nil
+		return NewString(filepath.Base(filename), provider), nil
 	}))
 
 	return f
+}
+
+func (file *fileClass) AddInstanceMethod(m Method) {
+	file.instanceMethods = append(file.instanceMethods, m)
+}
+
+func (file *fileClass) Name() string {
+	return "File"
 }
 
 func (file *fileClass) String() string {
 	return "File"
 }
 
-func (file *fileClass) New(args ...Value) Value {
+func (file *fileClass) New(provider ClassProvider, args ...Value) Value {
 	return file
 }

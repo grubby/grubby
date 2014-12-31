@@ -46,7 +46,7 @@ end`)
 		})
 
 		It("creates a private method on Kernel", func() {
-			kernel := vm.Classes()["Kernel"]
+			kernel := vm.Modules()["Kernel"]
 			method, err := kernel.PrivateMethod("foo")
 
 			Expect(err).ToNot(HaveOccurred())
@@ -62,7 +62,7 @@ end`)
 			object, err := vm.Get("Object")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(object.PrivateMethods()).To(ContainElement(
-				builtins.NewMethod("foo", nil),
+				builtins.NewMethod("foo", vm, nil),
 			))
 		})
 	})
@@ -72,7 +72,7 @@ end`)
 			val, err := vm.Run("'nonrestricted-consonantize'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm)))
 			Expect(val.String()).To(Equal("nonrestricted-consonantize"))
 		})
 
@@ -80,7 +80,7 @@ end`)
 			val, err := vm.Run("'foo' + 'bar'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal(builtins.NewString("foobar").String()))
+			Expect(val.String()).To(Equal(builtins.NewString("foobar", vm).String()))
 		})
 	})
 
@@ -136,7 +136,7 @@ end`)
 	Describe("a reference to a variable", func() {
 		Context("when it already is defined", func() {
 			BeforeEach(func() {
-				vm.Set("foo", builtins.NewString("superinquisitive-edacity"))
+				vm.Set("foo", builtins.NewString("superinquisitive-edacity", vm))
 			})
 
 			It("returns the variable referenced", func() {
@@ -191,7 +191,7 @@ end`)
 				_, err := vm.Run("require 'foo'")
 				Expect(err).ToNot(HaveOccurred())
 
-				kernel := vm.Classes()["Kernel"]
+				kernel := vm.Modules()["Kernel"]
 				method, err := kernel.PrivateMethod("foo")
 
 				Expect(err).ToNot(HaveOccurred())
@@ -203,7 +203,7 @@ end`)
 	Describe("the load path", func() {
 		It("is represented by $LOAD_PATH and $:", func() {
 			path := vm.MustGet("LOAD_PATH")
-			str := builtins.NewString("foo")
+			str := builtins.NewString("foo", vm)
 			path.(*builtins.Array).Append(str)
 
 			Expect(vm.MustGet(":").(*builtins.Array).Members()).To(ContainElement(str))
@@ -259,13 +259,13 @@ end`)
 
 	Describe("File class", func() {
 		It("has a reasonable .expand_path method", func() {
-			fileClass, err := vm.Get("File")
-			Expect(err).ToNot(HaveOccurred())
+			fileClass := vm.ClassWithName("File")
+			Expect(fileClass).ToNot(BeNil())
 
 			method, err := fileClass.Method("expand_path")
 			Expect(err).ToNot(HaveOccurred())
 
-			result, err := method.Execute(fileClass, builtins.NewString("~/foobar"))
+			result, err := method.Execute(fileClass, builtins.NewString("~/foobar", vm))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result.String()).To(Equal(os.Getenv("HOME") + "/foobar"))
 		})
@@ -310,7 +310,7 @@ end`)
 			value, err := vm.Run("ARGV.shift")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value).To(Equal(builtins.Nil()))
+			Expect(value).To(Equal(vm.ClassWithName("Nil").New(vm)))
 		})
 	})
 
@@ -328,7 +328,7 @@ end
 bar = true
 `)
 
-			trueValue := builtins.NewTrueClass().(builtins.Class).New()
+			trueValue := builtins.NewTrueClass(vm).(builtins.Class).New(vm)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(vm.MustGet("foo")).To(Equal(trueValue))
@@ -423,7 +423,7 @@ end
 				fooClass, err := vm.GetClass("Foo")
 				Expect(fooClass).ToNot(BeNil())
 
-				fooInstance := fooClass.New()
+				fooInstance := fooClass.New(vm)
 				Expect(fooInstance).ToNot(BeNil())
 
 				method, err := fooInstance.Method("hello")
@@ -431,7 +431,7 @@ end
 
 				val, err := method.Execute(fooInstance)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("")))
+				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm)))
 				Expect(val.String()).To(Equal("world"))
 			})
 		})
@@ -452,7 +452,7 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				barClass := vm.MustGetClass("Bar")
-				bar := barClass.New()
+				bar := barClass.New(vm)
 
 				method, err := bar.Method("superinquisitive")
 				Expect(err).ToNot(HaveOccurred())
@@ -476,13 +476,13 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				fooClass := vm.MustGetClass("Foo")
-				foo := fooClass.New()
+				foo := fooClass.New(vm)
 
 				reader, err := foo.Method("quaternion_vinic")
 				Expect(err).ToNot(HaveOccurred())
 
 				val, err := reader.Execute(foo)
-				Expect(val).To(Equal(builtins.Nil()))
+				Expect(val).To(Equal(vm.ClassWithName("Nil").New(vm)))
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
@@ -498,12 +498,12 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				fooClass := vm.MustGetClass("Foo")
-				foo := fooClass.New()
+				foo := fooClass.New(vm)
 
 				reader, err := foo.Method("chrysobull_nonmonarchist=")
 				Expect(err).ToNot(HaveOccurred())
 
-				_, err = reader.Execute(foo, builtins.NewString("lyncher-mudslinger"))
+				_, err = reader.Execute(foo, builtins.NewString("lyncher-mudslinger", vm))
 				Expect(err).ToNot(HaveOccurred())
 
 				// TODO: assert on the instance variable via instance_variable_get
@@ -521,19 +521,19 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				fooClass := vm.MustGetClass("Foo")
-				foo := fooClass.New()
+				foo := fooClass.New(vm)
 
 				reader, err := foo.Method("pieless_bothlike")
 				Expect(err).ToNot(HaveOccurred())
 
 				val, err := reader.Execute(foo)
-				Expect(val).To(Equal(builtins.Nil()))
+				Expect(val).To(Equal(vm.ClassWithName("Nil").New(vm)))
 				Expect(err).ToNot(HaveOccurred())
 
 				writer, err := foo.Method("pieless_bothlike=")
 				Expect(err).ToNot(HaveOccurred())
 
-				_, err = writer.Execute(foo, builtins.NewString("unordainable-luthier"))
+				_, err = writer.Execute(foo, builtins.NewString("unordainable-luthier", vm))
 				Expect(err).ToNot(HaveOccurred())
 
 				val, err = reader.Execute(foo)
@@ -553,8 +553,8 @@ end
 			Expect(err).ToNot(HaveOccurred())
 
 			var capturedSelf builtins.Value
-			foo := vm.MustGetClass("Foo").New()
-			foo.AddMethod(builtins.NewMethod("fasciculated_stripe", func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+			foo := vm.MustGetClass("Foo").New(vm)
+			foo.AddMethod(builtins.NewMethod("fasciculated_stripe", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 				capturedSelf = self
 				return nil, nil
 			}))

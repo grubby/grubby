@@ -2,12 +2,14 @@ package builtins
 
 type ArrayClass struct {
 	valueStub
+	classStub
 	instanceMethods []Method
 }
 
-func NewArrayClass() Class {
+func NewArrayClass(provider ClassProvider) Class {
 	a := &ArrayClass{}
-	a.class = NewClassValue()
+	a.class = provider.ClassWithName("Class")
+	a.superClass = provider.ClassWithName("Object")
 	a.initialize()
 	return a
 }
@@ -16,14 +18,15 @@ func (klass *ArrayClass) AddInstanceMethod(m Method) {
 	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
-func (klass *ArrayClass) New(args ...Value) Value {
+func (klass *ArrayClass) New(provider ClassProvider, args ...Value) Value {
 	a := &Array{}
 	a.initialize()
 	a.class = klass
 
-	a.AddMethod(NewMethod("shift", func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewMethod("shift", provider, func(self Value, args ...Value) (Value, error) {
 		if len(a.members) == 0 {
-			return Nil(), nil
+			// FIXME: this should return the singleton for nil
+			return provider.ClassWithName("Nil").New(provider), nil
 		}
 
 		val := a.members[0]
@@ -31,19 +34,21 @@ func (klass *ArrayClass) New(args ...Value) Value {
 		return val, nil
 	}))
 
-	a.AddMethod(NewMethod("unshift", func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewMethod("unshift", provider, func(self Value, args ...Value) (Value, error) {
 		a.members = append([]Value{args[0]}, a.members[0:]...)
 		return a, nil
 	}))
 
-	a.AddMethod(NewMethod("include?", func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewMethod("include?", provider, func(self Value, args ...Value) (Value, error) {
 		for _, m := range a.members {
 			if m == args[0] {
-				return NewTrueClass().(Class).New(), nil
+				// FIXME: needs a singleton provider? (someway to inject singletons)
+				return provider.ClassWithName("True").New(provider), nil
 			}
 		}
 
-		return NewFalseClass().(Class).New(), nil
+		// FIXME: needs singletons, as above
+		return provider.ClassWithName("False").New(provider), nil
 	}))
 
 	return a
