@@ -98,6 +98,7 @@ const (
 	tokenTypeLAMBDA
 	tokenTypeCASE
 	tokenTypeWHEN
+	tokenTypeALIAS
 	tokenType__FILE__
 	tokenType__LINE__
 	tokenType__ENCODING__
@@ -456,7 +457,7 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeSymbol:
 			debug("symbol: %s", token.value)
 			lval.genericValue = ast.Symbol{Name: token.value}
-			return NODE
+			return SYMBOL
 		case tokenTypeReference:
 			debug("REF: %s", token.value)
 			lval.genericValue = ast.BareReference{Name: token.value}
@@ -651,6 +652,9 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeWHEN:
 			debug("WHEN")
 			return WHEN
+		case tokenTypeALIAS:
+			debug("ALIAS")
+			return ALIAS
 		case tokenTypeOrEquals:
 			debug("||=")
 			return OR_EQUALS

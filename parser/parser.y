@@ -27,6 +27,7 @@ var Statements []ast.Node
 // really a field name in the above union struct
 %token <genericValue> NODE
 %token <genericValue> REF
+%token <genericValue> SYMBOL
 %token <genericValue> SPECIAL_CHAR_REF
 %token <genericValue> CAPITAL_REF
 %token <genericValue> LPAREN
@@ -61,6 +62,7 @@ var Statements []ast.Node
 %token <genericValue> LAMBDA
 %token <genericValue> CASE
 %token <genericValue> WHEN
+%token <genericValue> ALIAS
 
 // booleans
 %token <genericValue> TRUE
@@ -118,6 +120,7 @@ var Statements []ast.Node
 %type <genericValue> range
 %type <genericValue> block
 %type <genericValue> false
+%type <genericValue> alias
 %type <genericValue> array
 %type <genericValue> group
 %type <genericValue> global
@@ -246,14 +249,14 @@ list : /* empty */
 | list expr
 {  $$ = append($$, $2) };
 
-simple_node : NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | LINE_CONST_REF | FILE_CONST_REF;
+simple_node : SYMBOL | NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | LINE_CONST_REF | FILE_CONST_REF;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
 single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary;
+expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -1419,5 +1422,8 @@ switch_cases : WHEN comma_delimited_nodes list optional_newlines
   { $$ = append($$, ast.SwitchCase{Conditions: $3, Body: $4}) };
 
 range : single_node RANGE single_node { $$ = ast.Range{Start: $1, End: $3} };
+
+alias : ALIAS SYMBOL SYMBOL
+  { $$ = ast.Alias{To: $2.(ast.Symbol), From: $3.(ast.Symbol)} };
 
 %%
