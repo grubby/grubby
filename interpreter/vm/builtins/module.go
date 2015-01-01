@@ -17,13 +17,13 @@ type Module interface {
 // globlal Module class
 type ModuleClass struct {
 	valueStub
-	instanceMethods []Method
+	instanceMethods map[string]Method
 }
 
 func NewModuleClass() Class {
 	c := &ModuleClass{}
 	c.initialize()
-	c.instanceMethods = make([]Method, 0)
+	c.instanceMethods = make(map[string]Method, 0)
 	c.class = c
 
 	return c
@@ -42,11 +42,16 @@ func (c ModuleClass) String() string {
 }
 
 func (c *ModuleClass) AddInstanceMethod(m Method) {
-	c.instanceMethods = append(c.instanceMethods, m)
+	c.instanceMethods[m.Name()] = m
 }
 
 func (c *ModuleClass) InstanceMethods() []Method {
-	return c.instanceMethods
+	methods := []Method{}
+	for _, m := range c.instanceMethods {
+		methods = append(methods, m)
+	}
+
+	return methods
 }
 
 // user defined module type
@@ -55,14 +60,14 @@ type RubyModule struct {
 	valueStub
 
 	includedModules []Value
-	instanceMethods []Method
+	instanceMethods map[string]Method
 }
 
 func NewModule(name string) Module {
 	c := &RubyModule{
 		name:            name,
 		includedModules: make([]Value, 0),
-		instanceMethods: make([]Method, 0),
+		instanceMethods: make(map[string]Method, 0),
 	}
 	c.initialize()
 	c.class = NewModuleClass() // FIXME: should only be one in existence
@@ -85,8 +90,8 @@ func NewModule(name string) Module {
 		}
 
 		var instanceMethod Method
-		for _, m := range self.(*RubyModule).instanceMethods {
-			if m.Name() == symbol.String() {
+		for name, m := range self.(*RubyModule).instanceMethods {
+			if name == symbol.String() {
 				instanceMethod = m
 				break
 			}
@@ -109,9 +114,27 @@ func (m RubyModule) Name() string {
 }
 
 func (m *RubyModule) AddInstanceMethod(method Method) {
-	m.instanceMethods = append(m.instanceMethods, method)
+	m.instanceMethods[method.Name()] = method
 }
 
 func (m *RubyModule) InstanceMethods() []Method {
-	return m.instanceMethods
+	methods := []Method{}
+	for _, m := range m.instanceMethods {
+		methods = append(methods, m)
+	}
+
+	return methods
+}
+
+func (m *RubyModule) InstanceMethod(name string) (Method, error) {
+	method := m.instanceMethods[name]
+	if method == nil {
+		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
+	}
+
+	return method, nil
+}
+
+func (m *RubyModule) String() string {
+	return fmt.Sprintf("%s:Module", m.name)
 }

@@ -248,6 +248,21 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 			} else {
 				returnValue, returnErr = vm.executeWithContext(ifBlock.Else, context)
 			}
+		case ast.Alias:
+			// FIXME: assumes that the context will be a module, but could also be a class
+			aliasNode := statement.(ast.Alias)
+			contextModule := context.(*builtins.RubyModule)
+
+			m, err := contextModule.InstanceMethod(aliasNode.From.Name)
+			if err != nil {
+				returnErr = builtins.NewNameError(aliasNode.From.Name, contextModule.String(), contextModule.String(), vm.stack.String())
+				return returnValue, returnErr
+			}
+
+			contextModule.AddInstanceMethod(builtins.NewMethod(aliasNode.To.Name, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+				return m.Execute(self, args...)
+			}))
+
 		case ast.ModuleDecl:
 			moduleNode := statement.(ast.ModuleDecl)
 			theModule := builtins.NewModule(moduleNode.Name)
@@ -285,7 +300,12 @@ func (vm *vm) executeWithContext(statements []ast.Node, context builtins.Value) 
 				case builtins.Class:
 					context.(builtins.Class).AddInstanceMethod(method)
 				case builtins.Module:
-					context.(builtins.Module).AddInstanceMethod(method)
+					ref, ok := funcNode.Target.(ast.BareReference)
+					if ok && ref.Name == "self" {
+						context.AddMethod(method)
+					} else {
+						context.(builtins.Module).AddInstanceMethod(method)
+					}
 				default:
 					panic(fmt.Sprintf("unknown type of context: %#T", context))
 				}
