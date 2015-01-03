@@ -61,9 +61,7 @@ end`)
 		PIt("is also available in Object", func() {
 			object, err := vm.Get("Object")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(object.PrivateMethods()).To(ContainElement(
-				builtins.NewMethod("foo", vm, nil),
-			))
+			Expect(object).To(HaveMethod("foo"))
 		})
 	})
 
@@ -156,7 +154,7 @@ end`)
 		})
 	})
 
-	Describe("the standard lib", func() {
+	PDescribe("the standard lib", func() {
 		It("is available to require", func() {
 			_, err := vm.Run("require 'fileutils'")
 			Expect(err).ToNot(BeAssignableToTypeOf(builtins.NewLoadError("", "")))
@@ -554,7 +552,7 @@ end
 
 			var capturedSelf builtins.Value
 			foo := vm.MustGetClass("Foo").New(vm)
-			foo.AddMethod(builtins.NewMethod("fasciculated_stripe", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+			foo.AddMethod(builtins.NewNativeMethod("fasciculated_stripe", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 				capturedSelf = self
 				return nil, nil
 			}))

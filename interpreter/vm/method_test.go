@@ -40,5 +40,23 @@ Foo.greets
 
 			Expect(output).To(ContainSubstring("hello world"))
 		})
+
+		It("can reference its arguments by name", func() {
+			output := SwapStdout(func() {
+				_, err := vm.Run(`
+module Foo
+  def self.my_puts(arg)
+    puts arg
+  end
+end
+
+Foo.my_puts 'hello world'
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			Expect(output).To(ContainSubstring("hello world"))
+		})
 	})
 })
