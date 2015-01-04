@@ -319,7 +319,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 					vm.localVariableStack.store(arg.Name, arg.Value)
 				}
 
-				return vm.executeWithContext(context, method.Body()...)
+				return vm.executeWithContext(self, method.Body()...)
 			})
 			returnValue = method
 
@@ -455,6 +455,9 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			case ast.GlobalVariable:
 				globalVar := assignment.LHS.(ast.GlobalVariable)
 				vm.CurrentGlobals[globalVar.Name] = returnValue
+			case ast.InstanceVariable:
+				iVar := assignment.LHS.(ast.InstanceVariable)
+				context.SetInstanceVariable(iVar.Name, returnValue)
 			default:
 				panic(fmt.Sprintf("unimplemented assignment failure: %#v", assignment.LHS))
 			}

@@ -99,7 +99,10 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 		instance := c.New(provider, args...)
 		method, err := instance.Method("initialize")
 		if err == nil {
-			method.Execute(instance, args...)
+			_, err = method.Execute(instance, args...)
+			if err != nil {
+				panic(err)
+			}
 		}
 
 		return instance, nil
@@ -165,6 +168,7 @@ func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
 		}
 	}
 
+	// FIXME: these should be defined on Module
 	for _, attr := range c.attr_readers {
 		instance.AddMethod(NewNativeMethod(attr, provider, func(self Value, args ...Value) (Value, error) {
 			this := self.(*UserDefinedClassInstance)
@@ -183,6 +187,14 @@ func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
 			this.attrs[attr] = args[0]
 			return nil, nil
 		}))
+	}
+
+	method, err := instance.Method("initialize")
+	if err == nil {
+		_, err = method.Execute(instance, args...)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	return instance

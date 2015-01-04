@@ -12,11 +12,14 @@ type valueStub struct {
 	eigenclass_methods map[string]Method
 	private_methods    map[string]Method
 	class              Class
+
+	instance_variables map[string]Value
 }
 
 func (valueStub *valueStub) initialize() {
 	valueStub.eigenclass_methods = make(map[string]Method)
 	valueStub.private_methods = make(map[string]Method)
+	valueStub.instance_variables = make(map[string]Value)
 }
 
 // Method Lookup //
@@ -50,8 +53,8 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 	//		4. Modules included into the object's class in reverse order of inclusion
 	// FIXME: this should be reversed (should be fixed in Include method)
 	for _, module := range valueStub.class.includedModules() {
-		m, err := module.Method(name)
-		if err == nil {
+		m, ok := module.eigenclassMethods()[name]
+		if ok {
 			return m, nil
 		}
 	}
@@ -59,8 +62,8 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 	//		5. Methods defined by the object's superclass, i.e. inherited methods
 	super := valueStub.Class().SuperClass()
 	for super != nil {
-		m, err := super.Method(name)
-		if err == nil {
+		m, ok := super.eigenclassMethods()[name]
+		if ok {
 			return m, nil
 		}
 
@@ -115,4 +118,12 @@ func (valueStub *valueStub) Class() Class {
 
 func (valueStub *valueStub) eigenclassMethods() map[string]Method {
 	return valueStub.eigenclass_methods
+}
+
+func (valueStub *valueStub) GetInstanceVariable(name string) Value {
+	return valueStub.instance_variables[name]
+}
+
+func (valueStub *valueStub) SetInstanceVariable(name string, value Value) {
+	valueStub.instance_variables[name] = value
 }
