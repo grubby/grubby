@@ -17,19 +17,21 @@ type Module interface {
 // globlal Module class
 type ModuleClass struct {
 	valueStub
+	classStub
 	instanceMethods map[string]Method
 }
 
-func NewModuleClass() Class {
+func NewModuleClass(provider ClassProvider) Class {
 	c := &ModuleClass{}
 	c.initialize()
 	c.instanceMethods = make(map[string]Method, 0)
-	c.class = c
+	c.class = provider.ClassWithName("Class")
+	c.superClass = provider.ClassWithName("Object")
 
 	return c
 }
 
-func (c ModuleClass) New(args ...Value) Value {
+func (c ModuleClass) New(provider ClassProvider, args ...Value) Value {
 	return nil
 }
 
@@ -63,15 +65,16 @@ type RubyModule struct {
 	instanceMethods map[string]Method
 }
 
-func NewModule(name string) Module {
+func NewModule(name string, provider ClassProvider) Module {
 	c := &RubyModule{
 		name:            name,
 		includedModules: make([]Value, 0),
 		instanceMethods: make(map[string]Method, 0),
 	}
 	c.initialize()
-	c.class = NewModuleClass() // FIXME: should only be one in existence
-	c.AddMethod(NewMethod("include", func(self Value, args ...Value) (Value, error) {
+	c.class = provider.ClassWithName("Module")
+
+	c.AddMethod(NewMethod("include", provider, func(self Value, args ...Value) (Value, error) {
 		for _, module := range args {
 			c.includedModules = append(c.includedModules, module)
 		}
@@ -79,7 +82,7 @@ func NewModule(name string) Module {
 		return c, nil
 	}))
 
-	c.AddMethod(NewMethod("module_function", func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewMethod("module_function", provider, func(self Value, args ...Value) (Value, error) {
 		if len(args) != 1 {
 			return nil, errors.New("expected exactly one arg")
 		}

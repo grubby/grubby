@@ -14,8 +14,16 @@ type Method interface {
 	Execute(self Value, args ...Value) (Value, error)
 }
 
-func NewMethod(name string, body func(Value, ...Value) (Value, error)) Method {
+func AddMethod(provider ClassProvider, target Value, name string, body func(Value, ...Value) (Value, error)) {
 	m := &method{name: name, body: body}
+	m.class = provider.ClassWithName("Method")
+	m.initialize()
+	target.AddMethod(m)
+}
+
+func NewMethod(name string, provider ClassProvider, body func(Value, ...Value) (Value, error)) Method {
+	m := &method{name: name, body: body}
+	m.class = provider.ClassWithName("Method")
 	m.initialize()
 	return m
 }

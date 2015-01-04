@@ -1,26 +1,27 @@
 package builtins
 
-type processClass struct {
+type processModule struct {
 	valueStub
+	classStub
 	instanceMethods []Method
 }
 
-func NewProcessClass() Class {
-	f := &processClass{}
+func NewProcessModule(provider ClassProvider) Module {
+	f := &processModule{}
 	f.initialize()
-	f.class = NewClassValue().(Class)
+	f.class = provider.ClassWithName("Module")
 	return f
 }
 
-func (c *processClass) String() string {
+func (c *processModule) String() string {
 	return "Process"
 }
 
-func (c *processClass) Name() string {
+func (c *processModule) Name() string {
 	return "Process"
 }
 
-func (c *processClass) AddInstanceMethod(method Method) {
+func (c *processModule) AddInstanceMethod(method Method) {
 	c.instanceMethods = append(c.instanceMethods, method)
 }
 
@@ -28,10 +29,11 @@ type processValue struct {
 	valueStub
 }
 
-func (class *processClass) New(args ...Value) Value {
-	p := &processClass{}
-	p.initialize()
-	p.class = class
+func (module *processModule) New(args ...Value) Value {
+	return nil
+}
 
-	return p
+// FIXME: this should be in a module_stub
+func (module *processModule) InstanceMethods() []Method {
+	return module.instanceMethods
 }

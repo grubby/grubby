@@ -4,28 +4,47 @@ import "errors"
 
 // abstract class interface
 type Class interface {
-	New(args ...Value) Value
+	Value
+
+	New(provider ClassProvider, args ...Value) Value
 	Name() string
 
 	AddInstanceMethod(Method)
 
-	Value
+	SuperClass() Class
+
+	Include(Module)
+
+	includedModules() []Module
 }
 
 // globlal Class class
 type ClassValue struct {
 	valueStub
+	classStub
 	instanceMethods []Method
+
+	provider ClassProvider
 }
 
-func NewClassValue() Class {
+func NewClassClass(provider ClassProvider) Class {
 	c := &ClassValue{}
 	c.initialize()
 	c.class = c
+	c.provider = provider
+
 	return c
 }
 
-func (c ClassValue) New(args ...Value) Value {
+func (c *ClassValue) SetSuperClass() {
+	moduleClass := c.provider.ClassWithName("Module")
+	if moduleClass == nil {
+		panic("Expected Module class to exist")
+	}
+	c.superClass = moduleClass
+}
+
+func (c ClassValue) New(provider ClassProvider, args ...Value) Value {
 	return nil
 }
 
@@ -45,8 +64,8 @@ func (c ClassValue) AddInstanceMethod(m Method) {
 type UserDefinedClass struct {
 	name string
 	valueStub
+	classStub
 
-	includedModules []Value
 	instanceMethods map[string]Method
 
 	attr_readers []string
@@ -56,26 +75,28 @@ type UserDefinedClass struct {
 type UserDefinedClassInstance struct {
 	valueStub
 
-	attrs map[string]Value
+	provider ClassProvider
+	attrs    map[string]Value
 }
 
-func NewUserDefinedClass(name string) Class {
+func NewUserDefinedClass(name string, provider ClassProvider) Class {
 	c := &UserDefinedClass{
 		name:            name,
-		includedModules: make([]Value, 0),
 		instanceMethods: make(map[string]Method),
 	}
 	c.initialize()
-	c.class = NewClassValue()
-	c.AddMethod(NewMethod("include", func(self Value, args ...Value) (Value, error) {
+	c.class = provider.ClassWithName("Class")
+	c.superClass = nil // FIXME: should be provided as an argument
+
+	c.AddMethod(NewMethod("include", provider, func(self Value, args ...Value) (Value, error) {
 		for _, module := range args {
-			c.includedModules = append(c.includedModules, module)
+			c.Include(module.(Module))
 		}
 
 		return c, nil
 	}))
-	c.AddMethod(NewMethod("new", func(self Value, args ...Value) (Value, error) {
-		instance := c.New(args...)
+	c.AddMethod(NewMethod("new", provider, func(self Value, args ...Value) (Value, error) {
+		instance := c.New(provider, args...)
 		method, err := instance.Method("initialize")
 		if err == nil {
 			method.Execute(instance, args...)
@@ -83,7 +104,7 @@ func NewUserDefinedClass(name string) Class {
 
 		return instance, nil
 	}))
-	c.AddMethod(NewMethod("attr_accessor", func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewMethod("attr_accessor", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*SymbolValue)
 			if !ok {
@@ -97,7 +118,7 @@ func NewUserDefinedClass(name string) Class {
 
 		return nil, nil
 	}))
-	c.AddMethod(NewMethod("attr_reader", func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewMethod("attr_reader", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*SymbolValue)
 			if !ok {
@@ -110,7 +131,7 @@ func NewUserDefinedClass(name string) Class {
 
 		return nil, nil
 	}))
-	c.AddMethod(NewMethod("attr_writer", func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewMethod("attr_writer", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*SymbolValue)
 			if !ok {
@@ -127,9 +148,10 @@ func NewUserDefinedClass(name string) Class {
 	return c
 }
 
-func (c *UserDefinedClass) New(args ...Value) Value {
+func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
 	instance := &UserDefinedClassInstance{}
 	instance.initialize()
+	instance.provider = provider
 	instance.attrs = make(map[string]Value)
 	instance.class = c
 
@@ -137,18 +159,18 @@ func (c *UserDefinedClass) New(args ...Value) Value {
 		instance.AddMethod(m)
 	}
 
-	for _, module := range c.includedModules {
+	for _, module := range c.includedModules() {
 		for _, method := range module.(Module).InstanceMethods() {
 			instance.AddMethod(method)
 		}
 	}
 
 	for _, attr := range c.attr_readers {
-		instance.AddMethod(NewMethod(attr, func(self Value, args ...Value) (Value, error) {
+		instance.AddMethod(NewMethod(attr, provider, func(self Value, args ...Value) (Value, error) {
 			this := self.(*UserDefinedClassInstance)
 			value, ok := this.attrs[attr]
 			if !ok {
-				return Nil(), nil
+				return provider.ClassWithName("Nil").New(provider), nil
 			}
 
 			return value, nil
@@ -156,7 +178,7 @@ func (c *UserDefinedClass) New(args ...Value) Value {
 	}
 
 	for _, attr := range c.attr_writers {
-		instance.AddMethod(NewMethod(attr+"=", func(self Value, args ...Value) (Value, error) {
+		instance.AddMethod(NewMethod(attr+"=", provider, func(self Value, args ...Value) (Value, error) {
 			this := self.(*UserDefinedClassInstance)
 			this.attrs[attr] = args[0]
 			return nil, nil

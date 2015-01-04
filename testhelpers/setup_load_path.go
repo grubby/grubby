@@ -28,5 +28,5 @@ end
 		panic(err)
 	}
 
-	loadPathGlobal.(*builtins.Array).Append(builtins.NewString(tempPath))
+	loadPathGlobal.(*builtins.Array).Append(builtins.NewString(tempPath, vm))
 }

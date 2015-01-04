@@ -1,12 +1,12 @@
 package vm_test
 
 import (
-	"os"
-	"path/filepath"
 	. "github.com/grubby/grubby/interpreter/vm"
 	. "github.com/grubby/grubby/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
+	"path/filepath"
 )
 
 var _ = Describe("modules", func() {

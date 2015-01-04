@@ -2,13 +2,15 @@ package builtins
 
 type NilClass struct {
 	valueStub
+	classStub
 	instanceMethods []Method
 }
 
-func NewNilClass() Class {
+func NewNilClass(provider ClassProvider) Class {
 	n := &NilClass{}
 	n.initialize()
-	n.class = NewClassValue().(Class)
+	n.class = provider.ClassWithName("Class")
+	n.superClass = provider.ClassWithName("Object")
 	return n
 }
 
@@ -28,11 +30,7 @@ type nilInstance struct {
 	valueStub
 }
 
-func Nil() Value {
-	return NewNilClass().(Class).New()
-}
-
-func (class *NilClass) New(args ...Value) Value {
+func (class *NilClass) New(provider ClassProvider, args ...Value) Value {
 	n := &nilInstance{}
 	n.initialize()
 	n.class = class

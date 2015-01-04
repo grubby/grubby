@@ -2,13 +2,15 @@ package builtins
 
 type trueClass struct {
 	valueStub
+	classStub
 	instanceMethods []Method
 }
 
-func NewTrueClass() Class {
+func NewTrueClass(provider ClassProvider) Class {
 	o := &trueClass{}
 	o.initialize()
-	o.class = NewClassValue().(Class)
+	o.class = provider.ClassWithName("Class")
+	o.superClass = provider.ClassWithName("Object")
 	return o
 }
 
@@ -28,7 +30,7 @@ type true struct {
 	valueStub
 }
 
-func (obj *trueClass) New(args ...Value) Value {
+func (obj *trueClass) New(provider ClassProvider, args ...Value) Value {
 	o := &true{}
 	o.initialize()
 	o.class = obj
@@ -38,13 +40,15 @@ func (obj *trueClass) New(args ...Value) Value {
 
 type falseClass struct {
 	valueStub
+	classStub
 	instanceMethods []Method
 }
 
-func NewFalseClass() Class {
+func NewFalseClass(provider ClassProvider) Class {
 	o := &falseClass{}
 	o.initialize()
-	o.class = NewClassValue().(Class)
+	o.class = provider.ClassWithName("Class")
+	o.superClass = provider.ClassWithName("Object")
 	return o
 }
 
@@ -64,7 +68,7 @@ type false struct {
 	valueStub
 }
 
-func (obj *falseClass) New(args ...Value) Value {
+func (obj *falseClass) New(provider ClassProvider, args ...Value) Value {
 	o := &false{}
 	o.initialize()
 	o.class = obj
