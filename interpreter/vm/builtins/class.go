@@ -88,14 +88,14 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 	c.class = provider.ClassWithName("Class")
 	c.superClass = nil // FIXME: should be provided as an argument
 
-	c.AddMethod(NewMethod("include", provider, func(self Value, args ...Value) (Value, error) {
-		for _, module := range args {
-			c.Include(module.(Module))
+	c.AddMethod(NewNativeMethod("include", provider, func(self Value, args ...Value) (Value, error) {
+		for _, arg := range args {
+			c.Include(arg.(Module))
 		}
 
 		return c, nil
 	}))
-	c.AddMethod(NewMethod("new", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("new", provider, func(self Value, args ...Value) (Value, error) {
 		instance := c.New(provider, args...)
 		method, err := instance.Method("initialize")
 		if err == nil {
@@ -104,7 +104,7 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 
 		return instance, nil
 	}))
-	c.AddMethod(NewMethod("attr_accessor", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("attr_accessor", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*SymbolValue)
 			if !ok {
@@ -118,7 +118,7 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 
 		return nil, nil
 	}))
-	c.AddMethod(NewMethod("attr_reader", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("attr_reader", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*SymbolValue)
 			if !ok {
@@ -131,7 +131,7 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 
 		return nil, nil
 	}))
-	c.AddMethod(NewMethod("attr_writer", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("attr_writer", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*SymbolValue)
 			if !ok {
@@ -166,7 +166,7 @@ func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
 	}
 
 	for _, attr := range c.attr_readers {
-		instance.AddMethod(NewMethod(attr, provider, func(self Value, args ...Value) (Value, error) {
+		instance.AddMethod(NewNativeMethod(attr, provider, func(self Value, args ...Value) (Value, error) {
 			this := self.(*UserDefinedClassInstance)
 			value, ok := this.attrs[attr]
 			if !ok {
@@ -178,7 +178,7 @@ func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
 	}
 
 	for _, attr := range c.attr_writers {
-		instance.AddMethod(NewMethod(attr+"=", provider, func(self Value, args ...Value) (Value, error) {
+		instance.AddMethod(NewNativeMethod(attr+"=", provider, func(self Value, args ...Value) (Value, error) {
 			this := self.(*UserDefinedClassInstance)
 			this.attrs[attr] = args[0]
 			return nil, nil

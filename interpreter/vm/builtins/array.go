@@ -23,7 +23,7 @@ func (klass *ArrayClass) New(provider ClassProvider, args ...Value) Value {
 	a.initialize()
 	a.class = klass
 
-	a.AddMethod(NewMethod("shift", provider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("shift", provider, func(self Value, args ...Value) (Value, error) {
 		if len(a.members) == 0 {
 			// FIXME: this should return the singleton for nil
 			return provider.ClassWithName("Nil").New(provider), nil
@@ -34,12 +34,12 @@ func (klass *ArrayClass) New(provider ClassProvider, args ...Value) Value {
 		return val, nil
 	}))
 
-	a.AddMethod(NewMethod("unshift", provider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("unshift", provider, func(self Value, args ...Value) (Value, error) {
 		a.members = append([]Value{args[0]}, a.members[0:]...)
 		return a, nil
 	}))
 
-	a.AddMethod(NewMethod("include?", provider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("include?", provider, func(self Value, args ...Value) (Value, error) {
 		for _, m := range a.members {
 			if m == args[0] {
 				// FIXME: needs a singleton provider? (someway to inject singletons)

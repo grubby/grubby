@@ -14,13 +14,15 @@ import (
 
 type vm struct {
 	currentFilename string
-	ObjectSpace     map[string]builtins.Value
-	CurrentGlobals  map[string]builtins.Value
-	CurrentSymbols  map[string]builtins.Value
-	CurrentClasses  map[string]builtins.Class
-	CurrentModules  map[string]builtins.Module
 
-	stack *CallStack
+	stack          *CallStack
+	ObjectSpace    map[string]builtins.Value
+	CurrentGlobals map[string]builtins.Value
+	CurrentSymbols map[string]builtins.Value
+	CurrentClasses map[string]builtins.Class
+	CurrentModules map[string]builtins.Module
+
+	localVariableStack *localVariableStack
 }
 
 type VM interface {
@@ -43,12 +45,13 @@ type VM interface {
 
 func NewVM(rubyHome, name string) VM {
 	vm := &vm{
-		currentFilename: name,
-		stack:           NewCallStack(),
-		CurrentGlobals:  make(map[string]builtins.Value),
-		ObjectSpace:     make(map[string]builtins.Value),
-		CurrentSymbols:  make(map[string]builtins.Value),
-		CurrentModules:  make(map[string]builtins.Module),
+		currentFilename:    name,
+		stack:              NewCallStack(),
+		CurrentGlobals:     make(map[string]builtins.Value),
+		ObjectSpace:        make(map[string]builtins.Value),
+		CurrentSymbols:     make(map[string]builtins.Value),
+		CurrentModules:     make(map[string]builtins.Module),
+		localVariableStack: newLocalVariableStack(),
 	}
 	vm.registerBuiltinClassesAndModules()
 
@@ -60,10 +63,10 @@ func NewVM(rubyHome, name string) VM {
 	vm.ObjectSpace["ARGV"] = vm.CurrentClasses["Array"].New(vm)
 
 	main := vm.CurrentClasses["Object"].New(vm)
-	main.AddMethod(builtins.NewMethod("to_s", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+	main.AddMethod(builtins.NewNativeMethod("to_s", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 		return builtins.NewString("main", vm), nil
 	}))
-	main.AddMethod(builtins.NewMethod("require", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+	main.AddMethod(builtins.NewNativeMethod("require", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 		fileName := args[0].(*builtins.StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
@@ -240,6 +243,8 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 	vm.stack.Unshift("main", vm.currentFilename)
 	defer vm.stack.Shift()
 
+	vm.localVariableStack.unshift()
+	defer vm.localVariableStack.shift()
 	return vm.executeWithContext(main, parser.Statements...)
 }
 
@@ -278,7 +283,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 				return returnValue, returnErr
 			}
 
-			contextModule.AddInstanceMethod(builtins.NewMethod(aliasNode.To.Name, vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+			contextModule.AddInstanceMethod(builtins.NewNativeMethod(aliasNode.To.Name, vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 				return m.Execute(self, args...)
 			}))
 
@@ -306,9 +311,15 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 
 		case ast.FuncDecl:
 			funcNode := statement.(ast.FuncDecl)
-			method := builtins.NewMethod(funcNode.Name.Name, vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
-				// FIXME: should conditionally assert on number of args
-				return vm.executeWithContext(context, funcNode.Body...)
+			method := builtins.NewRubyMethod(funcNode.MethodName(), funcNode.MethodArgs(), funcNode.Body, vm, func(self builtins.Value, method *builtins.RubyMethod) (builtins.Value, error) {
+				vm.localVariableStack.unshift()
+				defer vm.localVariableStack.shift()
+
+				for _, arg := range method.Args() {
+					vm.localVariableStack.store(arg.Name, arg.Value)
+				}
+
+				return vm.executeWithContext(context, method.Body()...)
 			})
 			returnValue = method
 
@@ -357,19 +368,25 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			}
 		case ast.BareReference:
 			name := statement.(ast.BareReference).Name
-			maybe, ok := vm.ObjectSpace[name]
-			if ok {
+			maybe, err := vm.localVariableStack.retrieve(name)
+			if err == nil {
 				returnValue = maybe
 			} else {
-				maybe, ok := vm.CurrentClasses[name]
+				maybe, ok := vm.ObjectSpace[name]
 				if ok {
 					returnValue = maybe
 				} else {
-					maybe, ok := vm.CurrentModules[name]
+					maybe, ok := vm.CurrentClasses[name]
 					if ok {
 						returnValue = maybe
 					} else {
-						returnErr = builtins.NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+						maybe, ok := vm.CurrentModules[name]
+						if ok {
+							returnValue = maybe
+						} else {
+							returnValue = nil
+							returnErr = builtins.NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+						}
 					}
 				}
 			}
@@ -379,7 +396,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 
 			var (
 				target           builtins.Value
-				usePrivateMethod bool
+				usePrivateMethod bool // FIXME: this should be unnecessary now
 			)
 
 			if callExpr.Target != nil {

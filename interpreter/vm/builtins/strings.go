@@ -30,7 +30,7 @@ func (class *StringClass) New(provider ClassProvider, args ...Value) Value {
 	str := &StringValue{}
 	str.initialize()
 	str.class = class
-	str.AddMethod(NewMethod("+", provider, func(self Value, args ...Value) (Value, error) {
+	str.AddMethod(NewNativeMethod("+", provider, func(self Value, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
 		return NewString(str.value+arg.value, class.provider), nil
 	}))

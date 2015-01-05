@@ -13,7 +13,7 @@ func NewGlobalKernelModule(provider ClassProvider) Module {
 	k.initialize()
 	k.class = provider.ClassWithName("Module")
 
-	k.AddMethod(NewMethod("puts", provider, func(self Value, args ...Value) (Value, error) {
+	k.AddMethod(NewNativeMethod("puts", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			os.Stdout.Write([]byte(arg.String() + "\n"))
 		}

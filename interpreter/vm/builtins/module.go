@@ -74,7 +74,7 @@ func NewModule(name string, provider ClassProvider) Module {
 	c.initialize()
 	c.class = provider.ClassWithName("Module")
 
-	c.AddMethod(NewMethod("include", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("include", provider, func(self Value, args ...Value) (Value, error) {
 		for _, module := range args {
 			c.includedModules = append(c.includedModules, module)
 		}
@@ -82,7 +82,7 @@ func NewModule(name string, provider ClassProvider) Module {
 		return c, nil
 	}))
 
-	c.AddMethod(NewMethod("module_function", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("module_function", provider, func(self Value, args ...Value) (Value, error) {
 		if len(args) != 1 {
 			return nil, errors.New("expected exactly one arg")
 		}
