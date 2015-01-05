@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	. "github.com/grubby/grubby/interpreter/vm"
+	. "github.com/grubby/grubby/interpreter/vm/builtins"
 	. "github.com/grubby/grubby/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,6 +21,30 @@ var _ = Describe("methods", func() {
 		}
 
 		vm = NewVM(pathToExecutable, "fake-irb-under-test")
+	})
+
+	It("has a reference to self", func() {
+		_, err := vm.Run(`
+class Foo
+end
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+
+		foo, err := vm.MustGetClass("Foo").New(vm)
+		Expect(err).ToNot(HaveOccurred())
+
+		var capturedSelf Value
+		foo.AddMethod(NewNativeMethod("fasciculated_stripe", vm, func(self Value, args ...Value) (Value, error) {
+			capturedSelf = self
+			return nil, nil
+		}))
+
+		m, err := foo.Method("fasciculated_stripe")
+		Expect(err).ToNot(HaveOccurred())
+		m.Execute(foo)
+
+		Expect(capturedSelf).To(Equal(foo))
 	})
 
 	Context("defined by the user", func() {

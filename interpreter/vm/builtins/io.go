@@ -26,6 +26,6 @@ func (io *ioClass) AddInstanceMethod(m Method) {
 	io.instanceMethods = append(io.instanceMethods, m)
 }
 
-func (io *ioClass) New(provider ClassProvider, args ...Value) Value {
-	return nil
+func (io *ioClass) New(provider ClassProvider, args ...Value) (Value, error) {
+	return nil, nil
 }

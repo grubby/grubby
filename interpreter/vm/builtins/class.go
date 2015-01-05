@@ -6,7 +6,7 @@ import "errors"
 type Class interface {
 	Value
 
-	New(provider ClassProvider, args ...Value) Value
+	New(provider ClassProvider, args ...Value) (Value, error)
 	Name() string
 
 	AddInstanceMethod(Method)
@@ -44,8 +44,8 @@ func (c *ClassValue) SetSuperClass() {
 	c.superClass = moduleClass
 }
 
-func (c ClassValue) New(provider ClassProvider, args ...Value) Value {
-	return nil
+func (c ClassValue) New(provider ClassProvider, args ...Value) (Value, error) {
+	return nil, nil
 }
 
 func (c ClassValue) Name() string {
@@ -96,7 +96,11 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 		return c, nil
 	}))
 	c.AddMethod(NewNativeMethod("new", provider, func(self Value, args ...Value) (Value, error) {
-		instance := c.New(provider, args...)
+		instance, err := c.New(provider, args...)
+		if err != nil {
+			return nil, err
+		}
+
 		method, err := instance.Method("initialize")
 		if err == nil {
 			_, err = method.Execute(instance, args...)
@@ -151,7 +155,7 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 	return c
 }
 
-func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
+func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) (Value, error) {
 	instance := &UserDefinedClassInstance{}
 	instance.initialize()
 	instance.provider = provider
@@ -174,7 +178,7 @@ func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
 			this := self.(*UserDefinedClassInstance)
 			value, ok := this.attrs[attr]
 			if !ok {
-				return provider.ClassWithName("Nil").New(provider), nil
+				return provider.ClassWithName("Nil").New(provider)
 			}
 
 			return value, nil
@@ -193,11 +197,11 @@ func (c *UserDefinedClass) New(provider ClassProvider, args ...Value) Value {
 	if err == nil {
 		_, err = method.Execute(instance, args...)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
-	return instance
+	return instance, nil
 }
 
 func (c UserDefinedClass) Name() string {

@@ -35,7 +35,9 @@ end
 		fooClass := vm.ClassWithName("Foo")
 		Expect(fooClass).ToNot(BeNil())
 
-		fooInstance := fooClass.New(vm)
+		fooInstance, err := fooClass.New(vm)
+
+		Expect(err).ToNot(HaveOccurred())
 		Expect(fooInstance.GetInstanceVariable("foo")).To(Equal(builtins.NewSymbol("bar")))
 	})
 })

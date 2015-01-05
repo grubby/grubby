@@ -35,6 +35,6 @@ func (obj *BasicObjectClass) AddInstanceMethod(method Method) {
 	obj.instanceMethods = append(obj.instanceMethods, method)
 }
 
-func (obj *BasicObjectClass) New(provider ClassProvider, args ...Value) Value {
-	return nil
+func (obj *BasicObjectClass) New(provider ClassProvider, args ...Value) (Value, error) {
+	return nil, nil
 }

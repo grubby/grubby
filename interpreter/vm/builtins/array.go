@@ -18,7 +18,7 @@ func (klass *ArrayClass) AddInstanceMethod(m Method) {
 	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
-func (klass *ArrayClass) New(provider ClassProvider, args ...Value) Value {
+func (klass *ArrayClass) New(provider ClassProvider, args ...Value) (Value, error) {
 	a := &Array{}
 	a.initialize()
 	a.class = klass
@@ -26,7 +26,7 @@ func (klass *ArrayClass) New(provider ClassProvider, args ...Value) Value {
 	a.AddMethod(NewNativeMethod("shift", provider, func(self Value, args ...Value) (Value, error) {
 		if len(a.members) == 0 {
 			// FIXME: this should return the singleton for nil
-			return provider.ClassWithName("Nil").New(provider), nil
+			return provider.ClassWithName("Nil").New(provider)
 		}
 
 		val := a.members[0]
@@ -43,15 +43,15 @@ func (klass *ArrayClass) New(provider ClassProvider, args ...Value) Value {
 		for _, m := range a.members {
 			if m == args[0] {
 				// FIXME: needs a singleton provider? (someway to inject singletons)
-				return provider.ClassWithName("True").New(provider), nil
+				return provider.ClassWithName("True").New(provider)
 			}
 		}
 
 		// FIXME: needs singletons, as above
-		return provider.ClassWithName("False").New(provider), nil
+		return provider.ClassWithName("False").New(provider)
 	}))
 
-	return a
+	return a, nil
 }
 
 func (array *ArrayClass) Name() string {

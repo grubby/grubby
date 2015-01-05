@@ -308,7 +308,11 @@ end`)
 			value, err := vm.Run("ARGV.shift")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value).To(Equal(vm.ClassWithName("Nil").New(vm)))
+
+			nilInstance, err := vm.ClassWithName("Nil").New(vm)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value).To(Equal(nilInstance))
 		})
 	})
 
@@ -326,7 +330,9 @@ end
 bar = true
 `)
 
-			trueValue := builtins.NewTrueClass(vm).(builtins.Class).New(vm)
+			Expect(err).ToNot(HaveOccurred())
+
+			trueValue, err := builtins.NewTrueClass(vm).(builtins.Class).New(vm)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(vm.MustGet("foo")).To(Equal(trueValue))
@@ -422,7 +428,8 @@ end
 				fooClass, err := vm.GetClass("Foo")
 				Expect(fooClass).ToNot(BeNil())
 
-				fooInstance := fooClass.New(vm)
+				fooInstance, err := fooClass.New(vm)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(fooInstance).ToNot(BeNil())
 
 				method, err := fooInstance.Method("hello")
@@ -451,7 +458,8 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				barClass := vm.MustGetClass("Bar")
-				bar := barClass.New(vm)
+				bar, err := barClass.New(vm)
+				Expect(err).ToNot(HaveOccurred())
 
 				method, err := bar.Method("superinquisitive")
 				Expect(err).ToNot(HaveOccurred())
@@ -460,109 +468,6 @@ end
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val.String()).To(Equal("tumescent-wasty"))
 			})
-		})
-	})
-
-	Describe("class attribute methods", func() {
-		Describe(".attr_reader :symbol", func() {
-			It("creates a getter and setter on instances of the class", func() {
-				_, err := vm.Run(`
-class Foo
-  attr_reader :quaternion_vinic
-end
-`)
-
-				Expect(err).ToNot(HaveOccurred())
-
-				fooClass := vm.MustGetClass("Foo")
-				foo := fooClass.New(vm)
-
-				reader, err := foo.Method("quaternion_vinic")
-				Expect(err).ToNot(HaveOccurred())
-
-				val, err := reader.Execute(foo)
-				Expect(val).To(Equal(vm.ClassWithName("Nil").New(vm)))
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-
-		Describe(".attr_writer :some_symbol", func() {
-			It("creates a setter on instances of the class", func() {
-				_, err := vm.Run(`
-class Foo
-  attr_writer :chrysobull_nonmonarchist
-end
-`)
-
-				Expect(err).ToNot(HaveOccurred())
-
-				fooClass := vm.MustGetClass("Foo")
-				foo := fooClass.New(vm)
-
-				reader, err := foo.Method("chrysobull_nonmonarchist=")
-				Expect(err).ToNot(HaveOccurred())
-
-				_, err = reader.Execute(foo, builtins.NewString("lyncher-mudslinger", vm))
-				Expect(err).ToNot(HaveOccurred())
-
-				// TODO: assert on the instance variable via instance_variable_get
-			})
-		})
-
-		Describe(".attr_accessor :some_symbol", func() {
-			It("creates a getter and setter on instances of the class", func() {
-				_, err := vm.Run(`
-class Foo
-  attr_accessor :pieless_bothlike
-end
-`)
-
-				Expect(err).ToNot(HaveOccurred())
-
-				fooClass := vm.MustGetClass("Foo")
-				foo := fooClass.New(vm)
-
-				reader, err := foo.Method("pieless_bothlike")
-				Expect(err).ToNot(HaveOccurred())
-
-				val, err := reader.Execute(foo)
-				Expect(val).To(Equal(vm.ClassWithName("Nil").New(vm)))
-				Expect(err).ToNot(HaveOccurred())
-
-				writer, err := foo.Method("pieless_bothlike=")
-				Expect(err).ToNot(HaveOccurred())
-
-				_, err = writer.Execute(foo, builtins.NewString("unordainable-luthier", vm))
-				Expect(err).ToNot(HaveOccurred())
-
-				val, err = reader.Execute(foo)
-				Expect(val.String()).To(Equal("unordainable-luthier"))
-				Expect(err).ToNot(HaveOccurred())
-			})
-		})
-	})
-
-	Describe("methods", func() {
-		It("has a reference to self", func() {
-			_, err := vm.Run(`
-class Foo
-end
-`)
-
-			Expect(err).ToNot(HaveOccurred())
-
-			var capturedSelf builtins.Value
-			foo := vm.MustGetClass("Foo").New(vm)
-			foo.AddMethod(builtins.NewNativeMethod("fasciculated_stripe", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
-				capturedSelf = self
-				return nil, nil
-			}))
-
-			m, err := foo.Method("fasciculated_stripe")
-			Expect(err).ToNot(HaveOccurred())
-			m.Execute(foo)
-
-			Expect(capturedSelf).To(Equal(foo))
 		})
 	})
 })

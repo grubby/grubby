@@ -30,12 +30,12 @@ type true struct {
 	valueStub
 }
 
-func (obj *trueClass) New(provider ClassProvider, args ...Value) Value {
+func (obj *trueClass) New(provider ClassProvider, args ...Value) (Value, error) {
 	o := &true{}
 	o.initialize()
 	o.class = obj
 
-	return o
+	return o, nil
 }
 
 type falseClass struct {
@@ -68,10 +68,10 @@ type false struct {
 	valueStub
 }
 
-func (obj *falseClass) New(provider ClassProvider, args ...Value) Value {
+func (obj *falseClass) New(provider ClassProvider, args ...Value) (Value, error) {
 	o := &false{}
 	o.initialize()
 	o.class = obj
 
-	return o
+	return o, nil
 }
