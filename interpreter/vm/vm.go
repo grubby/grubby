@@ -146,6 +146,9 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["False"] = builtins.NewFalseClass(vm)
 	vm.CurrentClasses["Nil"] = builtins.NewNilClass(vm)
 	vm.CurrentClasses["String"] = builtins.NewStringClass(vm)
+	vm.CurrentClasses["Fixnum"] = builtins.NewFixnumClass(vm)
+	vm.CurrentClasses["Float"] = builtins.NewFloatClass(vm)
+	vm.CurrentClasses["Symbol"] = builtins.NewSymbolClass(vm)
 }
 
 func (vm *vm) MustGet(key string) builtins.Value {
@@ -356,14 +359,14 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 		case ast.GlobalVariable:
 			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
 		case ast.ConstantInt:
-			returnValue = builtins.NewInt(statement.(ast.ConstantInt).Value)
+			returnValue = builtins.NewFixnum(statement.(ast.ConstantInt).Value, vm)
 		case ast.ConstantFloat:
-			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value)
+			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value, vm)
 		case ast.Symbol:
 			name := statement.(ast.Symbol).Name
 			maybe, ok := vm.CurrentSymbols[name]
 			if !ok {
-				returnValue = builtins.NewSymbol(name)
+				returnValue = builtins.NewSymbol(name, vm)
 				vm.CurrentSymbols[name] = returnValue
 			} else {
 				returnValue = maybe

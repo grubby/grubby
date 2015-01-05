@@ -1,20 +1,55 @@
 package builtins
 
-type SymbolValue struct {
+import "errors"
+
+type symbolClass struct {
+	valueStub
+	classStub
+
+	instanceMethods []Method
+}
+
+func NewSymbolClass(provider ClassProvider) Class {
+	s := &symbolClass{}
+	s.initialize()
+	s.class = provider.ClassWithName("Class")
+	s.superClass = provider.ClassWithName("Object")
+
+	return s
+}
+
+func (class *symbolClass) AddInstanceMethod(method Method) {
+	class.instanceMethods = append(class.instanceMethods, method)
+}
+
+func (c *symbolClass) String() string {
+	return "Symbol"
+}
+
+func (c *symbolClass) Name() string {
+	return "Symbol"
+}
+
+func (c *symbolClass) New(provider ClassProvider, args ...Value) (Value, error) {
+	return nil, errors.New("undefined method 'new' for Symbol:Class")
+}
+
+type symbolValue struct {
 	value string
 	valueStub
 }
 
-func NewSymbol(val string) Value {
-	s := &SymbolValue{value: val}
+func NewSymbol(val string, provider ClassProvider) Value {
+	s := &symbolValue{value: val}
+	s.class = provider.ClassWithName("Symbol")
 	s.initialize()
 	return s
 }
 
-func (symbolValue *SymbolValue) String() string {
+func (symbolValue *symbolValue) String() string {
 	return symbolValue.value
 }
 
-func (symbolValue *SymbolValue) Name() string {
+func (symbolValue *symbolValue) Name() string {
 	return symbolValue.value
 }

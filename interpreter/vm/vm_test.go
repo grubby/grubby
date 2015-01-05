@@ -87,8 +87,9 @@ end`)
 			val, err := vm.Run("5")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewInt(0)))
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewFixnum(0, vm)))
 			Expect(val.String()).To(Equal("5"))
+			Expect(val.Class()).To(Equal(vm.MustGetClass("Fixnum")))
 		})
 	})
 
@@ -97,8 +98,9 @@ end`)
 			val, err := vm.Run("5.123")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewFloat(0.0)))
-			Expect(val).To(Equal(builtins.NewFloat(5.123)))
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewFloat(0.0, vm)))
+			Expect(val).To(Equal(builtins.NewFloat(5.123, vm)))
+			Expect(val.Class()).To(Equal(vm.MustGetClass("Float")))
 		})
 	})
 
@@ -113,12 +115,16 @@ end`)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
+		It("returns an instance of the Symbol class", func() {
+			Expect(val.Class()).To(Equal(vm.MustGetClass("Symbol")))
+		})
+
 		It("returns a ruby Symbol object", func() {
-			Expect(val).To(Equal(builtins.NewSymbol("foo")))
+			Expect(val).To(Equal(builtins.NewSymbol("foo", vm)))
 		})
 
 		It("registers the symbol globally", func() {
-			Expect(vm.Symbols()).To(ContainElement(builtins.NewSymbol("foo")))
+			Expect(vm.Symbols()).To(ContainElement(builtins.NewSymbol("foo", vm)))
 		})
 
 		It("records the symbol only once", func() {
@@ -221,7 +227,7 @@ end`)
 
 			keyArray, ok := keys.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("key")))
+			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("key", vm)))
 
 			valuesMethod, err := hash.Method("values")
 			Expect(err).ToNot(HaveOccurred())
@@ -231,12 +237,12 @@ end`)
 
 			valueArray, ok := values.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("value")))
+			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("value", vm)))
 
 			method, err := hash.Method("[]=")
 			Expect(err).ToNot(HaveOccurred())
 
-			_, err = method.Execute(hash, builtins.NewSymbol("foo"), builtins.NewSymbol("bar"))
+			_, err = method.Execute(hash, builtins.NewSymbol("foo", vm), builtins.NewSymbol("bar", vm))
 			Expect(err).ToNot(HaveOccurred())
 
 			keys, err = keysMethod.Execute(hash)
@@ -244,14 +250,14 @@ end`)
 
 			keyArray, ok = keys.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("foo")))
+			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("foo", vm)))
 
 			values, err = valuesMethod.Execute(hash)
 			Expect(err).ToNot(HaveOccurred())
 
 			valueArray, ok = values.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("bar")))
+			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("bar", vm)))
 		})
 	})
 
@@ -382,7 +388,7 @@ foo = 0
 			Expect(err).To(HaveOccurred())
 
 			value, _ := vm.Get("foo")
-			Expect(value).To(Equal(builtins.NewInt(1)))
+			Expect(value).To(Equal(builtins.NewFixnum(1, vm)))
 		})
 	})
 

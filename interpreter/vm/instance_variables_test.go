@@ -38,6 +38,6 @@ end
 		fooInstance, err := fooClass.New(vm)
 
 		Expect(err).ToNot(HaveOccurred())
-		Expect(fooInstance.GetInstanceVariable("foo")).To(Equal(builtins.NewSymbol("bar")))
+		Expect(fooInstance.GetInstanceVariable("foo")).To(Equal(builtins.NewSymbol("bar", vm)))
 	})
 })
