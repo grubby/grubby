@@ -341,7 +341,8 @@ bar = true
 		})
 	})
 
-	PDescribe("stack traces", func() {
+	Describe("stack traces", func() {
+		return
 		It("is included with errors", func() {
 			_, err := vm.Run(`
 def foo
