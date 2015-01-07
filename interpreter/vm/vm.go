@@ -55,14 +55,14 @@ func NewVM(rubyHome, name string) VM {
 	}
 	vm.registerBuiltinClassesAndModules()
 
-	loadPath := vm.CurrentClasses["Array"].New(vm)
+	loadPath, _ := vm.CurrentClasses["Array"].New(vm)
 	loadPath.(*builtins.Array).Append(builtins.NewString(filepath.Join(rubyHome, "lib"), vm))
 
 	vm.CurrentGlobals["LOAD_PATH"] = loadPath
 	vm.CurrentGlobals[":"] = loadPath
-	vm.ObjectSpace["ARGV"] = vm.CurrentClasses["Array"].New(vm)
+	vm.ObjectSpace["ARGV"], _ = vm.CurrentClasses["Array"].New(vm)
 
-	main := vm.CurrentClasses["Object"].New(vm)
+	main, _ := vm.CurrentClasses["Object"].New(vm)
 	main.AddMethod(builtins.NewNativeMethod("to_s", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
 		return builtins.NewString("main", vm), nil
 	}))
@@ -70,7 +70,7 @@ func NewVM(rubyHome, name string) VM {
 		fileName := args[0].(*builtins.StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
-			return vm.CurrentClasses["False"].New(vm), nil
+			return vm.CurrentClasses["False"].New(vm)
 		}
 
 		for _, pathStr := range loadPath.(*builtins.Array).Members() {
@@ -91,7 +91,11 @@ func NewVM(rubyHome, name string) VM {
 
 				vm.currentFilename = file.Name()
 				_, rubyErr := vm.Run(string(contents))
-				return vm.CurrentClasses["True"].New(vm), rubyErr
+				if rubyErr != nil {
+					return nil, rubyErr
+				}
+
+				return vm.CurrentClasses["True"].New(vm)
 			}
 		}
 
@@ -113,8 +117,6 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	objectClass := builtins.NewGlobalObjectClass(vm)
 	vm.CurrentClasses["Object"] = objectClass
 
-	// FIXME: need to set Class' superclass to module at this point
-	// and need to set "class" as the class on object and basic object
 	classClass := builtins.NewClassClass(vm)
 	vm.CurrentClasses["Class"] = classClass
 
@@ -347,9 +349,9 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value, vm)
 		case ast.Boolean:
 			if statement.(ast.Boolean).Value {
-				returnValue = vm.CurrentClasses["True"].New(vm)
+				returnValue, returnErr = vm.CurrentClasses["True"].New(vm)
 			} else {
-				returnValue = vm.CurrentClasses["False"].New(vm)
+				returnValue, returnErr = vm.CurrentClasses["False"].New(vm)
 			}
 		case ast.GlobalVariable:
 			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
@@ -410,7 +412,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			}
 
 			if target == nil {
-				nilValue := vm.CurrentClasses["Nil"].New(vm)
+				nilValue, _ := vm.CurrentClasses["Nil"].New(vm)
 				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
 			}
 
@@ -493,7 +495,8 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 				returnErr = err
 			}
 		case ast.Array:
-			array := vm.CurrentClasses["Array"].New(vm).(*builtins.Array)
+			arrayValue, _ := vm.CurrentClasses["Array"].New(vm)
+			array := arrayValue.(*builtins.Array)
 			for _, node := range statement.(ast.Array).Nodes {
 				value, err := vm.executeWithContext(context, node)
 				if err != nil {
@@ -506,7 +509,8 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			returnValue = array
 
 		case ast.Hash:
-			hash := vm.CurrentClasses["Hash"].New(vm).(*builtins.Hash)
+			hashValue, _ := vm.CurrentClasses["Hash"].New(vm)
+			hash := hashValue.(*builtins.Hash)
 			for _, keyPair := range statement.(ast.Hash).Pairs {
 				key, err := vm.executeWithContext(context, keyPair.Key)
 				if err != nil {

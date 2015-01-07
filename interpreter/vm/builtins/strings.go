@@ -26,7 +26,7 @@ func (c *StringClass) Name() string {
 	return "String"
 }
 
-func (class *StringClass) New(provider ClassProvider, args ...Value) Value {
+func (class *StringClass) New(provider ClassProvider, args ...Value) (Value, error) {
 	str := &StringValue{}
 	str.initialize()
 	str.class = class
@@ -35,7 +35,7 @@ func (class *StringClass) New(provider ClassProvider, args ...Value) Value {
 		return NewString(str.value+arg.value, class.provider), nil
 	}))
 
-	return str
+	return str, nil
 }
 
 func (class *StringClass) AddInstanceMethod(method Method) {
@@ -52,7 +52,7 @@ func (stringValue *StringValue) String() string {
 }
 
 func NewString(str string, provider ClassProvider) Value {
-	s := provider.ClassWithName("String").New(provider)
+	s, _ := provider.ClassWithName("String").New(provider)
 	s.(*StringValue).value = str
 	return s
 }

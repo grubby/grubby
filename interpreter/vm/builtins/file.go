@@ -54,6 +54,6 @@ func (file *fileClass) String() string {
 	return "File"
 }
 
-func (file *fileClass) New(provider ClassProvider, args ...Value) Value {
-	return nil
+func (file *fileClass) New(provider ClassProvider, args ...Value) (Value, error) {
+	return nil, nil
 }

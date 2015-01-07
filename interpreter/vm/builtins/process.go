@@ -25,14 +25,6 @@ func (c *processModule) AddInstanceMethod(method Method) {
 	c.instanceMethods = append(c.instanceMethods, method)
 }
 
-type processValue struct {
-	valueStub
-}
-
-func (module *processModule) New(args ...Value) Value {
-	return nil
-}
-
 // FIXME: this should be in a module_stub
 func (module *processModule) InstanceMethods() []Method {
 	return module.instanceMethods

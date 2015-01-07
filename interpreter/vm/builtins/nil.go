@@ -30,12 +30,12 @@ type nilInstance struct {
 	valueStub
 }
 
-func (class *NilClass) New(provider ClassProvider, args ...Value) Value {
+func (class *NilClass) New(provider ClassProvider, args ...Value) (Value, error) {
 	n := &nilInstance{}
 	n.initialize()
 	n.class = class
 
-	return n
+	return n, nil
 }
 
 func (n *nilInstance) String() string {

@@ -22,14 +22,15 @@ func (klass *HashClass) AddInstanceMethod(m Method) {
 	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
-func (klass *HashClass) New(provider ClassProvider, args ...Value) Value {
+func (klass *HashClass) New(provider ClassProvider, args ...Value) (Value, error) {
 	a := &Hash{}
 	a.initialize()
 	a.class = klass
 	a.hash = make(map[Value]Value)
 
 	a.AddMethod(NewNativeMethod("keys", provider, func(self Value, args ...Value) (Value, error) {
-		keys := klass.provider.ClassWithName("Array").New(provider).(*Array)
+		o, _ := klass.provider.ClassWithName("Array").New(provider)
+		keys := o.(*Array)
 		for key := range self.(*Hash).hash {
 			keys.Append(key)
 		}
@@ -37,7 +38,8 @@ func (klass *HashClass) New(provider ClassProvider, args ...Value) Value {
 		return keys, nil
 	}))
 	a.AddMethod(NewNativeMethod("values", provider, func(self Value, args ...Value) (Value, error) {
-		values := klass.provider.ClassWithName("Array").New(provider).(*Array)
+		o, _ := klass.provider.ClassWithName("Array").New(provider)
+		values := o.(*Array)
 		for key := range self.(*Hash).hash {
 			values.Append(self.(*Hash).hash[key])
 		}
@@ -50,7 +52,7 @@ func (klass *HashClass) New(provider ClassProvider, args ...Value) Value {
 		return args[1], nil
 	}))
 
-	return a
+	return a, nil
 }
 
 func (hash *HashClass) Name() string {

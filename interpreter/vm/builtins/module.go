@@ -31,8 +31,8 @@ func NewModuleClass(provider ClassProvider) Class {
 	return c
 }
 
-func (c ModuleClass) New(provider ClassProvider, args ...Value) Value {
-	return nil
+func (c ModuleClass) New(provider ClassProvider, args ...Value) (Value, error) {
+	return nil, nil
 }
 
 func (c ModuleClass) Name() string {
