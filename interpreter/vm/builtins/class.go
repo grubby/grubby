@@ -113,7 +113,7 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 	}))
 	c.AddMethod(NewNativeMethod("attr_accessor", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
-			symbol, ok := arg.(*SymbolValue)
+			symbol, ok := arg.(*symbolValue)
 			if !ok {
 				return nil, errors.New("not a symbol or a string")
 			}
@@ -127,7 +127,7 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 	}))
 	c.AddMethod(NewNativeMethod("attr_reader", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
-			symbol, ok := arg.(*SymbolValue)
+			symbol, ok := arg.(*symbolValue)
 			if !ok {
 				return nil, errors.New("not a symbol or a string")
 			}
@@ -140,7 +140,7 @@ func NewUserDefinedClass(name string, provider ClassProvider) Class {
 	}))
 	c.AddMethod(NewNativeMethod("attr_writer", provider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
-			symbol, ok := arg.(*SymbolValue)
+			symbol, ok := arg.(*symbolValue)
 			if !ok {
 				return nil, errors.New("not a symbol or a string")
 			}

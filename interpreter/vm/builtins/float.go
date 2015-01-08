@@ -1,22 +1,58 @@
 package builtins
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-type FloatValue struct {
+type floatClass struct {
+	valueStub
+	classStub
+
+	instanceMethods []Method
+}
+
+func NewFloatClass(provider ClassProvider) Class {
+	class := &floatClass{}
+	class.initialize()
+	class.class = provider.ClassWithName("Class")
+	class.superClass = provider.ClassWithName("Numeric")
+
+	return class
+}
+
+func (class *floatClass) AddInstanceMethod(method Method) {
+	class.instanceMethods = append(class.instanceMethods, method)
+}
+
+func (c *floatClass) String() string {
+	return "Float"
+}
+
+func (c *floatClass) Name() string {
+	return "Float"
+}
+
+func (c *floatClass) New(provider ClassProvider, args ...Value) (Value, error) {
+	return nil, errors.New("undefined method 'new' for Float:Class")
+}
+
+type floatValue struct {
 	value float64
 	valueStub
 }
 
-func NewFloat(val float64) Value {
-	f := &FloatValue{value: val}
+func NewFloat(val float64, provider ClassProvider) Value {
+	f := &floatValue{value: val}
+	f.class = provider.ClassWithName("Float")
 	f.initialize()
 	return f
 }
 
-func (floatValue *FloatValue) ValueAsFloat() float64 {
+func (floatValue *floatValue) ValueAsFloat() float64 {
 	return floatValue.value
 }
 
-func (floatValue *FloatValue) String() string {
+func (floatValue *floatValue) String() string {
 	return fmt.Sprintf("%d", floatValue.value)
 }

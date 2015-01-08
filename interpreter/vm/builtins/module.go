@@ -87,7 +87,7 @@ func NewModule(name string, provider ClassProvider) Module {
 			return nil, errors.New("expected exactly one arg")
 		}
 
-		symbol, ok := args[0].(*SymbolValue)
+		symbol, ok := args[0].(*symbolValue)
 		if !ok {
 			return nil, errors.New("expected method name to be a symbol")
 		}
