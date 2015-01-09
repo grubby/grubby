@@ -50,10 +50,10 @@ func (f FuncDecl) MethodName() string {
 	return f.Name.Name
 }
 
-func (f FuncDecl) MethodArgs() []string {
-	result := make([]string, 0, len(f.Args))
+func (f FuncDecl) MethodArgs() []MethodParam {
+	result := make([]MethodParam, 0, len(f.Args))
 	for _, a := range f.Args {
-		result = append(result, a.(MethodParam).Name.Name)
+		result = append(result, a.(MethodParam))
 	}
 
 	return result

@@ -8,73 +8,74 @@ import (
 	"path/filepath"
 
 	"github.com/grubby/grubby/ast"
-	"github.com/grubby/grubby/interpreter/vm/builtins"
 	"github.com/grubby/grubby/parser"
+
+	. "github.com/grubby/grubby/interpreter/vm/builtins"
 )
 
 type vm struct {
 	currentFilename string
 
 	stack          *CallStack
-	ObjectSpace    map[string]builtins.Value
-	CurrentGlobals map[string]builtins.Value
-	CurrentSymbols map[string]builtins.Value
-	CurrentClasses map[string]builtins.Class
-	CurrentModules map[string]builtins.Module
+	ObjectSpace    map[string]Value
+	CurrentGlobals map[string]Value
+	CurrentSymbols map[string]Value
+	CurrentClasses map[string]Class
+	CurrentModules map[string]Module
 
 	localVariableStack *localVariableStack
 }
 
 type VM interface {
-	Run(string) (builtins.Value, error)
-	Get(string) (builtins.Value, error)
-	MustGet(string) builtins.Value
+	Run(string) (Value, error)
+	Get(string) (Value, error)
+	MustGet(string) Value
 
-	GetClass(string) (builtins.Class, error)
-	MustGetClass(string) builtins.Class
+	GetClass(string) (Class, error)
+	MustGetClass(string) Class
 
-	Set(string, builtins.Value)
+	Set(string, Value)
 
-	Symbols() map[string]builtins.Value
-	Globals() map[string]builtins.Value
-	Classes() map[string]builtins.Class
-	Modules() map[string]builtins.Module
+	Symbols() map[string]Value
+	Globals() map[string]Value
+	Classes() map[string]Class
+	Modules() map[string]Module
 
-	builtins.ClassProvider
+	ClassProvider
 }
 
 func NewVM(rubyHome, name string) VM {
 	vm := &vm{
 		currentFilename:    name,
 		stack:              NewCallStack(),
-		CurrentGlobals:     make(map[string]builtins.Value),
-		ObjectSpace:        make(map[string]builtins.Value),
-		CurrentSymbols:     make(map[string]builtins.Value),
-		CurrentModules:     make(map[string]builtins.Module),
+		CurrentGlobals:     make(map[string]Value),
+		ObjectSpace:        make(map[string]Value),
+		CurrentSymbols:     make(map[string]Value),
+		CurrentModules:     make(map[string]Module),
 		localVariableStack: newLocalVariableStack(),
 	}
 	vm.registerBuiltinClassesAndModules()
 
 	loadPath, _ := vm.CurrentClasses["Array"].New(vm)
-	loadPath.(*builtins.Array).Append(builtins.NewString(filepath.Join(rubyHome, "lib"), vm))
+	loadPath.(*Array).Append(NewString(filepath.Join(rubyHome, "lib"), vm))
 
 	vm.CurrentGlobals["LOAD_PATH"] = loadPath
 	vm.CurrentGlobals[":"] = loadPath
 	vm.ObjectSpace["ARGV"], _ = vm.CurrentClasses["Array"].New(vm)
 
 	main, _ := vm.CurrentClasses["Object"].New(vm)
-	main.AddMethod(builtins.NewNativeMethod("to_s", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
-		return builtins.NewString("main", vm), nil
+	main.AddMethod(NewNativeMethod("to_s", vm, func(self Value, args ...Value) (Value, error) {
+		return NewString("main", vm), nil
 	}))
-	main.AddMethod(builtins.NewNativeMethod("require", vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
-		fileName := args[0].(*builtins.StringValue).String()
+	main.AddMethod(NewNativeMethod("require", vm, func(self Value, args ...Value) (Value, error) {
+		fileName := args[0].(*StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
 			return vm.CurrentClasses["False"].New(vm)
 		}
 
-		for _, pathStr := range loadPath.(*builtins.Array).Members() {
-			path := pathStr.(*builtins.StringValue)
+		for _, pathStr := range loadPath.(*Array).Members() {
+			path := pathStr.(*StringValue)
 			fullPath := filepath.Join(path.String(), fileName+".rb")
 			file, err := os.Open(fullPath)
 			if err != nil {
@@ -100,7 +101,7 @@ func NewVM(rubyHome, name string) VM {
 		}
 
 		errorMessage := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
-		return nil, builtins.NewLoadError(errorMessage, vm.stack.String())
+		return nil, NewLoadError(errorMessage, vm.stack.String())
 	}))
 	vm.ObjectSpace["main"] = main
 
@@ -108,23 +109,23 @@ func NewVM(rubyHome, name string) VM {
 }
 
 func (vm *vm) registerBuiltinClassesAndModules() {
-	vm.CurrentClasses = map[string]builtins.Class{}
-	vm.CurrentModules = map[string]builtins.Module{}
+	vm.CurrentClasses = map[string]Class{}
+	vm.CurrentModules = map[string]Module{}
 
-	basicObjectClass := builtins.NewBasicObjectClass(vm)
+	basicObjectClass := NewBasicObjectClass(vm)
 	vm.CurrentClasses["BasicObject"] = basicObjectClass
 
-	objectClass := builtins.NewGlobalObjectClass(vm)
+	objectClass := NewGlobalObjectClass(vm)
 	vm.CurrentClasses["Object"] = objectClass
 
-	classClass := builtins.NewClassClass(vm)
+	classClass := NewClassClass(vm)
 	vm.CurrentClasses["Class"] = classClass
 
-	moduleClass := builtins.NewModuleClass(vm)
+	moduleClass := NewModuleClass(vm)
 	vm.CurrentClasses["Module"] = moduleClass
-	vm.CurrentModules["Comparable"] = builtins.NewComparableModule(vm)
-	vm.CurrentModules["Kernel"] = builtins.NewGlobalKernelModule(vm)
-	vm.CurrentModules["Process"] = builtins.NewProcessModule(vm)
+	vm.CurrentModules["Comparable"] = NewComparableModule(vm)
+	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm)
+	vm.CurrentModules["Process"] = NewProcessModule(vm)
 
 	/* BEGIN RUNTIME TRICKERY
 	There's a cycle in ruby's builtin object graph
@@ -133,25 +134,25 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	*/
 	objectClass.Include(vm.CurrentModules["Kernel"])
 	moduleClass.Include(vm.CurrentModules["Kernel"])
-	classClass.(*builtins.ClassValue).SetSuperClass()
-	objectClass.(*builtins.ObjectClass).SetSuperClass()
-	basicObjectClass.(*builtins.BasicObjectClass).SetSuperClass()
+	classClass.(*ClassValue).SetSuperClass()
+	objectClass.(*ObjectClass).SetSuperClass()
+	basicObjectClass.(*BasicObjectClass).SetSuperClass()
 	// END RUNTIME TRICKERY
 
-	vm.CurrentClasses["IO"] = builtins.NewIOClass(vm)
-	vm.CurrentClasses["Array"] = builtins.NewArrayClass(vm)
-	vm.CurrentClasses["Hash"] = builtins.NewHashClass(vm)
-	vm.CurrentClasses["True"] = builtins.NewTrueClass(vm)
-	vm.CurrentClasses["File"] = builtins.NewFileClass(vm)
-	vm.CurrentClasses["False"] = builtins.NewFalseClass(vm)
-	vm.CurrentClasses["Nil"] = builtins.NewNilClass(vm)
-	vm.CurrentClasses["String"] = builtins.NewStringClass(vm)
-	vm.CurrentClasses["Fixnum"] = builtins.NewFixnumClass(vm)
-	vm.CurrentClasses["Float"] = builtins.NewFloatClass(vm)
-	vm.CurrentClasses["Symbol"] = builtins.NewSymbolClass(vm)
+	vm.CurrentClasses["IO"] = NewIOClass(vm)
+	vm.CurrentClasses["Array"] = NewArrayClass(vm)
+	vm.CurrentClasses["Hash"] = NewHashClass(vm)
+	vm.CurrentClasses["True"] = NewTrueClass(vm)
+	vm.CurrentClasses["File"] = NewFileClass(vm)
+	vm.CurrentClasses["False"] = NewFalseClass(vm)
+	vm.CurrentClasses["Nil"] = NewNilClass(vm)
+	vm.CurrentClasses["String"] = NewStringClass(vm)
+	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm)
+	vm.CurrentClasses["Float"] = NewFloatClass(vm)
+	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm)
 }
 
-func (vm *vm) MustGet(key string) builtins.Value {
+func (vm *vm) MustGet(key string) Value {
 	val, err := vm.Get(key)
 	if err != nil {
 		panic(err)
@@ -160,7 +161,7 @@ func (vm *vm) MustGet(key string) builtins.Value {
 	return val
 }
 
-func (vm *vm) Get(key string) (builtins.Value, error) {
+func (vm *vm) Get(key string) (Value, error) {
 	val, ok := vm.ObjectSpace[key]
 	if ok {
 		return val, nil
@@ -184,7 +185,7 @@ func (vm *vm) Get(key string) (builtins.Value, error) {
 	return nil, errors.New(fmt.Sprintf("'%s' is undefined", key))
 }
 
-func (vm *vm) GetClass(name string) (builtins.Class, error) {
+func (vm *vm) GetClass(name string) (Class, error) {
 	for _, class := range vm.CurrentClasses {
 		if class.Name() == name {
 			return class, nil
@@ -194,7 +195,7 @@ func (vm *vm) GetClass(name string) (builtins.Class, error) {
 	return nil, errors.New(fmt.Sprintf("Class '%s' not found", name))
 }
 
-func (vm *vm) MustGetClass(name string) builtins.Class {
+func (vm *vm) MustGetClass(name string) Class {
 	for _, class := range vm.CurrentClasses {
 		if class.Name() == name {
 			return class
@@ -204,23 +205,23 @@ func (vm *vm) MustGetClass(name string) builtins.Class {
 	panic(fmt.Sprintf("class '%s' requested, but does not exist", name))
 }
 
-func (vm *vm) Set(key string, value builtins.Value) {
+func (vm *vm) Set(key string, value Value) {
 	vm.ObjectSpace[key] = value
 }
 
-func (vm *vm) Symbols() map[string]builtins.Value {
+func (vm *vm) Symbols() map[string]Value {
 	return vm.CurrentSymbols
 }
 
-func (vm *vm) Globals() map[string]builtins.Value {
+func (vm *vm) Globals() map[string]Value {
 	return vm.CurrentGlobals
 }
 
-func (vm *vm) Classes() map[string]builtins.Class {
+func (vm *vm) Classes() map[string]Class {
 	return vm.CurrentClasses
 }
 
-func (vm *vm) Modules() map[string]builtins.Module {
+func (vm *vm) Modules() map[string]Module {
 	return vm.CurrentModules
 }
 
@@ -236,7 +237,7 @@ func (err *ParseError) Error() string {
 	return "parse error"
 }
 
-func (vm *vm) Run(input string) (builtins.Value, error) {
+func (vm *vm) Run(input string) (Value, error) {
 	parser.Statements = []ast.Node{}
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
@@ -253,9 +254,9 @@ func (vm *vm) Run(input string) (builtins.Value, error) {
 	return vm.executeWithContext(main, parser.Statements...)
 }
 
-func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node) (builtins.Value, error) {
+func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, error) {
 	var (
-		returnValue builtins.Value
+		returnValue Value
 		returnErr   error
 	)
 	for _, statement := range statements {
@@ -280,21 +281,21 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 		case ast.Alias:
 			// FIXME: assumes that the context will be a module, but could also be a class
 			aliasNode := statement.(ast.Alias)
-			contextModule := context.(*builtins.RubyModule)
+			contextModule := context.(*RubyModule)
 
 			m, err := contextModule.InstanceMethod(aliasNode.From.Name)
 			if err != nil {
-				returnErr = builtins.NewNameError(aliasNode.From.Name, contextModule.String(), contextModule.String(), vm.stack.String())
+				returnErr = NewNameError(aliasNode.From.Name, contextModule.String(), contextModule.String(), vm.stack.String())
 				return returnValue, returnErr
 			}
 
-			contextModule.AddInstanceMethod(builtins.NewNativeMethod(aliasNode.To.Name, vm, func(self builtins.Value, args ...builtins.Value) (builtins.Value, error) {
+			contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, func(self Value, args ...Value) (Value, error) {
 				return m.Execute(self, args...)
 			}))
 
 		case ast.ModuleDecl:
 			moduleNode := statement.(ast.ModuleDecl)
-			theModule := builtins.NewModule(moduleNode.Name, vm)
+			theModule := NewModule(moduleNode.Name, vm)
 			vm.CurrentModules[moduleNode.Name] = theModule
 
 			_, err := vm.executeWithContext(theModule, moduleNode.Body...)
@@ -306,7 +307,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 
 		case ast.ClassDecl:
 			classNode := statement.(ast.ClassDecl)
-			theClass := builtins.NewUserDefinedClass(classNode.Name, vm)
+			theClass := NewUserDefinedClass(classNode.Name, vm)
 			vm.CurrentClasses[classNode.Name] = theClass
 
 			_, err := vm.executeWithContext(theClass, classNode.Body...)
@@ -316,30 +317,36 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 
 		case ast.FuncDecl:
 			funcNode := statement.(ast.FuncDecl)
-			method := builtins.NewRubyMethod(funcNode.MethodName(), funcNode.MethodArgs(), funcNode.Body, vm, func(self builtins.Value, method *builtins.RubyMethod) (builtins.Value, error) {
-				vm.localVariableStack.unshift()
-				defer vm.localVariableStack.shift()
+			method := NewRubyMethod(
+				funcNode.MethodName(),
+				funcNode.MethodArgs(),
+				funcNode.Body,
+				vm,
+				vm,
+				func(self Value, method *RubyMethod) (Value, error) {
+					vm.localVariableStack.unshift()
+					defer vm.localVariableStack.shift()
 
-				for _, arg := range method.Args() {
-					vm.localVariableStack.store(arg.Name, arg.Value)
-				}
+					for _, arg := range method.Args() {
+						vm.localVariableStack.store(arg.Name, arg.Value)
+					}
 
-				return vm.executeWithContext(self, method.Body()...)
-			})
+					return vm.executeWithContext(self, method.Body()...)
+				})
 			returnValue = method
 
 			if context == vm.ObjectSpace["main"] {
 				vm.CurrentModules["Kernel"].AddPrivateMethod(method)
 			} else {
 				switch context.(type) {
-				case builtins.Class:
-					context.(builtins.Class).AddInstanceMethod(method)
-				case builtins.Module:
+				case Class:
+					context.(Class).AddInstanceMethod(method)
+				case Module:
 					ref, ok := funcNode.Target.(ast.BareReference)
 					if ok && ref.Name == "self" {
 						context.AddMethod(method)
 					} else {
-						context.(builtins.Module).AddInstanceMethod(method)
+						context.(Module).AddInstanceMethod(method)
 					}
 				default:
 					panic(fmt.Sprintf("unknown type of context: %#T", context))
@@ -347,9 +354,9 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			}
 
 		case ast.SimpleString:
-			returnValue = builtins.NewString(statement.(ast.SimpleString).Value, vm)
+			returnValue = NewString(statement.(ast.SimpleString).Value, vm)
 		case ast.InterpolatedString:
-			returnValue = builtins.NewString(statement.(ast.InterpolatedString).Value, vm)
+			returnValue = NewString(statement.(ast.InterpolatedString).Value, vm)
 		case ast.Boolean:
 			if statement.(ast.Boolean).Value {
 				returnValue, returnErr = vm.CurrentClasses["True"].New(vm)
@@ -359,14 +366,14 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 		case ast.GlobalVariable:
 			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
 		case ast.ConstantInt:
-			returnValue = builtins.NewFixnum(statement.(ast.ConstantInt).Value, vm)
+			returnValue = NewFixnum(statement.(ast.ConstantInt).Value, vm)
 		case ast.ConstantFloat:
-			returnValue = builtins.NewFloat(statement.(ast.ConstantFloat).Value, vm)
+			returnValue = NewFloat(statement.(ast.ConstantFloat).Value, vm)
 		case ast.Symbol:
 			name := statement.(ast.Symbol).Name
 			maybe, ok := vm.CurrentSymbols[name]
 			if !ok {
-				returnValue = builtins.NewSymbol(name, vm)
+				returnValue = NewSymbol(name, vm)
 				vm.CurrentSymbols[name] = returnValue
 			} else {
 				returnValue = maybe
@@ -390,17 +397,17 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 							returnValue = maybe
 						} else {
 							returnValue = nil
-							returnErr = builtins.NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+							returnErr = NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
 						}
 					}
 				}
 			}
 		case ast.CallExpression:
-			var method builtins.Method
+			var method Method
 			callExpr := statement.(ast.CallExpression)
 
 			var (
-				target           builtins.Value
+				target           Value
 				usePrivateMethod bool // FIXME: this should be unnecessary now
 			)
 
@@ -416,7 +423,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 
 			if target == nil {
 				nilValue, _ := vm.CurrentClasses["Nil"].New(vm)
-				return nil, builtins.NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
+				return nil, NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
 			}
 
 			method, err := target.Method(callExpr.Func.Name)
@@ -428,7 +435,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 				return nil, err
 			}
 
-			args := []builtins.Value{}
+			args := []Value{}
 			for _, astArgument := range callExpr.Args {
 				arg, err := vm.executeWithContext(context, astArgument)
 				if err != nil {
@@ -468,14 +475,14 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			}
 
 		case ast.FileNameConstReference:
-			returnValue = builtins.NewString(vm.currentFilename, vm)
+			returnValue = NewString(vm.currentFilename, vm)
 		case ast.Begin:
 			begin := statement.(ast.Begin)
 			_, err := vm.executeWithContext(context, begin.Body...)
 
 			if err != nil {
 				matchingRescue := false
-				rubyErr := err.(builtins.Value)
+				rubyErr := err.(Value)
 				for _, rescue := range begin.Rescue {
 					if matchingRescue {
 						break
@@ -499,7 +506,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 			}
 		case ast.Array:
 			arrayValue, _ := vm.CurrentClasses["Array"].New(vm)
-			array := arrayValue.(*builtins.Array)
+			array := arrayValue.(*Array)
 			for _, node := range statement.(ast.Array).Nodes {
 				value, err := vm.executeWithContext(context, node)
 				if err != nil {
@@ -513,7 +520,7 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 
 		case ast.Hash:
 			hashValue, _ := vm.CurrentClasses["Hash"].New(vm)
-			hash := hashValue.(*builtins.Hash)
+			hash := hashValue.(*Hash)
 			for _, keyPair := range statement.(ast.Hash).Pairs {
 				key, err := vm.executeWithContext(context, keyPair.Key)
 				if err != nil {
@@ -539,6 +546,12 @@ func (vm *vm) executeWithContext(context builtins.Value, statements ...ast.Node)
 	return returnValue, returnErr
 }
 
-func (vm *vm) ClassWithName(name string) builtins.Class {
+// ClassProvider
+func (vm *vm) ClassWithName(name string) Class {
 	return vm.CurrentClasses[name]
+}
+
+// ArgEvaluator
+func (vm *vm) EvaluateArgInContext(arg ast.Node, context Value) (Value, error) {
+	return vm.executeWithContext(context, arg)
 }

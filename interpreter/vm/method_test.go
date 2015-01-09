@@ -83,5 +83,65 @@ Foo.my_puts 'hello world'
 
 			Expect(output).To(ContainSubstring("hello world"))
 		})
+
+		Describe("default values for named arguments", func() {
+			var object Value
+
+			Context("when they are provided a value", func() {
+				BeforeEach(func() {
+					var err error
+					object, err = vm.Run(`
+class Acetylthymol
+  def stroboscopical(foo, bar = 1)
+    @foo = foo
+    @bar = bar
+  end
+end
+
+ace = Acetylthymol.new
+ace.stroboscopical('abc', 'def')
+ace
+`)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("takes on the value provided", func() {
+					Expect(object).ToNot(BeNil())
+
+					ivar := object.GetInstanceVariable("foo")
+					Expect(ivar.Class().String()).To(Equal("String"))
+					Expect(ivar.String()).To(Equal("abc"))
+
+					ivar = object.GetInstanceVariable("bar")
+					Expect(ivar.Class().String()).To(Equal("String"))
+					Expect(ivar.String()).To(Equal("def"))
+				})
+			})
+
+			Context("when they are not provided a value", func() {
+				BeforeEach(func() {
+					var err error
+					object, err = vm.Run(`
+class Acetylthymol
+  def stroboscopical(foo, bar = 1)
+    @foo = foo
+    @bar = bar
+  end
+end
+
+ace = Acetylthymol.new
+ace.stroboscopical('abc')
+ace
+`)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("takes on the default value", func() {
+					Expect(object).ToNot(BeNil())
+					Expect(object.GetInstanceVariable("foo")).To(EqualRubyString("abc"))
+					Expect(object.GetInstanceVariable("bar")).To(Equal(NewFixnum(1, vm)))
+				})
+			})
+		})
 	})
 })

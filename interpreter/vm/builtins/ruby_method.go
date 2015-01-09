@@ -13,20 +13,31 @@ type methodArg struct {
 
 type RubyMethod struct {
 	valueStub
-	name     string
-	argNames []string
+	name string
+
+	args []ast.MethodParam
 
 	body func(self Value, method *RubyMethod) (Value, error)
 
 	invocationArgs  []methodArg
 	unevaluatedBody []ast.Node
+
+	evaluator ArgEvaluator
 }
 
-func NewRubyMethod(name string, argNames []string, rubyBody []ast.Node, provider ClassProvider, body func(self Value, method *RubyMethod) (Value, error)) Method {
+func NewRubyMethod(
+	name string,
+	args []ast.MethodParam,
+	rubyBody []ast.Node,
+	provider ClassProvider,
+	evaluator ArgEvaluator,
+	body func(self Value, method *RubyMethod) (Value, error),
+) Method {
 	m := &RubyMethod{
 		name:            name,
-		argNames:        argNames,
 		body:            body,
+		args:            args,
+		evaluator:       evaluator,
 		unevaluatedBody: rubyBody,
 	}
 	m.class = provider.ClassWithName("Method")
@@ -52,12 +63,31 @@ func (method *RubyMethod) Body() []ast.Node {
 
 func (method *RubyMethod) Execute(self Value, args ...Value) (Value, error) {
 	method.invocationArgs = make([]methodArg, 0, len(args))
-	for index, arg := range args {
-		arg := methodArg{
-			Name:  method.argNames[index],
-			Value: arg,
+	for index, arg := range method.args {
+
+		var (
+			argValue Value
+			err      error
+		)
+
+		if index >= len(args) {
+			if arg.DefaultValue != nil {
+				argValue, err = method.evaluator.EvaluateArgInContext(arg.DefaultValue, self)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				panic("whoops")
+			}
+		} else {
+			argValue = args[index]
 		}
-		method.invocationArgs = append(method.invocationArgs, arg)
+
+		argument := methodArg{
+			Name:  arg.Name.Name,
+			Value: argValue,
+		}
+		method.invocationArgs = append(method.invocationArgs, argument)
 	}
 	defer func() {
 		method.invocationArgs = nil
