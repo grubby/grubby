@@ -54,6 +54,8 @@ const (
 	tokenTypeMODULE
 	tokenTypeTRUE
 	tokenTypeFALSE
+	tokenTypeSELF
+	tokenTypeNIL
 	tokenTypeLessThan
 	tokenTypeGreaterThan
 	tokenTypeColon
@@ -652,6 +654,12 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeWHEN:
 			debug("WHEN")
 			return WHEN
+		case tokenTypeSELF:
+			debug("SELF")
+			return SELF
+		case tokenTypeNIL:
+			debug("NIL")
+			return NIL
 		case tokenTypeALIAS:
 			debug("ALIAS")
 			return ALIAS

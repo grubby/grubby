@@ -342,8 +342,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				case Class:
 					context.(Class).AddInstanceMethod(method)
 				case Module:
-					ref, ok := funcNode.Target.(ast.BareReference)
-					if ok && ref.Name == "self" {
+					_, ok := funcNode.Target.(ast.Self)
+					if ok {
 						context.AddMethod(method)
 					} else {
 						context.(Module).AddInstanceMethod(method)

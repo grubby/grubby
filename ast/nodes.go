@@ -273,3 +273,7 @@ type Alias struct {
 	To   Symbol
 	From Symbol
 }
+
+type Nil struct{}
+
+type Self struct{}

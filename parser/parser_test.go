@@ -576,7 +576,7 @@ d *= nil
 						ast.CallExpression{
 							Target: ast.BareReference{Name: "d"},
 							Func:   ast.BareReference{Name: "*="},
-							Args:   []ast.Node{ast.BareReference{Name: "nil"}},
+							Args:   []ast.Node{ast.Nil{}},
 						},
 					}))
 				})
@@ -1108,7 +1108,7 @@ end
 							Body: []ast.Node{},
 						},
 						ast.FuncDecl{
-							Target: ast.BareReference{Name: "self"},
+							Target: ast.Self{},
 							Name:   ast.BareReference{Name: "bar="},
 							Args: []ast.Node{
 								ast.MethodParam{
@@ -1167,7 +1167,7 @@ end
 							Body: []ast.Node{
 								ast.CallExpression{
 									Target: ast.CallExpression{
-										Target: ast.BareReference{Name: "self"},
+										Target: ast.Self{},
 										Func:   ast.BareReference{Name: "to_i"},
 									},
 									Func: ast.BareReference{Name: "<=>"},
@@ -1323,13 +1323,13 @@ end
 				It("returns a function declaration with appropriate method parameters", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Target: ast.BareReference{Name: "self"},
+							Target: ast.Self{},
 							Name:   ast.BareReference{Name: "describe"},
 							Args: []ast.Node{
 								ast.MethodParam{Name: ast.BareReference{Name: "mod"}},
 								ast.MethodParam{
 									Name:         ast.BareReference{Name: "options"},
-									DefaultValue: ast.BareReference{Name: "nil"},
+									DefaultValue: ast.Nil{},
 								},
 								ast.MethodParam{
 									Name:   ast.BareReference{Name: "block"},
@@ -1557,7 +1557,7 @@ end
 						Name: "Foo",
 						Body: []ast.Node{
 							ast.EigenClass{
-								Target: ast.BareReference{Name: "self"},
+								Target: ast.Self{},
 								Body: []ast.Node{
 									ast.CallExpression{
 										Func: ast.BareReference{Name: "puts"},

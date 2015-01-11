@@ -137,6 +137,10 @@ func lexMinus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeError:
 		l.emit(tokenTypeUnaryMinus)
+	case tokenTypeSELF:
+		l.emit(tokenTypeBinaryMinus)
+	case tokenTypeNIL:
+		l.emit(tokenTypeBinaryMinus)
 	default:
 		panic(fmt.Sprintf("Unknown node preceding '-' :: '%#v'", l.lastToken()))
 	}

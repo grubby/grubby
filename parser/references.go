@@ -17,7 +17,7 @@ func lexReference(l StatefulRubyLexer) stateFn {
 
 		if l.lengthOfInput() > l.startIndex()+5 && l.slice(l.startIndex(), l.startIndex()+5) == "self." {
 			l.acceptRun("self")
-			l.emit(tokenTypeReference)
+			l.emit(tokenTypeSELF)
 			l.accept(".")
 			l.emit(tokenTypeDot)
 		}
@@ -87,6 +87,10 @@ func lexReference(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeCASE)
 	case "when":
 		l.emit(tokenTypeWHEN)
+	case "self":
+		l.emit(tokenTypeSELF)
+	case "nil":
+		l.emit(tokenTypeNIL)
 	case "alias":
 		l.emit(tokenTypeALIAS)
 		// keep reading references as symbols until EOL

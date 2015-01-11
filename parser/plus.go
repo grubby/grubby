@@ -137,6 +137,10 @@ func lexPlus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeError:
 		l.emit(tokenTypeUnaryPlus)
+	case tokenTypeSELF:
+		l.emit(tokenTypeBinaryPlus)
+	case tokenTypeNIL:
+		l.emit(tokenTypeBinaryPlus)
 	default:
 		panic(fmt.Sprintf("Unknown node preceding '+' :: '%#v'", l.lastToken()))
 	}

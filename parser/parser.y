@@ -63,6 +63,8 @@ var Statements []ast.Node
 %token <genericValue> CASE
 %token <genericValue> WHEN
 %token <genericValue> ALIAS
+%token <genericValue> SELF
+%token <genericValue> NIL
 
 // booleans
 %token <genericValue> TRUE
@@ -113,9 +115,11 @@ var Statements []ast.Node
       declare a type (or possibly just a token)
 */
 
-// single nodes
+ // single nodes
+%type <genericValue> nil
 %type <genericValue> expr
 %type <genericValue> true
+%type <genericValue> self
 %type <genericValue> hash
 %type <genericValue> range
 %type <genericValue> block
@@ -249,7 +253,7 @@ list : /* empty */
 | list expr
 {  $$ = append($$, $2) };
 
-simple_node : SYMBOL | NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | LINE_CONST_REF | FILE_CONST_REF;
+simple_node : SYMBOL | NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | true | false | LINE_CONST_REF | FILE_CONST_REF | self | nil;
 
 // e.g.: not a complex set of tokens (e.g.: call expression)
 single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression;
@@ -606,7 +610,26 @@ method_declaration : DEF REF method_args list END
 			Body: $6,
     }
   }
+| DEF self DOT REF method_args list END
+  {
+		$$ = ast.FuncDecl{
+      Target: $2,
+			Name: $4.(ast.BareReference),
+      Args: $5,
+			Body: $6,
+    }
+  }
 | DEF REF DOT REF method_args list rescues END
+  {
+		$$ = ast.FuncDecl{
+      Target: $2,
+			Name: $4.(ast.BareReference),
+      Args: $5,
+			Body: $6,
+      Rescues: $7,
+    }
+  }
+| DEF self DOT REF method_args list rescues END
   {
 		$$ = ast.FuncDecl{
       Target: $2,
@@ -960,7 +983,10 @@ bitwise_or: single_node PIPE single_node
 true : TRUE { $$ = ast.Boolean{Value: true} }
 false : FALSE { $$ = ast.Boolean{Value: false} }
 array : LBRACKET optional_newlines nodes_with_commas_and_optional_newlines optional_newlines RBRACKET
-  { $$ = ast.Array{Nodes: $3} };
+{ $$ = ast.Array{Nodes: $3} };
+
+self : SELF { $$ = ast.Self{} };
+nil : NIL { $$ = ast.Nil{} };
 
 nodes_with_commas_and_optional_newlines : /* empty */ { $$ = ast.Nodes{} }
 | single_node
