@@ -31,7 +31,7 @@ func NewModuleClass(provider ClassProvider) Class {
 	return c
 }
 
-func (c ModuleClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (c ModuleClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	return nil, nil
 }
 
@@ -65,7 +65,7 @@ type RubyModule struct {
 	instanceMethods map[string]Method
 }
 
-func NewModule(name string, provider ClassProvider) Module {
+func NewModule(name string, provider ClassProvider, singletonProvider SingletonProvider) Module {
 	c := &RubyModule{
 		name:            name,
 		includedModules: make([]Value, 0),
@@ -74,7 +74,7 @@ func NewModule(name string, provider ClassProvider) Module {
 	c.initialize()
 	c.class = provider.ClassWithName("Module")
 
-	c.AddMethod(NewNativeMethod("include", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		for _, module := range args {
 			c.includedModules = append(c.includedModules, module)
 		}
@@ -82,7 +82,7 @@ func NewModule(name string, provider ClassProvider) Module {
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("module_function", provider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("module_function", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		if len(args) != 1 {
 			return nil, errors.New("expected exactly one arg")
 		}

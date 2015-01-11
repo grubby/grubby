@@ -33,7 +33,7 @@ func (c *floatClass) Name() string {
 	return "Float"
 }
 
-func (c *floatClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (c *floatClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	return nil, errors.New("undefined method 'new' for Float:Class")
 }
 

@@ -4,6 +4,8 @@ type ArrayClass struct {
 	valueStub
 	classStub
 	instanceMethods []Method
+
+	singletonProvider SingletonProvider
 }
 
 func NewArrayClass(provider ClassProvider) Class {
@@ -18,15 +20,14 @@ func (klass *ArrayClass) AddInstanceMethod(m Method) {
 	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
-func (klass *ArrayClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	a := &Array{}
 	a.initialize()
 	a.class = klass
 
-	a.AddMethod(NewNativeMethod("shift", provider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("shift", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		if len(a.members) == 0 {
-			// FIXME: this should return the singleton for nil
-			return provider.ClassWithName("Nil").New(provider)
+			return singletonProvider.SingletonWithName("nil"), nil
 		}
 
 		val := a.members[0]
@@ -34,21 +35,19 @@ func (klass *ArrayClass) New(provider ClassProvider, args ...Value) (Value, erro
 		return val, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("unshift", provider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("unshift", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		a.members = append([]Value{args[0]}, a.members[0:]...)
 		return a, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("include?", provider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("include?", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		for _, m := range a.members {
 			if m == args[0] {
-				// FIXME: needs a singleton provider? (someway to inject singletons)
-				return provider.ClassWithName("True").New(provider)
+				return singletonProvider.SingletonWithName("true"), nil
 			}
 		}
 
-		// FIXME: needs singletons, as above
-		return provider.ClassWithName("False").New(provider)
+		return singletonProvider.SingletonWithName("false"), nil
 	}))
 
 	return a, nil

@@ -30,7 +30,7 @@ type nilInstance struct {
 	valueStub
 }
 
-func (class *NilClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (class *NilClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	n := &nilInstance{}
 	n.initialize()
 	n.class = class

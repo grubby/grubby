@@ -11,3 +11,7 @@ type ArgEvaluator interface {
 type ClassProvider interface {
 	ClassWithName(string) Class
 }
+
+type SingletonProvider interface {
+	SingletonWithName(string) Value
+}

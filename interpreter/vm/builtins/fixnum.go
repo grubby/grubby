@@ -33,7 +33,7 @@ func (c *fixnumClass) Name() string {
 	return "Fixnum"
 }
 
-func (c *fixnumClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (c *fixnumClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	return nil, errors.New("undefined method 'new' for Fixnum:Class")
 }
 

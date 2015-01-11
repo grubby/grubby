@@ -30,7 +30,7 @@ type true struct {
 	valueStub
 }
 
-func (obj *trueClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (obj *trueClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	o := &true{}
 	o.initialize()
 	o.class = obj
@@ -68,7 +68,7 @@ type false struct {
 	valueStub
 }
 
-func (obj *falseClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (obj *falseClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	o := &false{}
 	o.initialize()
 	o.class = obj

@@ -31,11 +31,11 @@ end
 
 		Expect(err).ToNot(HaveOccurred())
 
-		foo, err := vm.MustGetClass("Foo").New(vm)
+		foo, err := vm.MustGetClass("Foo").New(vm, vm)
 		Expect(err).ToNot(HaveOccurred())
 
 		var capturedSelf Value
-		foo.AddMethod(NewNativeMethod("fasciculated_stripe", vm, func(self Value, args ...Value) (Value, error) {
+		foo.AddMethod(NewNativeMethod("fasciculated_stripe", vm, vm, func(self Value, args ...Value) (Value, error) {
 			capturedSelf = self
 			return nil, nil
 		}))

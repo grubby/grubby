@@ -70,7 +70,7 @@ end`)
 			val, err := vm.Run("'nonrestricted-consonantize'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm)))
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm, vm)))
 			Expect(val.String()).To(Equal("nonrestricted-consonantize"))
 		})
 
@@ -78,7 +78,7 @@ end`)
 			val, err := vm.Run("'foo' + 'bar'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal(builtins.NewString("foobar", vm).String()))
+			Expect(val.String()).To(Equal(builtins.NewString("foobar", vm, vm).String()))
 		})
 	})
 
@@ -137,10 +137,35 @@ end`)
 		})
 	})
 
+	Describe("nil", func() {
+		var (
+			val builtins.Value
+			err error
+		)
+
+		BeforeEach(func() {
+			val, err = vm.Run("nil")
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("returns an instance of the NilClass class", func() {
+			Expect(val.Class()).To(Equal(vm.MustGetClass("NilClass")))
+		})
+
+		It("treats nil as a singleton", func() {
+			nilValue, err := vm.Run("nil")
+			Expect(err).ToNot(HaveOccurred())
+
+			firstPointer := reflect.ValueOf(val).Pointer()
+			secondPointer := reflect.ValueOf(nilValue).Pointer()
+			Expect(firstPointer).To(Equal(secondPointer))
+		})
+	})
+
 	Describe("a reference to a variable", func() {
 		Context("when it already is defined", func() {
 			BeforeEach(func() {
-				vm.Set("foo", builtins.NewString("superinquisitive-edacity", vm))
+				vm.Set("foo", builtins.NewString("superinquisitive-edacity", vm, vm))
 			})
 
 			It("returns the variable referenced", func() {
@@ -207,7 +232,7 @@ end`)
 	Describe("the load path", func() {
 		It("is represented by $LOAD_PATH and $:", func() {
 			path := vm.MustGet("LOAD_PATH")
-			str := builtins.NewString("foo", vm)
+			str := builtins.NewString("foo", vm, vm)
 			path.(*builtins.Array).Append(str)
 
 			Expect(vm.MustGet(":").(*builtins.Array).Members()).To(ContainElement(str))
@@ -269,7 +294,7 @@ end`)
 			method, err := fileClass.Method("expand_path")
 			Expect(err).ToNot(HaveOccurred())
 
-			result, err := method.Execute(fileClass, builtins.NewString("~/foobar", vm))
+			result, err := method.Execute(fileClass, builtins.NewString("~/foobar", vm, vm))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result.String()).To(Equal(os.Getenv("HOME") + "/foobar"))
 		})
@@ -315,7 +340,7 @@ end`)
 
 			Expect(err).ToNot(HaveOccurred())
 
-			nilInstance, err := vm.ClassWithName("Nil").New(vm)
+			nilInstance, err := vm.ClassWithName("NilClass").New(vm, vm)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value).To(Equal(nilInstance))
@@ -338,7 +363,7 @@ bar = true
 
 			Expect(err).ToNot(HaveOccurred())
 
-			trueValue, err := builtins.NewTrueClass(vm).(builtins.Class).New(vm)
+			trueValue := vm.SingletonWithName("true")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(vm.MustGet("foo")).To(Equal(trueValue))
@@ -434,7 +459,7 @@ end
 				fooClass, err := vm.GetClass("Foo")
 				Expect(fooClass).ToNot(BeNil())
 
-				fooInstance, err := fooClass.New(vm)
+				fooInstance, err := fooClass.New(vm, vm)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fooInstance).ToNot(BeNil())
 
@@ -443,7 +468,7 @@ end
 
 				val, err := method.Execute(fooInstance)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm)))
+				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm, vm)))
 				Expect(val.String()).To(Equal("world"))
 			})
 		})
@@ -464,7 +489,7 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				barClass := vm.MustGetClass("Bar")
-				bar, err := barClass.New(vm)
+				bar, err := barClass.New(vm, vm)
 				Expect(err).ToNot(HaveOccurred())
 
 				method, err := bar.Method("superinquisitive")

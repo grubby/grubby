@@ -26,13 +26,13 @@ func (c *StringClass) Name() string {
 	return "String"
 }
 
-func (class *StringClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (class *StringClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	str := &StringValue{}
 	str.initialize()
 	str.class = class
-	str.AddMethod(NewNativeMethod("+", provider, func(self Value, args ...Value) (Value, error) {
+	str.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
-		return NewString(str.value+arg.value, class.provider), nil
+		return NewString(str.value+arg.value, provider, singletonProvider), nil
 	}))
 
 	return str, nil
@@ -51,8 +51,8 @@ func (stringValue *StringValue) String() string {
 	return stringValue.value
 }
 
-func NewString(str string, provider ClassProvider) Value {
-	s, _ := provider.ClassWithName("String").New(provider)
+func NewString(str string, provider ClassProvider, singletonProvider SingletonProvider) Value {
+	s, _ := provider.ClassWithName("String").New(provider, singletonProvider)
 	s.(*StringValue).value = str
 	return s
 }

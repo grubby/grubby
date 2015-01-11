@@ -11,12 +11,12 @@ type fileClass struct {
 	instanceMethods []Method
 }
 
-func NewFileClass(provider ClassProvider) Class {
+func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	f := &fileClass{}
 	f.initialize()
 	f.class = provider.ClassWithName("Class")
 	f.superClass = provider.ClassWithName("IO")
-	f.AddMethod(NewNativeMethod("expand_path", provider, func(self Value, args ...Value) (Value, error) {
+	f.AddMethod(NewNativeMethod("expand_path", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		arg1 := args[0].(*StringValue).String()
 
 		if arg1[0] == '~' {
@@ -30,13 +30,13 @@ func NewFileClass(provider ClassProvider) Class {
 			path, _ = filepath.Abs(arg1)
 		}
 
-		return NewString(path, provider), nil
+		return NewString(path, provider, singletonProvider), nil
 	}))
 
-	f.AddMethod(NewNativeMethod("dirname", provider, func(self Value, args ...Value) (Value, error) {
+	f.AddMethod(NewNativeMethod("dirname", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		filename := args[0].(*StringValue).String()
 
-		return NewString(filepath.Base(filename), provider), nil
+		return NewString(filepath.Base(filename), provider, singletonProvider), nil
 	}))
 
 	return f
@@ -54,6 +54,6 @@ func (file *fileClass) String() string {
 	return "File"
 }
 
-func (file *fileClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (file *fileClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	return nil, nil
 }

@@ -10,14 +10,18 @@ type Method interface {
 
 type nativeMethod struct {
 	valueStub
-	name string
-	body func(self Value, args ...Value) (Value, error)
+	name              string
+	body              func(self Value, args ...Value) (Value, error)
+	classProvider     ClassProvider
+	singletonProvider SingletonProvider
 }
 
-func NewNativeMethod(name string, provider ClassProvider, body func(self Value, args ...Value) (Value, error)) Method {
+func NewNativeMethod(name string, provider ClassProvider, singletonProvider SingletonProvider, body func(self Value, args ...Value) (Value, error)) Method {
 	m := &nativeMethod{
-		name: name,
-		body: body,
+		name:              name,
+		body:              body,
+		classProvider:     provider,
+		singletonProvider: singletonProvider,
 	}
 	m.class = provider.ClassWithName("Method")
 	m.initialize()

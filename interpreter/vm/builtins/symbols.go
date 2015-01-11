@@ -30,7 +30,7 @@ func (c *symbolClass) Name() string {
 	return "Symbol"
 }
 
-func (c *symbolClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (c *symbolClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	return nil, errors.New("undefined method 'new' for Symbol:Class")
 }
 

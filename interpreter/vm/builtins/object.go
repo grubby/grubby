@@ -46,7 +46,7 @@ type object struct {
 	valueStub
 }
 
-func (obj *ObjectClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (obj *ObjectClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	o := &object{}
 	o.initialize()
 	o.class = obj

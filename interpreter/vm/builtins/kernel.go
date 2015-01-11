@@ -8,12 +8,12 @@ type kernel struct {
 	instanceMethods []Method
 }
 
-func NewGlobalKernelModule(provider ClassProvider) Module {
+func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonProvider) Module {
 	k := &kernel{}
 	k.initialize()
 	k.class = provider.ClassWithName("Module")
 
-	k.AddMethod(NewNativeMethod("puts", provider, func(self Value, args ...Value) (Value, error) {
+	k.AddMethod(NewNativeMethod("puts", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			os.Stdout.Write([]byte(arg.String() + "\n"))
 		}

@@ -22,6 +22,7 @@ type vm struct {
 	CurrentSymbols map[string]Value
 	CurrentClasses map[string]Class
 	CurrentModules map[string]Module
+	singletons     map[string]Value
 
 	localVariableStack *localVariableStack
 }
@@ -42,6 +43,7 @@ type VM interface {
 	Modules() map[string]Module
 
 	ClassProvider
+	SingletonProvider
 }
 
 func NewVM(rubyHome, name string) VM {
@@ -53,25 +55,26 @@ func NewVM(rubyHome, name string) VM {
 		CurrentSymbols:     make(map[string]Value),
 		CurrentModules:     make(map[string]Module),
 		localVariableStack: newLocalVariableStack(),
+		singletons:         make(map[string]Value),
 	}
 	vm.registerBuiltinClassesAndModules()
 
-	loadPath, _ := vm.CurrentClasses["Array"].New(vm)
-	loadPath.(*Array).Append(NewString(filepath.Join(rubyHome, "lib"), vm))
+	loadPath, _ := vm.CurrentClasses["Array"].New(vm, vm)
+	loadPath.(*Array).Append(NewString(filepath.Join(rubyHome, "lib"), vm, vm))
 
 	vm.CurrentGlobals["LOAD_PATH"] = loadPath
 	vm.CurrentGlobals[":"] = loadPath
-	vm.ObjectSpace["ARGV"], _ = vm.CurrentClasses["Array"].New(vm)
+	vm.ObjectSpace["ARGV"], _ = vm.CurrentClasses["Array"].New(vm, vm)
 
-	main, _ := vm.CurrentClasses["Object"].New(vm)
-	main.AddMethod(NewNativeMethod("to_s", vm, func(self Value, args ...Value) (Value, error) {
-		return NewString("main", vm), nil
+	main, _ := vm.CurrentClasses["Object"].New(vm, vm)
+	main.AddMethod(NewNativeMethod("to_s", vm, vm, func(self Value, args ...Value) (Value, error) {
+		return NewString("main", vm, vm), nil
 	}))
-	main.AddMethod(NewNativeMethod("require", vm, func(self Value, args ...Value) (Value, error) {
+	main.AddMethod(NewNativeMethod("require", vm, vm, func(self Value, args ...Value) (Value, error) {
 		fileName := args[0].(*StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
-			return vm.CurrentClasses["False"].New(vm)
+			return vm.singletons["false"], nil
 		}
 
 		for _, pathStr := range loadPath.(*Array).Members() {
@@ -96,7 +99,7 @@ func NewVM(rubyHome, name string) VM {
 					return nil, rubyErr
 				}
 
-				return vm.CurrentClasses["True"].New(vm)
+				return vm.singletons["true"], nil
 			}
 		}
 
@@ -123,8 +126,8 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 
 	moduleClass := NewModuleClass(vm)
 	vm.CurrentClasses["Module"] = moduleClass
-	vm.CurrentModules["Comparable"] = NewComparableModule(vm)
-	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm)
+	vm.CurrentModules["Comparable"] = NewComparableModule(vm, vm)
+	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm, vm)
 	vm.CurrentModules["Process"] = NewProcessModule(vm)
 
 	/* BEGIN RUNTIME TRICKERY
@@ -143,13 +146,17 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["Array"] = NewArrayClass(vm)
 	vm.CurrentClasses["Hash"] = NewHashClass(vm)
 	vm.CurrentClasses["True"] = NewTrueClass(vm)
-	vm.CurrentClasses["File"] = NewFileClass(vm)
+	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
 	vm.CurrentClasses["False"] = NewFalseClass(vm)
-	vm.CurrentClasses["Nil"] = NewNilClass(vm)
+	vm.CurrentClasses["NilClass"] = NewNilClass(vm)
 	vm.CurrentClasses["String"] = NewStringClass(vm)
 	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm)
 	vm.CurrentClasses["Float"] = NewFloatClass(vm)
 	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm)
+
+	vm.singletons["nil"], _ = vm.CurrentClasses["NilClass"].New(vm, vm)
+	vm.singletons["true"], _ = vm.CurrentClasses["True"].New(vm, vm)   // should be TrueClass
+	vm.singletons["false"], _ = vm.CurrentClasses["False"].New(vm, vm) // should be FalseClass
 }
 
 func (vm *vm) MustGet(key string) Value {
@@ -289,13 +296,13 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				return returnValue, returnErr
 			}
 
-			contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, func(self Value, args ...Value) (Value, error) {
+			contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, vm, func(self Value, args ...Value) (Value, error) {
 				return m.Execute(self, args...)
 			}))
 
 		case ast.ModuleDecl:
 			moduleNode := statement.(ast.ModuleDecl)
-			theModule := NewModule(moduleNode.Name, vm)
+			theModule := NewModule(moduleNode.Name, vm, vm)
 			vm.CurrentModules[moduleNode.Name] = theModule
 
 			_, err := vm.executeWithContext(theModule, moduleNode.Body...)
@@ -307,7 +314,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 
 		case ast.ClassDecl:
 			classNode := statement.(ast.ClassDecl)
-			theClass := NewUserDefinedClass(classNode.Name, vm)
+			theClass := NewUserDefinedClass(classNode.Name, vm, vm)
 			vm.CurrentClasses[classNode.Name] = theClass
 
 			_, err := vm.executeWithContext(theClass, classNode.Body...)
@@ -353,15 +360,17 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				}
 			}
 
+		case ast.Nil:
+			returnValue = vm.singletons["nil"]
 		case ast.SimpleString:
-			returnValue = NewString(statement.(ast.SimpleString).Value, vm)
+			returnValue = NewString(statement.(ast.SimpleString).Value, vm, vm)
 		case ast.InterpolatedString:
-			returnValue = NewString(statement.(ast.InterpolatedString).Value, vm)
+			returnValue = NewString(statement.(ast.InterpolatedString).Value, vm, vm)
 		case ast.Boolean:
 			if statement.(ast.Boolean).Value {
-				returnValue, returnErr = vm.CurrentClasses["True"].New(vm)
+				returnValue = vm.singletons["true"]
 			} else {
-				returnValue, returnErr = vm.CurrentClasses["False"].New(vm)
+				returnValue = vm.singletons["false"]
 			}
 		case ast.GlobalVariable:
 			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
@@ -422,7 +431,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			}
 
 			if target == nil {
-				nilValue, _ := vm.CurrentClasses["Nil"].New(vm)
+				nilValue := vm.singletons["nil"]
 				return nil, NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
 			}
 
@@ -475,7 +484,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			}
 
 		case ast.FileNameConstReference:
-			returnValue = NewString(vm.currentFilename, vm)
+			returnValue = NewString(vm.currentFilename, vm, vm)
 		case ast.Begin:
 			begin := statement.(ast.Begin)
 			_, err := vm.executeWithContext(context, begin.Body...)
@@ -505,7 +514,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				returnErr = err
 			}
 		case ast.Array:
-			arrayValue, _ := vm.CurrentClasses["Array"].New(vm)
+			arrayValue, _ := vm.CurrentClasses["Array"].New(vm, vm)
 			array := arrayValue.(*Array)
 			for _, node := range statement.(ast.Array).Nodes {
 				value, err := vm.executeWithContext(context, node)
@@ -519,7 +528,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue = array
 
 		case ast.Hash:
-			hashValue, _ := vm.CurrentClasses["Hash"].New(vm)
+			hashValue, _ := vm.CurrentClasses["Hash"].New(vm, vm)
 			hash := hashValue.(*Hash)
 			for _, keyPair := range statement.(ast.Hash).Pairs {
 				key, err := vm.executeWithContext(context, keyPair.Key)
@@ -554,4 +563,9 @@ func (vm *vm) ClassWithName(name string) Class {
 // ArgEvaluator
 func (vm *vm) EvaluateArgInContext(arg ast.Node, context Value) (Value, error) {
 	return vm.executeWithContext(context, arg)
+}
+
+// SingletonProvider
+func (vm *vm) SingletonWithName(name string) Value {
+	return vm.singletons[name]
 }

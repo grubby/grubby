@@ -22,14 +22,14 @@ func (klass *HashClass) AddInstanceMethod(m Method) {
 	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
-func (klass *HashClass) New(provider ClassProvider, args ...Value) (Value, error) {
+func (klass *HashClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	a := &Hash{}
 	a.initialize()
 	a.class = klass
 	a.hash = make(map[Value]Value)
 
-	a.AddMethod(NewNativeMethod("keys", provider, func(self Value, args ...Value) (Value, error) {
-		o, _ := klass.provider.ClassWithName("Array").New(provider)
+	a.AddMethod(NewNativeMethod("keys", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		o, _ := klass.provider.ClassWithName("Array").New(provider, singletonProvider)
 		keys := o.(*Array)
 		for key := range self.(*Hash).hash {
 			keys.Append(key)
@@ -37,8 +37,8 @@ func (klass *HashClass) New(provider ClassProvider, args ...Value) (Value, error
 
 		return keys, nil
 	}))
-	a.AddMethod(NewNativeMethod("values", provider, func(self Value, args ...Value) (Value, error) {
-		o, _ := klass.provider.ClassWithName("Array").New(provider)
+	a.AddMethod(NewNativeMethod("values", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		o, _ := klass.provider.ClassWithName("Array").New(provider, singletonProvider)
 		values := o.(*Array)
 		for key := range self.(*Hash).hash {
 			values.Append(self.(*Hash).hash[key])
@@ -47,7 +47,7 @@ func (klass *HashClass) New(provider ClassProvider, args ...Value) (Value, error
 		return values, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("[]=", provider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("[]=", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		self.(*Hash).hash[args[0]] = args[1]
 		return args[1], nil
 	}))
