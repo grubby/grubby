@@ -21,12 +21,30 @@ type ModuleClass struct {
 	instanceMethods map[string]Method
 }
 
-func NewModuleClass(provider ClassProvider) Class {
+func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
 	c := &ModuleClass{}
 	c.initialize()
 	c.instanceMethods = make(map[string]Method, 0)
-	c.class = provider.ClassWithName("Class")
-	c.superClass = provider.ClassWithName("Object")
+	c.class = classProvider.ClassWithName("Class")
+	c.superClass = classProvider.ClassWithName("Object")
+
+	c.AddMethod(NewNativeMethod("private_class_method", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		methodName, ok := args[0].(*symbolValue)
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("TypeError: %v is not a symbol", args[0]))
+		}
+
+		method, err := self.Method(methodName.String())
+		if err != nil {
+			panic(fmt.Sprintf("%#v", self))
+			return nil, err
+		}
+
+		self.RemoveMethod(method)
+		self.AddPrivateMethod(method)
+
+		return methodName, nil
+	}))
 
 	return c
 }

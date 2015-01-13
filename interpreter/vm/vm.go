@@ -124,7 +124,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	classClass := NewClassClass(vm)
 	vm.CurrentClasses["Class"] = classClass
 
-	moduleClass := NewModuleClass(vm)
+	moduleClass := NewModuleClass(vm, vm)
 	vm.CurrentClasses["Module"] = moduleClass
 	vm.CurrentModules["Comparable"] = NewComparableModule(vm, vm)
 	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm, vm)
@@ -320,6 +320,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			_, err := vm.executeWithContext(theClass, classNode.Body...)
 			if err != nil {
 				returnErr = err
+			} else {
+				returnValue = theClass
 			}
 
 		case ast.FuncDecl:
@@ -347,7 +349,12 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			} else {
 				switch context.(type) {
 				case Class:
-					context.(Class).AddInstanceMethod(method)
+					_, ok := funcNode.Target.(ast.Self)
+					if ok {
+						context.(Class).AddMethod(method)
+					} else {
+						context.(Class).AddInstanceMethod(method)
+					}
 				case Module:
 					_, ok := funcNode.Target.(ast.Self)
 					if ok {

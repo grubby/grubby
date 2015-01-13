@@ -104,6 +104,10 @@ func (valueStub *valueStub) AddMethod(m Method) {
 	valueStub.eigenclass_methods[m.Name()] = m
 }
 
+func (valueStub *valueStub) RemoveMethod(m Method) {
+	delete(valueStub.eigenclass_methods, m.Name())
+}
+
 func (valueStub *valueStub) AddPrivateMethod(m Method) {
 	valueStub.private_methods[m.Name()] = m
 }

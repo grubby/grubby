@@ -3,8 +3,10 @@ package vm_test
 import (
 	"os"
 	"path/filepath"
+
 	. "github.com/grubby/grubby/interpreter/vm"
 	. "github.com/grubby/grubby/interpreter/vm/builtins"
+	. "github.com/grubby/grubby/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -124,6 +126,26 @@ end
 				Expect(val.String()).To(Equal("unordainable-luthier"))
 				Expect(err).ToNot(HaveOccurred())
 			})
+		})
+	})
+
+	Describe("private methods", func() {
+		It("can be created from a public method using .private_class_method()", func() {
+			class, err := vm.Run(`
+class Foo
+  def self.bar
+  end
+
+  private_class_method :bar
+end
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+
+			_, err = class.PrivateMethod("bar")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(class).ToNot(HaveMethod("bar"))
 		})
 	})
 })

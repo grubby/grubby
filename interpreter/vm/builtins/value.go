@@ -5,6 +5,7 @@ type Value interface {
 	Class() Class
 
 	AddMethod(Method)
+	RemoveMethod(Method)
 	Method(string) (Method, error)
 	Methods() []Method
 
