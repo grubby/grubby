@@ -145,9 +145,9 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["IO"] = NewIOClass(vm)
 	vm.CurrentClasses["Array"] = NewArrayClass(vm)
 	vm.CurrentClasses["Hash"] = NewHashClass(vm)
-	vm.CurrentClasses["True"] = NewTrueClass(vm)
+	vm.CurrentClasses["TrueClass"] = NewTrueClass(vm)
 	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
-	vm.CurrentClasses["False"] = NewFalseClass(vm)
+	vm.CurrentClasses["FalseClass"] = NewFalseClass(vm)
 	vm.CurrentClasses["NilClass"] = NewNilClass(vm)
 	vm.CurrentClasses["String"] = NewStringClass(vm)
 	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm)
@@ -155,8 +155,8 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm)
 
 	vm.singletons["nil"], _ = vm.CurrentClasses["NilClass"].New(vm, vm)
-	vm.singletons["true"], _ = vm.CurrentClasses["True"].New(vm, vm)   // should be TrueClass
-	vm.singletons["false"], _ = vm.CurrentClasses["False"].New(vm, vm) // should be FalseClass
+	vm.singletons["true"], _ = vm.CurrentClasses["TrueClass"].New(vm, vm)
+	vm.singletons["false"], _ = vm.CurrentClasses["FalseClass"].New(vm, vm)
 }
 
 func (vm *vm) MustGet(key string) Value {
