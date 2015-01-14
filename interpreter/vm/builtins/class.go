@@ -86,7 +86,9 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 	}
 	c.initialize()
 	c.class = provider.ClassWithName("Class")
-	c.superClass = nil // FIXME: should be provided as an argument
+
+	// FIXME: should be provided as an argument
+	c.superClass = provider.ClassWithName("Object")
 
 	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {

@@ -148,4 +148,15 @@ end
 			Expect(class).ToNot(HaveMethod("bar"))
 		})
 	})
+
+	Describe("superclasses", func() {
+		It("defaults to Object", func() {
+			class, err := vm.Run(`
+class Foo
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(class.(Class).SuperClass().String()).To(Equal("Object"))
+		})
+	})
 })
