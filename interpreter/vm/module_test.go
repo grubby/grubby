@@ -1,12 +1,12 @@
 package vm_test
 
 import (
+	"os"
+	"path/filepath"
 	. "github.com/grubby/grubby/interpreter/vm"
 	. "github.com/grubby/grubby/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
-	"path/filepath"
 )
 
 var _ = Describe("modules", func() {
@@ -29,6 +29,16 @@ end
 
 		Expect(err).ToNot(HaveOccurred())
 		Expect(vm.Modules()["Foo"]).ToNot(BeNil())
+	})
+
+	It("has the Kernel#require method", func() {
+		SetupLoadPathWithAFileToRequire(vm)
+		_, err := vm.Run(`
+module Foo
+  require 'foo'
+end
+`)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("has a .module_function method", func() {

@@ -70,13 +70,39 @@ func NewVM(rubyHome, name string) VM {
 	main.AddMethod(NewNativeMethod("to_s", vm, vm, func(self Value, args ...Value) (Value, error) {
 		return NewString("main", vm, vm), nil
 	}))
-	main.AddMethod(NewNativeMethod("require", vm, vm, func(self Value, args ...Value) (Value, error) {
+	vm.ObjectSpace["main"] = main
+
+	return vm
+}
+
+func (vm *vm) registerBuiltinClassesAndModules() {
+	vm.CurrentClasses = map[string]Class{}
+	vm.CurrentModules = map[string]Module{}
+
+	basicObjectClass := NewBasicObjectClass(vm)
+	vm.CurrentClasses["BasicObject"] = basicObjectClass
+
+	objectClass := NewGlobalObjectClass(vm)
+	vm.CurrentClasses["Object"] = objectClass
+
+	classClass := NewClassClass(vm)
+	vm.CurrentClasses["Class"] = classClass
+
+	moduleClass := NewModuleClass(vm, vm)
+	vm.CurrentClasses["Module"] = moduleClass
+	vm.CurrentModules["Comparable"] = NewComparableModule(vm, vm)
+	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm, vm)
+	vm.CurrentModules["Process"] = NewProcessModule(vm)
+
+	// FIXME: this should be private, but method resolution fails
+	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("require", vm, vm, func(self Value, args ...Value) (Value, error) {
 		fileName := args[0].(*StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
 			return vm.singletons["false"], nil
 		}
 
+		loadPath := vm.CurrentGlobals["LOAD_PATH"]
 		for _, pathStr := range loadPath.(*Array).Members() {
 			path := pathStr.(*StringValue)
 			fullPath := filepath.Join(path.String(), fileName+".rb")
@@ -106,29 +132,6 @@ func NewVM(rubyHome, name string) VM {
 		errorMessage := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
 		return nil, NewLoadError(errorMessage, vm.stack.String())
 	}))
-	vm.ObjectSpace["main"] = main
-
-	return vm
-}
-
-func (vm *vm) registerBuiltinClassesAndModules() {
-	vm.CurrentClasses = map[string]Class{}
-	vm.CurrentModules = map[string]Module{}
-
-	basicObjectClass := NewBasicObjectClass(vm)
-	vm.CurrentClasses["BasicObject"] = basicObjectClass
-
-	objectClass := NewGlobalObjectClass(vm)
-	vm.CurrentClasses["Object"] = objectClass
-
-	classClass := NewClassClass(vm)
-	vm.CurrentClasses["Class"] = classClass
-
-	moduleClass := NewModuleClass(vm, vm)
-	vm.CurrentClasses["Module"] = moduleClass
-	vm.CurrentModules["Comparable"] = NewComparableModule(vm, vm)
-	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm, vm)
-	vm.CurrentModules["Process"] = NewProcessModule(vm)
 
 	/* BEGIN RUNTIME TRICKERY
 	There's a cycle in ruby's builtin object graph
@@ -498,7 +501,13 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 
 			if err != nil {
 				matchingRescue := false
-				rubyErr := err.(Value)
+
+				rubyErr, ok := err.(Value)
+				if !ok {
+					panic(context)
+					return nil, err
+				}
+
 				for _, rescue := range begin.Rescue {
 					if matchingRescue {
 						break
