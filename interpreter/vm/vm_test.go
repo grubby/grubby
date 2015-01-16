@@ -473,6 +473,27 @@ end
 			})
 		})
 
+		Context("when it extends a module", func() {
+			It("makes the modules methods available on itself", func() {
+				_, err := vm.Run(`
+module Foo
+  def publication
+    'Chichimec-lipochrome'
+  end
+end
+
+class Bar
+  extend Foo
+end
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				barClass := vm.MustGetClass("Bar")
+				Expect(barClass).To(HaveMethod("publication"))
+			})
+		})
+
 		Context("when it includes a module", func() {
 			It("makes the modules methods available on its instances", func() {
 				_, err := vm.Run(`

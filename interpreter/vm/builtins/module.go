@@ -100,6 +100,16 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 		return c, nil
 	}))
 
+	c.AddMethod(NewNativeMethod("extend", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		for _, module := range args {
+			for _, method := range module.Methods() {
+				self.AddMethod(method)
+			}
+		}
+
+		return c, nil
+	}))
+
 	c.AddMethod(NewNativeMethod("module_function", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		if len(args) != 1 {
 			return nil, errors.New("expected exactly one arg")

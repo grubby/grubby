@@ -97,6 +97,17 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 
 		return c, nil
 	}))
+
+	c.AddMethod(NewNativeMethod("extend", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		for _, module := range args {
+			for _, method := range module.(Module).InstanceMethods() {
+				self.AddMethod(method)
+			}
+		}
+
+		return c, nil
+	}))
+
 	c.AddMethod(NewNativeMethod("new", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		instance, err := c.New(provider, singletonProvider, args...)
 		if err != nil {

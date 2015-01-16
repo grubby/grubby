@@ -83,7 +83,7 @@ func (valueStub *valueStub) PrivateMethod(name string) (Method, error) {
 }
 
 func (valueStub *valueStub) Methods() []Method {
-	values := make([]Method, len(valueStub.eigenclass_methods))
+	values := make([]Method, 0, len(valueStub.eigenclass_methods))
 	for _, m := range valueStub.eigenclass_methods {
 		values = append(values, m)
 	}
