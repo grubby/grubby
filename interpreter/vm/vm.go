@@ -291,7 +291,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.Alias:
 			// FIXME: assumes that the context will be a module, but could also be a class
 			aliasNode := statement.(ast.Alias)
-			contextModule := context.(*RubyModule)
+			contextModule := context.(Module)
 
 			m, err := contextModule.InstanceMethod(aliasNode.From.Name)
 			if err != nil {

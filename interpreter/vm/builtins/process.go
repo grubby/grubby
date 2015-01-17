@@ -3,7 +3,7 @@ package builtins
 type processModule struct {
 	valueStub
 	classStub
-	instanceMethods []Method
+	moduleStub
 }
 
 func NewProcessModule(provider ClassProvider) Module {
@@ -19,13 +19,4 @@ func (c *processModule) String() string {
 
 func (c *processModule) Name() string {
 	return "Process"
-}
-
-func (c *processModule) AddInstanceMethod(method Method) {
-	c.instanceMethods = append(c.instanceMethods, method)
-}
-
-// FIXME: this should be in a module_stub
-func (module *processModule) InstanceMethods() []Method {
-	return module.instanceMethods
 }

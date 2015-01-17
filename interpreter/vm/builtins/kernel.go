@@ -5,7 +5,7 @@ import "os"
 type kernel struct {
 	valueStub
 	classStub
-	instanceMethods []Method
+	moduleStub
 }
 
 func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonProvider) Module {
@@ -30,13 +30,4 @@ func (kernel *kernel) String() string {
 
 func (kernel *kernel) Name() string {
 	return "Kernel"
-}
-
-func (kernel *kernel) AddInstanceMethod(m Method) {
-	kernel.instanceMethods = append(kernel.instanceMethods, m)
-}
-
-// FIXME: this should be in a module_stub
-func (kernel *kernel) InstanceMethods() []Method {
-	return kernel.instanceMethods
 }

@@ -10,6 +10,7 @@ type Module interface {
 	Name() string
 	AddInstanceMethod(Method)
 	InstanceMethods() []Method
+	InstanceMethod(string) (Method, error)
 
 	Value
 }
