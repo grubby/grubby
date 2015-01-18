@@ -4,12 +4,9 @@ import "errors"
 
 // abstract class interface
 type Class interface {
-	Value
+	Module // includes Value
 
 	New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error)
-	Name() string
-
-	AddInstanceMethod(Method)
 
 	SuperClass() Class
 
@@ -22,7 +19,6 @@ type Class interface {
 type ClassValue struct {
 	valueStub
 	classStub
-	instanceMethods []Method
 
 	provider ClassProvider
 }
@@ -56,17 +52,11 @@ func (c ClassValue) String() string {
 	return "Class"
 }
 
-func (c ClassValue) AddInstanceMethod(m Method) {
-	c.instanceMethods = append(c.instanceMethods, m)
-}
-
 // user defined class type
 type UserDefinedClass struct {
 	name string
 	valueStub
 	classStub
-
-	instanceMethods map[string]Method
 
 	attr_readers []string
 	attr_writers []string
@@ -81,8 +71,7 @@ type UserDefinedClassInstance struct {
 
 func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider SingletonProvider) Class {
 	c := &UserDefinedClass{
-		name:            name,
-		instanceMethods: make(map[string]Method),
+		name: name,
 	}
 	c.initialize()
 	c.class = provider.ClassWithName("Class")
@@ -223,10 +212,6 @@ func (c UserDefinedClass) Name() string {
 
 func (c UserDefinedClass) String() string {
 	return c.name
-}
-
-func (c *UserDefinedClass) AddInstanceMethod(m Method) {
-	c.instanceMethods[m.Name()] = m
 }
 
 func (c *UserDefinedClass) Class() Class {

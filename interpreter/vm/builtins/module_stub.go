@@ -19,6 +19,10 @@ func (m *moduleStub) InstanceMethod(name string) (Method, error) {
 }
 
 func (m *moduleStub) AddInstanceMethod(method Method) {
+	if m.instanceMethods == nil {
+		m.instanceMethods = make(map[string]Method)
+	}
+
 	m.instanceMethods[method.Name()] = method
 }
 

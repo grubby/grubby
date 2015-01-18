@@ -8,8 +8,6 @@ import (
 type floatClass struct {
 	valueStub
 	classStub
-
-	instanceMethods []Method
 }
 
 func NewFloatClass(provider ClassProvider) Class {
@@ -19,10 +17,6 @@ func NewFloatClass(provider ClassProvider) Class {
 	class.superClass = provider.ClassWithName("Numeric")
 
 	return class
-}
-
-func (class *floatClass) AddInstanceMethod(method Method) {
-	class.instanceMethods = append(class.instanceMethods, method)
 }
 
 func (c *floatClass) String() string {

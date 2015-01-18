@@ -3,7 +3,6 @@ package builtins
 type ObjectClass struct {
 	valueStub
 	classStub
-	instanceMethods []Method
 
 	provider ClassProvider
 }
@@ -36,10 +35,6 @@ func (obj *ObjectClass) String() string {
 
 func (obj *ObjectClass) Name() string {
 	return "Object"
-}
-
-func (obj *ObjectClass) AddInstanceMethod(method Method) {
-	obj.instanceMethods = append(obj.instanceMethods, method)
 }
 
 type object struct {

@@ -5,8 +5,6 @@ import "errors"
 type symbolClass struct {
 	valueStub
 	classStub
-
-	instanceMethods []Method
 }
 
 func NewSymbolClass(provider ClassProvider) Class {
@@ -16,10 +14,6 @@ func NewSymbolClass(provider ClassProvider) Class {
 	s.superClass = provider.ClassWithName("Object")
 
 	return s
-}
-
-func (class *symbolClass) AddInstanceMethod(method Method) {
-	class.instanceMethods = append(class.instanceMethods, method)
 }
 
 func (c *symbolClass) String() string {

@@ -3,7 +3,6 @@ package builtins
 type BasicObjectClass struct {
 	valueStub
 	classStub
-	instanceMethods []Method
 
 	provider ClassProvider
 }
@@ -29,10 +28,6 @@ func (obj *BasicObjectClass) String() string {
 
 func (obj *BasicObjectClass) Name() string {
 	return "BasicObject"
-}
-
-func (obj *BasicObjectClass) AddInstanceMethod(method Method) {
-	obj.instanceMethods = append(obj.instanceMethods, method)
 }
 
 func (obj *BasicObjectClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {

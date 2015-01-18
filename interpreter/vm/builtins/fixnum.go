@@ -8,8 +8,6 @@ import (
 type fixnumClass struct {
 	valueStub
 	classStub
-
-	instanceMethods []Method
 }
 
 func NewFixnumClass(provider ClassProvider) Class {
@@ -19,10 +17,6 @@ func NewFixnumClass(provider ClassProvider) Class {
 	class.superClass = provider.ClassWithName("Integer")
 
 	return class
-}
-
-func (class *fixnumClass) AddInstanceMethod(method Method) {
-	class.instanceMethods = append(class.instanceMethods, method)
 }
 
 func (c *fixnumClass) String() string {

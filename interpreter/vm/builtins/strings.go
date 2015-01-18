@@ -5,8 +5,6 @@ type StringClass struct {
 	classStub
 
 	provider ClassProvider
-
-	instanceMethods []Method
 }
 
 func NewStringClass(provider ClassProvider) Class {
@@ -36,10 +34,6 @@ func (class *StringClass) New(provider ClassProvider, singletonProvider Singleto
 	}))
 
 	return str, nil
-}
-
-func (class *StringClass) AddInstanceMethod(method Method) {
-	class.instanceMethods = append(class.instanceMethods, method)
 }
 
 type StringValue struct {

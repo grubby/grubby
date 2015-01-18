@@ -159,4 +159,12 @@ end
 			Expect(class.(Class).SuperClass().String()).To(Equal("Object"))
 		})
 	})
+
+	It("is a kind of module", func() {
+		classClass := vm.MustGetClass("Class")
+		Expect(classClass.(Class).SuperClass().String()).To(Equal("Module"))
+
+		_, ok := classClass.(Module)
+		Expect(ok).To(BeTrue())
+	})
 })

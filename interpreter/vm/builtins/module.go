@@ -19,13 +19,11 @@ type Module interface {
 type ModuleClass struct {
 	valueStub
 	classStub
-	instanceMethods map[string]Method
 }
 
 func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
 	c := &ModuleClass{}
 	c.initialize()
-	c.instanceMethods = make(map[string]Method, 0)
 	c.class = classProvider.ClassWithName("Class")
 	c.superClass = classProvider.ClassWithName("Object")
 
@@ -62,33 +60,19 @@ func (c ModuleClass) String() string {
 	return "Module"
 }
 
-func (c *ModuleClass) AddInstanceMethod(m Method) {
-	c.instanceMethods[m.Name()] = m
-}
-
-func (c *ModuleClass) InstanceMethods() []Method {
-	methods := []Method{}
-	for _, m := range c.instanceMethods {
-		methods = append(methods, m)
-	}
-
-	return methods
-}
-
 // user defined module type
 type RubyModule struct {
 	name string
 	valueStub
+	moduleStub
 
 	includedModules []Value
-	instanceMethods map[string]Method
 }
 
 func NewModule(name string, provider ClassProvider, singletonProvider SingletonProvider) Module {
 	c := &RubyModule{
 		name:            name,
 		includedModules: make([]Value, 0),
-		instanceMethods: make(map[string]Method, 0),
 	}
 	c.initialize()
 	c.class = provider.ClassWithName("Module")
@@ -121,16 +105,9 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 			return nil, errors.New("expected method name to be a symbol")
 		}
 
-		var instanceMethod Method
-		for name, m := range self.(*RubyModule).instanceMethods {
-			if name == symbol.String() {
-				instanceMethod = m
-				break
-			}
-		}
-
-		if instanceMethod == nil {
-			return nil, errors.New(fmt.Sprintf("method '%s' does not exist", symbol.String()))
+		instanceMethod, err := self.(*RubyModule).InstanceMethod(symbol.String())
+		if err != nil {
+			return nil, err
 		}
 
 		self.(*RubyModule).AddMethod(instanceMethod)
@@ -143,28 +120,6 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 
 func (m RubyModule) Name() string {
 	return m.name
-}
-
-func (m *RubyModule) AddInstanceMethod(method Method) {
-	m.instanceMethods[method.Name()] = method
-}
-
-func (m *RubyModule) InstanceMethods() []Method {
-	methods := []Method{}
-	for _, m := range m.instanceMethods {
-		methods = append(methods, m)
-	}
-
-	return methods
-}
-
-func (m *RubyModule) InstanceMethod(name string) (Method, error) {
-	method := m.instanceMethods[name]
-	if method == nil {
-		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
-	}
-
-	return method, nil
 }
 
 func (m *RubyModule) String() string {

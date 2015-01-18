@@ -3,6 +3,8 @@ package builtins
 type classStub struct {
 	superClass        Class
 	_included_modules []Module
+
+	moduleStub
 }
 
 func (classStub *classStub) SuperClass() Class {
