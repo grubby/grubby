@@ -473,8 +473,9 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			}
 
 		case ast.Assignment:
+			var err error
 			assignment := statement.(ast.Assignment)
-			returnValue, err := vm.executeWithContext(context, assignment.RHS)
+			returnValue, err = vm.executeWithContext(context, assignment.RHS)
 			if err != nil {
 				return nil, err
 			}
@@ -563,6 +564,19 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			}
 
 			returnValue = hash
+		case ast.Ternary:
+			ternary := statement.(ast.Ternary)
+			value, err := vm.executeWithContext(context, ternary.Condition)
+			if err != nil {
+				returnErr = err
+			} else {
+				if value.IsTruthy() {
+					returnValue, returnErr = vm.executeWithContext(context, ternary.True)
+				} else {
+					returnValue, returnErr = vm.executeWithContext(context, ternary.False)
+				}
+
+			}
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}

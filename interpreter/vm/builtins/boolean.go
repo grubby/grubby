@@ -26,12 +26,12 @@ func (t *trueClass) Name() string {
 	return "True"
 }
 
-type true struct {
+type trueInstance struct {
 	valueStub
 }
 
 func (obj *trueClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
-	o := &true{}
+	o := &trueInstance{}
 	o.initialize()
 	o.class = obj
 
@@ -64,14 +64,18 @@ func (f *falseClass) Name() string {
 	return "False"
 }
 
-type false struct {
+type falseInstance struct {
 	valueStub
 }
 
 func (obj *falseClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
-	o := &false{}
+	o := &falseInstance{}
 	o.initialize()
 	o.class = obj
 
 	return o, nil
+}
+
+func (f *falseInstance) IsTruthy() bool {
+	return false
 }

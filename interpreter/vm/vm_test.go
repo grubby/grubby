@@ -522,4 +522,20 @@ end
 			})
 		})
 	})
+
+	Describe("the ternary operator", func() {
+		It("picks the first value when it is truthy", func() {
+			val, err := vm.Run("foo = true ? 'a' : 'b'")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val.String()).To(Equal("a"))
+		})
+
+		It("picks the second value when the first is falsy", func() {
+			val, err := vm.Run("foo = nil ? 'a' : 'b'")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val.String()).To(Equal("b"))
+		})
+	})
 })

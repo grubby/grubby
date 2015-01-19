@@ -17,4 +17,6 @@ type Value interface {
 
 	GetInstanceVariable(string) Value
 	SetInstanceVariable(string, Value)
+
+	IsTruthy() bool
 }

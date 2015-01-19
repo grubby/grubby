@@ -131,3 +131,7 @@ func (valueStub *valueStub) GetInstanceVariable(name string) Value {
 func (valueStub *valueStub) SetInstanceVariable(name string, value Value) {
 	valueStub.instance_variables[name] = value
 }
+
+func (v *valueStub) IsTruthy() bool {
+	return true
+}

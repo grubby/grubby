@@ -36,3 +36,7 @@ func (class *NilClass) New(provider ClassProvider, singletonProvider SingletonPr
 func (n *nilInstance) String() string {
 	return ""
 }
+
+func (n *nilInstance) IsTruthy() bool {
+	return false
+}
