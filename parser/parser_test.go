@@ -1482,6 +1482,25 @@ end
 			Context("with namespaces", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
+class Foo::Bar
+end
+`)
+				})
+
+				It("returns a class with the given namespace", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.ClassDecl{
+							Name:      "Bar",
+							Namespace: "Foo",
+							Body:      []ast.Node{},
+						},
+					}))
+				})
+			})
+
+			Context("with namespaces and super classes", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
 class Foo::Biz::Bar < Foo::Biz::Baz
 end
 `)

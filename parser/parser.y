@@ -683,6 +683,7 @@ class_declaration : CLASS class_name_with_modules list END
   {
     $$ = ast.ClassDecl{
        Name: $2.(ast.Class).Name,
+       Namespace: $2.(ast.Class).Namespace,
        Body: $3,
     }
   }
@@ -729,10 +730,15 @@ class_name_with_modules : CAPITAL_REF
     firstPart := $1.(ast.BareReference).Name
     fullName := strings.Join([]string{firstPart, $2.(string)}, "")
     pieces := strings.Split(fullName, "::")
+    name := pieces[len(pieces)-1]
+    var namespace []string
+    if len(pieces) > 1 {
+      namespace = pieces[0:len(pieces)-1]
+    }
 
     $$ = ast.Class{
-       Name: pieces[len(pieces)-1],
-       Namespace: strings.Join(pieces[:len(pieces)-1], "::"),
+       Name: name,
+       Namespace: strings.Join(namespace, "::"),
        IsGlobalNamespace: false,
     }
   }
