@@ -23,6 +23,19 @@ var _ = Describe("classes", func() {
 		vm = NewVM(pathToExecutable, "fake-irb-under-test")
 	})
 
+	It("can be used as a value", func() {
+		value, err := vm.Run(`
+class Foo::Bar
+end
+
+foo = Foo::Bar
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(value).ToNot(BeNil())
+		Expect(value).To(Equal(vm.MustGetClass("Foo::Bar")))
+	})
+
 	Describe(".new", func() {
 		It("returns an error when initializing the object would fail", func() {
 			_, err := vm.Run(`

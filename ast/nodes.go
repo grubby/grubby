@@ -66,10 +66,26 @@ type ClassDecl struct {
 	Body       []Node
 }
 
+func (c ClassDecl) FullName() string {
+	if c.Namespace != "" {
+		return c.Namespace + "::" + c.Name
+	} else {
+		return c.Name
+	}
+}
+
 type Class struct {
 	Name              string
 	Namespace         string
 	IsGlobalNamespace bool
+}
+
+func (c Class) FullName() string {
+	if c.Namespace != "" {
+		return c.Namespace + "::" + c.Name
+	} else {
+		return c.Name
+	}
 }
 
 type ModuleDecl struct {

@@ -196,8 +196,8 @@ func (vm *vm) Get(key string) (Value, error) {
 }
 
 func (vm *vm) GetClass(name string) (Class, error) {
-	for _, class := range vm.CurrentClasses {
-		if class.Name() == name {
+	for keyName, class := range vm.CurrentClasses {
+		if keyName == name {
 			return class, nil
 		}
 	}
@@ -206,8 +206,8 @@ func (vm *vm) GetClass(name string) (Class, error) {
 }
 
 func (vm *vm) MustGetClass(name string) Class {
-	for _, class := range vm.CurrentClasses {
-		if class.Name() == name {
+	for keyName, class := range vm.CurrentClasses {
+		if keyName == name {
 			return class
 		}
 	}
@@ -318,7 +318,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.ClassDecl:
 			classNode := statement.(ast.ClassDecl)
 			theClass := NewUserDefinedClass(classNode.Name, vm, vm)
-			vm.CurrentClasses[classNode.Name] = theClass
+			vm.CurrentClasses[classNode.FullName()] = theClass
 
 			_, err := vm.executeWithContext(theClass, classNode.Body...)
 			if err != nil {
@@ -577,6 +577,17 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				}
 
 			}
+
+		case ast.Class:
+			class := statement.(ast.Class)
+			className := class.FullName()
+			value, ok := vm.CurrentClasses[className]
+			if !ok {
+				returnErr = NewNameError(className, context.String(), context.Class().String(), vm.stack.String())
+			} else {
+				returnValue = value
+			}
+
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
