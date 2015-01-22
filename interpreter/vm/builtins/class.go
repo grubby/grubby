@@ -23,11 +23,28 @@ type ClassValue struct {
 	provider ClassProvider
 }
 
-func NewClassClass(provider ClassProvider) Class {
+func NewClassClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	c := &ClassValue{}
 	c.initialize()
 	c.class = c
 	c.provider = provider
+
+	c.AddMethod(NewNativeMethod("new", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		instance, err := self.(Class).New(provider, singletonProvider, args...)
+		if err != nil {
+			return nil, err
+		}
+
+		method, err := instance.Method("initialize")
+		if err == nil {
+			_, err = method.Execute(instance, args...)
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		return instance, nil
+	}))
 
 	return c
 }
@@ -97,22 +114,6 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("new", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
-		instance, err := c.New(provider, singletonProvider, args...)
-		if err != nil {
-			return nil, err
-		}
-
-		method, err := instance.Method("initialize")
-		if err == nil {
-			_, err = method.Execute(instance, args...)
-			if err != nil {
-				panic(err)
-			}
-		}
-
-		return instance, nil
-	}))
 	c.AddMethod(NewNativeMethod("attr_accessor", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*symbolValue)

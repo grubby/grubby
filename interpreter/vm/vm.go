@@ -85,7 +85,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	objectClass := NewGlobalObjectClass(vm)
 	vm.CurrentClasses["Object"] = objectClass
 
-	classClass := NewClassClass(vm)
+	classClass := NewClassClass(vm, vm)
 	vm.CurrentClasses["Class"] = classClass
 
 	moduleClass := NewModuleClass(vm, vm)
@@ -347,26 +347,21 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				})
 			returnValue = method
 
-			if context == vm.ObjectSpace["main"] {
+			if context == vm.ObjectSpace["main"] && funcNode.Target == nil {
 				vm.CurrentModules["Kernel"].AddPrivateMethod(method)
 			} else {
-				switch context.(type) {
-				case Class:
-					_, ok := funcNode.Target.(ast.Self)
-					if ok {
-						context.(Class).AddMethod(method)
-					} else {
-						context.(Class).AddInstanceMethod(method)
-					}
-				case Module:
-					_, ok := funcNode.Target.(ast.Self)
-					if ok {
-						context.AddMethod(method)
-					} else {
-						context.(Module).AddInstanceMethod(method)
-					}
+				switch funcNode.Target.(type) {
+				case ast.Self:
+					context.AddMethod(method)
+				case nil:
+					context.(Module).AddInstanceMethod(method)
 				default:
-					panic(fmt.Sprintf("unknown type of context: %#T", context))
+					value, err := vm.executeWithContext(context, funcNode.Target)
+					if err != nil {
+						return nil, err
+					}
+
+					value.AddMethod(method)
 				}
 			}
 

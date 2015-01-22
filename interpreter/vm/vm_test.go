@@ -538,4 +538,21 @@ end
 			Expect(val.String()).To(Equal("b"))
 		})
 	})
+
+	Describe("eigenclasses", func() {
+		It("can store instance methods for a given object", func() {
+			_, err := vm.Run(`
+object = Object.new
+
+def object.whatever
+end
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+
+			object := vm.MustGet("object")
+			Expect(object).ToNot(BeNil())
+			Expect(object).To(HaveMethod("whatever"))
+		})
+	})
 })
