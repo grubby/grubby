@@ -540,7 +540,7 @@ end
 	})
 
 	Describe("eigenclasses", func() {
-		It("can store instance methods for a given object", func() {
+		BeforeEach(func() {
 			_, err := vm.Run(`
 object = Object.new
 
@@ -549,10 +549,21 @@ end
 `)
 
 			Expect(err).ToNot(HaveOccurred())
+		})
 
+		It("can store instance methods for a given object", func() {
 			object := vm.MustGet("object")
 			Expect(object).ToNot(BeNil())
 			Expect(object).To(HaveMethod("whatever"))
+		})
+
+		It("lists its methods when Kernel#singleton_methods is invoked", func() {
+			list, err := vm.Run(`
+object.singleton_methods
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(list.(*builtins.Array).Members()).To(ContainElement(builtins.NewSymbol("whatever", vm)))
 		})
 	})
 })

@@ -21,6 +21,20 @@ func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonPr
 		return nil, nil
 	}))
 
+	k.AddMethod(NewNativeMethod("singleton_methods", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		methodsArray, err := provider.ClassWithName("Array").New(provider, singletonProvider)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, method := range self.eigenclassMethods() {
+			symbol := NewSymbol(method.Name(), provider)
+			methodsArray.(*Array).Append(symbol)
+		}
+
+		return methodsArray, nil
+	}))
+
 	return k
 }
 
