@@ -566,4 +566,26 @@ object.singleton_methods
 			Expect(list.(*builtins.Array).Members()).To(ContainElement(builtins.NewSymbol("whatever", vm)))
 		})
 	})
+
+	Describe("equality", func() {
+		Context("with the == operator", func() {
+			It("treats objects as equal when they have the same value", func() {
+				result, err := vm.Run("'foo' == 'foo'")
+
+				trueValue := vm.SingletonWithName("true")
+				falseValue := vm.SingletonWithName("false")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result).To(Equal(trueValue))
+				result, err = vm.Run("'foo' == 'bar'")
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result).To(Equal(falseValue))
+
+				result, err = vm.Run(":foo == :foo")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result).To(Equal(trueValue))
+			})
+		})
+	})
 })

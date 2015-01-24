@@ -82,7 +82,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	basicObjectClass := NewBasicObjectClass(vm)
 	vm.CurrentClasses["BasicObject"] = basicObjectClass
 
-	objectClass := NewGlobalObjectClass(vm)
+	objectClass := NewGlobalObjectClass(vm, vm)
 	vm.CurrentClasses["Object"] = objectClass
 
 	classClass := NewClassClass(vm, vm)

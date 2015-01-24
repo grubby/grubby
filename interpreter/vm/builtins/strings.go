@@ -32,6 +32,19 @@ func (class *StringClass) New(provider ClassProvider, singletonProvider Singleto
 		arg := args[0].(*StringValue)
 		return NewString(str.value+arg.value, provider, singletonProvider), nil
 	}))
+	str.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		asStr, ok := args[0].(*StringValue)
+		if !ok {
+			return singletonProvider.SingletonWithName("false"), nil
+		}
+
+		selfAsStr := self.(*StringValue)
+		if selfAsStr.value == asStr.value {
+			return singletonProvider.SingletonWithName("true"), nil
+		} else {
+			return singletonProvider.SingletonWithName("false"), nil
+		}
+	}))
 
 	return str, nil
 }

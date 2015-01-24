@@ -7,10 +7,19 @@ type ObjectClass struct {
 	provider ClassProvider
 }
 
-func NewGlobalObjectClass(provider ClassProvider) Class {
+func NewGlobalObjectClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	o := &ObjectClass{}
 	o.initialize()
 	o.provider = provider
+
+	o.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		if self == args[0] {
+			return singletonProvider.SingletonWithName("true"), nil
+		} else {
+			return singletonProvider.SingletonWithName("false"), nil
+		}
+	}))
+
 	return o
 }
 
