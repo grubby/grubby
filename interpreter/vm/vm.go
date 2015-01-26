@@ -153,6 +153,8 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["FalseClass"] = NewFalseClass(vm)
 	vm.CurrentClasses["NilClass"] = NewNilClass(vm)
 	vm.CurrentClasses["String"] = NewStringClass(vm)
+	vm.CurrentClasses["Numeric"] = NewNumericClass(vm)
+	vm.CurrentClasses["Integer"] = NewIntegerClass(vm)
 	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm)
 	vm.CurrentClasses["Float"] = NewFloatClass(vm)
 	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm)
@@ -604,4 +606,8 @@ func (vm *vm) EvaluateArgInContext(arg ast.Node, context Value) (Value, error) {
 // SingletonProvider
 func (vm *vm) SingletonWithName(name string) Value {
 	return vm.singletons[name]
+}
+
+func (vm *vm) NewSingletonWithName(name string, value Value) {
+	vm.singletons[name] = value
 }
