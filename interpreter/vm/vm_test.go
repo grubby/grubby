@@ -82,14 +82,20 @@ end`)
 		})
 	})
 
-	Describe("interpreting a number", func() {
-		It("returns a ruby Fixnum object", func() {
+	Describe("numbers", func() {
+		It("returns a ruby Fixnum for a number literal", func() {
 			val, err := vm.Run("5")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewFixnum(0, vm)))
+			Expect(val).To(BeAssignableToTypeOf(builtins.NewFixnum(0, vm, vm)))
 			Expect(val.String()).To(Equal("5"))
 			Expect(val.Class()).To(Equal(vm.MustGetClass("Fixnum")))
+		})
+
+		It("treats numbers as singletons", func() {
+			val, err := vm.Run("5 == 5")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(vm.SingletonWithName("true")))
 		})
 	})
 
@@ -413,7 +419,7 @@ foo = 0
 			Expect(err).To(HaveOccurred())
 
 			value, _ := vm.Get("foo")
-			Expect(value).To(Equal(builtins.NewFixnum(1, vm)))
+			Expect(value).To(Equal(builtins.NewFixnum(1, vm, vm)))
 		})
 	})
 

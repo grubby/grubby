@@ -36,11 +36,19 @@ type fixnumInstance struct {
 	valueStub
 }
 
-func NewFixnum(val int, provider ClassProvider) Value {
-	i := &fixnumInstance{value: val}
-	i.class = provider.ClassWithName("Fixnum")
-	i.initialize()
-	return i
+func NewFixnum(val int, provider ClassProvider, singletonProvider SingletonProvider) Value {
+	name := fmt.Sprintf("%d", val)
+	singleton := singletonProvider.SingletonWithName(name)
+	if singleton == nil {
+		i := &fixnumInstance{value: val}
+		i.class = provider.ClassWithName("Fixnum")
+		i.initialize()
+
+		singletonProvider.NewSingletonWithName(name, i)
+		return i
+	} else {
+		return singleton
+	}
 }
 
 func (fixnumInstance *fixnumInstance) Value() int {

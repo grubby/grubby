@@ -139,7 +139,7 @@ ace
 				It("takes on the default value", func() {
 					Expect(object).ToNot(BeNil())
 					Expect(object.GetInstanceVariable("foo")).To(EqualRubyString("abc"))
-					Expect(object.GetInstanceVariable("bar")).To(Equal(NewFixnum(1, vm)))
+					Expect(object.GetInstanceVariable("bar")).To(Equal(NewFixnum(1, vm, vm)))
 				})
 			})
 		})

@@ -14,4 +14,5 @@ type ClassProvider interface {
 
 type SingletonProvider interface {
 	SingletonWithName(string) Value
+	NewSingletonWithName(string, Value)
 }

@@ -382,7 +382,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.GlobalVariable:
 			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
 		case ast.ConstantInt:
-			returnValue = NewFixnum(statement.(ast.ConstantInt).Value, vm)
+			returnValue = NewFixnum(statement.(ast.ConstantInt).Value, vm, vm)
 		case ast.ConstantFloat:
 			returnValue = NewFloat(statement.(ast.ConstantFloat).Value, vm)
 		case ast.Symbol:
