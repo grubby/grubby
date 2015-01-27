@@ -75,11 +75,11 @@ func lexSlash(l StatefulRubyLexer) stateFn {
 	case tokenTypeLBracket:
 		parseAsRegex(l)
 	case tokenTypeRBracket:
-		parseAsRegex(l)
+		parseAsOperator(l)
 	case tokenTypeLBrace:
 		parseAsRegex(l)
 	case tokenTypeRBrace:
-		parseAsRegex(l)
+		parseAsOperator(l)
 	case tokenType__FILE__:
 		parseAsOperator(l)
 	case tokenType__LINE__:

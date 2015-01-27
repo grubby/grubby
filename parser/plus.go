@@ -80,11 +80,11 @@ func lexPlus(l StatefulRubyLexer) stateFn {
 	case tokenTypeLBracket:
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeRBracket:
-		l.emit(tokenTypeUnaryPlus)
+		l.emit(tokenTypeBinaryPlus)
 	case tokenTypeLBrace:
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeRBrace:
-		l.emit(tokenTypeUnaryPlus)
+		l.emit(tokenTypeBinaryPlus)
 	case tokenType__FILE__:
 		l.emit(tokenTypeBinaryPlus)
 	case tokenType__LINE__:

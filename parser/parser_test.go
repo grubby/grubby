@@ -2405,6 +2405,32 @@ File.lchmod mode & 01777, path
 				})
 			})
 
+			Context("as the target and argument of a binary operator", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("[1,2,3,4,5] - [1]")
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.Array{Nodes: []ast.Node{
+								ast.ConstantInt{Value: 1},
+								ast.ConstantInt{Value: 2},
+								ast.ConstantInt{Value: 3},
+								ast.ConstantInt{Value: 4},
+								ast.ConstantInt{Value: 5},
+							}},
+							Func: ast.BareReference{Name: "-"},
+							Args: []ast.Node{
+								ast.Array{Nodes: []ast.Node{
+									ast.ConstantInt{Value: 1},
+								}},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("of simple built-in types", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("[1,2,3,   4,5,6 ]")

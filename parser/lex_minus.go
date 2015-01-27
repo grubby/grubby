@@ -80,11 +80,11 @@ func lexMinus(l StatefulRubyLexer) stateFn {
 	case tokenTypeLBracket:
 		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeRBracket:
-		l.emit(tokenTypeUnaryMinus)
+		l.emit(tokenTypeBinaryMinus)
 	case tokenTypeLBrace:
 		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeRBrace:
-		l.emit(tokenTypeUnaryMinus)
+		l.emit(tokenTypeBinaryMinus)
 	case tokenType__FILE__:
 		l.emit(tokenTypeBinaryMinus)
 	case tokenType__LINE__:
