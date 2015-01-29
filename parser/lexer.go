@@ -83,6 +83,7 @@ const (
 	tokenTypeSubshell
 	tokenTypeOperator
 	tokenTypeQuestionMark
+	tokenTypeProcArg
 	tokenTypeFOR
 	tokenTypeWHILE
 	tokenTypeUNTIL
@@ -289,11 +290,7 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 	case r == '/':
 		return lexSlash
 	case r == '&':
-		if l.accept("&") {
-			l.emit(tokenTypeOperator)
-		} else {
-			l.emit(tokenTypeAmpersand)
-		}
+		return lexAmpersand
 	case r == '%':
 		return lexPercentSign
 	case r == '^':
@@ -680,6 +677,9 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("NamespacedModule '%s'", token.value)
 			lval.genericValue = token.value
 			return NamespacedModule
+		case tokenTypeProcArg:
+			debug("ProcArg")
+			return ProcArg
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

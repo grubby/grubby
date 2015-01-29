@@ -15,6 +15,7 @@ var Statements []ast.Node
 // as RubySymType, of which a reference is passed to the lexer.
 %union{
   operator        string
+  genericBlock    ast.Block
   genericValue    ast.Node
   genericSlice    ast.Nodes
   stringSlice     []string
@@ -33,7 +34,9 @@ var Statements []ast.Node
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
 %token <genericValue> COMMA
+
 %token <genericValue> NamespacedModule
+%token <genericValue> ProcArg
 
 // keywords
 %token <genericValue> DO
@@ -122,7 +125,7 @@ var Statements []ast.Node
 %type <genericValue> self
 %type <genericValue> hash
 %type <genericValue> range
-%type <genericValue> block
+%type <genericBlock> block
 %type <genericValue> false
 %type <genericValue> alias
 %type <genericValue> array
@@ -132,6 +135,7 @@ var Statements []ast.Node
 %type <genericValue> rescue
 %type <genericValue> ternary
 %type <genericValue> if_block
+%type <genericValue> proc_arg
 %type <genericValue> splat_arg
 %type <genericValue> assignment
 %type <genericValue> multiple_assignment;
@@ -203,7 +207,6 @@ var Statements []ast.Node
 %type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nonempty_nodes_with_commas
 %type <genericSlice> two_or_more_call_expressions
-%type <genericSlice> nodes_with_commas_and_optional_block
 %type <genericSlice> comma_delimited_args_with_default_values
 %type <genericSlice> comma_delimited_class_names
 %type <genericSlice> nodes_with_commas_and_optional_newlines
@@ -279,7 +282,8 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
-      Args: append($3, $5),
+      Args: $3,
+      OptionalBlock: $5,
     }
   }
 | SPECIAL_CHAR_REF
@@ -311,7 +315,16 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
-      Args: append($2, $3),
+      Args: $2,
+      OptionalBlock: $3,
+    }
+  }
+| REF block
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: []ast.Node{},
+      OptionalBlock: $2,
     }
   }
 | single_node DOT REF
@@ -319,14 +332,24 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     $$ = ast.CallExpression{
       Target: $1,
       Func: $3.(ast.BareReference),
-    };
+    }
   }
-| single_node DOT REF nodes_with_commas_and_optional_block
+| single_node DOT REF block
+  {
+    $$ = ast.CallExpression{
+      Target: $1,
+      Func: $3.(ast.BareReference),
+      Args: []ast.Node{},
+      OptionalBlock: $4,
+    }
+  }
+| single_node DOT REF call_args block
   {
     $$ = ast.CallExpression{
       Target: $1,
       Func: $3.(ast.BareReference),
       Args: $4,
+      OptionalBlock: $5,
     }
   }
 | single_node DOT REF call_args
@@ -336,14 +359,6 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
       Func: $3.(ast.BareReference),
       Args: $4,
     };
-  }
-| single_node DOT REF call_args block
-  {
-    $$ = ast.CallExpression{
-      Target: $1,
-      Func: $3.(ast.BareReference),
-      Args: append($4, $5),
-    }
   }
 | group DOT REF
   {
@@ -358,7 +373,8 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     $$ = ast.CallExpression{
       Target: $1,
       Func: $3.(ast.BareReference),
-      Args: []ast.Node{$4},
+      Args: []ast.Node{},
+      OptionalBlock: $4,
     }
   }
 | single_node DOT REF EQUALTO expr
@@ -372,11 +388,19 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
   }
 
 // e.g.: `puts 'whatever' do ; end;` or with_a_block { puts 'foo' }
-| REF nodes_with_commas_and_optional_block
+| REF nodes_with_commas
   {
     $$ = ast.CallExpression{
       Func: $1.(ast.BareReference),
       Args: $2,
+    }
+  }
+| REF nodes_with_commas block
+  {
+    $$ = ast.CallExpression{
+      Func: $1.(ast.BareReference),
+      Args: $2,
+      OptionalBlock: $3,
     }
   }
 | single_node LESSTHAN single_node
@@ -528,60 +552,44 @@ operator_expression : single_node OPERATOR optional_newlines single_node
 
 call_args : LPAREN nodes_with_commas RPAREN
   { $$ = $2 }
-| LPAREN nodes_with_commas COMMA optional_newlines AMPERSAND REF RPAREN
-  { $$ = append($2, ast.ProcArg{Value: $6}) }
+| LPAREN nodes_with_commas COMMA optional_newlines proc_arg RPAREN
+  { $$ = append($2, $5) }
 | nonempty_nodes_with_commas
   { $$ = $1 }
-| nonempty_nodes_with_commas COMMA optional_newlines AMPERSAND REF
-  { $$ = append($1, ast.ProcArg{Value: $5}) };
+| nonempty_nodes_with_commas COMMA optional_newlines proc_arg
+  { $$ = append($1, $4) };
 
 comma_delimited_nodes : single_node
-  { $$ = append($$, $1); }
+  { $$ = append($$, $1) }
 | comma_delimited_nodes COMMA single_node
-  { $$ = append($$, $3); };
+  { $$ = append($$, $3) };
 
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | single_node
   { $$ = append($$, $1) }
 | assignment
   { $$ = append($$, $1) }
-| AMPERSAND single_node
-  {
-    $$ = append($$, ast.CallExpression{
-      Func: ast.BareReference{Name:"to_proc"},
-      Target: $2,
-    })
-  }
+| proc_arg
+  { $$ = append($$, $1) }
 | nodes_with_commas COMMA optional_newlines single_node
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines assignment
   { $$ = append($$, $4) }
-| nodes_with_commas COMMA optional_newlines AMPERSAND single_node
-  {
-    $$ = append($$, ast.CallExpression{
-      Func: ast.BareReference{Name: "to_proc"},
-      Target: $5,
-    })
-  };
+| nodes_with_commas COMMA optional_newlines proc_arg
+  { $$ = append($$, $4) };
 
-// FIXME: this should ONLY have a block at the end (not in the middle)
-nodes_with_commas_and_optional_block : single_node
-  { $$ = append($$, $1); }
-| block
-  { $$ = append($$, $1); }
-| nodes_with_commas_and_optional_block COMMA optional_newlines single_node
-  { $$ = append($$, $4); }
-| nodes_with_commas_and_optional_block block
-  { $$ = append($$, $2); }
-| nodes_with_commas_and_optional_block COMMA optional_newlines AMPERSAND REF
-  { $$ = append($$, ast.ProcArg{Value: $5}) }
+proc_arg : ProcArg single_node
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Name: "to_proc"},
+      Target: $2,
+    }
+  };
 
 nonempty_nodes_with_commas : single_node
   { $$ = append($$, $1); }
 | nonempty_nodes_with_commas COMMA single_node
   { $$ = append($$, $3); }
-| nonempty_nodes_with_commas COMMA block
-  { $$ = append($$, $3); };
 
 
 method_declaration : DEF REF method_args list END
@@ -675,7 +683,7 @@ default_value_arg : REF
   { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsSplat: true} }
 | REF EQUALTO single_node
   { $$ = ast.MethodParam{Name: $1.(ast.BareReference), DefaultValue: $3} }
-| AMPERSAND REF
+| ProcArg REF
   { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsProc: true} };
 
 
@@ -999,24 +1007,14 @@ nodes_with_commas_and_optional_newlines : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $1) }
 | assignment
   { $$ = append($$, $1) }
-| AMPERSAND single_node
-  {
-    $$ = append($$, ast.CallExpression{
-      Func: ast.BareReference{Name:"to_proc"},
-      Target: $2,
-    })
-  }
+| proc_arg
+  { $$ = append($$, $1) }
 | nodes_with_commas_and_optional_newlines COMMA optional_newlines single_node
   { $$ = append($$, $4) }
 | nodes_with_commas_and_optional_newlines COMMA optional_newlines assignment
   { $$ = append($$, $4) }
-| nodes_with_commas_and_optional_newlines COMMA optional_newlines AMPERSAND single_node
-  {
-    $$ = append($$, ast.CallExpression{
-      Func: ast.BareReference{Name: "to_proc"},
-      Target: $5,
-    })
-  };
+| nodes_with_commas_and_optional_newlines COMMA optional_newlines proc_arg
+  { $$ = append($$, $4) };
 
 hash : LBRACE optional_newlines RBRACE
   { $$ = ast.Hash{} }
@@ -1035,15 +1033,13 @@ hash : LBRACE optional_newlines RBRACE
       pairs = append(pairs, node.(ast.HashKeyValuePair))
     }
     $$ = ast.Hash{Pairs: pairs}
-  }
-| LBRACE optional_newlines call_expression optional_newlines RBRACE
-  { $$ = ast.Block{Body: ast.Nodes{$3} } };
+  };
 
 key_value_pairs : single_node OPERATOR expr
   {
     if $2 != "=>" {
       panic("FREAKOUT")
-    }
+        }
     $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $3})
   }
 | key_value_pairs COMMA optional_newlines single_node OPERATOR expr optional_comma
@@ -1079,18 +1075,20 @@ symbol_key_value_pairs : REF COLON single_node
 block : DO list END
   { $$ = ast.Block{Body: $2} }
 | DO block_args list END
-  {
-    $$ = ast.Block{
-    Body: $3,
-    Args: $2,
-    }
-  }
-block : LBRACE optional_newlines block_args list RBRACE
-  {
-    $$ = ast.Block{Args: $3, Body: $4}
-  }
+  { $$ = ast.Block{Args: $2, Body: $3} }
 | LBRACE optional_newlines list optional_newlines RBRACE
-  { $$ = ast.Block{Body: $3} };
+  { $$ = ast.Block{Body: $3} }
+| LBRACE optional_newlines block_args list RBRACE
+  { $$ = ast.Block{Args: $3, Body: $4} }
+| LBRACE optional_newlines call_expression optional_newlines RBRACE
+  { $$ = ast.Block{Body: []ast.Node{$3}} };
+| LBRACE optional_newlines call_expression list optional_newlines RBRACE
+  {
+      head := []ast.Node{$3}
+      tail := $4
+      body := append(head, tail...)
+    $$ = ast.Block{Body: body}
+  };
 
 block_args : PIPE comma_delimited_refs PIPE
   { $$ = $2 };
@@ -1437,7 +1435,7 @@ logical_and : single_node AND optional_newlines single_node
 logical_or : single_node OR optional_newlines single_node
   { $$ = ast.WeakLogicalOr{LHS: $1, RHS: $4} };
 
-lambda : LAMBDA block { $$ = ast.Lambda{Body: $2.(ast.Block)} };
+lambda : LAMBDA block { $$ = ast.Lambda{Body: $2} };
 
 switch_statement : CASE single_node optional_newlines switch_cases END
   { $$ = ast.SwitchStatement{Condition: $2, Cases: $4} }

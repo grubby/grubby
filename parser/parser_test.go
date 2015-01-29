@@ -496,7 +496,7 @@ end
 			})
 		})
 
-		Describe("Proc", func() {
+		Describe("procs", func() {
 			Context("created with curly braces", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("Proc.new { Mock.verify_count }")
@@ -507,13 +507,12 @@ end
 						ast.CallExpression{
 							Target: ast.BareReference{Name: "Proc"},
 							Func:   ast.BareReference{Name: "new"},
-							Args: []ast.Node{
-								ast.Block{
-									Body: []ast.Node{
-										ast.CallExpression{
-											Target: ast.BareReference{Name: "Mock"},
-											Func:   ast.BareReference{Name: "verify_count"},
-										},
+							Args:   []ast.Node{},
+							OptionalBlock: ast.Block{
+								Body: []ast.Node{
+									ast.CallExpression{
+										Target: ast.BareReference{Name: "Mock"},
+										Func:   ast.BareReference{Name: "verify_count"},
 									},
 								},
 							},
@@ -526,7 +525,7 @@ end
 		Describe("call expressions", func() {
 			Context("with a value that should be converted to a proc", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("describe(&block)")
+					lexer = parser.NewLexer("describe(&blocks); explain(&:it_well)")
 				})
 
 				It("converts the argument to a proc", func() {
@@ -535,7 +534,16 @@ end
 							Func: ast.BareReference{Name: "describe"},
 							Args: []ast.Node{
 								ast.CallExpression{
-									Target: ast.BareReference{Name: "block"},
+									Target: ast.BareReference{Name: "blocks"},
+									Func:   ast.BareReference{Name: "to_proc"},
+								},
+							},
+						},
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "explain"},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Target: ast.Symbol{Name: "it_well"},
 									Func:   ast.BareReference{Name: "to_proc"},
 								},
 							},
@@ -600,7 +608,10 @@ method_with_lots_of_args('foo',
 								ast.SimpleString{Value: "foo"},
 								ast.SimpleString{Value: "bar"},
 								ast.SimpleString{Value: "baz"},
-								ast.ProcArg{Value: ast.BareReference{Name: "buz"}},
+								ast.CallExpression{
+									Func:   ast.BareReference{Name: "to_proc"},
+									Target: ast.BareReference{Name: "buz"},
+								},
 							},
 						},
 					}))
@@ -624,13 +635,13 @@ end
 							Args: []ast.Node{
 								ast.InterpolatedString{Value: "INT"},
 								ast.InterpolatedString{Value: "TERM"},
-								ast.Block{
-									Body: []ast.Node{
-										ast.CallExpression{
-											Target: ast.BareReference{Name: "MSpec"},
-											Func:   ast.BareReference{Name: "actions"},
-											Args:   []ast.Node{ast.Symbol{Name: "abort"}},
-										},
+							},
+							OptionalBlock: ast.Block{
+								Body: []ast.Node{
+									ast.CallExpression{
+										Target: ast.BareReference{Name: "MSpec"},
+										Func:   ast.BareReference{Name: "actions"},
+										Args:   []ast.Node{ast.Symbol{Name: "abort"}},
 									},
 								},
 							},
@@ -661,10 +672,9 @@ end
 								},
 							},
 							Func: ast.BareReference{Name: "times"},
-							Args: []ast.Node{
-								ast.Block{
-									Body: []ast.Node{ast.Yield{}},
-								},
+							Args: []ast.Node{},
+							OptionalBlock: ast.Block{
+								Body: []ast.Node{ast.Yield{}},
 							},
 						},
 					}))
@@ -690,13 +700,13 @@ end
 								ast.SimpleString{Value: "foo"},
 								ast.SimpleString{Value: "bar"},
 								ast.SimpleString{Value: "baz"},
-								ast.Block{
-									Args: []ast.Node{ast.BareReference{Name: "foo"}},
-									Body: []ast.Node{
-										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.BareReference{Name: "foo"}},
-										},
+							},
+							OptionalBlock: ast.Block{
+								Args: []ast.Node{ast.BareReference{Name: "foo"}},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.BareReference{Name: "foo"}},
 									},
 								},
 							},
@@ -718,7 +728,10 @@ end
 								Args: []ast.Node{
 									ast.SimpleString{Value: "foo"},
 									ast.SimpleString{Value: "bar"},
-									ast.ProcArg{Value: ast.BareReference{Name: "baz"}},
+									ast.CallExpression{
+										Func:   ast.BareReference{Name: "to_proc"},
+										Target: ast.BareReference{Name: "baz"},
+									},
 								},
 							},
 						}))
@@ -737,7 +750,10 @@ end
 								Args: []ast.Node{
 									ast.SimpleString{Value: "foo"},
 									ast.SimpleString{Value: "bar"},
-									ast.ProcArg{Value: ast.BareReference{Name: "baz"}},
+									ast.CallExpression{
+										Target: ast.BareReference{Name: "baz"},
+										Func:   ast.BareReference{Name: "to_proc"},
+									},
 								},
 							},
 						}))
@@ -783,27 +799,27 @@ MSpec.retrieve(:files).inject(0) { |max, f| f.size > max ? f.size : max }
 							Func: ast.BareReference{Name: "inject"},
 							Args: []ast.Node{
 								ast.ConstantInt{Value: 0},
-								ast.Block{
-									Args: []ast.Node{
-										ast.BareReference{Name: "max"},
-										ast.BareReference{Name: "f"},
-									},
-									Body: []ast.Node{
-										ast.Ternary{
-											Condition: ast.CallExpression{
-												Target: ast.CallExpression{
-													Target: ast.BareReference{Name: "f"},
-													Func:   ast.BareReference{Name: "size"},
-												},
-												Func: ast.BareReference{Name: ">"},
-												Args: []ast.Node{ast.BareReference{Name: "max"}},
-											},
-											True: ast.CallExpression{
+							},
+							OptionalBlock: ast.Block{
+								Args: []ast.Node{
+									ast.BareReference{Name: "max"},
+									ast.BareReference{Name: "f"},
+								},
+								Body: []ast.Node{
+									ast.Ternary{
+										Condition: ast.CallExpression{
+											Target: ast.CallExpression{
 												Target: ast.BareReference{Name: "f"},
 												Func:   ast.BareReference{Name: "size"},
 											},
-											False: ast.BareReference{Name: "max"},
+											Func: ast.BareReference{Name: ">"},
+											Args: []ast.Node{ast.BareReference{Name: "max"}},
 										},
+										True: ast.CallExpression{
+											Target: ast.BareReference{Name: "f"},
+											Func:   ast.BareReference{Name: "size"},
+										},
+										False: ast.BareReference{Name: "max"},
 									},
 								},
 							},
@@ -2887,37 +2903,36 @@ end
 							ast.CallExpression{
 								Target: ast.BareReference{Name: "names"},
 								Func:   ast.BareReference{Name: "each"},
-								Args: []ast.Node{
-									ast.Block{
-										Args: []ast.Node{ast.BareReference{Name: "name"}},
-										Body: []ast.Node{
-											ast.IfBlock{
-												Condition: ast.CallExpression{
-													Target: ast.BareReference{Name: "File"},
-													Func:   ast.BareReference{Name: "exist?"},
-													Args: []ast.Node{
-														ast.CallExpression{
-															Target: ast.BareReference{Name: "File"},
-															Func:   ast.BareReference{Name: "expand_path"},
-															Args:   []ast.Node{ast.BareReference{Name: "name"}},
-														},
-													},
-												},
-												Body: []ast.Node{
-													ast.Return{
-														Value: ast.CallExpression{
-															Target: ast.BareReference{Name: "Kernel"},
-															Func:   ast.BareReference{Name: "load"},
-															Args:   []ast.Node{ast.BareReference{Name: "name"}},
-														},
+								Args:   []ast.Node{},
+								OptionalBlock: ast.Block{
+									Args: []ast.Node{ast.BareReference{Name: "name"}},
+									Body: []ast.Node{
+										ast.IfBlock{
+											Condition: ast.CallExpression{
+												Target: ast.BareReference{Name: "File"},
+												Func:   ast.BareReference{Name: "exist?"},
+												Args: []ast.Node{
+													ast.CallExpression{
+														Target: ast.BareReference{Name: "File"},
+														Func:   ast.BareReference{Name: "expand_path"},
+														Args:   []ast.Node{ast.BareReference{Name: "name"}},
 													},
 												},
 											},
-											ast.IfBlock{
-												Condition: ast.Negation{Target: ast.Boolean{Value: false}},
-												Body: []ast.Node{
-													ast.Return{},
+											Body: []ast.Node{
+												ast.Return{
+													Value: ast.CallExpression{
+														Target: ast.BareReference{Name: "Kernel"},
+														Func:   ast.BareReference{Name: "load"},
+														Args:   []ast.Node{ast.BareReference{Name: "name"}},
+													},
 												},
+											},
+										},
+										ast.IfBlock{
+											Condition: ast.Negation{Target: ast.Boolean{Value: false}},
+											Body: []ast.Node{
+												ast.Return{},
 											},
 										},
 									},
@@ -2977,13 +2992,12 @@ end
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Func: ast.BareReference{Name: "function_that_takes_a_block"},
-							Args: []ast.Node{
-								ast.Block{
-									Body: []ast.Node{
-										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "semiannual-pomfret"}},
-										},
+							Args: []ast.Node{},
+							OptionalBlock: ast.Block{
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.SimpleString{Value: "semiannual-pomfret"}},
 									},
 								},
 							},
@@ -2996,7 +3010,7 @@ end
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
 with_a_block do |with, some, args|
-'aww yiss'
+  'aww yiss'
 end
 `)
 				})
@@ -3005,15 +3019,14 @@ end
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Func: ast.BareReference{Name: "with_a_block"},
-							Args: []ast.Node{
-								ast.Block{
-									Args: []ast.Node{
-										ast.BareReference{Name: "with"},
-										ast.BareReference{Name: "some"},
-										ast.BareReference{Name: "args"},
-									},
-									Body: []ast.Node{ast.SimpleString{Value: "aww yiss"}},
+							Args: []ast.Node{},
+							OptionalBlock: ast.Block{
+								Args: []ast.Node{
+									ast.BareReference{Name: "with"},
+									ast.BareReference{Name: "some"},
+									ast.BareReference{Name: "args"},
 								},
+								Body: []ast.Node{ast.SimpleString{Value: "aww yiss"}},
 							},
 						},
 					}))
@@ -3030,14 +3043,13 @@ end
 						ast.CallExpression{
 							Target: ast.BareReference{Name: "with"},
 							Func:   ast.BareReference{Name: "a_block"},
-							Args: []ast.Node{
-								ast.Block{
-									Args: []ast.Node{ast.BareReference{Name: "foo"}},
-									Body: []ast.Node{
-										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.BareReference{Name: "foo"}},
-										},
+							Args:   []ast.Node{},
+							OptionalBlock: ast.Block{
+								Args: []ast.Node{ast.BareReference{Name: "foo"}},
+								Body: []ast.Node{
+									ast.CallExpression{
+										Func: ast.BareReference{Name: "puts"},
+										Args: []ast.Node{ast.BareReference{Name: "foo"}},
 									},
 								},
 							},
@@ -3691,10 +3703,9 @@ end
 						ast.CallExpression{
 							Target: ast.ConstantInt{Value: 5},
 							Func:   ast.BareReference{Name: "times"},
-							Args: []ast.Node{
-								ast.Block{
-									Body: []ast.Node{ast.Next{}},
-								},
+							Args:   []ast.Node{},
+							OptionalBlock: ast.Block{
+								Body: []ast.Node{ast.Next{}},
 							},
 						},
 					}))

@@ -33,9 +33,10 @@ type BareReference struct {
 }
 
 type CallExpression struct {
-	Target Node
-	Func   BareReference
-	Args   []Node
+	Target        Node
+	Func          BareReference
+	Args          []Node
+	OptionalBlock Block
 }
 
 type FuncDecl struct {
@@ -240,10 +241,6 @@ type WeakLogicalOr struct {
 
 type Lambda struct {
 	Body Block
-}
-
-type ProcArg struct {
-	Value Node
 }
 
 type SwitchStatement struct {
