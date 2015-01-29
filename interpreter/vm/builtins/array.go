@@ -1,5 +1,10 @@
 package builtins
 
+import (
+	"errors"
+	"fmt"
+)
+
 type ArrayClass struct {
 	valueStub
 	classStub
@@ -48,6 +53,38 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 		}
 
 		return singletonProvider.SingletonWithName("false"), nil
+	}))
+
+	a.AddMethod(NewNativeMethod("-", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		argAsArray, ok := args[0].(*Array)
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("TypeError: no implicit conversion of %s into Array", args[0].Class().String()))
+		}
+
+		selfAsArray := self.(*Array)
+		indicesToRemove := []int{}
+		for _, otherMember := range argAsArray.members {
+			for index, member := range selfAsArray.members {
+				equalMethod, err := member.Method("==")
+				if err != nil {
+					return nil, err
+				}
+				equal, err := equalMethod.Execute(member, otherMember)
+				if err != nil {
+					return nil, err
+				}
+
+				if equal.IsTruthy() {
+					indicesToRemove = append(indicesToRemove, index)
+				}
+			}
+		}
+
+		for _, indexToRemove := range indicesToRemove {
+			a.members = append(a.members[:indexToRemove], a.members[indexToRemove+1:]...)
+		}
+
+		return self, nil
 	}))
 
 	return a, nil

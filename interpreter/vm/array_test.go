@@ -4,9 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/grubby/grubby/interpreter/vm/builtins"
-
 	. "github.com/grubby/grubby/interpreter/vm"
+	. "github.com/grubby/grubby/interpreter/vm/builtins"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +27,19 @@ var _ = Describe("Arrays", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(value).ToNot(BeNil())
 
-		_, ok := value.(*builtins.Array)
+		_, ok := value.(*Array)
 		Expect(ok).To(BeTrue())
+	})
+
+	Describe("subtracting one array from another", func() {
+		It("returns the elements in the first that are not in the latter", func() {
+			value, err := vm.Run("[:hello, :world] - [:cruel, :world]")
+			Expect(err).ToNot(HaveOccurred())
+
+			array, ok := value.(*Array)
+			Expect(ok).To(BeTrue())
+			Expect(len(array.Members())).To(Equal(1))
+			Expect(array.Members()).To(ContainElement(NewSymbol("hello", vm)))
+		})
 	})
 })
