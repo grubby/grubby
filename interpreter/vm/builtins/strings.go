@@ -28,11 +28,11 @@ func (class *StringClass) New(provider ClassProvider, singletonProvider Singleto
 	str := &StringValue{}
 	str.initialize()
 	str.class = class
-	str.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	str.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
 		return NewString(str.value+arg.value, provider, singletonProvider), nil
 	}))
-	str.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	str.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		asStr, ok := args[0].(*StringValue)
 		if !ok {
 			return singletonProvider.SingletonWithName("false"), nil

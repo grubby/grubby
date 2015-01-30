@@ -28,7 +28,7 @@ func (klass *HashClass) New(provider ClassProvider, singletonProvider SingletonP
 	a.class = klass
 	a.hash = make(map[Value]Value)
 
-	a.AddMethod(NewNativeMethod("keys", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("keys", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		o, _ := klass.provider.ClassWithName("Array").New(provider, singletonProvider)
 		keys := o.(*Array)
 		for key := range self.(*Hash).hash {
@@ -37,7 +37,7 @@ func (klass *HashClass) New(provider ClassProvider, singletonProvider SingletonP
 
 		return keys, nil
 	}))
-	a.AddMethod(NewNativeMethod("values", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("values", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		o, _ := klass.provider.ClassWithName("Array").New(provider, singletonProvider)
 		values := o.(*Array)
 		for key := range self.(*Hash).hash {
@@ -47,7 +47,7 @@ func (klass *HashClass) New(provider ClassProvider, singletonProvider SingletonP
 		return values, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("[]=", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("[]=", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		self.(*Hash).hash[args[0]] = args[1]
 		return args[1], nil
 	}))

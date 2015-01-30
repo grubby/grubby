@@ -29,7 +29,7 @@ func NewClassClass(provider ClassProvider, singletonProvider SingletonProvider) 
 	c.class = c
 	c.provider = provider
 
-	c.AddMethod(NewNativeMethod("new", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("new", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		instance, err := self.(Class).New(provider, singletonProvider, args...)
 		if err != nil {
 			return nil, err
@@ -37,7 +37,7 @@ func NewClassClass(provider ClassProvider, singletonProvider SingletonProvider) 
 
 		method, err := instance.Method("initialize")
 		if err == nil {
-			_, err = method.Execute(instance, args...)
+			_, err = method.Execute(instance, block, args...)
 			if err != nil {
 				panic(err)
 			}
@@ -96,7 +96,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 	// FIXME: should be provided as an argument
 	c.superClass = provider.ClassWithName("Object")
 
-	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
 			c.Include(arg.(Module))
 		}
@@ -104,7 +104,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("extend", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("extend", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, module := range args {
 			for _, method := range module.(Module).InstanceMethods() {
 				self.AddMethod(method)
@@ -114,7 +114,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("attr_accessor", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("attr_accessor", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*symbolValue)
 			if !ok {
@@ -128,7 +128,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 
 		return nil, nil
 	}))
-	c.AddMethod(NewNativeMethod("attr_reader", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("attr_reader", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*symbolValue)
 			if !ok {
@@ -141,7 +141,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 
 		return nil, nil
 	}))
-	c.AddMethod(NewNativeMethod("attr_writer", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("attr_writer", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*symbolValue)
 			if !ok {
@@ -177,7 +177,7 @@ func (c *UserDefinedClass) New(provider ClassProvider, singletonProvider Singlet
 
 	// FIXME: these should be defined on Module
 	for _, attr := range c.attr_readers {
-		instance.AddMethod(NewNativeMethod(attr, provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		instance.AddMethod(NewNativeMethod(attr, provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 			this := self.(*UserDefinedClassInstance)
 			value, ok := this.attrs[attr]
 			if !ok {
@@ -189,7 +189,7 @@ func (c *UserDefinedClass) New(provider ClassProvider, singletonProvider Singlet
 	}
 
 	for _, attr := range c.attr_writers {
-		instance.AddMethod(NewNativeMethod(attr+"=", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+		instance.AddMethod(NewNativeMethod(attr+"=", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 			this := self.(*UserDefinedClassInstance)
 			this.attrs[attr] = args[0]
 			return nil, nil
@@ -198,7 +198,7 @@ func (c *UserDefinedClass) New(provider ClassProvider, singletonProvider Singlet
 
 	method, err := instance.Method("initialize")
 	if err == nil {
-		_, err = method.Execute(instance, args...)
+		_, err = method.Execute(instance, nil, args...)
 		if err != nil {
 			return nil, err
 		}

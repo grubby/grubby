@@ -30,7 +30,7 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 	a.initialize()
 	a.class = klass
 
-	a.AddMethod(NewNativeMethod("shift", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("shift", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		if len(a.members) == 0 {
 			return singletonProvider.SingletonWithName("nil"), nil
 		}
@@ -40,12 +40,12 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 		return val, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("unshift", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("unshift", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		a.members = append([]Value{args[0]}, a.members[0:]...)
 		return a, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("include?", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("include?", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, m := range a.members {
 			if m == args[0] {
 				return singletonProvider.SingletonWithName("true"), nil
@@ -55,7 +55,7 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 		return singletonProvider.SingletonWithName("false"), nil
 	}))
 
-	a.AddMethod(NewNativeMethod("-", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("-", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		argAsArray, ok := args[0].(*Array)
 		if !ok {
 			return nil, errors.New(fmt.Sprintf("TypeError: no implicit conversion of %s into Array", args[0].Class().String()))
@@ -69,7 +69,7 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 				if err != nil {
 					return nil, err
 				}
-				equal, err := equalMethod.Execute(member, otherMember)
+				equal, err := equalMethod.Execute(member, block, otherMember)
 				if err != nil {
 					return nil, err
 				}
@@ -85,6 +85,25 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 		}
 
 		return self, nil
+	}))
+
+	a.AddMethod(NewNativeMethod("select", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		arr, _ := classProvider.ClassWithName("Array").New(classProvider, singletonProvider)
+		filteredArray := arr.(*Array)
+		selfAsArray := self.(*Array)
+
+		for _, element := range selfAsArray.members {
+			result, err := block.Call(element)
+			if err != nil {
+				return nil, err
+			}
+
+			if result.IsTruthy() {
+				filteredArray.members = append(filteredArray.members, element)
+			}
+		}
+
+		return filteredArray, nil
 	}))
 
 	return a, nil

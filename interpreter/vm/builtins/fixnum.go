@@ -10,11 +10,21 @@ type fixnumClass struct {
 	classStub
 }
 
-func NewFixnumClass(provider ClassProvider) Class {
+func NewFixnumClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	class := &fixnumClass{}
 	class.initialize()
 	class.class = provider.ClassWithName("Class")
 	class.superClass = provider.ClassWithName("Integer")
+
+	class.AddMethod(NewNativeMethod("even?", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		asFixnum := self.(*fixnumInstance)
+
+		if asFixnum.value%2 == 0 {
+			return singletonProvider.SingletonWithName("true"), nil
+		} else {
+			return singletonProvider.SingletonWithName("false"), nil
+		}
+	}))
 
 	return class
 }

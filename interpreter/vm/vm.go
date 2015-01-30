@@ -67,7 +67,7 @@ func NewVM(rubyHome, name string) VM {
 	vm.ObjectSpace["ARGV"], _ = vm.CurrentClasses["Array"].New(vm, vm)
 
 	main, _ := vm.CurrentClasses["Object"].New(vm, vm)
-	main.AddMethod(NewNativeMethod("to_s", vm, vm, func(self Value, args ...Value) (Value, error) {
+	main.AddMethod(NewNativeMethod("to_s", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
 		return NewString("main", vm, vm), nil
 	}))
 	vm.ObjectSpace["main"] = main
@@ -95,7 +95,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentModules["Process"] = NewProcessModule(vm)
 
 	// FIXME: this should be private, but method resolution fails
-	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("require", vm, vm, func(self Value, args ...Value) (Value, error) {
+	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("require", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
 		fileName := args[0].(*StringValue).String()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
@@ -155,7 +155,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["String"] = NewStringClass(vm)
 	vm.CurrentClasses["Numeric"] = NewNumericClass(vm)
 	vm.CurrentClasses["Integer"] = NewIntegerClass(vm)
-	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm)
+	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm, vm)
 	vm.CurrentClasses["Float"] = NewFloatClass(vm)
 	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm)
 
@@ -301,8 +301,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				return returnValue, returnErr
 			}
 
-			contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, vm, func(self Value, args ...Value) (Value, error) {
-				return m.Execute(self, args...)
+			contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
+				return m.Execute(self, block, args...)
 			}))
 
 		case ast.ModuleDecl:
@@ -464,10 +464,26 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			vm.stack.Unshift(method.Name(), vm.currentFilename)
 			defer vm.stack.Shift()
 
-			returnValue, returnErr = method.Execute(target, args...)
+			var block Block
+			if callExpr.OptionalBlock.Provided() {
+				blockValue, err := vm.executeWithContext(context, callExpr.OptionalBlock)
+
+				if err != nil {
+					return nil, err
+				}
+
+				block = blockValue.(Block)
+			}
+
+			returnValue, returnErr = method.Execute(target, block, args...)
 			if returnErr != nil {
 				return returnValue, returnErr
 			}
+
+		case ast.Block:
+			astBlock := statement.(ast.Block)
+			block := NewBlock(context, astBlock.Args, astBlock.Body, vm)
+			returnValue = block.(Value)
 
 		case ast.Assignment:
 			var err error
@@ -601,6 +617,21 @@ func (vm *vm) ClassWithName(name string) Class {
 // ArgEvaluator
 func (vm *vm) EvaluateArgInContext(arg ast.Node, context Value) (Value, error) {
 	return vm.executeWithContext(context, arg)
+}
+
+// BlockEvaluator
+func (vm *vm) EvaluateBlockWithArgsInContext(
+	context Value,
+	args []BlockArg,
+	statements []ast.Node) (Value, error) {
+	vm.localVariableStack.unshift()
+	defer vm.localVariableStack.shift()
+
+	for _, arg := range args {
+		vm.localVariableStack.store(arg.Name, arg.Value)
+	}
+
+	return vm.executeWithContext(context, statements...)
 }
 
 // SingletonProvider

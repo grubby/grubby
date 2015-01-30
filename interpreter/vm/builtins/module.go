@@ -27,7 +27,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 	c.class = classProvider.ClassWithName("Class")
 	c.superClass = classProvider.ClassWithName("Object")
 
-	c.AddMethod(NewNativeMethod("private_class_method", classProvider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("private_class_method", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		methodName, ok := args[0].(*symbolValue)
 		if !ok {
 			return nil, errors.New(fmt.Sprintf("TypeError: %v is not a symbol", args[0]))
@@ -77,7 +77,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 	c.initialize()
 	c.class = provider.ClassWithName("Module")
 
-	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, module := range args {
 			c.includedModules = append(c.includedModules, module)
 		}
@@ -85,7 +85,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("extend", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("extend", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, module := range args {
 			for _, method := range module.Methods() {
 				self.AddMethod(method)
@@ -95,7 +95,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("module_function", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("module_function", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		if len(args) != 1 {
 			return nil, errors.New("expected exactly one arg")
 		}

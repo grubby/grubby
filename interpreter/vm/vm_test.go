@@ -253,7 +253,7 @@ end`)
 			keysMethod, err := hash.Method("keys")
 			Expect(err).ToNot(HaveOccurred())
 
-			keys, err := keysMethod.Execute(hash)
+			keys, err := keysMethod.Execute(hash, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			keyArray, ok := keys.(*builtins.Array)
@@ -263,7 +263,7 @@ end`)
 			valuesMethod, err := hash.Method("values")
 			Expect(err).ToNot(HaveOccurred())
 
-			values, err := valuesMethod.Execute(hash)
+			values, err := valuesMethod.Execute(hash, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			valueArray, ok := values.(*builtins.Array)
@@ -273,17 +273,17 @@ end`)
 			method, err := hash.Method("[]=")
 			Expect(err).ToNot(HaveOccurred())
 
-			_, err = method.Execute(hash, builtins.NewSymbol("foo", vm), builtins.NewSymbol("bar", vm))
+			_, err = method.Execute(hash, nil, builtins.NewSymbol("foo", vm), builtins.NewSymbol("bar", vm))
 			Expect(err).ToNot(HaveOccurred())
 
-			keys, err = keysMethod.Execute(hash)
+			keys, err = keysMethod.Execute(hash, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			keyArray, ok = keys.(*builtins.Array)
 			Expect(ok).To(BeTrue())
 			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("foo", vm)))
 
-			values, err = valuesMethod.Execute(hash)
+			values, err = valuesMethod.Execute(hash, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			valueArray, ok = values.(*builtins.Array)
@@ -300,7 +300,7 @@ end`)
 			method, err := fileClass.Method("expand_path")
 			Expect(err).ToNot(HaveOccurred())
 
-			result, err := method.Execute(fileClass, builtins.NewString("~/foobar", vm, vm))
+			result, err := method.Execute(fileClass, nil, builtins.NewString("~/foobar", vm, vm))
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result.String()).To(Equal(os.Getenv("HOME") + "/foobar"))
 		})
@@ -445,7 +445,7 @@ end
 			method, err := fooClass.Method("new")
 			Expect(err).ToNot(HaveOccurred())
 
-			instance, err := method.Execute(fooClass)
+			instance, err := method.Execute(fooClass, nil)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(instance.Class()).To(Equal(fooClass))
 		})
@@ -472,7 +472,7 @@ end
 				method, err := fooInstance.Method("hello")
 				Expect(err).ToNot(HaveOccurred())
 
-				val, err := method.Execute(fooInstance)
+				val, err := method.Execute(fooInstance, nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm, vm)))
 				Expect(val.String()).To(Equal("world"))
@@ -522,7 +522,7 @@ end
 				method, err := bar.Method("superinquisitive")
 				Expect(err).ToNot(HaveOccurred())
 
-				val, err := method.Execute(bar)
+				val, err := method.Execute(bar, nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val.String()).To(Equal("tumescent-wasty"))
 			})

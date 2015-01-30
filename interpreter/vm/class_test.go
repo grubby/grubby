@@ -71,7 +71,7 @@ end
 				reader, err := foo.Method("quaternion_vinic")
 				Expect(err).ToNot(HaveOccurred())
 
-				val, err := reader.Execute(foo)
+				val, err := reader.Execute(foo, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				nilInstance, err := vm.ClassWithName("NilClass").New(vm, vm)
@@ -98,7 +98,7 @@ end
 				reader, err := foo.Method("chrysobull_nonmonarchist=")
 				Expect(err).ToNot(HaveOccurred())
 
-				_, err = reader.Execute(foo, NewString("lyncher-mudslinger", vm, vm))
+				_, err = reader.Execute(foo, nil, NewString("lyncher-mudslinger", vm, vm))
 				Expect(err).ToNot(HaveOccurred())
 
 				// TODO: assert on the instance variable via instance_variable_get
@@ -122,7 +122,7 @@ end
 				reader, err := foo.Method("pieless_bothlike")
 				Expect(err).ToNot(HaveOccurred())
 
-				val, err := reader.Execute(foo)
+				val, err := reader.Execute(foo, nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				nilInstance, err := vm.ClassWithName("NilClass").New(vm, vm)
@@ -132,10 +132,10 @@ end
 				writer, err := foo.Method("pieless_bothlike=")
 				Expect(err).ToNot(HaveOccurred())
 
-				_, err = writer.Execute(foo, NewString("unordainable-luthier", vm, vm))
+				_, err = writer.Execute(foo, nil, NewString("unordainable-luthier", vm, vm))
 				Expect(err).ToNot(HaveOccurred())
 
-				val, err = reader.Execute(foo)
+				val, err = reader.Execute(foo, nil)
 				Expect(val.String()).To(Equal("unordainable-luthier"))
 				Expect(err).ToNot(HaveOccurred())
 			})

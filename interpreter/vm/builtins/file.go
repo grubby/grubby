@@ -16,7 +16,7 @@ func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) C
 	f.initialize()
 	f.class = provider.ClassWithName("Class")
 	f.superClass = provider.ClassWithName("IO")
-	f.AddMethod(NewNativeMethod("expand_path", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	f.AddMethod(NewNativeMethod("expand_path", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg1 := args[0].(*StringValue).String()
 
 		if arg1[0] == '~' {
@@ -33,7 +33,7 @@ func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) C
 		return NewString(path, provider, singletonProvider), nil
 	}))
 
-	f.AddMethod(NewNativeMethod("dirname", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	f.AddMethod(NewNativeMethod("dirname", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		filename := args[0].(*StringValue).String()
 
 		return NewString(filepath.Base(filename), provider, singletonProvider), nil

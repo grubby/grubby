@@ -12,7 +12,7 @@ func NewGlobalObjectClass(provider ClassProvider, singletonProvider SingletonPro
 	o.initialize()
 	o.provider = provider
 
-	o.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	o.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		if self == args[0] {
 			return singletonProvider.SingletonWithName("true"), nil
 		} else {

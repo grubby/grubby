@@ -61,7 +61,7 @@ func (method *RubyMethod) Body() []ast.Node {
 	return method.unevaluatedBody
 }
 
-func (method *RubyMethod) Execute(self Value, args ...Value) (Value, error) {
+func (method *RubyMethod) Execute(self Value, block Block, args ...Value) (Value, error) {
 	method.invocationArgs = make([]methodArg, 0, len(args))
 	for index, arg := range method.args {
 

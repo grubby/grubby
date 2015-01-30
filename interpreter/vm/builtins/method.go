@@ -5,18 +5,18 @@ import "fmt"
 type Method interface {
 	Value
 	Name() string
-	Execute(self Value, args ...Value) (Value, error)
+	Execute(self Value, block Block, args ...Value) (Value, error)
 }
 
 type nativeMethod struct {
 	valueStub
 	name              string
-	body              func(self Value, args ...Value) (Value, error)
+	body              func(self Value, block Block, args ...Value) (Value, error)
 	classProvider     ClassProvider
 	singletonProvider SingletonProvider
 }
 
-func NewNativeMethod(name string, provider ClassProvider, singletonProvider SingletonProvider, body func(self Value, args ...Value) (Value, error)) Method {
+func NewNativeMethod(name string, provider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
 	m := &nativeMethod{
 		name:              name,
 		body:              body,
@@ -31,8 +31,8 @@ func (method *nativeMethod) Name() string {
 	return method.name
 }
 
-func (method *nativeMethod) Execute(self Value, args ...Value) (Value, error) {
-	return method.body(self, args...)
+func (method *nativeMethod) Execute(self Value, block Block, args ...Value) (Value, error) {
+	return method.body(self, block, args...)
 }
 
 func (method *nativeMethod) String() string {

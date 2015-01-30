@@ -35,14 +35,14 @@ end
 		Expect(err).ToNot(HaveOccurred())
 
 		var capturedSelf Value
-		foo.AddMethod(NewNativeMethod("fasciculated_stripe", vm, vm, func(self Value, args ...Value) (Value, error) {
+		foo.AddMethod(NewNativeMethod("fasciculated_stripe", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
 			capturedSelf = self
 			return nil, nil
 		}))
 
 		m, err := foo.Method("fasciculated_stripe")
 		Expect(err).ToNot(HaveOccurred())
-		m.Execute(foo)
+		m.Execute(foo, nil)
 
 		Expect(capturedSelf).To(Equal(foo))
 	})

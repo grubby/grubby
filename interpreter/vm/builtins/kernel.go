@@ -13,7 +13,7 @@ func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonPr
 	k.initialize()
 	k.class = provider.ClassWithName("Module")
 
-	k.AddMethod(NewNativeMethod("puts", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	k.AddMethod(NewNativeMethod("puts", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
 			os.Stdout.Write([]byte(arg.String() + "\n"))
 		}
@@ -21,7 +21,7 @@ func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonPr
 		return nil, nil
 	}))
 
-	k.AddMethod(NewNativeMethod("singleton_methods", provider, singletonProvider, func(self Value, args ...Value) (Value, error) {
+	k.AddMethod(NewNativeMethod("singleton_methods", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		methodsArray, err := provider.ClassWithName("Array").New(provider, singletonProvider)
 		if err != nil {
 			return nil, err

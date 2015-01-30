@@ -168,6 +168,10 @@ type Block struct {
 	Body []Node
 }
 
+func (b *Block) Provided() bool {
+	return b.Args != nil && b.Body != nil
+}
+
 type IfBlock struct {
 	Condition Node
 	Body      []Node
