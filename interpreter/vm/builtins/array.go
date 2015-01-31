@@ -13,24 +13,14 @@ type ArrayClass struct {
 	singletonProvider SingletonProvider
 }
 
-func NewArrayClass(provider ClassProvider) Class {
+func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
 	a := &ArrayClass{}
-	a.class = provider.ClassWithName("Class")
-	a.superClass = provider.ClassWithName("Object")
+	a.class = classProvider.ClassWithName("Class")
+	a.superClass = classProvider.ClassWithName("Object")
 	a.initialize()
-	return a
-}
-
-func (klass *ArrayClass) AddInstanceMethod(m Method) {
-	klass.instanceMethods = append(klass.instanceMethods, m)
-}
-
-func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
-	a := &Array{}
-	a.initialize()
-	a.class = klass
 
 	a.AddMethod(NewNativeMethod("shift", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		a := self.(*Array)
 		if len(a.members) == 0 {
 			return singletonProvider.SingletonWithName("nil"), nil
 		}
@@ -41,11 +31,13 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 	}))
 
 	a.AddMethod(NewNativeMethod("unshift", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		a := self.(*Array)
 		a.members = append([]Value{args[0]}, a.members[0:]...)
 		return a, nil
 	}))
 
 	a.AddMethod(NewNativeMethod("include?", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		a := self.(*Array)
 		for _, m := range a.members {
 			if m == args[0] {
 				return singletonProvider.SingletonWithName("true"), nil
@@ -56,6 +48,7 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 	}))
 
 	a.AddMethod(NewNativeMethod("-", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		a := self.(*Array)
 		argAsArray, ok := args[0].(*Array)
 		if !ok {
 			return nil, errors.New(fmt.Sprintf("TypeError: no implicit conversion of %s into Array", args[0].Class().String()))
@@ -105,6 +98,18 @@ func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider Sing
 
 		return filteredArray, nil
 	}))
+
+	return a
+}
+
+func (klass *ArrayClass) AddInstanceMethod(m Method) {
+	klass.instanceMethods = append(klass.instanceMethods, m)
+}
+
+func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+	a := &Array{}
+	a.initialize()
+	a.class = klass
 
 	return a, nil
 }

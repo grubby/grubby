@@ -146,7 +146,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	// END RUNTIME TRICKERY
 
 	vm.CurrentClasses["IO"] = NewIOClass(vm)
-	vm.CurrentClasses["Array"] = NewArrayClass(vm)
+	vm.CurrentClasses["Array"] = NewArrayClass(vm, vm)
 	vm.CurrentClasses["Hash"] = NewHashClass(vm)
 	vm.CurrentClasses["TrueClass"] = NewTrueClass(vm)
 	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
