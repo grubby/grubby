@@ -13,6 +13,7 @@ type floatClass struct {
 func NewFloatClass(provider ClassProvider) Class {
 	class := &floatClass{}
 	class.initialize()
+	class.setStringer(class.String)
 	class.class = provider.ClassWithName("Class")
 	class.superClass = provider.ClassWithName("Numeric")
 
@@ -31,22 +32,23 @@ func (c *floatClass) New(provider ClassProvider, singletonProvider SingletonProv
 	return nil, errors.New("undefined method 'new' for Float:Class")
 }
 
-type floatValue struct {
+type FloatValue struct {
 	value float64
 	valueStub
 }
 
 func NewFloat(val float64, provider ClassProvider) Value {
-	f := &floatValue{value: val}
+	f := &FloatValue{value: val}
 	f.class = provider.ClassWithName("Float")
 	f.initialize()
+	f.setStringer(f.String)
 	return f
 }
 
-func (floatValue *floatValue) ValueAsFloat() float64 {
-	return floatValue.value
+func (FloatValue *FloatValue) ValueAsFloat() float64 {
+	return FloatValue.value
 }
 
-func (floatValue *floatValue) String() string {
-	return fmt.Sprintf("%d", floatValue.value)
+func (FloatValue *FloatValue) String() string {
+	return fmt.Sprintf("%d", FloatValue.value)
 }

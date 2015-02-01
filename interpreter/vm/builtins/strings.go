@@ -1,5 +1,7 @@
 package builtins
 
+import "fmt"
+
 type StringClass struct {
 	valueStub
 	classStub
@@ -10,6 +12,9 @@ type StringClass struct {
 func NewStringClass(provider ClassProvider) Class {
 	s := &StringClass{}
 	s.initialize()
+	s.setStringer(s.String)
+	s.setStringer(s.String)
+
 	s.provider = provider
 	s.class = provider.ClassWithName("Class")
 	s.superClass = provider.ClassWithName("Object")
@@ -27,7 +32,10 @@ func (c *StringClass) Name() string {
 func (class *StringClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	str := &StringValue{}
 	str.initialize()
+	str.setStringer(str.String)
+	str.setStringer(str.String)
 	str.class = class
+
 	str.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
 		return NewString(str.value+arg.value, provider, singletonProvider), nil
@@ -54,8 +62,12 @@ type StringValue struct {
 	valueStub
 }
 
-func (stringValue *StringValue) String() string {
-	return stringValue.value
+func (s *StringValue) String() string {
+	return fmt.Sprintf(`"%s"`, s.value)
+}
+
+func (s *StringValue) RawString() string {
+	return s.value
 }
 
 func NewString(str string, provider ClassProvider, singletonProvider SingletonProvider) Value {

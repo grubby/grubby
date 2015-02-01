@@ -110,11 +110,11 @@ ace
 
 					ivar := object.GetInstanceVariable("foo")
 					Expect(ivar.Class().String()).To(Equal("String"))
-					Expect(ivar.String()).To(Equal("abc"))
+					Expect(ivar.String()).To(Equal(`"abc"`))
 
 					ivar = object.GetInstanceVariable("bar")
 					Expect(ivar.Class().String()).To(Equal("String"))
-					Expect(ivar.String()).To(Equal("def"))
+					Expect(ivar.String()).To(Equal(`"def"`))
 				})
 			})
 

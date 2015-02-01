@@ -10,6 +10,7 @@ type BasicObjectClass struct {
 func NewBasicObjectClass(provider ClassProvider) Class {
 	o := &BasicObjectClass{}
 	o.initialize()
+	o.setStringer(o.String)
 	o.provider = provider
 	return o
 }

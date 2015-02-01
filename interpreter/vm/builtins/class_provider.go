@@ -15,4 +15,7 @@ type ClassProvider interface {
 type SingletonProvider interface {
 	SingletonWithName(string) Value
 	NewSingletonWithName(string, Value)
+
+	SymbolWithName(string) Value
+	AddSymbol(Value)
 }

@@ -1,6 +1,9 @@
 package builtins
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // abstract class interface
 type Class interface {
@@ -26,6 +29,7 @@ type ClassValue struct {
 func NewClassClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	c := &ClassValue{}
 	c.initialize()
+	c.setStringer(c.String)
 	c.class = c
 	c.provider = provider
 
@@ -86,11 +90,16 @@ type UserDefinedClassInstance struct {
 	attrs    map[string]Value
 }
 
+func (i *UserDefinedClassInstance) String() string {
+	return fmt.Sprintf("%s:%p", i.Class().String(), i)
+}
+
 func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider SingletonProvider) Class {
 	c := &UserDefinedClass{
 		name: name,
 	}
 	c.initialize()
+	c.setStringer(c.String)
 	c.class = provider.ClassWithName("Class")
 
 	// FIXME: should be provided as an argument
@@ -116,7 +125,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 
 	c.AddMethod(NewNativeMethod("attr_accessor", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
-			symbol, ok := arg.(*symbolValue)
+			symbol, ok := arg.(*SymbolValue)
 			if !ok {
 				return nil, errors.New("not a symbol or a string")
 			}
@@ -130,7 +139,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 	}))
 	c.AddMethod(NewNativeMethod("attr_reader", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
-			symbol, ok := arg.(*symbolValue)
+			symbol, ok := arg.(*SymbolValue)
 			if !ok {
 				return nil, errors.New("not a symbol or a string")
 			}
@@ -143,7 +152,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 	}))
 	c.AddMethod(NewNativeMethod("attr_writer", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
-			symbol, ok := arg.(*symbolValue)
+			symbol, ok := arg.(*SymbolValue)
 			if !ok {
 				return nil, errors.New("not a symbol or a string")
 			}
@@ -161,6 +170,7 @@ func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider 
 func (c *UserDefinedClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	instance := &UserDefinedClassInstance{}
 	instance.initialize()
+	instance.setStringer(instance.String)
 	instance.provider = provider
 	instance.attrs = make(map[string]Value)
 	instance.class = c

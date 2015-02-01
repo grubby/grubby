@@ -18,6 +18,7 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 	a.class = classProvider.ClassWithName("Class")
 	a.superClass = classProvider.ClassWithName("Object")
 	a.initialize()
+	a.setStringer(a.String)
 
 	a.AddMethod(NewNativeMethod("shift", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		a := self.(*Array)
@@ -109,6 +110,7 @@ func (klass *ArrayClass) AddInstanceMethod(m Method) {
 func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	a := &Array{}
 	a.initialize()
+	a.setStringer(a.String)
 	a.class = klass
 
 	return a, nil

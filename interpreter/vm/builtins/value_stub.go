@@ -13,6 +13,8 @@ type valueStub struct {
 	private_methods    map[string]Method
 	class              Class
 
+	stringer func() string
+
 	instance_variables map[string]Value
 }
 
@@ -70,7 +72,7 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 		super = super.SuperClass()
 	}
 
-	return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
+	return nil, NewNoMethodError(name, valueStub.String(), valueStub.Class().String(), "")
 }
 
 func (valueStub *valueStub) PrivateMethod(name string) (Method, error) {
@@ -113,7 +115,11 @@ func (valueStub *valueStub) AddPrivateMethod(m Method) {
 }
 
 func (valueStub *valueStub) String() string {
-	return "ValueStub"
+	return valueStub.stringer()
+}
+
+func (valueStub *valueStub) setStringer(stringer func() string) {
+	valueStub.stringer = stringer
 }
 
 func (valueStub *valueStub) Class() Class {

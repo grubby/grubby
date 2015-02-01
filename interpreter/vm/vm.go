@@ -96,7 +96,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 
 	// FIXME: this should be private, but method resolution fails
 	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("require", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
-		fileName := args[0].(*StringValue).String()
+		fileName := args[0].(*StringValue).RawString()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
 			return vm.singletons["false"], nil
@@ -105,7 +105,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 		loadPath := vm.CurrentGlobals["LOAD_PATH"]
 		for _, pathStr := range loadPath.(*Array).Members() {
 			path := pathStr.(*StringValue)
-			fullPath := filepath.Join(path.String(), fileName+".rb")
+			fullPath := filepath.Join(path.RawString(), fileName+".rb")
 			file, err := os.Open(fullPath)
 			if err != nil {
 				continue
@@ -641,4 +641,13 @@ func (vm *vm) SingletonWithName(name string) Value {
 
 func (vm *vm) NewSingletonWithName(name string, value Value) {
 	vm.singletons[name] = value
+}
+
+func (vm *vm) SymbolWithName(name string) Value {
+	return vm.CurrentSymbols[name]
+}
+
+func (vm *vm) AddSymbol(val Value) {
+	symbol := val.(*SymbolValue)
+	vm.CurrentSymbols[symbol.Name()] = symbol
 }

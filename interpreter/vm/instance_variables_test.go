@@ -4,8 +4,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/grubby/grubby/interpreter/vm/builtins"
-
 	. "github.com/grubby/grubby/interpreter/vm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -38,6 +36,9 @@ end
 		fooInstance, err := fooClass.New(vm, vm)
 
 		Expect(err).ToNot(HaveOccurred())
-		Expect(fooInstance.GetInstanceVariable("foo")).To(Equal(builtins.NewSymbol("bar", vm)))
+
+		foo := fooInstance.GetInstanceVariable("foo")
+		bar := vm.Symbols()["bar"]
+		Expect(foo).To(Equal(bar))
 	})
 })

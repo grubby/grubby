@@ -39,7 +39,7 @@ var _ = Describe("Arrays", func() {
 			array, ok := value.(*Array)
 			Expect(ok).To(BeTrue())
 			Expect(len(array.Members())).To(Equal(1))
-			Expect(array.Members()).To(ContainElement(NewSymbol("hello", vm)))
+			Expect(array.Members()).To(ContainElement(vm.Symbols()["hello"]))
 		})
 	})
 })

@@ -42,6 +42,7 @@ func NewRubyMethod(
 	}
 	m.class = provider.ClassWithName("Method")
 	m.initialize()
+	m.setStringer(m.String)
 	return m
 }
 

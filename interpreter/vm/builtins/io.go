@@ -9,6 +9,7 @@ type ioClass struct {
 func NewIOClass(provider ClassProvider) Class {
 	i := &ioClass{}
 	i.initialize()
+	i.setStringer(i.String)
 	i.class = provider.ClassWithName("Class")
 	i.superClass = provider.ClassWithName("Object")
 	return i

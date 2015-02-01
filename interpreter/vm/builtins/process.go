@@ -9,6 +9,7 @@ type processModule struct {
 func NewProcessModule(provider ClassProvider) Module {
 	f := &processModule{}
 	f.initialize()
+	f.setStringer(f.String)
 	f.class = provider.ClassWithName("Module")
 	return f
 }

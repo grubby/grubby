@@ -1,6 +1,7 @@
 package vm_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -71,7 +72,7 @@ end`)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm, vm)))
-			Expect(val.String()).To(Equal("nonrestricted-consonantize"))
+			Expect(val.String()).To(Equal(`"nonrestricted-consonantize"`))
 		})
 
 		It("has a + method", func() {
@@ -104,9 +105,13 @@ end`)
 			val, err := vm.Run("5.123")
 
 			Expect(err).ToNot(HaveOccurred())
+
 			Expect(val).To(BeAssignableToTypeOf(builtins.NewFloat(0.0, vm)))
-			Expect(val).To(Equal(builtins.NewFloat(5.123, vm)))
 			Expect(val.Class()).To(Equal(vm.MustGetClass("Float")))
+
+			asFloat, ok := val.(*builtins.FloatValue)
+			Expect(ok).To(BeTrue())
+			Expect(asFloat.ValueAsFloat()).To(Equal(5.123))
 		})
 	})
 
@@ -126,11 +131,11 @@ end`)
 		})
 
 		It("returns a ruby Symbol object", func() {
-			Expect(val).To(Equal(builtins.NewSymbol("foo", vm)))
+			Expect(val).To(Equal(vm.Symbols()["foo"]))
 		})
 
 		It("registers the symbol globally", func() {
-			Expect(vm.Symbols()).To(ContainElement(builtins.NewSymbol("foo", vm)))
+			Expect(val).To(Equal(vm.Symbols()["foo"]))
 		})
 
 		It("records the symbol only once", func() {
@@ -178,7 +183,7 @@ end`)
 				value, err := vm.Run("foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(value.String()).To(Equal("superinquisitive-edacity"))
+				Expect(value.String()).To(Equal(`"superinquisitive-edacity"`))
 			})
 		})
 
@@ -258,7 +263,7 @@ end`)
 
 			keyArray, ok := keys.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("key", vm)))
+			Expect(keyArray.Members()).To(ContainElement(vm.Symbols()["key"]))
 
 			valuesMethod, err := hash.Method("values")
 			Expect(err).ToNot(HaveOccurred())
@@ -268,12 +273,15 @@ end`)
 
 			valueArray, ok := values.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("value", vm)))
+			Expect(valueArray.Members()).To(ContainElement(vm.Symbols()["value"]))
 
 			method, err := hash.Method("[]=")
 			Expect(err).ToNot(HaveOccurred())
 
-			_, err = method.Execute(hash, nil, builtins.NewSymbol("foo", vm), builtins.NewSymbol("bar", vm))
+			fooSymbol := builtins.NewSymbol("foo", vm)
+			barSymbol := builtins.NewSymbol("bar", vm)
+
+			_, err = method.Execute(hash, nil, fooSymbol, barSymbol)
 			Expect(err).ToNot(HaveOccurred())
 
 			keys, err = keysMethod.Execute(hash, nil)
@@ -281,14 +289,14 @@ end`)
 
 			keyArray, ok = keys.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(keyArray.Members()).To(ContainElement(builtins.NewSymbol("foo", vm)))
+			Expect(keyArray.Members()).To(ContainElement(fooSymbol))
 
 			values, err = valuesMethod.Execute(hash, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			valueArray, ok = values.(*builtins.Array)
 			Expect(ok).To(BeTrue())
-			Expect(valueArray.Members()).To(ContainElement(builtins.NewSymbol("bar", vm)))
+			Expect(valueArray.Members()).To(ContainElement(barSymbol))
 		})
 	})
 
@@ -302,7 +310,9 @@ end`)
 
 			result, err := method.Execute(fileClass, nil, builtins.NewString("~/foobar", vm, vm))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(result.String()).To(Equal(os.Getenv("HOME") + "/foobar"))
+
+			expectedPath := fmt.Sprintf(`"%s/%s"`, os.Getenv("HOME"), "foobar")
+			Expect(result.String()).To(Equal(expectedPath))
 		})
 	})
 
@@ -313,7 +323,7 @@ end`)
 
 			value, err := vm.Get("foo")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value.String()).To(Equal("albitite-compotor"))
+			Expect(value.(*builtins.StringValue).RawString()).To(Equal("albitite-compotor"))
 		})
 	})
 
@@ -323,7 +333,7 @@ end`)
 				value, err := vm.Run("__FILE__")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(value.String()).To(Equal("fake-irb-under-test"))
+				Expect(value.String()).To(Equal(`"fake-irb-under-test"`))
 			})
 
 			It("uses the relative path to the file if used in a require'd file", func() {
@@ -343,12 +353,9 @@ end`)
 	Describe("ARGV", func() {
 		It("has a shift method", func() {
 			value, err := vm.Run("ARGV.shift")
-
 			Expect(err).ToNot(HaveOccurred())
 
-			nilInstance, err := vm.ClassWithName("NilClass").New(vm, vm)
-
-			Expect(err).ToNot(HaveOccurred())
+			nilInstance := vm.SingletonWithName("nil")
 			Expect(value).To(Equal(nilInstance))
 		})
 	})
@@ -379,8 +386,9 @@ bar = true
 
 	Describe("calling a method that does not exist", func() {
 		It("raises a NoMethodError", func() {
-			_, err := vm.Run("$foo.bar()")
+			_, err := vm.Run("'hello'.world()")
 			Expect(err).To(BeAssignableToTypeOf(builtins.NewNoMethodError("", "", "", "")))
+			Expect(err.Error()).To(ContainSubstring("undefined method 'world' for \"hello\":String"))
 		})
 	})
 
@@ -475,7 +483,7 @@ end
 				val, err := method.Execute(fooInstance, nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm, vm)))
-				Expect(val.String()).To(Equal("world"))
+				Expect(val.String()).To(Equal(`"world"`))
 			})
 		})
 
@@ -524,7 +532,7 @@ end
 
 				val, err := method.Execute(bar, nil)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(val.String()).To(Equal("tumescent-wasty"))
+				Expect(val.String()).To(Equal(`"tumescent-wasty"`))
 			})
 		})
 	})
@@ -534,14 +542,14 @@ end
 			val, err := vm.Run("foo = true ? 'a' : 'b'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal("a"))
+			Expect(val.String()).To(Equal(`"a"`))
 		})
 
 		It("picks the second value when the first is falsy", func() {
 			val, err := vm.Run("foo = nil ? 'a' : 'b'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal("b"))
+			Expect(val.String()).To(Equal(`"b"`))
 		})
 	})
 
@@ -569,7 +577,7 @@ object.singleton_methods
 `)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(list.(*builtins.Array).Members()).To(ContainElement(builtins.NewSymbol("whatever", vm)))
+			Expect(list.(*builtins.Array).Members()).To(ContainElement(vm.Symbols()["whatever"]))
 		})
 	})
 

@@ -10,6 +10,7 @@ type symbolClass struct {
 func NewSymbolClass(provider ClassProvider) Class {
 	s := &symbolClass{}
 	s.initialize()
+	s.setStringer(s.String)
 	s.class = provider.ClassWithName("Class")
 	s.superClass = provider.ClassWithName("Object")
 
@@ -28,22 +29,23 @@ func (c *symbolClass) New(provider ClassProvider, singletonProvider SingletonPro
 	return nil, errors.New("undefined method 'new' for Symbol:Class")
 }
 
-type symbolValue struct {
+type SymbolValue struct {
 	value string
 	valueStub
 }
 
 func NewSymbol(val string, provider ClassProvider) Value {
-	s := &symbolValue{value: val}
+	s := &SymbolValue{value: val}
 	s.class = provider.ClassWithName("Symbol")
 	s.initialize()
+	s.setStringer(s.String)
 	return s
 }
 
-func (symbolValue *symbolValue) String() string {
-	return symbolValue.value
+func (SymbolValue *SymbolValue) String() string {
+	return SymbolValue.value
 }
 
-func (symbolValue *symbolValue) Name() string {
-	return symbolValue.value
+func (SymbolValue *SymbolValue) Name() string {
+	return SymbolValue.value
 }

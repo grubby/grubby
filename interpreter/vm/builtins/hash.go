@@ -12,6 +12,7 @@ type HashClass struct {
 func NewHashClass(provider ClassProvider) Class {
 	a := &HashClass{}
 	a.initialize()
+	a.setStringer(a.String)
 	a.class = provider.ClassWithName("Class")
 	a.superClass = provider.ClassWithName("Object")
 	a.provider = provider
@@ -25,6 +26,7 @@ func (klass *HashClass) AddInstanceMethod(m Method) {
 func (klass *HashClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	a := &Hash{}
 	a.initialize()
+	a.setStringer(a.String)
 	a.class = klass
 	a.hash = make(map[Value]Value)
 

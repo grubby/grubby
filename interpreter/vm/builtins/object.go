@@ -1,5 +1,7 @@
 package builtins
 
+import "fmt"
+
 type ObjectClass struct {
 	valueStub
 	classStub
@@ -10,6 +12,7 @@ type ObjectClass struct {
 func NewGlobalObjectClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	o := &ObjectClass{}
 	o.initialize()
+	o.setStringer(o.String)
 	o.provider = provider
 
 	o.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
@@ -50,9 +53,14 @@ type object struct {
 	valueStub
 }
 
+func (o *object) String() string {
+	return fmt.Sprintf("%s:%p", o.Class().String(), o)
+}
+
 func (obj *ObjectClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	o := &object{}
 	o.initialize()
+	o.setStringer(o.String)
 	o.class = obj
 
 	return o, nil

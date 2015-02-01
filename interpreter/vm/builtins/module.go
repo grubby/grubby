@@ -24,11 +24,12 @@ type ModuleClass struct {
 func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
 	c := &ModuleClass{}
 	c.initialize()
+	c.setStringer(c.String)
 	c.class = classProvider.ClassWithName("Class")
 	c.superClass = classProvider.ClassWithName("Object")
 
 	c.AddMethod(NewNativeMethod("private_class_method", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		methodName, ok := args[0].(*symbolValue)
+		methodName, ok := args[0].(*SymbolValue)
 		if !ok {
 			return nil, errors.New(fmt.Sprintf("TypeError: %v is not a symbol", args[0]))
 		}
@@ -75,6 +76,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 		includedModules: make([]Value, 0),
 	}
 	c.initialize()
+	c.setStringer(c.String)
 	c.class = provider.ClassWithName("Module")
 
 	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
@@ -100,7 +102,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 			return nil, errors.New("expected exactly one arg")
 		}
 
-		symbol, ok := args[0].(*symbolValue)
+		symbol, ok := args[0].(*SymbolValue)
 		if !ok {
 			return nil, errors.New("expected method name to be a symbol")
 		}

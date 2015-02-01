@@ -10,6 +10,7 @@ type numericClass struct {
 func NewNumericClass(provider ClassProvider) Class {
 	class := &numericClass{}
 	class.initialize()
+	class.setStringer(class.String)
 	class.class = provider.ClassWithName("Class")
 	class.superClass = provider.ClassWithName("Object")
 

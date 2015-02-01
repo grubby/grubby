@@ -9,6 +9,7 @@ type trueClass struct {
 func NewTrueClass(provider ClassProvider) Class {
 	o := &trueClass{}
 	o.initialize()
+	o.setStringer(o.String)
 	o.class = provider.ClassWithName("Class")
 	o.superClass = provider.ClassWithName("Object")
 	return o
@@ -30,9 +31,14 @@ type trueInstance struct {
 	valueStub
 }
 
+func (t *trueInstance) String() string {
+	return "true"
+}
+
 func (obj *trueClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	o := &trueInstance{}
 	o.initialize()
+	o.setStringer(o.String)
 	o.class = obj
 
 	return o, nil
@@ -47,6 +53,7 @@ type falseClass struct {
 func NewFalseClass(provider ClassProvider) Class {
 	o := &falseClass{}
 	o.initialize()
+	o.setStringer(o.String)
 	o.class = provider.ClassWithName("Class")
 	o.superClass = provider.ClassWithName("Object")
 	return o
@@ -68,9 +75,14 @@ type falseInstance struct {
 	valueStub
 }
 
+func (f *falseInstance) String() string {
+	return "false"
+}
+
 func (obj *falseClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	o := &falseInstance{}
 	o.initialize()
+	o.setStringer(o.String)
 	o.class = obj
 
 	return o, nil

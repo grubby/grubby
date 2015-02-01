@@ -27,7 +27,7 @@ func (matcher *equalRubyString) Match(actual interface{}) (bool, error) {
 		return false, nil
 	}
 
-	return asStr.String() == matcher.expectedString, nil
+	return asStr.RawString() == matcher.expectedString, nil
 }
 
 func (matcher *equalRubyString) FailureMessage(actual interface{}) string {

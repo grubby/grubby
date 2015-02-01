@@ -14,10 +14,12 @@ type fileClass struct {
 func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	f := &fileClass{}
 	f.initialize()
+	f.setStringer(f.String)
 	f.class = provider.ClassWithName("Class")
 	f.superClass = provider.ClassWithName("IO")
+
 	f.AddMethod(NewNativeMethod("expand_path", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		arg1 := args[0].(*StringValue).String()
+		arg1 := args[0].(*StringValue).RawString()
 
 		if arg1[0] == '~' {
 			arg1 = os.Getenv("HOME") + arg1[1:]
@@ -25,7 +27,7 @@ func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) C
 
 		var path string
 		if len(args) == 2 {
-			path = filepath.Join(args[1].(*StringValue).String(), arg1)
+			path = filepath.Join(args[1].(*StringValue).RawString(), arg1)
 		} else {
 			path, _ = filepath.Abs(arg1)
 		}
@@ -34,7 +36,7 @@ func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) C
 	}))
 
 	f.AddMethod(NewNativeMethod("dirname", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		filename := args[0].(*StringValue).String()
+		filename := args[0].(*StringValue).RawString()
 
 		return NewString(filepath.Base(filename), provider, singletonProvider), nil
 	}))

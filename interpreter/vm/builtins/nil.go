@@ -8,6 +8,7 @@ type NilClass struct {
 func NewNilClass(provider ClassProvider) Class {
 	n := &NilClass{}
 	n.initialize()
+	n.setStringer(n.String)
 	n.class = provider.ClassWithName("Class")
 	n.superClass = provider.ClassWithName("Object")
 	return n
@@ -28,6 +29,7 @@ type nilInstance struct {
 func (class *NilClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	n := &nilInstance{}
 	n.initialize()
+	n.setStringer(n.String)
 	n.class = class
 
 	return n, nil

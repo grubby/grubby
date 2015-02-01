@@ -11,6 +11,7 @@ type kernel struct {
 func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonProvider) Module {
 	k := &kernel{}
 	k.initialize()
+	k.setStringer(k.String)
 	k.class = provider.ClassWithName("Module")
 
 	k.AddMethod(NewNativeMethod("puts", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
@@ -28,7 +29,13 @@ func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonPr
 		}
 
 		for _, method := range self.eigenclassMethods() {
-			symbol := NewSymbol(method.Name(), provider)
+			symbol := singletonProvider.SymbolWithName(method.Name())
+
+			if symbol == nil {
+				symbol = NewSymbol(method.Name(), provider)
+				singletonProvider.AddSymbol(symbol)
+			}
+
 			methodsArray.(*Array).Append(symbol)
 		}
 

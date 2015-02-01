@@ -13,6 +13,7 @@ type fixnumClass struct {
 func NewFixnumClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	class := &fixnumClass{}
 	class.initialize()
+	class.setStringer(class.String)
 	class.class = provider.ClassWithName("Class")
 	class.superClass = provider.ClassWithName("Integer")
 
@@ -53,6 +54,7 @@ func NewFixnum(val int, provider ClassProvider, singletonProvider SingletonProvi
 		i := &fixnumInstance{value: val}
 		i.class = provider.ClassWithName("Fixnum")
 		i.initialize()
+		i.setStringer(i.String)
 
 		singletonProvider.NewSingletonWithName(name, i)
 		return i

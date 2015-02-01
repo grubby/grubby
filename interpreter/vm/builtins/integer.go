@@ -10,6 +10,7 @@ type integerClass struct {
 func NewIntegerClass(provider ClassProvider) Class {
 	class := &integerClass{}
 	class.initialize()
+	class.setStringer(class.String)
 	class.class = provider.ClassWithName("Class")
 	class.superClass = provider.ClassWithName("Numeric")
 

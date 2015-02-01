@@ -74,7 +74,7 @@ end
 				val, err := reader.Execute(foo, nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				nilInstance, err := vm.ClassWithName("NilClass").New(vm, vm)
+				nilInstance := vm.SingletonWithName("nil")
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val).To(Equal(nilInstance))
@@ -125,7 +125,7 @@ end
 				val, err := reader.Execute(foo, nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				nilInstance, err := vm.ClassWithName("NilClass").New(vm, vm)
+				nilInstance := vm.SingletonWithName("nil")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val).To(Equal(nilInstance))
 
@@ -136,8 +136,8 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				val, err = reader.Execute(foo, nil)
-				Expect(val.String()).To(Equal("unordainable-luthier"))
 				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(EqualRubyString("unordainable-luthier"))
 			})
 		})
 	})
