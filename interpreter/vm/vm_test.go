@@ -6,9 +6,8 @@ import (
 	"path/filepath"
 	"reflect"
 
-	"github.com/grubby/grubby/interpreter/vm/builtins"
-
 	. "github.com/grubby/grubby/interpreter/vm"
+	. "github.com/grubby/grubby/interpreter/vm/builtins"
 	. "github.com/grubby/grubby/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -71,7 +70,7 @@ end`)
 			val, err := vm.Run("'nonrestricted-consonantize'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm, vm)))
+			Expect(val).To(BeAssignableToTypeOf(NewString("", vm, vm)))
 			Expect(val.String()).To(Equal(`"nonrestricted-consonantize"`))
 		})
 
@@ -79,7 +78,7 @@ end`)
 			val, err := vm.Run("'foo' + 'bar'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal(builtins.NewString("foobar", vm, vm).String()))
+			Expect(val.String()).To(Equal(NewString("foobar", vm, vm).String()))
 		})
 	})
 
@@ -88,7 +87,7 @@ end`)
 			val, err := vm.Run("5")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewFixnum(0, vm, vm)))
+			Expect(val).To(BeAssignableToTypeOf(NewFixnum(0, vm, vm)))
 			Expect(val.String()).To(Equal("5"))
 			Expect(val.Class()).To(Equal(vm.MustGetClass("Fixnum")))
 		})
@@ -106,10 +105,10 @@ end`)
 
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(val).To(BeAssignableToTypeOf(builtins.NewFloat(0.0, vm)))
+			Expect(val).To(BeAssignableToTypeOf(NewFloat(0.0, vm)))
 			Expect(val.Class()).To(Equal(vm.MustGetClass("Float")))
 
-			asFloat, ok := val.(*builtins.FloatValue)
+			asFloat, ok := val.(*FloatValue)
 			Expect(ok).To(BeTrue())
 			Expect(asFloat.ValueAsFloat()).To(Equal(5.123))
 		})
@@ -117,7 +116,7 @@ end`)
 
 	Describe("interpreting a symbol", func() {
 		var (
-			val builtins.Value
+			val Value
 			err error
 		)
 
@@ -150,7 +149,7 @@ end`)
 
 	Describe("nil", func() {
 		var (
-			val builtins.Value
+			val Value
 			err error
 		)
 
@@ -176,7 +175,7 @@ end`)
 	Describe("a reference to a variable", func() {
 		Context("when it already is defined", func() {
 			BeforeEach(func() {
-				vm.Set("foo", builtins.NewString("superinquisitive-edacity", vm, vm))
+				vm.Set("foo", NewString("superinquisitive-edacity", vm, vm))
 			})
 
 			It("returns the variable referenced", func() {
@@ -199,7 +198,7 @@ end`)
 	PDescribe("the standard lib", func() {
 		It("is available to require", func() {
 			_, err := vm.Run("require 'fileutils'")
-			Expect(err).ToNot(BeAssignableToTypeOf(builtins.NewLoadError("", "")))
+			Expect(err).ToNot(BeAssignableToTypeOf(NewLoadError("", "")))
 		})
 	})
 
@@ -219,7 +218,7 @@ end`)
 			_, err := vm.Run("require 'something'")
 
 			Expect(err).To(HaveOccurred())
-			Expect(err).To(BeAssignableToTypeOf(builtins.NewLoadError("", "")))
+			Expect(err).To(BeAssignableToTypeOf(NewLoadError("", "")))
 		})
 
 		Context("with a load path and a file to require", func() {
@@ -243,60 +242,10 @@ end`)
 	Describe("the load path", func() {
 		It("is represented by $LOAD_PATH and $:", func() {
 			path := vm.MustGet("LOAD_PATH")
-			str := builtins.NewString("foo", vm, vm)
-			path.(*builtins.Array).Append(str)
+			str := NewString("foo", vm, vm)
+			path.(*Array).Append(str)
 
-			Expect(vm.MustGet(":").(*builtins.Array).Members()).To(ContainElement(str))
-		})
-	})
-
-	Describe("Hash class", func() {
-		It("it can be constructed from a hash literal", func() {
-			hash, err := vm.Run("{:key => :value}")
-			Expect(err).ToNot(HaveOccurred())
-
-			keysMethod, err := hash.Method("keys")
-			Expect(err).ToNot(HaveOccurred())
-
-			keys, err := keysMethod.Execute(hash, nil)
-			Expect(err).ToNot(HaveOccurred())
-
-			keyArray, ok := keys.(*builtins.Array)
-			Expect(ok).To(BeTrue())
-			Expect(keyArray.Members()).To(ContainElement(vm.Symbols()["key"]))
-
-			valuesMethod, err := hash.Method("values")
-			Expect(err).ToNot(HaveOccurred())
-
-			values, err := valuesMethod.Execute(hash, nil)
-			Expect(err).ToNot(HaveOccurred())
-
-			valueArray, ok := values.(*builtins.Array)
-			Expect(ok).To(BeTrue())
-			Expect(valueArray.Members()).To(ContainElement(vm.Symbols()["value"]))
-
-			method, err := hash.Method("[]=")
-			Expect(err).ToNot(HaveOccurred())
-
-			fooSymbol := builtins.NewSymbol("foo", vm)
-			barSymbol := builtins.NewSymbol("bar", vm)
-
-			_, err = method.Execute(hash, nil, fooSymbol, barSymbol)
-			Expect(err).ToNot(HaveOccurred())
-
-			keys, err = keysMethod.Execute(hash, nil)
-			Expect(err).ToNot(HaveOccurred())
-
-			keyArray, ok = keys.(*builtins.Array)
-			Expect(ok).To(BeTrue())
-			Expect(keyArray.Members()).To(ContainElement(fooSymbol))
-
-			values, err = valuesMethod.Execute(hash, nil)
-			Expect(err).ToNot(HaveOccurred())
-
-			valueArray, ok = values.(*builtins.Array)
-			Expect(ok).To(BeTrue())
-			Expect(valueArray.Members()).To(ContainElement(barSymbol))
+			Expect(vm.MustGet(":").(*Array).Members()).To(ContainElement(str))
 		})
 	})
 
@@ -308,7 +257,7 @@ end`)
 			method, err := fileClass.Method("expand_path")
 			Expect(err).ToNot(HaveOccurred())
 
-			result, err := method.Execute(fileClass, nil, builtins.NewString("~/foobar", vm, vm))
+			result, err := method.Execute(fileClass, nil, NewString("~/foobar", vm, vm))
 			Expect(err).ToNot(HaveOccurred())
 
 			expectedPath := fmt.Sprintf(`"%s/%s"`, os.Getenv("HOME"), "foobar")
@@ -323,7 +272,7 @@ end`)
 
 			value, err := vm.Get("foo")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value.(*builtins.StringValue).RawString()).To(Equal("albitite-compotor"))
+			Expect(value.(*StringValue).RawString()).To(Equal("albitite-compotor"))
 		})
 	})
 
@@ -387,7 +336,7 @@ bar = true
 	Describe("calling a method that does not exist", func() {
 		It("raises a NoMethodError", func() {
 			_, err := vm.Run("'hello'.world()")
-			Expect(err).To(BeAssignableToTypeOf(builtins.NewNoMethodError("", "", "", "")))
+			Expect(err).To(BeAssignableToTypeOf(NewNoMethodError("", "", "", "")))
 			Expect(err.Error()).To(ContainSubstring("undefined method 'world' for \"hello\":String"))
 		})
 	})
@@ -427,7 +376,7 @@ foo = 0
 			Expect(err).To(HaveOccurred())
 
 			value, _ := vm.Get("foo")
-			Expect(value).To(Equal(builtins.NewFixnum(1, vm, vm)))
+			Expect(value).To(Equal(NewFixnum(1, vm, vm)))
 		})
 	})
 
@@ -482,7 +431,7 @@ end
 
 				val, err := method.Execute(fooInstance, nil)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(val).To(BeAssignableToTypeOf(builtins.NewString("", vm, vm)))
+				Expect(val).To(BeAssignableToTypeOf(NewString("", vm, vm)))
 				Expect(val.String()).To(Equal(`"world"`))
 			})
 		})
@@ -577,7 +526,7 @@ object.singleton_methods
 `)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(list.(*builtins.Array).Members()).To(ContainElement(vm.Symbols()["whatever"]))
+			Expect(list.(*Array).Members()).To(ContainElement(vm.Symbols()["whatever"]))
 		})
 	})
 

@@ -1,5 +1,10 @@
 package builtins
 
+import (
+	"fmt"
+	"strings"
+)
+
 type HashClass struct {
 	valueStub
 	classStub
@@ -71,7 +76,12 @@ type Hash struct {
 }
 
 func (hash *Hash) String() string {
-	return "Hash"
+	pieces := []string{}
+	for key, value := range hash.hash {
+		pieces = append(pieces, fmt.Sprintf("%s => %s", key.String(), value.String()))
+	}
+
+	return fmt.Sprintf("{%s}", strings.Join(pieces, ", "))
 }
 
 func (hash *Hash) Add(key, value Value) {

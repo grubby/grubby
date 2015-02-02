@@ -1,6 +1,9 @@
 package builtins
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type symbolClass struct {
 	valueStub
@@ -43,7 +46,7 @@ func NewSymbol(val string, provider ClassProvider) Value {
 }
 
 func (SymbolValue *SymbolValue) String() string {
-	return SymbolValue.value
+	return fmt.Sprintf(":%s", SymbolValue.value)
 }
 
 func (SymbolValue *SymbolValue) Name() string {

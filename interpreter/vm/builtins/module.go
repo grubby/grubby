@@ -34,7 +34,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			return nil, errors.New(fmt.Sprintf("TypeError: %v is not a symbol", args[0]))
 		}
 
-		method, err := self.Method(methodName.String())
+		method, err := self.Method(methodName.value)
 		if err != nil {
 			panic(fmt.Sprintf("%#v", self))
 			return nil, err
@@ -107,7 +107,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 			return nil, errors.New("expected method name to be a symbol")
 		}
 
-		instanceMethod, err := self.(*RubyModule).InstanceMethod(symbol.String())
+		instanceMethod, err := self.(*RubyModule).InstanceMethod(symbol.value)
 		if err != nil {
 			return nil, err
 		}
