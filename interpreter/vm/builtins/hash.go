@@ -14,13 +14,25 @@ type HashClass struct {
 	instanceMethods []Method
 }
 
-func NewHashClass(provider ClassProvider) Class {
+func NewHashClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	a := &HashClass{}
 	a.initialize()
 	a.setStringer(a.String)
 	a.class = provider.ClassWithName("Class")
 	a.superClass = provider.ClassWithName("Object")
 	a.provider = provider
+
+	a.AddMethod(NewNativeMethod("[]", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsHash := self.(*Hash)
+		value, ok := selfAsHash.hash[args[0]]
+
+		if !ok {
+			return singletonProvider.SingletonWithName("nil"), nil
+		} else {
+			return value, nil
+		}
+	}))
+
 	return a
 }
 

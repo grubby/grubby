@@ -147,7 +147,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 
 	vm.CurrentClasses["IO"] = NewIOClass(vm)
 	vm.CurrentClasses["Array"] = NewArrayClass(vm, vm)
-	vm.CurrentClasses["Hash"] = NewHashClass(vm)
+	vm.CurrentClasses["Hash"] = NewHashClass(vm, vm)
 	vm.CurrentClasses["TrueClass"] = NewTrueClass(vm)
 	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
 	vm.CurrentClasses["FalseClass"] = NewFalseClass(vm)

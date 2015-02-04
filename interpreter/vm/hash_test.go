@@ -71,8 +71,17 @@ var _ = Describe("Hashes", func() {
 	})
 
 	It("has a reasonable String() method", func() {
-		val, err := vm.Run("{:hello => 'world', :foo => :bar}")
+		val, err := vm.Run("{:hello => 'world'}")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(val.String()).To(Equal("{:hello => \"world\", :foo => :bar}"))
+		Expect(val.String()).To(Equal("{:hello => \"world\"}"))
+	})
+
+	It("can yield the value for keys with the [] operator", func() {
+		value, err := vm.Run(`
+hash = {:hello => :world}
+hash[:hello]
+`)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(value).To(Equal(vm.Symbols()["world"]))
 	})
 })
