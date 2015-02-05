@@ -9,15 +9,34 @@ type StringClass struct {
 	provider ClassProvider
 }
 
-func NewStringClass(provider ClassProvider) Class {
+func NewStringClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
 	s := &StringClass{}
 	s.initialize()
-	s.setStringer(s.String)
 	s.setStringer(s.String)
 
 	s.provider = provider
 	s.class = provider.ClassWithName("Class")
 	s.superClass = provider.ClassWithName("Object")
+
+	s.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		arg := args[0].(*StringValue)
+		selfAsStr := self.(*StringValue)
+		return NewString(selfAsStr.value+arg.value, provider, singletonProvider), nil
+	}))
+	s.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		asStr, ok := args[0].(*StringValue)
+		if !ok {
+			return singletonProvider.SingletonWithName("false"), nil
+		}
+
+		selfAsStr := self.(*StringValue)
+		if selfAsStr.value == asStr.value {
+			return singletonProvider.SingletonWithName("true"), nil
+		} else {
+			return singletonProvider.SingletonWithName("false"), nil
+		}
+	}))
+
 	return s
 }
 
@@ -35,24 +54,6 @@ func (class *StringClass) New(provider ClassProvider, singletonProvider Singleto
 	str.setStringer(str.String)
 	str.setStringer(str.String)
 	str.class = class
-
-	str.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		arg := args[0].(*StringValue)
-		return NewString(str.value+arg.value, provider, singletonProvider), nil
-	}))
-	str.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		asStr, ok := args[0].(*StringValue)
-		if !ok {
-			return singletonProvider.SingletonWithName("false"), nil
-		}
-
-		selfAsStr := self.(*StringValue)
-		if selfAsStr.value == asStr.value {
-			return singletonProvider.SingletonWithName("true"), nil
-		} else {
-			return singletonProvider.SingletonWithName("false"), nil
-		}
-	}))
 
 	return str, nil
 }

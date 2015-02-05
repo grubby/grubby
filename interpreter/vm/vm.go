@@ -152,7 +152,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
 	vm.CurrentClasses["FalseClass"] = NewFalseClass(vm)
 	vm.CurrentClasses["NilClass"] = NewNilClass(vm)
-	vm.CurrentClasses["String"] = NewStringClass(vm)
+	vm.CurrentClasses["String"] = NewStringClass(vm, vm)
 	vm.CurrentClasses["Numeric"] = NewNumericClass(vm)
 	vm.CurrentClasses["Integer"] = NewIntegerClass(vm)
 	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm, vm)

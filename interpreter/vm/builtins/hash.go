@@ -15,14 +15,38 @@ type HashClass struct {
 }
 
 func NewHashClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
-	a := &HashClass{}
-	a.initialize()
-	a.setStringer(a.String)
-	a.class = provider.ClassWithName("Class")
-	a.superClass = provider.ClassWithName("Object")
-	a.provider = provider
+	class := &HashClass{}
+	class.initialize()
+	class.setStringer(class.String)
+	class.class = provider.ClassWithName("Class")
+	class.superClass = provider.ClassWithName("Object")
+	class.provider = provider
 
-	a.AddMethod(NewNativeMethod("[]", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	class.AddMethod(NewNativeMethod("keys", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		o, _ := provider.ClassWithName("Array").New(provider, singletonProvider)
+		keys := o.(*Array)
+		for key := range self.(*Hash).hash {
+			keys.Append(key)
+		}
+
+		return keys, nil
+	}))
+	class.AddMethod(NewNativeMethod("values", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		o, _ := provider.ClassWithName("Array").New(provider, singletonProvider)
+		values := o.(*Array)
+		for key := range self.(*Hash).hash {
+			values.Append(self.(*Hash).hash[key])
+		}
+
+		return values, nil
+	}))
+
+	class.AddMethod(NewNativeMethod("[]=", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		self.(*Hash).hash[args[0]] = args[1]
+		return args[1], nil
+	}))
+
+	class.AddMethod(NewNativeMethod("[]", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsHash := self.(*Hash)
 		value, ok := selfAsHash.hash[args[0]]
 
@@ -33,7 +57,7 @@ func NewHashClass(provider ClassProvider, singletonProvider SingletonProvider) C
 		}
 	}))
 
-	return a
+	return class
 }
 
 func (klass *HashClass) AddInstanceMethod(m Method) {
@@ -41,37 +65,13 @@ func (klass *HashClass) AddInstanceMethod(m Method) {
 }
 
 func (klass *HashClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
-	a := &Hash{}
-	a.initialize()
-	a.setStringer(a.String)
-	a.class = klass
-	a.hash = make(map[Value]Value)
+	hash := &Hash{}
+	hash.initialize()
+	hash.setStringer(hash.String)
+	hash.class = klass
+	hash.hash = make(map[Value]Value)
 
-	a.AddMethod(NewNativeMethod("keys", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		o, _ := klass.provider.ClassWithName("Array").New(provider, singletonProvider)
-		keys := o.(*Array)
-		for key := range self.(*Hash).hash {
-			keys.Append(key)
-		}
-
-		return keys, nil
-	}))
-	a.AddMethod(NewNativeMethod("values", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		o, _ := klass.provider.ClassWithName("Array").New(provider, singletonProvider)
-		values := o.(*Array)
-		for key := range self.(*Hash).hash {
-			values.Append(self.(*Hash).hash[key])
-		}
-
-		return values, nil
-	}))
-
-	a.AddMethod(NewNativeMethod("[]=", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		self.(*Hash).hash[args[0]] = args[1]
-		return args[1], nil
-	}))
-
-	return a, nil
+	return hash, nil
 }
 
 func (hash *HashClass) Name() string {
