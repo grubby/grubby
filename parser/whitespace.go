@@ -5,6 +5,7 @@ const newline = "\n"
 
 func lexNewlines(l StatefulRubyLexer) stateFn {
 	for l.accept(newline) {
+		l.parsedNewLine()
 		l.emit(tokenTypeNewline)
 	}
 	return lexSomething
@@ -15,7 +16,9 @@ func lexWhiteSpaceIncludingNewlineAndComments(l StatefulRubyLexer) stateFn {
 	l.acceptRun(whitespace)
 
 	// accept a newline and following whitespace, if present
-	l.accept(newline)
+	if l.accept(newline) {
+		l.parsedNewLine()
+	}
 	l.acceptRun(whitespace)
 
 	// ignore a comment, if this line had one
@@ -28,6 +31,7 @@ func lexWhiteSpaceIncludingNewlineAndComments(l StatefulRubyLexer) stateFn {
 		l.ignore()
 
 		if l.accept(newline) {
+			l.parsedNewLine()
 			l.acceptRun(whitespace)
 		}
 	}

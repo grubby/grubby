@@ -129,6 +129,7 @@ var _ = Describe("goyacc parser", func() {
 					It("returns an interpolated string", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
 							ast.InterpolatedString{
+								Line:  1,
 								Value: `#{@tag}#{ "(#{@comment})" if @comment }:#{escape @description}`,
 							},
 						}))
@@ -181,16 +182,18 @@ EOS
 					It("should parse the heredoc around the method call", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
 							ast.CallExpression{
-								Func: ast.BareReference{Name: "foo"},
+								Line: 1,
+								Func: ast.BareReference{Line: 1, Name: "foo"},
 								Args: []ast.Node{
-									ast.InterpolatedString{Value: "something\ngoes\nhere"},
-									ast.SimpleString{Value: "a"},
-									ast.SimpleString{Value: "b"},
-									ast.SimpleString{Value: "c"},
+									ast.InterpolatedString{Line: 2, Value: "something\ngoes\nhere"},
+									ast.SimpleString{Line: 1, Value: "a"},
+									ast.SimpleString{Line: 1, Value: "b"},
+									ast.SimpleString{Line: 1, Value: "c"},
 									ast.CallExpression{
-										Target: ast.LineNumberConstReference{},
-										Func:   ast.BareReference{Name: "+"},
-										Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+										Line:   1,
+										Target: ast.LineNumberConstReference{Line: 1},
+										Func:   ast.BareReference{Line: 1, Name: "+"},
+										Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 1}},
 									},
 								},
 							},
@@ -209,7 +212,7 @@ spheniscomorphic-monoptic
 
 					It("returns an interpolated string, ending when it finds the identifier", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
-							ast.InterpolatedString{Value: "spheniscomorphic-monoptic"},
+							ast.InterpolatedString{Line: 2, Value: "spheniscomorphic-monoptic"},
 						}))
 					})
 				})
@@ -226,7 +229,7 @@ FOO
 
 					It("returns an interpolated string, ending only when it finds the identifier at column 0", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
-							ast.InterpolatedString{Value: "resenter-postvenous\n  FOO"},
+							ast.InterpolatedString{Line: 2, Value: "resenter-postvenous\n  FOO"},
 						}))
 					})
 				})
@@ -244,10 +247,10 @@ FOO
 
 				It("is parsed as an interpolated string", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.InterpolatedString{Value: "ain't life grand"},
-						ast.InterpolatedString{Value: "this is the worst"},
-						ast.InterpolatedString{Value: "GET OUT"},
-						ast.InterpolatedString{Value: "DONT EVER WRITE CODE LIKE THIS"},
+						ast.InterpolatedString{Line: 1, Value: "ain't life grand"},
+						ast.InterpolatedString{Line: 2, Value: "this is the worst"},
+						ast.InterpolatedString{Line: 3, Value: "GET OUT"},
+						ast.InterpolatedString{Line: 4, Value: "DONT EVER WRITE CODE LIKE THIS"},
 					}))
 				})
 			})
@@ -313,8 +316,8 @@ FOO
 
 			It("returns multiple nodes", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.Symbol{Name: "foo"},
-					ast.Symbol{Name: "bar"},
+					ast.Symbol{Line: 1, Name: "foo"},
+					ast.Symbol{Line: 2, Name: "bar"},
 				}))
 			})
 		})
@@ -389,22 +392,25 @@ end
 				It("should be parsed as an ast.SwitchStatement", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.SwitchStatement{
+							Line: 1,
 							Cases: []ast.SwitchCase{
 								ast.SwitchCase{
 									Conditions: []ast.Node{
 										ast.CallExpression{
-											Func: ast.BareReference{Name: "truthy_method?"},
+											Line: 2,
+											Func: ast.BareReference{Line: 2, Name: "truthy_method?"},
 										},
 									},
-									Body: []ast.Node{ast.ConstantInt{Value: 0}},
+									Body: []ast.Node{ast.ConstantInt{Line: 3, Value: 0}},
 								},
 								ast.SwitchCase{
 									Conditions: []ast.Node{
 										ast.CallExpression{
-											Func: ast.BareReference{Name: "falsey_method?"},
+											Line: 4,
+											Func: ast.BareReference{Line: 4, Name: "falsey_method?"},
 										},
 									},
-									Body: []ast.Node{ast.ConstantInt{Value: 1}},
+									Body: []ast.Node{ast.ConstantInt{Line: 5, Value: 1}},
 								},
 							},
 						},
@@ -433,60 +439,66 @@ end
 				It("should be parsed as an ast.SwitchStatement", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.SwitchStatement{
-							Condition: ast.BareReference{Name: "some_integer"},
+							Line:      1,
+							Condition: ast.BareReference{Line: 1, Name: "some_integer"},
 							Cases: []ast.SwitchCase{
 								ast.SwitchCase{
 									Conditions: []ast.Node{
-										ast.ConstantInt{Value: 1},
-										ast.ConstantInt{Value: 3},
+										ast.ConstantInt{Line: 2, Value: 1},
+										ast.ConstantInt{Line: 2, Value: 3},
 									},
 									Body: []ast.Node{
 										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "even"}},
+											Line: 3,
+											Func: ast.BareReference{Line: 3, Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Line: 3, Value: "even"}},
 										},
 									},
 								},
 								ast.SwitchCase{
 									Conditions: []ast.Node{
-										ast.ConstantInt{Value: 2},
-										ast.ConstantInt{Value: 4},
+										ast.ConstantInt{Line: 4, Value: 2},
+										ast.ConstantInt{Line: 4, Value: 4},
 									},
 									Body: []ast.Node{
 										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "odd"}},
+											Line: 5,
+											Func: ast.BareReference{Line: 5, Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Line: 5, Value: "odd"}},
 										},
 									},
 								},
 								ast.SwitchCase{
 									Conditions: []ast.Node{
-										ast.CharacterLiteral{Value: "^"},
+										ast.CharacterLiteral{Line: 6, Value: "^"},
 									},
 									Body: []ast.Node{
 										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "a single character (^) literal"}},
+											Line: 7,
+											Func: ast.BareReference{Line: 7, Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Line: 7, Value: "a single character (^) literal"}},
 										},
 									},
 								},
 								ast.SwitchCase{
 									Conditions: []ast.Node{
-										ast.CharacterLiteral{Value: ":"},
+										ast.CharacterLiteral{Line: 8, Value: ":"},
 									},
 									Body: []ast.Node{
 										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "a single character (:) literal"}},
+											Line: 9,
+											Func: ast.BareReference{Line: 9, Name: "puts"},
+											Args: []ast.Node{ast.SimpleString{Line: 9, Value: "a single character (:) literal"}},
 										},
 									},
 								},
 							},
 							Else: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
+									Line: 11,
+									Func: ast.BareReference{Line: 11, Name: "puts"},
 									Args: []ast.Node{
-										ast.SimpleString{Value: "whoops"},
+										ast.SimpleString{Line: 11, Value: "whoops"},
 									},
 								},
 							},
@@ -565,26 +577,31 @@ d *= nil
 				It("is parsed with the operator as the method name", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "a"},
-							Func:   ast.BareReference{Name: "+="},
-							Args:   []ast.Node{ast.ConstantInt{Value: 5}},
+							Line:   1,
+							Target: ast.BareReference{Line: 1, Name: "a"},
+							Func:   ast.BareReference{Line: 1, Name: "+="},
+							Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 5}},
 						},
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "b"},
-							Func:   ast.BareReference{Name: "-="},
+							Line:   2,
+							Target: ast.BareReference{Line: 2, Name: "b"},
+							Func:   ast.BareReference{Line: 2, Name: "-="},
 							Args: []ast.Node{ast.Array{
-								Nodes: []ast.Node{ast.ConstantInt{Value: 1}},
+								Line:  2,
+								Nodes: []ast.Node{ast.ConstantInt{Line: 2, Value: 1}},
 							}},
 						},
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "c"},
-							Func:   ast.BareReference{Name: "/="},
-							Args:   []ast.Node{ast.SimpleString{Value: "x"}},
+							Line:   3,
+							Target: ast.BareReference{Line: 3, Name: "c"},
+							Func:   ast.BareReference{Line: 3, Name: "/="},
+							Args:   []ast.Node{ast.SimpleString{Line: 3, Value: "x"}},
 						},
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "d"},
-							Func:   ast.BareReference{Name: "*="},
-							Args:   []ast.Node{ast.Nil{}},
+							Line:   4,
+							Target: ast.BareReference{Line: 4, Name: "d"},
+							Func:   ast.BareReference{Line: 4, Name: "*="},
+							Args:   []ast.Node{ast.Nil{Line: 4}},
 						},
 					}))
 				})
@@ -603,14 +620,16 @@ method_with_lots_of_args('foo',
 				It("should be parsed as though the newlines were not present", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Func: ast.BareReference{Name: "method_with_lots_of_args"},
+							Line: 1,
+							Func: ast.BareReference{Line: 1, Name: "method_with_lots_of_args"},
 							Args: []ast.Node{
-								ast.SimpleString{Value: "foo"},
-								ast.SimpleString{Value: "bar"},
-								ast.SimpleString{Value: "baz"},
+								ast.SimpleString{Line: 1, Value: "foo"},
+								ast.SimpleString{Line: 2, Value: "bar"},
+								ast.SimpleString{Line: 3, Value: "baz"},
 								ast.CallExpression{
-									Func:   ast.BareReference{Name: "to_proc"},
-									Target: ast.BareReference{Name: "buz"},
+									Line:   4,
+									Func:   ast.BareReference{Line: 4, Name: "to_proc"},
+									Target: ast.BareReference{Line: 4, Name: "buz"},
 								},
 							},
 						},
@@ -630,18 +649,21 @@ end
 				It("is parsed correctly", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "Signal"},
-							Func:   ast.BareReference{Name: "trap"},
+							Line:   1,
+							Target: ast.BareReference{Line: 1, Name: "Signal"},
+							Func:   ast.BareReference{Line: 1, Name: "trap"},
 							Args: []ast.Node{
-								ast.InterpolatedString{Value: "INT"},
-								ast.InterpolatedString{Value: "TERM"},
+								ast.InterpolatedString{Line: 1, Value: "INT"},
+								ast.InterpolatedString{Line: 1, Value: "TERM"},
 							},
 							OptionalBlock: ast.Block{
+								Line: 1,
 								Body: []ast.Node{
 									ast.CallExpression{
-										Target: ast.BareReference{Name: "MSpec"},
-										Func:   ast.BareReference{Name: "actions"},
-										Args:   []ast.Node{ast.Symbol{Name: "abort"}},
+										Line:   2,
+										Target: ast.BareReference{Line: 2, Name: "MSpec"},
+										Func:   ast.BareReference{Line: 2, Name: "actions"},
+										Args:   []ast.Node{ast.Symbol{Line: 2, Name: "abort"}},
 									},
 								},
 							},
@@ -662,19 +684,23 @@ end
 				It("is parsed as a call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
+							Line: 1,
 							Target: ast.Group{
+								Line: 1,
 								Body: []ast.Node{
 									ast.CallExpression{
-										Target: ast.InstanceVariable{Name: "repeat"},
-										Func:   ast.BareReference{Name: "||"},
-										Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+										Line:   1,
+										Target: ast.InstanceVariable{Line: 1, Name: "repeat"},
+										Func:   ast.BareReference{Line: 1, Name: "||"},
+										Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 1}},
 									},
 								},
 							},
-							Func: ast.BareReference{Name: "times"},
+							Func: ast.BareReference{Line: 1, Name: "times"},
 							Args: []ast.Node{},
 							OptionalBlock: ast.Block{
-								Body: []ast.Node{ast.Yield{}},
+								Line: 1,
+								Body: []ast.Node{ast.Yield{Line: 2}},
 							},
 						},
 					}))
@@ -695,18 +721,21 @@ end
 				It("should be parsed as though the newlines were not present", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Func: ast.BareReference{Name: "method_with_lots_of_args"},
+							Line: 1,
+							Func: ast.BareReference{Line: 1, Name: "method_with_lots_of_args"},
 							Args: []ast.Node{
-								ast.SimpleString{Value: "foo"},
-								ast.SimpleString{Value: "bar"},
-								ast.SimpleString{Value: "baz"},
+								ast.SimpleString{Line: 1, Value: "foo"},
+								ast.SimpleString{Line: 2, Value: "bar"},
+								ast.SimpleString{Line: 3, Value: "baz"},
 							},
 							OptionalBlock: ast.Block{
-								Args: []ast.Node{ast.BareReference{Name: "foo"}},
+								Line: 3,
+								Args: []ast.Node{ast.BareReference{Line: 3, Name: "foo"}},
 								Body: []ast.Node{
 									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.BareReference{Name: "foo"}},
+										Line: 4,
+										Func: ast.BareReference{Line: 4, Name: "puts"},
+										Args: []ast.Node{ast.BareReference{Line: 4, Name: "foo"}},
 									},
 								},
 							},
@@ -781,9 +810,7 @@ end
 
 			Context("chained together with a block at the end", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer(`
-MSpec.retrieve(:files).inject(0) { |max, f| f.size > max ? f.size : max }
-`)
+					lexer = parser.NewLexer("MSpec.retrieve(:files).inject(0) { |max, f| f.size > max ? f.size : max }")
 				})
 
 				It("is parsed as nested call expressions", func() {
@@ -918,12 +945,14 @@ MSpec.retrieve(:files).inject(0) { |max, f| f.size > max ? f.size : max }
 				It("is parsed as a call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 5},
-							Func:   ast.BareReference{Name: "!"},
+							Line:   1,
+							Target: ast.ConstantInt{Line: 1, Value: 5},
+							Func:   ast.BareReference{Line: 1, Name: "!"},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 123},
-							Func:   ast.BareReference{Name: "abc"},
+							Line:   2,
+							Target: ast.ConstantInt{Line: 2, Value: 123},
+							Func:   ast.BareReference{Line: 2, Name: "abc"},
 							Args:   []ast.Node{},
 						},
 					}))
@@ -990,13 +1019,15 @@ ARGV.shift
 				It("correctly sets the target", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "foo"},
-							Func:   ast.BareReference{Name: "send"},
-							Args:   []ast.Node{ast.Symbol{Name: "catalecta_coassistant"}},
+							Line:   1,
+							Target: ast.BareReference{Line: 1, Name: "foo"},
+							Func:   ast.BareReference{Line: 1, Name: "send"},
+							Args:   []ast.Node{ast.Symbol{Line: 1, Name: "catalecta_coassistant"}},
 						},
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "ARGV"},
-							Func:   ast.BareReference{Name: "shift"},
+							Line:   2,
+							Target: ast.BareReference{Line: 2, Name: "ARGV"},
+							Func:   ast.BareReference{Line: 2, Name: "shift"},
 						},
 					}))
 				})
@@ -1113,22 +1144,24 @@ end
 				It("should be parsed with the equals sign in the name", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
+							Line:   1,
 							Target: nil,
-							Name:   ast.BareReference{Name: "foo="},
+							Name:   ast.BareReference{Line: 1, Name: "foo="},
 							Args: []ast.Node{
 								ast.MethodParam{
-									Name:    ast.BareReference{Name: "bar"},
+									Name:    ast.BareReference{Line: 1, Name: "bar"},
 									IsSplat: false,
 								},
 							},
 							Body: []ast.Node{},
 						},
 						ast.FuncDecl{
-							Target: ast.Self{},
-							Name:   ast.BareReference{Name: "bar="},
+							Line:   4,
+							Target: ast.Self{Line: 4},
+							Name:   ast.BareReference{Line: 4, Name: "bar="},
 							Args: []ast.Node{
 								ast.MethodParam{
-									Name:    ast.BareReference{Name: "foo"},
+									Name:    ast.BareReference{Line: 4, Name: "foo"},
 									IsSplat: false,
 								},
 							},
@@ -1150,15 +1183,18 @@ end
 				It("is parsed as a method declaration", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Assignment{
-							LHS: ast.BareReference{Name: "obj"},
+							Line: 1,
+							LHS:  ast.BareReference{Line: 1, Name: "obj"},
 							RHS: ast.CallExpression{
-								Target: ast.BareReference{Name: "Object"},
-								Func:   ast.BareReference{Name: "new"},
+								Line:   1,
+								Target: ast.BareReference{Line: 1, Name: "Object"},
+								Func:   ast.BareReference{Line: 1, Name: "new"},
 							},
 						},
 						ast.FuncDecl{
-							Target: ast.BareReference{Name: "obj"},
-							Name:   ast.BareReference{Name: "start"},
+							Line:   2,
+							Target: ast.BareReference{Line: 2, Name: "obj"},
+							Name:   ast.BareReference{Line: 2, Name: "start"},
 							Body:   []ast.Node{},
 							Args:   []ast.Node{},
 						},
@@ -1178,16 +1214,19 @@ end
 				It("parses them as binary operators", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "<=>"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "<=>"},
 							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.CallExpression{
+									Line: 2,
 									Target: ast.CallExpression{
-										Target: ast.Self{},
-										Func:   ast.BareReference{Name: "to_i"},
+										Line:   2,
+										Target: ast.Self{Line: 2},
+										Func:   ast.BareReference{Line: 2, Name: "to_i"},
 									},
-									Func: ast.BareReference{Name: "<=>"},
-									Args: []ast.Node{ast.BareReference{Name: "other"}},
+									Func: ast.BareReference{Line: 2, Name: "<=>"},
+									Args: []ast.Node{ast.BareReference{Line: 2, Name: "other"}},
 								},
 							},
 						},
@@ -1206,10 +1245,11 @@ end
 				It("marks the param as being splatted", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "on"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "on"},
 							Args: []ast.Node{
 								ast.MethodParam{
-									Name:    ast.BareReference{Name: "args"},
+									Name:    ast.BareReference{Line: 1, Name: "args"},
 									IsSplat: true,
 								},
 							},
@@ -1226,17 +1266,19 @@ def test(*args, &block)
 end
 `)
 				})
+
 				It("marks the param as a proc", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "test"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "test"},
 							Args: []ast.Node{
 								ast.MethodParam{
-									Name:    ast.BareReference{Name: "args"},
+									Name:    ast.BareReference{Line: 1, Name: "args"},
 									IsSplat: true,
 								},
 								ast.MethodParam{
-									Name:   ast.BareReference{Name: "block"},
+									Name:   ast.BareReference{Line: 1, Name: "block"},
 									IsProc: true,
 								},
 							},
@@ -1262,17 +1304,19 @@ end
 				It("is parsed with the correct method name", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "foo!"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "foo!"},
 							Args: []ast.Node{},
 							Body: []ast.Node{
-								ast.BareReference{Name: "raise"},
+								ast.BareReference{Line: 2, Name: "raise"},
 							},
 						},
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "foo?"},
+							Line: 5,
+							Name: ast.BareReference{Line: 5, Name: "foo?"},
 							Args: []ast.Node{},
 							Body: []ast.Node{
-								ast.Boolean{Value: false},
+								ast.Boolean{Line: 6, Value: false},
 							},
 						},
 					}))
@@ -1291,12 +1335,14 @@ end
 				It("returns a function declaration with the body set", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "something"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "something"},
 							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "hai"}},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 2, Value: "hai"}},
 								},
 							},
 						},
@@ -1315,11 +1361,12 @@ end
 				It("returns a function declaration with the default values set", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{"foo"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "foo"},
 							Args: []ast.Node{
 								ast.MethodParam{
-									Name:         ast.BareReference{Name: "a"},
-									DefaultValue: ast.ConstantInt{Value: 123},
+									Name:         ast.BareReference{Line: 1, Name: "a"},
+									DefaultValue: ast.ConstantInt{Line: 1, Value: 123},
 								},
 							},
 							Body: []ast.Node{},
@@ -1339,16 +1386,17 @@ end
 				It("returns a function declaration with appropriate method parameters", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Target: ast.Self{},
-							Name:   ast.BareReference{Name: "describe"},
+							Line:   1,
+							Target: ast.Self{Line: 1},
+							Name:   ast.BareReference{Line: 1, Name: "describe"},
 							Args: []ast.Node{
-								ast.MethodParam{Name: ast.BareReference{Name: "mod"}},
+								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "mod"}},
 								ast.MethodParam{
-									Name:         ast.BareReference{Name: "options"},
-									DefaultValue: ast.Nil{},
+									Name:         ast.BareReference{Line: 1, Name: "options"},
+									DefaultValue: ast.Nil{Line: 1},
 								},
 								ast.MethodParam{
-									Name:   ast.BareReference{Name: "block"},
+									Name:   ast.BareReference{Line: 1, Name: "block"},
 									IsProc: true,
 								},
 							},
@@ -1371,19 +1419,22 @@ end
 				It("returns a function declaration with the args set", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "multi_put"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "multi_put"},
 							Args: []ast.Node{
-								ast.MethodParam{Name: ast.BareReference{Name: "str1"}},
-								ast.MethodParam{Name: ast.BareReference{Name: "str2"}},
+								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str1"}},
+								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str2"}},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.BareReference{Name: "str1"}},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
+									Args: []ast.Node{ast.BareReference{Line: 2, Name: "str1"}},
 								},
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.BareReference{Name: "str2"}},
+									Line: 3,
+									Func: ast.BareReference{Line: 3, Name: "puts"},
+									Args: []ast.Node{ast.BareReference{Line: 3, Name: "str2"}},
 								},
 							},
 						},
@@ -1403,17 +1454,19 @@ end
 				It("returns a function declaration with the args set", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.FuncDecl{
-							Name: ast.BareReference{Name: "multi_put"},
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "multi_put"},
 							Args: []ast.Node{
-								ast.MethodParam{Name: ast.BareReference{Name: "str1"}},
-								ast.MethodParam{Name: ast.BareReference{Name: "str2"}},
+								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str1"}},
+								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str2"}},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
 									Args: []ast.Node{
-										ast.BareReference{Name: "str1"},
-										ast.BareReference{Name: "str2"},
+										ast.BareReference{Line: 2, Name: "str1"},
+										ast.BareReference{Line: 2, Name: "str2"},
 									},
 								},
 							},
@@ -1444,8 +1497,8 @@ end
 
 				It("reads the line of code, ignoring the comment", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.ConstantInt{Value: 5},
-						ast.ConstantInt{Value: 12},
+						ast.ConstantInt{Line: 1, Value: 5},
+						ast.ConstantInt{Line: 2, Value: 12},
 					}))
 				})
 			})
@@ -1464,11 +1517,13 @@ end
 				It("returns a ClassDefn with the body set", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.ClassDecl{
+							Line: 1,
 							Name: "Foo",
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "hai"}},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 2, Value: "hai"}},
 								},
 							},
 						},
@@ -1487,8 +1542,9 @@ end
 				It("returns a class with the given superclass", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.ClassDecl{
+							Line:       1,
 							Name:       "Foo",
-							SuperClass: ast.Class{Name: "Bar"},
+							SuperClass: ast.Class{Line: 1, Name: "Bar"},
 							Body:       []ast.Node{},
 						},
 					}))
@@ -1506,6 +1562,7 @@ end
 				It("returns a class with the given namespace", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.ClassDecl{
+							Line:      1,
 							Name:      "Bar",
 							Namespace: "Foo",
 							Body:      []ast.Node{},
@@ -1525,8 +1582,9 @@ end
 				It("returns a class with the given namespace", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.ClassDecl{
+							Line:       1,
 							Name:       "Bar",
-							SuperClass: ast.Class{Name: "Baz", Namespace: "Foo::Biz"},
+							SuperClass: ast.Class{Line: 1, Name: "Baz", Namespace: "Foo::Biz"},
 							Namespace:  "Foo::Biz",
 							Body:       []ast.Node{},
 						},
@@ -1550,20 +1608,23 @@ end
 				It("should parse a class with a single method defined", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.ClassDecl{
+							Line:       1,
 							Name:       "Whatever",
-							SuperClass: ast.Class{Name: "ThisShouldWork"},
+							SuperClass: ast.Class{Line: 1, Name: "ThisShouldWork"},
 							Body: []ast.Node{
 								ast.FuncDecl{
-									Name: ast.BareReference{Name: "initialize"},
+									Line: 2,
+									Name: ast.BareReference{Line: 2, Name: "initialize"},
 									Args: []ast.Node{},
 									Body: []ast.Node{
-										ast.BareReference{Name: "super"},
+										ast.BareReference{Line: 3, Name: "super"},
 										ast.CallExpression{
-											Target: ast.BareReference{Name: "config"},
-											Func:   ast.BareReference{Name: "[]="},
+											Line:   5,
+											Target: ast.BareReference{Line: 5, Name: "config"},
+											Func:   ast.BareReference{Line: 5, Name: "[]="},
 											Args: []ast.Node{
-												ast.Symbol{Name: "files"},
-												ast.Array{Nodes: []ast.Node{}},
+												ast.Symbol{Line: 5, Name: "files"},
+												ast.Array{Line: 5, Nodes: []ast.Node{}},
 											},
 										},
 									},
@@ -1589,15 +1650,19 @@ end
 			It("can be used to modify the unique singleton class for an object", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.ClassDecl{
+						Line: 1,
 						Name: "Foo",
 						Body: []ast.Node{
 							ast.EigenClass{
-								Target: ast.Self{},
+								Line:   2,
+								Target: ast.Self{Line: 2},
 								Body: []ast.Node{
 									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
+										Line: 3,
+										Func: ast.BareReference{Line: 3, Name: "puts"},
 										Args: []ast.Node{
 											ast.SimpleString{
+												Line:  3,
 												Value: "this is evaluated inside the eigenclass for the Foo class",
 											},
 										},
@@ -1626,23 +1691,27 @@ end
 				It("should be parsed as a call expression for the []= operator", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.InstanceVariable{Name: "shared"},
-							Func:   ast.BareReference{Name: "[]="},
+							Line:   1,
+							Target: ast.InstanceVariable{Line: 1, Name: "shared"},
+							Func:   ast.BareReference{Line: 1, Name: "[]="},
 							Args: []ast.Node{
 								ast.CallExpression{
-									Target: ast.BareReference{Name: "state"},
-									Func:   ast.BareReference{Name: "to_s"},
+									Line:   1,
+									Target: ast.BareReference{Line: 1, Name: "state"},
+									Func:   ast.BareReference{Line: 1, Name: "to_s"},
 								},
-								ast.BareReference{Name: "state"},
+								ast.BareReference{Line: 1, Name: "state"},
 							},
 						},
 						ast.CallExpression{
-							Target: ast.InstanceVariable{Name: "shared"},
-							Func:   ast.BareReference{Name: "[]"},
+							Line:   2,
+							Target: ast.InstanceVariable{Line: 2, Name: "shared"},
+							Func:   ast.BareReference{Line: 2, Name: "[]"},
 							Args: []ast.Node{
 								ast.CallExpression{
-									Target: ast.BareReference{Name: "state"},
-									Func:   ast.BareReference{Name: "to_s"},
+									Line:   2,
+									Target: ast.BareReference{Line: 2, Name: "state"},
+									Func:   ast.BareReference{Line: 2, Name: "to_s"},
 								},
 							},
 						},
@@ -1708,16 +1777,19 @@ SomeModule::InThe::CurrentScope
 				It("is parsed with the IsGlobalNamespace field set", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Class{
+							Line:              1,
 							Name:              "CurrentScope",
 							Namespace:         "SomeModule::InThe",
 							IsGlobalNamespace: false,
 						},
 						ast.Class{
+							Line:              2,
 							Name:              "InTheGlobalNamespace",
 							Namespace:         "SomeModule",
 							IsGlobalNamespace: true,
 						},
 						ast.Class{
+							Line:              3,
 							Name:              "AnotherModule",
 							Namespace:         "",
 							IsGlobalNamespace: true,
@@ -1738,12 +1810,14 @@ end
 				It("returns a module declaration", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.ModuleDecl{
+							Line:      1,
 							Name:      "Baz",
 							Namespace: "Foo::Bar",
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "tumescent-wasty"}},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 2, Value: "tumescent-wasty"}},
 								},
 							},
 						},
@@ -1766,8 +1840,9 @@ foo  \
 			It("can be done using a backslash at the end of a line", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.CallExpression{
-						Target: ast.BareReference{Name: "foo"},
-						Func:   ast.BareReference{Name: "inspect"},
+						Line:   2,
+						Target: ast.BareReference{Line: 2, Name: "foo"},
+						Func:   ast.BareReference{Line: 5, Name: "inspect"},
 					},
 				}))
 			})
@@ -1784,16 +1859,19 @@ a ||= 'aftergrass-Dowieite'
 			It("returns a ConditionalAssignment expression", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.ConditionalAssignment{
-						LHS: ast.BareReference{Name: "a"},
-						RHS: ast.SimpleString{Value: "aftergrass-Dowieite"},
+						Line: 1,
+						LHS:  ast.BareReference{Line: 1, Name: "a"},
+						RHS:  ast.SimpleString{Line: 1, Value: "aftergrass-Dowieite"},
 					},
 					ast.ConditionalAssignment{
+						Line: 2,
 						LHS: ast.CallExpression{
-							Target: ast.InstanceVariable{Name: "options"},
-							Func:   ast.BareReference{Name: "[]"},
-							Args:   []ast.Node{ast.Symbol{Name: "shared"}},
+							Line:   2,
+							Target: ast.InstanceVariable{Line: 2, Name: "options"},
+							Func:   ast.BareReference{Line: 2, Name: "[]"},
+							Args:   []ast.Node{ast.Symbol{Line: 2, Name: "shared"}},
 						},
-						RHS: ast.Boolean{Value: false},
+						RHS: ast.Boolean{Line: 2, Value: false},
 					},
 				}))
 			})
@@ -1831,17 +1909,20 @@ HASH['second_key'] = [:something]
 				It("is parsed as nested call expressions", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "HASH"},
-							Func:   ast.BareReference{Name: "[]="},
+							Line:   1,
+							Target: ast.BareReference{Line: 1, Name: "HASH"},
+							Func:   ast.BareReference{Line: 1, Name: "[]="},
 							Args: []ast.Node{
-								ast.SimpleString{Value: "first_key"},
+								ast.SimpleString{Line: 1, Value: "first_key"},
 								ast.CallExpression{
-									Target: ast.BareReference{Name: "HASH"},
-									Func:   ast.BareReference{Name: "[]="},
+									Line:   2,
+									Target: ast.BareReference{Line: 2, Name: "HASH"},
+									Func:   ast.BareReference{Line: 2, Name: "[]="},
 									Args: []ast.Node{
-										ast.SimpleString{Value: "second_key"},
+										ast.SimpleString{Line: 2, Value: "second_key"},
 										ast.Array{
-											Nodes: []ast.Node{ast.Symbol{Name: "something"}},
+											Line:  2,
+											Nodes: []ast.Node{ast.Symbol{Line: 2, Name: "something"}},
 										},
 									},
 								},
@@ -1925,30 +2006,36 @@ HASH['second_key'] = [:something]
 				It("should be parsed as a multiple assignment as well", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Assignment{
+							Line: 1,
 							LHS: ast.Array{
+								Line: 1,
 								Nodes: []ast.Node{
-									ast.InstanceVariable{Name: "foo"},
-									ast.InstanceVariable{Name: "bar"},
+									ast.InstanceVariable{Line: 1, Name: "foo"},
+									ast.InstanceVariable{Line: 1, Name: "bar"},
 								},
 							},
 							RHS: ast.Array{
+								Line: 1,
 								Nodes: []ast.Node{
-									ast.ConstantInt{Value: 1},
-									ast.ConstantInt{Value: 2},
+									ast.ConstantInt{Line: 1, Value: 1},
+									ast.ConstantInt{Line: 1, Value: 2},
 								},
 							},
 						},
 						ast.Assignment{
+							Line: 2,
 							LHS: ast.Array{
+								Line: 2,
 								Nodes: []ast.Node{
-									ast.ClassVariable{Name: "foo"},
-									ast.ClassVariable{Name: "bar"},
+									ast.ClassVariable{Line: 2, Name: "foo"},
+									ast.ClassVariable{Line: 2, Name: "bar"},
 								},
 							},
 							RHS: ast.Array{
+								Line: 2,
 								Nodes: []ast.Node{
-									ast.ConstantInt{Value: 3},
-									ast.ConstantInt{Value: 4},
+									ast.ConstantInt{Line: 2, Value: 3},
+									ast.ConstantInt{Line: 2, Value: 4},
 								},
 							},
 						},
@@ -2008,8 +2095,8 @@ false
 
 			It("returns a Boolean", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.Boolean{Value: true},
-					ast.Boolean{Value: false},
+					ast.Boolean{Line: 1, Value: true},
+					ast.Boolean{Line: 2, Value: false},
 				}))
 			})
 		})
@@ -2023,7 +2110,7 @@ false
 				It("returns a Negation expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Negation{
-							ast.Negation{
+							Target: ast.Negation{
 								Target: ast.Boolean{Value: true},
 							},
 						},
@@ -2039,7 +2126,7 @@ false
 				It("returns a Complement expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Complement{
-							ast.Complement{
+							Target: ast.Complement{
 								Target: ast.Boolean{Value: false},
 							},
 						},
@@ -2055,7 +2142,7 @@ false
 				It("returns a Positive expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Positive{
-							ast.Positive{
+							Target: ast.Positive{
 								Target: ast.BareReference{Name: "foo"},
 							},
 						},
@@ -2071,7 +2158,7 @@ false
 				It("returns a Negative expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Negative{
-							ast.Negative{
+							Target: ast.Negative{
 								Target: ast.ConstantFloat{Value: 867.5309},
 							},
 						},
@@ -2140,14 +2227,24 @@ false
 				It("returns a division call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 321},
-							Func:   ast.BareReference{Name: "/"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
+							Line:   1,
+							Target: ast.ConstantInt{Line: 1, Value: 321},
+							Func:   ast.BareReference{Line: 1, Name: "/"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 123}},
 						},
 						ast.CallExpression{
-							Target: ast.Group{Body: []ast.Node{ast.BareReference{Name: "abc"}}},
-							Func:   ast.BareReference{Name: "/"},
-							Args:   []ast.Node{ast.Group{Body: []ast.Node{ast.BareReference{Name: "xyz"}}}},
+							Line: 2,
+							Target: ast.Group{
+								Line: 2,
+								Body: []ast.Node{ast.BareReference{Line: 2, Name: "abc"}},
+							},
+							Func: ast.BareReference{Line: 2, Name: "/"},
+							Args: []ast.Node{
+								ast.Group{
+									Line: 2,
+									Body: []ast.Node{ast.BareReference{Line: 2, Name: "xyz"}},
+								},
+							},
 						},
 					}))
 				})
@@ -2196,14 +2293,16 @@ false
 				It("returns a shovel call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 321},
-							Func:   ast.BareReference{Name: "<<"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 123}},
+							Line:   1,
+							Target: ast.ConstantInt{Line: 1, Value: 321},
+							Func:   ast.BareReference{Line: 1, Name: "<<"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 123}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 555},
-							Func:   ast.BareReference{Name: ">>"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 666}},
+							Line:   2,
+							Target: ast.ConstantInt{Line: 2, Value: 555},
+							Func:   ast.BareReference{Line: 2, Name: ">>"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 2, Value: 666}},
 						},
 					}))
 				})
@@ -2222,30 +2321,35 @@ File.lchmod mode & 01777, path
 				It("returns a call expressions for those methods", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "&"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+							Line:   1,
+							Target: ast.ConstantInt{Line: 1, Value: 1},
+							Func:   ast.BareReference{Line: 1, Name: "&"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 0}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "|"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+							Line:   2,
+							Target: ast.ConstantInt{Line: 2, Value: 1},
+							Func:   ast.BareReference{Line: 2, Name: "|"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 2, Value: 0}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "^"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 5}},
+							Line:   3,
+							Target: ast.ConstantInt{Line: 3, Value: 1},
+							Func:   ast.BareReference{Line: 3, Name: "^"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 3, Value: 5}},
 						},
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "File"},
-							Func:   ast.BareReference{Name: "lchmod"},
+							Line:   4,
+							Target: ast.BareReference{Line: 4, Name: "File"},
+							Func:   ast.BareReference{Line: 4, Name: "lchmod"},
 							Args: []ast.Node{
 								ast.CallExpression{
-									Target: ast.BareReference{Name: "mode"},
-									Func:   ast.BareReference{Name: "&"},
-									Args:   []ast.Node{ast.ConstantInt{Value: 1777}},
+									Line:   4,
+									Target: ast.BareReference{Line: 4, Name: "mode"},
+									Func:   ast.BareReference{Line: 4, Name: "&"},
+									Args:   []ast.Node{ast.ConstantInt{Line: 4, Value: 1777}},
 								},
-								ast.BareReference{Name: "path"},
+								ast.BareReference{Line: 4, Name: "path"},
 							},
 						},
 					}))
@@ -2266,29 +2370,34 @@ File.lchmod mode & 01777, path
 				It("is parsed as an call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 0},
-							Func:   ast.BareReference{Name: "<"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+							Line:   1,
+							Target: ast.ConstantInt{Line: 1, Value: 0},
+							Func:   ast.BareReference{Line: 1, Name: "<"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 1}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: ">"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+							Line:   2,
+							Target: ast.ConstantInt{Line: 2, Value: 1},
+							Func:   ast.BareReference{Line: 2, Name: ">"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 2, Value: 0}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 5},
-							Func:   ast.BareReference{Name: "<="},
-							Args:   []ast.Node{ast.ConstantInt{Value: 55}},
+							Line:   3,
+							Target: ast.ConstantInt{Line: 3, Value: 5},
+							Func:   ast.BareReference{Line: 3, Name: "<="},
+							Args:   []ast.Node{ast.ConstantInt{Line: 3, Value: 55}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 12},
-							Func:   ast.BareReference{Name: ">="},
-							Args:   []ast.Node{ast.ConstantInt{Value: 21}},
+							Line:   4,
+							Target: ast.ConstantInt{Line: 4, Value: 12},
+							Func:   ast.BareReference{Line: 4, Name: ">="},
+							Args:   []ast.Node{ast.ConstantInt{Line: 4, Value: 21}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 22},
-							Func:   ast.BareReference{Name: "<=>"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 22}},
+							Line:   5,
+							Target: ast.ConstantInt{Line: 5, Value: 22},
+							Func:   ast.BareReference{Line: 5, Name: "<=>"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 5, Value: 22}},
 						},
 					}))
 				})
@@ -2309,22 +2418,26 @@ File.lchmod mode & 01777, path
 					It("is parsed as a call expression", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
 							ast.CallExpression{
-								Target: ast.ConstantInt{Value: 1},
-								Func:   ast.BareReference{Name: "&&"},
-								Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+								Line:   1,
+								Target: ast.ConstantInt{Line: 1, Value: 1},
+								Func:   ast.BareReference{Line: 1, Name: "&&"},
+								Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 0}},
 							},
 							ast.CallExpression{
-								Target: ast.ConstantInt{Value: 1},
-								Func:   ast.BareReference{Name: "||"},
-								Args:   []ast.Node{ast.ConstantInt{Value: 0}},
+								Line:   2,
+								Target: ast.ConstantInt{Line: 2, Value: 1},
+								Func:   ast.BareReference{Line: 2, Name: "||"},
+								Args:   []ast.Node{ast.ConstantInt{Line: 2, Value: 0}},
 							},
 							ast.WeakLogicalAnd{
-								LHS: ast.ConstantInt{Value: 1},
-								RHS: ast.ConstantInt{Value: 0},
+								Line: 3,
+								LHS:  ast.ConstantInt{Line: 3, Value: 1},
+								RHS:  ast.ConstantInt{Line: 3, Value: 0},
 							},
 							ast.WeakLogicalOr{
-								LHS: ast.ConstantInt{Value: 1},
-								RHS: ast.ConstantInt{Value: 0},
+								Line: 4,
+								LHS:  ast.ConstantInt{Line: 4, Value: 1},
+								RHS:  ast.ConstantInt{Line: 4, Value: 0},
 							},
 						}))
 					})
@@ -2368,29 +2481,34 @@ File.lchmod mode & 01777, path
 				It("is parsed as a call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "=="},
-							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+							Line:   1,
+							Target: ast.ConstantInt{Line: 1, Value: 1},
+							Func:   ast.BareReference{Line: 1, Name: "=="},
+							Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 1}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "==="},
-							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+							Line:   2,
+							Target: ast.ConstantInt{Line: 2, Value: 1},
+							Func:   ast.BareReference{Line: 2, Name: "==="},
+							Args:   []ast.Node{ast.ConstantInt{Line: 2, Value: 1}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "!="},
-							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+							Line:   3,
+							Target: ast.ConstantInt{Line: 3, Value: 1},
+							Func:   ast.BareReference{Line: 3, Name: "!="},
+							Args:   []ast.Node{ast.ConstantInt{Line: 3, Value: 1}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "=~"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+							Line:   4,
+							Target: ast.ConstantInt{Line: 4, Value: 1},
+							Func:   ast.BareReference{Line: 4, Name: "=~"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 4, Value: 1}},
 						},
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 1},
-							Func:   ast.BareReference{Name: "!~"},
-							Args:   []ast.Node{ast.ConstantInt{Value: 1}},
+							Line:   5,
+							Target: ast.ConstantInt{Line: 5, Value: 1},
+							Func:   ast.BareReference{Line: 5, Name: "!~"},
+							Args:   []ast.Node{ast.ConstantInt{Line: 5, Value: 1}},
 						},
 					}))
 				})
@@ -2413,9 +2531,9 @@ File.lchmod mode & 01777, path
 							ast.ConstantInt{Value: 1},
 							ast.ConstantInt{Value: 2},
 							ast.ConstantInt{Value: 3},
-							ast.ConstantInt{Value: 4},
-							ast.ConstantInt{Value: 5},
-							ast.ConstantInt{Value: 6},
+							ast.ConstantInt{Line: 1, Value: 4},
+							ast.ConstantInt{Line: 2, Value: 5},
+							ast.ConstantInt{Line: 3, Value: 6},
 						}},
 					}))
 				})
@@ -2525,26 +2643,28 @@ File.lchmod mode & 01777, path
 				It("returns a Hash node", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Hash{
+							Line: 2,
 							Pairs: []ast.HashKeyValuePair{
 								{
-									Key:   ast.Symbol{Name: "foo"},
-									Value: ast.Symbol{Name: "bar"},
+									Key:   ast.Symbol{Line: 3, Name: "foo"},
+									Value: ast.Symbol{Line: 3, Name: "bar"},
 								},
 								{
-									Key:   ast.Symbol{Name: "bar"},
-									Value: ast.Symbol{Name: "foo"},
+									Key:   ast.Symbol{Line: 4, Name: "bar"},
+									Value: ast.Symbol{Line: 4, Name: "foo"},
 								},
 							},
 						},
 						ast.Hash{
+							Line: 7,
 							Pairs: []ast.HashKeyValuePair{
 								{
-									Key:   ast.Symbol{Name: "foo"},
-									Value: ast.Symbol{Name: "bar"},
+									Key:   ast.Symbol{Line: 8, Name: "foo"},
+									Value: ast.Symbol{Line: 8, Name: "bar"},
 								},
 								{
-									Key:   ast.Symbol{Name: "bar"},
-									Value: ast.Symbol{Name: "foo"},
+									Key:   ast.Symbol{Line: 9, Name: "bar"},
+									Value: ast.Symbol{Line: 9, Name: "foo"},
 								},
 							},
 						},
@@ -2647,13 +2767,14 @@ foo: bar,
 				It("returns a Hash node with symbol keys", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Hash{
+							Line: 0,
 							Pairs: []ast.HashKeyValuePair{
 								{
-									Key:   ast.Symbol{Name: "key"},
-									Value: ast.BareReference{Name: "value"},
+									Key:   ast.Symbol{Line: 1, Name: "key"},
+									Value: ast.BareReference{Line: 1, Name: "value"},
 								}, {
-									Key:   ast.Symbol{Name: "foo"},
-									Value: ast.BareReference{Name: "bar"},
+									Key:   ast.Symbol{Line: 2, Name: "foo"},
+									Value: ast.BareReference{Line: 2, Name: "bar"},
 								},
 							},
 						},
@@ -2686,12 +2807,14 @@ foo: bar,
 			It("should be parsed as an InstanceVariable", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Assignment{
-						LHS: ast.InstanceVariable{Name: "foo"},
-						RHS: ast.Symbol{Name: "bar"},
+						Line: 1,
+						LHS:  ast.InstanceVariable{Line: 1, Name: "foo"},
+						RHS:  ast.Symbol{Line: 1, Name: "bar"},
 					},
 					ast.Assignment{
-						LHS: ast.InstanceVariable{Name: "FOO"},
-						RHS: ast.Symbol{Name: "baz"},
+						Line: 2,
+						LHS:  ast.InstanceVariable{Line: 2, Name: "FOO"},
+						RHS:  ast.Symbol{Line: 2, Name: "baz"},
 					},
 				}))
 			})
@@ -2708,12 +2831,14 @@ foo: bar,
 			It("should be parsed as an ClassVariable", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Assignment{
-						LHS: ast.ClassVariable{Name: "foo"},
-						RHS: ast.Symbol{Name: "bar"},
+						Line: 1,
+						LHS:  ast.ClassVariable{Line: 1, Name: "foo"},
+						RHS:  ast.Symbol{Line: 1, Name: "bar"},
 					},
 					ast.Assignment{
-						LHS: ast.ClassVariable{Name: "FOO"},
-						RHS: ast.Symbol{Name: "baz"},
+						Line: 2,
+						LHS:  ast.ClassVariable{Line: 2, Name: "FOO"},
+						RHS:  ast.Symbol{Line: 2, Name: "baz"},
 					},
 				}))
 			})
@@ -2766,56 +2891,68 @@ end
 			It("is parsed as rescue statements", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.FuncDecl{
-						Name: ast.BareReference{Name: "samsonic_obey"},
+						Line: 1,
+						Name: ast.BareReference{Line: 1, Name: "samsonic_obey"},
 						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.CallExpression{
-								Func: ast.BareReference{Name: "raise"},
-								Args: []ast.Node{ast.SimpleString{Value: "whoopsie-daisy"}},
+								Line: 2,
+								Func: ast.BareReference{Line: 2, Name: "raise"},
+								Args: []ast.Node{ast.SimpleString{Line: 2, Value: "whoopsie-daisy"}},
 							},
 						},
 						Rescues: []ast.Node{
 							ast.Rescue{
+								Line: 3,
 								Exception: ast.RescueException{
-									Classes: []ast.Class{{Name: "Nope"}},
+									Classes: []ast.Class{{Line: 3, Name: "Nope"}},
 								},
 								Body: []ast.Node{ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "unlikely"}},
+									Line: 4,
+									Func: ast.BareReference{Line: 4, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 4, Value: "unlikely"}},
 								}},
 							},
 							ast.Rescue{
+								Line: 5,
 								Exception: ast.RescueException{
-									Classes: []ast.Class{{Name: "NotThisEither"}},
-									Var:     ast.BareReference{Name: "e"},
+									Classes: []ast.Class{{Line: 5, Name: "NotThisEither"}},
+									Var:     ast.BareReference{Line: 5, Name: "e"},
 								},
 								Body: []ast.Node{ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "contrived"}},
+									Line: 6,
+									Func: ast.BareReference{Line: 6, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 6, Value: "contrived"}},
 								}},
 							},
 							ast.Rescue{
+								Line: 7,
 								Exception: ast.RescueException{
 									Classes: []ast.Class{
 										{
+											Line:      7,
 											Name:      "ENOTEMPTY",
 											Namespace: "Errno",
 										}, {
+											Line:      7,
 											Name:      "ENOENT",
 											Namespace: "Errno",
 										},
 									},
 								},
 								Body: []ast.Node{ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "less contrived"}},
+									Line: 8,
+									Func: ast.BareReference{Line: 8, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 8, Value: "less contrived"}},
 								}},
 							},
 							ast.Rescue{
+								Line:      9,
 								Exception: ast.RescueException{},
 								Body: []ast.Node{ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "aww yisss"}},
+									Line: 10,
+									Func: ast.BareReference{Line: 10, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 10, Value: "aww yisss"}},
 								}},
 							},
 						},
@@ -2837,15 +2974,18 @@ end
 			It("does not allow commas and converts its 'args' to symbols", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.ModuleDecl{
+						Line: 1,
 						Name: "Foo",
 						Body: []ast.Node{
 							ast.Alias{
-								To:   ast.Symbol{Name: "wat"},
-								From: ast.Symbol{Name: "zomg"},
+								Line: 2,
+								To:   ast.Symbol{Line: 2, Name: "wat"},
+								From: ast.Symbol{Line: 2, Name: "zomg"},
 							},
 							ast.Alias{
-								To:   ast.Symbol{Name: "seriously?"},
-								From: ast.Symbol{Name: "yes_srsly!"},
+								Line: 3,
+								To:   ast.Symbol{Line: 3, Name: "seriously?"},
+								From: ast.Symbol{Line: 3, Name: "yes_srsly!"},
 							},
 						},
 					},
@@ -2866,15 +3006,18 @@ end
 			It("should be parsed as a Retry node", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Begin{
+						Line: 1,
 						Body: []ast.Node{
 							ast.IfBlock{
+								Line: 2,
 								Condition: ast.CallExpression{
+									Line: 2,
 									Args: []ast.Node{},
-									Func: ast.BareReference{Name: "falsey_method"},
+									Func: ast.BareReference{Line: 2, Name: "falsey_method"},
 								},
-								Body: []ast.Node{ast.Retry{}},
+								Body: []ast.Node{ast.Retry{Line: 2}},
 							},
-							ast.Retry{},
+							ast.Retry{Line: 3},
 						},
 						Rescue: []ast.Node{},
 					},
@@ -2897,42 +3040,54 @@ end
 			It("should be parsed correctly", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.FuncDecl{
-						Name: ast.BareReference{Name: "method_with_conditional_return"},
+						Line: 1,
+						Name: ast.BareReference{Line: 1, Name: "method_with_conditional_return"},
 						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.CallExpression{
-								Target: ast.BareReference{Name: "names"},
-								Func:   ast.BareReference{Name: "each"},
+								Line:   2,
+								Target: ast.BareReference{Line: 2, Name: "names"},
+								Func:   ast.BareReference{Line: 2, Name: "each"},
 								Args:   []ast.Node{},
 								OptionalBlock: ast.Block{
-									Args: []ast.Node{ast.BareReference{Name: "name"}},
+									Line: 2,
+									Args: []ast.Node{ast.BareReference{Line: 2, Name: "name"}},
 									Body: []ast.Node{
 										ast.IfBlock{
+											Line: 3,
 											Condition: ast.CallExpression{
-												Target: ast.BareReference{Name: "File"},
-												Func:   ast.BareReference{Name: "exist?"},
+												Line:   3,
+												Target: ast.BareReference{Line: 3, Name: "File"},
+												Func:   ast.BareReference{Line: 3, Name: "exist?"},
 												Args: []ast.Node{
 													ast.CallExpression{
-														Target: ast.BareReference{Name: "File"},
-														Func:   ast.BareReference{Name: "expand_path"},
-														Args:   []ast.Node{ast.BareReference{Name: "name"}},
+														Line:   3,
+														Target: ast.BareReference{Line: 3, Name: "File"},
+														Func:   ast.BareReference{Line: 3, Name: "expand_path"},
+														Args:   []ast.Node{ast.BareReference{Line: 3, Name: "name"}},
 													},
 												},
 											},
 											Body: []ast.Node{
 												ast.Return{
+													Line: 3,
 													Value: ast.CallExpression{
-														Target: ast.BareReference{Name: "Kernel"},
-														Func:   ast.BareReference{Name: "load"},
-														Args:   []ast.Node{ast.BareReference{Name: "name"}},
+														Line:   3,
+														Target: ast.BareReference{Line: 3, Name: "Kernel"},
+														Func:   ast.BareReference{Line: 3, Name: "load"},
+														Args:   []ast.Node{ast.BareReference{Line: 3, Name: "name"}},
 													},
 												},
 											},
 										},
 										ast.IfBlock{
-											Condition: ast.Negation{Target: ast.Boolean{Value: false}},
+											Line: 4,
+											Condition: ast.Negation{
+												Line:   4,
+												Target: ast.Boolean{Line: 4, Value: false},
+											},
 											Body: []ast.Node{
-												ast.Return{},
+												ast.Return{Line: 4},
 											},
 										},
 									},
@@ -2957,19 +3112,23 @@ end
 			It("should parse the expressions correctly", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.FuncDecl{
-						Name: ast.BareReference{Name: "with_a_block"},
+						Line: 1,
+						Name: ast.BareReference{Line: 1, Name: "with_a_block"},
 						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.Yield{
+								Line: 2,
 								Value: ast.SimpleString{
+									Line:  2,
 									Value: "nonrestricted-consonantize",
 								},
 							},
 							ast.Return{
+								Line: 3,
 								Value: ast.Nodes{
-									ast.SimpleString{Value: "albitite-compotor"},
-									ast.SimpleString{Value: "catalecta-coassistant"},
-									ast.SimpleString{Value: "semiannual-pomfret"},
+									ast.SimpleString{Line: 3, Value: "albitite-compotor"},
+									ast.SimpleString{Line: 3, Value: "catalecta-coassistant"},
+									ast.SimpleString{Line: 3, Value: "semiannual-pomfret"},
 								},
 							},
 						},
@@ -2991,13 +3150,18 @@ end
 				It("is parsed as an ast.Block", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Func: ast.BareReference{Name: "function_that_takes_a_block"},
+							Line: 1,
+							Func: ast.BareReference{Line: 1, Name: "function_that_takes_a_block"},
 							Args: []ast.Node{},
 							OptionalBlock: ast.Block{
+								Line: 1,
 								Body: []ast.Node{
 									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "semiannual-pomfret"}},
+										Line: 2,
+										Func: ast.BareReference{Line: 2, Name: "puts"},
+										Args: []ast.Node{
+											ast.SimpleString{Line: 2, Value: "semiannual-pomfret"},
+										},
 									},
 								},
 							},
@@ -3018,15 +3182,17 @@ end
 				It("is parsed as an ast.Block with args", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Func: ast.BareReference{Name: "with_a_block"},
+							Line: 1,
+							Func: ast.BareReference{Line: 1, Name: "with_a_block"},
 							Args: []ast.Node{},
 							OptionalBlock: ast.Block{
+								Line: 1,
 								Args: []ast.Node{
-									ast.BareReference{Name: "with"},
-									ast.BareReference{Name: "some"},
-									ast.BareReference{Name: "args"},
+									ast.BareReference{Line: 1, Name: "with"},
+									ast.BareReference{Line: 1, Name: "some"},
+									ast.BareReference{Line: 1, Name: "args"},
 								},
-								Body: []ast.Node{ast.SimpleString{Value: "aww yiss"}},
+								Body: []ast.Node{ast.SimpleString{Line: 2, Value: "aww yiss"}},
 							},
 						},
 					}))
@@ -3111,7 +3277,7 @@ end
 				It("is parsed as an IfBlock", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.IfBlock{
-							Condition: ast.Negation{Target: ast.Boolean{false}},
+							Condition: ast.Negation{Target: ast.Boolean{Value: false}},
 							Body:      []ast.Node{ast.ConstantInt{Value: 5}},
 						},
 					}))
@@ -3129,24 +3295,30 @@ end
 				It("is parsed as an IfBlock", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.IfBlock{
+							Line: 1,
 							Condition: ast.Negation{
-								ast.CallExpression{
+								Line: 1,
+								Target: ast.CallExpression{
+									Line: 1,
 									Target: ast.CallExpression{
-										Target: ast.BareReference{Name: "target"},
-										Func:   ast.BareReference{Name: "[]"},
+										Line:   1,
+										Target: ast.BareReference{Line: 1, Name: "target"},
+										Func:   ast.BareReference{Line: 1, Name: "[]"},
 										Args: []ast.Node{
 											ast.Range{
-												Start: ast.ConstantInt{Value: 0},
-												End:   ast.ConstantInt{Value: 1},
+												Line:  1,
+												Start: ast.ConstantInt{Line: 1, Value: 0},
+												End:   ast.ConstantInt{Line: 1, Value: 1},
 											},
 										},
 									},
-									Func: ast.BareReference{Name: "=="},
+									Func: ast.BareReference{Line: 1, Name: "=="},
 									Args: []ast.Node{
 										ast.CallExpression{
-											Target: ast.BareReference{Name: "config"},
-											Func:   ast.BareReference{Name: "[]"},
-											Args:   []ast.Node{ast.Symbol{Name: "config_ext"}},
+											Line:   1,
+											Target: ast.BareReference{Line: 1, Name: "config"},
+											Func:   ast.BareReference{Line: 1, Name: "[]"},
+											Args:   []ast.Node{ast.Symbol{Line: 1, Name: "config_ext"}},
 										},
 									},
 								},
@@ -3170,23 +3342,37 @@ end
 				It("is parsed as a nested IfBlock", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.IfBlock{
-							Condition: ast.Negation{Target: ast.InstanceVariable{Name: "zomg"}},
+							Line: 1,
+							Condition: ast.Negation{
+								Line:   1,
+								Target: ast.InstanceVariable{Line: 1, Name: "zomg"},
+							},
 							Body: []ast.Node{
 								ast.IfBlock{
-									Condition: ast.Negation{Target: ast.BareReference{Name: "yes_wai"}},
+									Line: 2,
+									Condition: ast.Negation{
+										Line:   2,
+										Target: ast.BareReference{Line: 2, Name: "yes_wai"},
+									},
 									Body: []ast.Node{
 										ast.Assignment{
-											LHS: ast.BareReference{Name: "no_wai"},
-											RHS: ast.ConstantInt{Value: 9999},
+											Line: 2,
+											LHS:  ast.BareReference{Line: 2, Name: "no_wai"},
+											RHS:  ast.ConstantInt{Line: 2, Value: 9999},
 										},
 									},
 								},
 								ast.IfBlock{
-									Condition: ast.Negation{Target: ast.BareReference{Name: "no_wai"}},
+									Line: 3,
+									Condition: ast.Negation{
+										Line:   3,
+										Target: ast.BareReference{Line: 3, Name: "no_wai"},
+									},
 									Body: []ast.Node{
 										ast.Assignment{
-											LHS: ast.BareReference{Name: "yes_wai"},
-											RHS: ast.ConstantInt{Value: 9999},
+											Line: 3,
+											LHS:  ast.BareReference{Line: 3, Name: "yes_wai"},
+											RHS:  ast.ConstantInt{Line: 3, Value: 9999},
 										},
 									},
 								},
@@ -3209,11 +3395,13 @@ end`)
 				It("is parsed as an ast.IfBlock struct", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.IfBlock{
-							Condition: ast.Boolean{Value: false},
+							Line:      1,
+							Condition: ast.Boolean{Line: 1, Value: false},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "Romanize-whereover"}},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 2, Value: "Romanize-whereover"}},
 								},
 							},
 						},
@@ -3233,41 +3421,50 @@ raise OptionError, "description" if args.size < 2
 				It("is parsed as an ast.IfBlock", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.IfBlock{
-							Condition: ast.Boolean{Value: false},
+							Line:      1,
+							Condition: ast.Boolean{Line: 1, Value: false},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "exit"},
-									Args: []ast.Node{ast.ConstantInt{Value: 1}},
+									Line: 1,
+									Func: ast.BareReference{Line: 1, Name: "exit"},
+									Args: []ast.Node{ast.ConstantInt{Line: 1, Value: 1}},
 								},
 							},
 						},
 						ast.IfBlock{
+							Line: 2,
 							Condition: ast.CallExpression{
-								Target: ast.BareReference{Name: "something"},
-								Func:   ast.BareReference{Name: "truthy_method"},
+								Line:   2,
+								Target: ast.BareReference{Line: 2, Name: "something"},
+								Func:   ast.BareReference{Line: 2, Name: "truthy_method"},
 							},
 							Body: []ast.Node{
 								ast.Assignment{
-									LHS: ast.BareReference{Name: "foo"},
-									RHS: ast.Symbol{Name: "bar"},
+									Line: 2,
+									LHS:  ast.BareReference{Line: 2, Name: "foo"},
+									RHS:  ast.Symbol{Line: 2, Name: "bar"},
 								},
 							},
 						},
 						ast.IfBlock{
+							Line: 3,
 							Condition: ast.CallExpression{
+								Line: 3,
 								Target: ast.CallExpression{
-									Target: ast.BareReference{Name: "args"},
-									Func:   ast.BareReference{Name: "size"},
+									Line:   3,
+									Target: ast.BareReference{Line: 3, Name: "args"},
+									Func:   ast.BareReference{Line: 3, Name: "size"},
 								},
-								Func: ast.BareReference{Name: "<"},
-								Args: []ast.Node{ast.ConstantInt{Value: 2}},
+								Func: ast.BareReference{Line: 3, Name: "<"},
+								Args: []ast.Node{ast.ConstantInt{Line: 3, Value: 2}},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "raise"},
+									Line: 3,
+									Func: ast.BareReference{Line: 3, Name: "raise"},
 									Args: []ast.Node{
-										ast.BareReference{Name: "OptionError"},
-										ast.InterpolatedString{Value: "description"},
+										ast.BareReference{Line: 3, Name: "OptionError"},
+										ast.InterpolatedString{Line: 3, Value: "description"},
 									},
 								},
 							},
@@ -3289,20 +3486,26 @@ end`)
 				It("is parsed as an ast.IfBlock struct", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.IfBlock{
-							Condition: ast.Boolean{Value: false},
+							Line:      1,
+							Condition: ast.Boolean{Line: 1, Value: false},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "Romanize-whereover"}},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 2, Value: "Romanize-whereover"}},
 								},
 							},
 							Else: []ast.Node{
 								ast.IfBlock{
-									Condition: ast.Boolean{Value: true},
+									Line:      3,
+									Condition: ast.Boolean{Line: 3, Value: true},
 									Body: []ast.Node{
 										ast.CallExpression{
-											Func: ast.BareReference{Name: "puts"},
-											Args: []ast.Node{ast.SimpleString{Value: "Kiplingese-disinvolve"}},
+											Line: 4,
+											Func: ast.BareReference{Line: 4, Name: "puts"},
+											Args: []ast.Node{
+												ast.SimpleString{Line: 4, Value: "Kiplingese-disinvolve"},
+											},
 										},
 									},
 								},
@@ -3330,27 +3533,31 @@ end
 				It("returns a very nested set of conditions to check", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.IfBlock{
-							Condition: ast.Boolean{Value: false},
+							Line:      1,
+							Condition: ast.Boolean{Line: 1, Value: false},
 							Body: []ast.Node{
-								ast.SimpleString{Value: "purifier-cartouche"},
+								ast.SimpleString{Line: 2, Value: "purifier-cartouche"},
 							},
 							Else: []ast.Node{
 								ast.IfBlock{
-									Condition: ast.Boolean{Value: false},
+									Line:      3,
+									Condition: ast.Boolean{Line: 3, Value: false},
 									Body: []ast.Node{
-										ast.SimpleString{Value: "bronchophthisis-hypersurface"},
+										ast.SimpleString{Line: 4, Value: "bronchophthisis-hypersurface"},
 									},
 								},
 								ast.IfBlock{
-									Condition: ast.Boolean{Value: false},
+									Line:      5,
+									Condition: ast.Boolean{Line: 5, Value: false},
 									Body: []ast.Node{
-										ast.SimpleString{Value: "sharpware-nasality"},
+										ast.SimpleString{Line: 6, Value: "sharpware-nasality"},
 									},
 								},
 								ast.IfBlock{
-									Condition: ast.Boolean{Value: true},
+									Line:      7,
+									Condition: ast.Boolean{Line: 7, Value: true},
 									Body: []ast.Node{
-										ast.SimpleString{Value: "Osmeridae-harpylike"},
+										ast.SimpleString{Line: 8, Value: "Osmeridae-harpylike"},
 									},
 								},
 							},
@@ -3393,12 +3600,14 @@ end
 			It("should be parsed as a BeginBlock struct", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Begin{
+						Line: 1,
 						Body: []ast.Node{},
 						Rescue: []ast.Node{
 							ast.Rescue{
+								Line: 2,
 								Body: []ast.Node{},
 								Exception: ast.RescueException{
-									Var: ast.BareReference{Name: "wat"},
+									Var: ast.BareReference{Line: 2, Name: "wat"},
 								},
 							},
 						},
@@ -3423,16 +3632,20 @@ end
 			It("should be parsed as a BeginBlock struct", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Begin{
-						Body: []ast.Node{ast.SimpleString{Value: "this always happens"}},
+						Line: 1,
+						Body: []ast.Node{ast.SimpleString{Line: 2, Value: "this always happens"}},
 						Rescue: []ast.Node{
-							ast.Rescue{Body: []ast.Node{
-								ast.SimpleString{
-									Value: "only when an exception occurs in the begin scope",
-								},
-							}},
+							ast.Rescue{
+								Line: 3,
+								Body: []ast.Node{
+									ast.SimpleString{
+										Line:  4,
+										Value: "only when an exception occurs in the begin scope",
+									},
+								}},
 						},
 						Else: []ast.Node{
-							ast.SimpleString{Value: "this only happens if there were no exceptions"},
+							ast.SimpleString{Line: 6, Value: "this only happens if there were no exceptions"},
 						},
 					},
 				}))
@@ -3457,40 +3670,48 @@ end
 			It("is parsed as a BeginBlock struct", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Begin{
+						Line: 1,
 						Body: []ast.Node{
 							ast.CallExpression{
-								Func: ast.BareReference{Name: "foo"},
+								Line: 2,
+								Func: ast.BareReference{Line: 2, Name: "foo"},
 								Args: []ast.Node{},
 							},
 						},
 						Rescue: []ast.Node{
 							ast.Rescue{
+								Line: 3,
 								Body: []ast.Node{
 									ast.CallExpression{
-										Func: ast.BareReference{Name: "bar"},
+										Line: 4,
+										Func: ast.BareReference{Line: 4, Name: "bar"},
 										Args: []ast.Node{},
 									},
 								},
 							},
 							ast.Rescue{
+								Line: 5,
 								Exception: ast.RescueException{
-									Classes: []ast.Class{{Name: "LoadError"}},
+									Classes: []ast.Class{{Line: 5, Name: "LoadError"}},
 								},
 								Body: []ast.Node{
 									ast.CallExpression{
-										Func: ast.BareReference{Name: "biz"},
+										Line: 6,
+										Func: ast.BareReference{Line: 6, Name: "biz"},
 										Args: []ast.Node{},
 									},
 								},
 							},
 							ast.Rescue{
+								Line: 7,
 								Exception: ast.RescueException{
-									Var:     ast.BareReference{Name: "e"},
-									Classes: []ast.Class{{Name: "Exception"}},
+									Var:     ast.BareReference{Line: 7, Name: "e"},
+									Classes: []ast.Class{{Line: 7, Name: "Exception"}},
 								},
 								Body: []ast.Node{
 									ast.CallExpression{
-										Func: ast.BareReference{Name: "baz"},
+										Line: 8,
+										Func: ast.BareReference{Line: 8, Name: "baz"},
 										Args: []ast.Node{},
 									},
 								},
@@ -3512,14 +3733,17 @@ s = short ? short.dup : "  "
 				It("is parsed correctly", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Assignment{
-							LHS: ast.BareReference{Name: "s"},
+							Line: 1,
+							LHS:  ast.BareReference{Line: 1, Name: "s"},
 							RHS: ast.Ternary{
-								Condition: ast.BareReference{Name: "short"},
+								Line:      1,
+								Condition: ast.BareReference{Line: 1, Name: "short"},
 								True: ast.CallExpression{
-									Target: ast.BareReference{Name: "short"},
-									Func:   ast.BareReference{Name: "dup"},
+									Line:   1,
+									Target: ast.BareReference{Line: 1, Name: "short"},
+									Func:   ast.BareReference{Line: 1, Name: "dup"},
 								},
-								False: ast.InterpolatedString{Value: "  "},
+								False: ast.InterpolatedString{Line: 1, Value: "  "},
 							},
 						},
 					}))
@@ -3595,29 +3819,35 @@ s = short ? short.dup : "  "
 			It("is treated as a grouping for a set of expressions", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Group{
-						Body: []ast.Node{ast.ConstantInt{Value: 1}},
+						Line: 1,
+						Body: []ast.Node{ast.ConstantInt{Line: 1, Value: 1}},
 					},
 					ast.Group{
+						Line: 2,
 						Body: []ast.Node{
-							ast.SimpleString{Value: "hey"},
-							ast.SimpleString{Value: "this"},
-							ast.SimpleString{Value: "works!"},
+							ast.SimpleString{Line: 2, Value: "hey"},
+							ast.SimpleString{Line: 2, Value: "this"},
+							ast.SimpleString{Line: 2, Value: "works!"},
 						},
 					},
 					ast.Group{
+						Line: 3,
 						Body: []ast.Node{
 							ast.CallExpression{
-								Target: ast.Array{Nodes: []ast.Node{}},
-								Func:   ast.BareReference{Name: "unshift"},
+								Line:   3,
+								Target: ast.Array{Line: 3, Nodes: []ast.Node{}},
+								Func:   ast.BareReference{Line: 3, Name: "unshift"},
 							},
 						},
 					},
 					ast.Group{
+						Line: 4,
 						Body: []ast.Node{
 							ast.CallExpression{
-								Target: ast.SimpleString{Value: "hello %s world"},
-								Func:   ast.BareReference{Name: "%"},
-								Args:   []ast.Node{ast.SimpleString{Value: "grubby"}},
+								Line:   4,
+								Target: ast.SimpleString{Line: 4, Value: "hello %s world"},
+								Func:   ast.BareReference{Line: 4, Name: "%"},
+								Args:   []ast.Node{ast.SimpleString{Line: 4, Value: "grubby"}},
 							},
 						},
 					},
@@ -3636,15 +3866,18 @@ Foo::Bar::Baz.method_call
 			It("can be used to refer to classes and methods inside modules", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.Class{
+						Line:      1,
 						Name:      "Bar",
 						Namespace: "Foo",
 					},
 					ast.CallExpression{
+						Line: 2,
 						Target: ast.Class{
+							Line:      2,
 							Name:      "Baz",
 							Namespace: "Foo::Bar",
 						},
-						Func: ast.BareReference{Name: "method_call"},
+						Func: ast.BareReference{Line: 2, Name: "method_call"},
 					},
 				}))
 			})
@@ -3666,22 +3899,29 @@ end
 			It("should be parsed correctly", func() {
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.FuncDecl{
-						Name: ast.BareReference{Name: "memoized_func"},
+						Line: 1,
+						Name: ast.BareReference{Line: 1, Name: "memoized_func"},
 						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.IfBlock{
-								Condition: ast.Negation{ast.InstanceVariable{Name: "value"}},
+								Line: 2,
+								Condition: ast.Negation{
+									Line:   2,
+									Target: ast.InstanceVariable{Line: 2, Name: "value"},
+								},
 								Body: []ast.Node{
 									ast.Assignment{
-										LHS: ast.InstanceVariable{Name: "value"},
+										Line: 3,
+										LHS:  ast.InstanceVariable{Line: 3, Name: "value"},
 										RHS: ast.CallExpression{
-											Func: ast.BareReference{Name: "expensive_function_call"},
+											Line: 3,
+											Func: ast.BareReference{Line: 3, Name: "expensive_function_call"},
 											Args: []ast.Node{},
 										},
 									},
 								},
 							},
-							ast.InstanceVariable{Name: "value"},
+							ast.InstanceVariable{Line: 6, Name: "value"},
 						},
 					},
 				}))
@@ -3701,10 +3941,12 @@ end
 				It("is parsed as a block, but the 'next' keyword is valid here", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.ConstantInt{Value: 5},
-							Func:   ast.BareReference{Name: "times"},
+							Line:   1,
+							Target: ast.ConstantInt{Line: 1, Value: 5},
+							Func:   ast.BareReference{Line: 1, Name: "times"},
 							Args:   []ast.Node{},
 							OptionalBlock: ast.Block{
+								Line: 1,
 								Body: []ast.Node{ast.Next{}},
 							},
 						},
@@ -3724,17 +3966,23 @@ end
 				It("is parsed as a Loop", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Loop{
+							Line: 1,
 							Condition: ast.Negation{
+								Line: 1,
 								Target: ast.CallExpression{
-									Target: ast.ConstantInt{Value: 1},
-									Func:   ast.BareReference{Name: "=="},
-									Args:   []ast.Node{ast.ConstantInt{Value: 2}},
+									Line:   1,
+									Target: ast.ConstantInt{Line: 1, Value: 1},
+									Func:   ast.BareReference{Line: 1, Name: "=="},
+									Args:   []ast.Node{ast.ConstantInt{Line: 1, Value: 2}},
 								},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
-									Func: ast.BareReference{Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Value: "INFINITE LOOP AHOY!!!!1"}},
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "puts"},
+									Args: []ast.Node{
+										ast.SimpleString{Line: 2, Value: "INFINITE LOOP AHOY!!!!1"},
+									},
 								},
 							},
 						},
@@ -3757,19 +4005,23 @@ end while true
 					It("are valid loops too", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
 							ast.Loop{
-								Condition: ast.Boolean{Value: false},
+								Line:      1,
+								Condition: ast.Boolean{Line: 1, Value: false},
 								Body: []ast.Node{
-									ast.SimpleString{Value: "check this out"},
+									ast.SimpleString{Line: 1, Value: "check this out"},
 								},
 							},
 							ast.Loop{
-								Condition: ast.Boolean{Value: true},
+								Line:      5,
+								Condition: ast.Boolean{Line: 5, Value: true},
 								Body: []ast.Node{
 									ast.Begin{
+										Line: 3,
 										Body: []ast.Node{
 											ast.CallExpression{
-												Func: ast.BareReference{Name: "puts"},
-												Args: []ast.Node{ast.SimpleString{Value: "whaaat"}},
+												Line: 4,
+												Func: ast.BareReference{Line: 4, Name: "puts"},
+												Args: []ast.Node{ast.SimpleString{Line: 4, Value: "whaaat"}},
 											},
 										},
 										Rescue: []ast.Node{},
@@ -3794,24 +4046,30 @@ end
 					It("is parsed into a Loop struct", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
 							ast.Loop{
+								Line: 1,
 								Condition: ast.Assignment{
-									LHS: ast.BareReference{Name: "foo"},
+									Line: 1,
+									LHS:  ast.BareReference{Line: 1, Name: "foo"},
 									RHS: ast.CallExpression{
-										Target: ast.BareReference{Name: "bar"},
-										Func:   ast.BareReference{Name: "baz"},
+										Line:   1,
+										Target: ast.BareReference{Line: 1, Name: "bar"},
+										Func:   ast.BareReference{Line: 1, Name: "baz"},
 									},
 								},
 								Body: []ast.Node{
 									ast.CallExpression{
-										Func: ast.BareReference{Name: "puts"},
-										Args: []ast.Node{ast.SimpleString{Value: "welp"}},
+										Line: 2,
+										Func: ast.BareReference{Line: 2, Name: "puts"},
+										Args: []ast.Node{ast.SimpleString{Line: 2, Value: "welp"}},
 									},
 									ast.IfBlock{
-										Condition: ast.Boolean{Value: false},
+										Line:      3,
+										Condition: ast.Boolean{Line: 3, Value: false},
 										Body:      []ast.Node{ast.Break{}},
 									},
 									ast.IfBlock{
-										Condition: ast.Boolean{Value: false},
+										Line:      4,
+										Condition: ast.Boolean{Line: 4, Value: false},
 										Body:      []ast.Node{ast.Next{}},
 									},
 								},
@@ -3836,15 +4094,17 @@ end
 					It("parses correctly", func() {
 						Expect(parser.Statements).To(Equal([]ast.Node{
 							ast.Loop{
-								Condition: ast.Boolean{Value: true},
+								Line:      1,
+								Condition: ast.Boolean{Line: 1, Value: true},
 								Body: []ast.Node{
 									ast.IfBlock{
-										Condition: ast.Boolean{Value: false},
+										Line:      2,
+										Condition: ast.Boolean{Line: 2, Value: false},
 										Body: []ast.Node{
 											ast.IfBlock{
-												Condition: ast.Boolean{Value: false},
+												Line:      3,
+												Condition: ast.Boolean{Line: 3, Value: false},
 												Body: []ast.Node{
-
 													ast.Next{},
 												},
 											},
@@ -3893,18 +4153,22 @@ s << (short ? ", " : "  ") if long
 				Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.IfBlock{
-						Condition: ast.BareReference{Name: "long"},
+						Line:      1,
+						Condition: ast.BareReference{Line: 1, Name: "long"},
 						Body: []ast.Node{
 							ast.CallExpression{
-								Target: ast.BareReference{Name: "s"},
-								Func:   ast.BareReference{Name: "<<"},
+								Line:   1,
+								Target: ast.BareReference{Line: 1, Name: "s"},
+								Func:   ast.BareReference{Line: 1, Name: "<<"},
 								Args: []ast.Node{
 									ast.Group{
+										Line: 1,
 										Body: []ast.Node{
 											ast.Ternary{
-												Condition: ast.BareReference{Name: "short"},
-												True:      ast.InterpolatedString{Value: ", "},
-												False:     ast.InterpolatedString{Value: "  "},
+												Line:      1,
+												Condition: ast.BareReference{Line: 1, Name: "short"},
+												True:      ast.InterpolatedString{Line: 1, Value: ", "},
+												False:     ast.InterpolatedString{Line: 1, Value: "  "},
 											},
 										},
 									},
@@ -3928,18 +4192,156 @@ end`)
 				Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
 				Expect(parser.Statements).To(Equal([]ast.Node{
 					ast.IfBlock{
+						Line: 1,
 						Condition: ast.Negation{
+							Line: 1,
 							Target: ast.Assignment{
-								LHS: ast.BareReference{Name: "option"},
+								Line: 1,
+								LHS:  ast.BareReference{Line: 1, Name: "option"},
 								RHS: ast.CallExpression{
-									Func: ast.BareReference{Name: "match?"},
-									Args: []ast.Node{ast.BareReference{Name: "opt"}},
+									Line: 1,
+									Func: ast.BareReference{Line: 1, Name: "match?"},
+									Args: []ast.Node{ast.BareReference{Line: 1, Name: "opt"}},
 								},
 							},
 						},
 						Body: []ast.Node{},
 					},
 				}))
+			})
+		})
+
+		Describe("line numbers", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+:clog                    #1
+'hemihypalgesia'         #2
+"prematrimonial"         #3
+/unrevived/              #4
+SANNAITE                 #5
+@stickers                #6
+@@Penny                  #7
+$commercialism           #8
+__LINE__                 #9
+__FILE__                 #10
+Choletelin::Gatter       #11
+Incross::Distant.swollen #12
+lambda { p 'bakula' }    #13
+!'ethnically'            #14
+~'viridigenous'          #15
++5                       #16
+-6                       #17
+true && false            #18
+true || false            #19
+1 + 1                    #20
+1 - 1                    #21
+1 * 1                    #22
+1 / 1                    #23
+0.12                     #24
+123                      #25
+                         #26
+def whippet              #27
+  return 'cheesecake'    #28
+end                      #29
+                         #30
+class Turbinidae         #31
+end                      #32
+                         #33
+module Weighage          #34
+end                      #35
+                         #36
+class << self            #37
+end                      #38
+                         #39
+a = 'unfightable'        #40
+a, b = 'poisonful'       #41
+a ||= 'dastardliness'    #42
+                         #43
+if a                     #44
+  puts 'presecure'       #45
+end                      #46
+                         #47
+begin                    #48
+rescue Bananas           #49
+end                      #50
+                         #51
+5.times do               #52
+  yield 'butterman'      #53
+end                      #54
+                         #55
+while true               #56
+  puts 'disloyalist'     #57
+end                      #58
+                         #59
+case something           #60
+  when true              #61
+    puts 'reascension'   #62
+end                      #63
+                         #64
+0..12                    #65
+                         #66
+true ? 'a' : 'b'         #67
+                         #68
+alias dazing holomorphy  #69
+                         #70
+5 & 11                   #71
+5 | 11                   #72
+self                     #73
+nil                      #74
+`)
+			})
+
+			JustBeforeEach(func() {
+				Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+				Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
+				Expect(len(parser.Statements)).To(Equal(44))
+			})
+
+			It("sets the correct line number for terminal statements", func() {
+				Expect(parser.Statements[0].LineNumber()).To(Equal(1))
+				Expect(parser.Statements[1].LineNumber()).To(Equal(2))
+				Expect(parser.Statements[2].LineNumber()).To(Equal(3))
+				Expect(parser.Statements[3].LineNumber()).To(Equal(4))
+				Expect(parser.Statements[4].LineNumber()).To(Equal(5))
+				Expect(parser.Statements[5].LineNumber()).To(Equal(6))
+				Expect(parser.Statements[6].LineNumber()).To(Equal(7))
+				Expect(parser.Statements[7].LineNumber()).To(Equal(8))
+				Expect(parser.Statements[8].LineNumber()).To(Equal(9))
+				Expect(parser.Statements[9].LineNumber()).To(Equal(10))
+				Expect(parser.Statements[10].LineNumber()).To(Equal(11))
+				Expect(parser.Statements[11].LineNumber()).To(Equal(12))
+				Expect(parser.Statements[12].LineNumber()).To(Equal(13))
+				Expect(parser.Statements[13].LineNumber()).To(Equal(14))
+				Expect(parser.Statements[14].LineNumber()).To(Equal(15))
+				Expect(parser.Statements[15].LineNumber()).To(Equal(16))
+				Expect(parser.Statements[16].LineNumber()).To(Equal(17))
+				Expect(parser.Statements[17].LineNumber()).To(Equal(18))
+				Expect(parser.Statements[18].LineNumber()).To(Equal(19))
+				Expect(parser.Statements[19].LineNumber()).To(Equal(20))
+				Expect(parser.Statements[20].LineNumber()).To(Equal(21))
+				Expect(parser.Statements[21].LineNumber()).To(Equal(22))
+				Expect(parser.Statements[22].LineNumber()).To(Equal(23))
+				Expect(parser.Statements[23].LineNumber()).To(Equal(24))
+				Expect(parser.Statements[24].LineNumber()).To(Equal(25))
+				Expect(parser.Statements[25].LineNumber()).To(Equal(27))
+				Expect(parser.Statements[26].LineNumber()).To(Equal(31))
+				Expect(parser.Statements[27].LineNumber()).To(Equal(34))
+				Expect(parser.Statements[28].LineNumber()).To(Equal(37))
+				Expect(parser.Statements[29].LineNumber()).To(Equal(40))
+				Expect(parser.Statements[30].LineNumber()).To(Equal(41))
+				Expect(parser.Statements[31].LineNumber()).To(Equal(42))
+				Expect(parser.Statements[32].LineNumber()).To(Equal(44))
+				Expect(parser.Statements[33].LineNumber()).To(Equal(48))
+				Expect(parser.Statements[34].LineNumber()).To(Equal(52))
+				Expect(parser.Statements[35].LineNumber()).To(Equal(56))
+				Expect(parser.Statements[36].LineNumber()).To(Equal(60))
+				Expect(parser.Statements[37].LineNumber()).To(Equal(65))
+				Expect(parser.Statements[38].LineNumber()).To(Equal(67))
+				Expect(parser.Statements[39].LineNumber()).To(Equal(69))
+				Expect(parser.Statements[40].LineNumber()).To(Equal(71))
+				Expect(parser.Statements[41].LineNumber()).To(Equal(72))
+				Expect(parser.Statements[42].LineNumber()).To(Equal(73))
+				Expect(parser.Statements[43].LineNumber()).To(Equal(74))
 			})
 		})
 	})

@@ -47,8 +47,20 @@ func (l *nonEmitingLexer) acceptRun(valid string) {
 	l.backup()
 }
 
+func (l *nonEmitingLexer) CurrentLineNumber() int {
+	return l.lexer.CurrentLineNumber()
+}
+
+func (l *nonEmitingLexer) parsedNewLine() {
+	l.lexer.parsedNewLine()
+}
+
 func (l *nonEmitingLexer) emit(t tokenType) {
-	l.Tokens = append(l.Tokens, token{typ: t, value: l.lexer.currentSlice()})
+	l.Tokens = append(l.Tokens, token{
+		typ:   t,
+		value: l.lexer.currentSlice(),
+		line:  l.lexer.CurrentLineNumber(),
+	})
 	l.lexer.ignore()
 }
 

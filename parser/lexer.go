@@ -20,6 +20,7 @@ const eof = -1
 type token struct {
 	typ   tokenType
 	value string
+	line  int
 }
 
 type tokenType int
@@ -133,19 +134,24 @@ type StatefulRubyLexer interface {
 
 	lengthOfInput() int
 
+	parsedNewLine()
+	CurrentLineNumber() int
+
 	RubyLexer
 }
 
 type ConcreteStatefulRubyLexer struct {
 	input string
-	start int
-	pos   int
+	start int // index of rune currently being read
+	pos   int // current position within input string of lexer
 	width int // width of last rune read from input
 
 	tokens chan token
 
 	lastTokenEmitted token
 	LastError        error
+
+	currentLineNumber int
 }
 
 type stateFn func(StatefulRubyLexer) stateFn
@@ -396,10 +402,19 @@ func (l *ConcreteStatefulRubyLexer) lengthOfInput() int {
 	return len(l.input)
 }
 
+func (l *ConcreteStatefulRubyLexer) parsedNewLine() {
+	l.currentLineNumber += 1
+}
+
+func (l *ConcreteStatefulRubyLexer) CurrentLineNumber() int {
+	return l.currentLineNumber
+}
+
 func (l *ConcreteStatefulRubyLexer) emit(t tokenType) {
 	l.emitToken(token{
 		typ:   t,
 		value: l.input[l.start:l.pos],
+		line:  l.currentLineNumber,
 	})
 }
 
@@ -429,8 +444,9 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			if err != nil {
 				panic(err)
 			}
-
-			lval.genericValue = ast.ConstantInt{Value: intVal}
+			intValue := ast.ConstantInt{Value: intVal}
+			intValue.Line = token.line
+			lval.genericValue = intValue
 			return NODE
 		case tokenTypeFloat:
 			debug("float: %s", token.value)
@@ -438,39 +454,55 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			if err != nil {
 				panic(err)
 			}
-
-			lval.genericValue = ast.ConstantFloat{Value: floatval}
+			someValue := ast.ConstantFloat{Value: floatval}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return NODE
 		case tokenTypeString:
 			debug("string: '%s'", token.value)
-			lval.genericValue = ast.SimpleString{Value: token.value}
+			someValue := ast.SimpleString{Value: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return NODE
 		case tokenTypeDoubleQuoteString:
 			debug("string: '%s'", token.value)
-			lval.genericValue = ast.InterpolatedString{Value: token.value}
+			someValue := ast.InterpolatedString{Value: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return NODE
 		case tokenTypeCharacter:
 			debug("char: '%s'", token.value)
-			lval.genericValue = ast.CharacterLiteral{Value: token.value}
+			someValue := ast.CharacterLiteral{Value: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return NODE
 		case tokenTypeSymbol:
 			debug("symbol: %s", token.value)
-			lval.genericValue = ast.Symbol{Name: token.value}
+			someValue := ast.Symbol{Name: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return SYMBOL
 		case tokenTypeReference:
 			debug("REF: %s", token.value)
-			lval.genericValue = ast.BareReference{Name: token.value}
+			someValue := ast.BareReference{Name: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return REF
 		case tokenTypeCapitalizedReference:
 			debug("CAPITAL REF: %s", token.value)
-			lval.genericValue = ast.BareReference{Name: token.value}
+			someValue := ast.BareReference{Name: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return CAPITAL_REF
 		case tokenTypeGlobal:
 			debug("REF: '%s'", token.value)
-			lval.genericValue = ast.GlobalVariable{Name: token.value}
+			someValue := ast.GlobalVariable{Name: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return REF
 		case tokenTypeLParen:
 			debug("(")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return LPAREN
 		case tokenTypeRParen:
 			debug(")")
@@ -489,21 +521,26 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			return DEF
 		case tokenTypeDO:
 			debug("DO")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return DO
 		case tokenTypeEND:
 			debug("END")
 			return END
 		case tokenTypeIF:
 			debug("IF")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return IF
 		case tokenTypeELSE:
 			debug("ELSE")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return ELSE
 		case tokenTypeELSIF:
 			debug("ELSIF")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return ELSIF
 		case tokenTypeUNLESS:
 			debug("UNLESS")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return UNLESS
 		case tokenTypeCLASS:
 			debug("CLASS")
@@ -513,15 +550,23 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			return MODULE
 		case tokenTypeTRUE:
 			debug("TRUE")
-			return TRUE
+			value := ast.Boolean{Value: true}
+			value.Line = token.line
+			lval.genericValue = value
+			return NODE
 		case tokenTypeFALSE:
 			debug("FALSE")
-			return FALSE
+			value := ast.Boolean{Value: false}
+			value.Line = token.line
+			lval.genericValue = value
+			return NODE
 		case tokenTypeLessThan:
 			debug("<")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return LESSTHAN
 		case tokenTypeGreaterThan:
 			debug(">")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return GREATERTHAN
 		case tokenTypeColon:
 			debug(":")
@@ -540,27 +585,34 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			return COMPLEMENT
 		case tokenTypeUnaryPlus:
 			debug("(unary) +")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return UNARY_PLUS
 		case tokenTypeBinaryPlus:
 			debug("(binary) +")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return BINARY_PLUS
 		case tokenTypeBinaryMinus:
 			debug("(binary) -")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return BINARY_MINUS
 		case tokenTypeUnaryMinus:
 			debug("(unary) -")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return UNARY_MINUS
 		case tokenTypeStar:
 			debug("*")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return STAR
 		case tokenTypeLBracket:
 			debug("[")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return LBRACKET
 		case tokenTypeRBracket:
 			debug("]")
 			return RBRACKET
 		case tokenTypeLBrace:
 			debug("{")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return LBRACE
 		case tokenTypeRBrace:
 			debug("}")
@@ -573,37 +625,51 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			return ATSIGN
 		case tokenType__FILE__:
 			debug("__FILE__")
-			lval.genericValue = ast.FileNameConstReference{}
+			someValue := ast.FileNameConstReference{}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return FILE_CONST_REF
 		case tokenType__LINE__:
 			debug("__LINE__")
-			lval.genericValue = ast.LineNumberConstReference{}
+			someValue := ast.LineNumberConstReference{}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return LINE_CONST_REF
 		case tokenTypeDot:
 			debug(".")
 			return DOT
 		case tokenTypePipe:
 			debug("|")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return PIPE
 		case tokenTypeForwardSlash:
 			debug("/")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return SLASH
 		case tokenTypeAmpersand:
 			debug("&")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return AMPERSAND
 		case tokenTypeSubshell:
 			debug("subshell : '%s'", token.value)
-			lval.genericValue = ast.Subshell{Command: token.value}
+			someValue := ast.Subshell{Command: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return NODE
 		case tokenTypeOperator:
 			debug("Operator: %s", token.value)
-			lval.operator = token.value
+			someValue := ast.BareReference{Name: token.value, Line: token.line}
+			lval.genericValue = someValue
 			return OPERATOR
 		case tokenTypeBEGIN:
 			debug("BEGIN")
+			someValue := ast.Nil{Line: token.line}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return BEGIN
 		case tokenTypeRESCUE:
 			debug("RESCUE")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return RESCUE
 		case tokenTypeENSURE:
 			debug("ENSURE")
@@ -616,22 +682,28 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			return NEXT
 		case tokenTypeREDO:
 			debug("REDO")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return REDO
 		case tokenTypeRETRY:
 			debug("RETRY")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return RETRY
 		case tokenTypeRETURN:
 			debug("RETURN")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return RETURN
 		case tokenTypeYIELD:
 			debug("YIELD")
+			lval.genericValue = ast.Nil{Line: token.line}
 			return YIELD
 		case tokenTypeQuestionMark:
 			debug("?")
 			return QUESTIONMARK
 		case tokenTypeMethodName:
 			debug("Method: '%s'", token.value)
-			lval.genericValue = ast.BareReference{Name: token.value}
+			someValue := ast.BareReference{Name: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return SPECIAL_CHAR_REF
 		case tokenTypeWHILE:
 			debug("WHILE")
@@ -647,18 +719,30 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			return LAMBDA
 		case tokenTypeCASE:
 			debug("CASE")
+			someValue := ast.BareReference{}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return CASE
 		case tokenTypeWHEN:
 			debug("WHEN")
 			return WHEN
 		case tokenTypeSELF:
 			debug("SELF")
+			self := ast.Self{}
+			self.Line = token.line
+			lval.genericValue = self
 			return SELF
 		case tokenTypeNIL:
 			debug("NIL")
+			nilValue := ast.Nil{}
+			nilValue.Line = token.line
+			lval.genericValue = nilValue
 			return NIL
 		case tokenTypeALIAS:
 			debug("ALIAS")
+			someValue := ast.BareReference{}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return ALIAS
 		case tokenTypeOrEquals:
 			debug("||=")
@@ -668,15 +752,17 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			return RANGE
 		case tokenTypeRegex:
 			debug("regex: '%s'", token.value)
-			lval.genericValue = ast.Regex{Value: token.value}
+			someValue := ast.Regex{Value: token.value}
+			someValue.Line = token.line
+			lval.genericValue = someValue
 			return NODE
 		case tokenTypeUNTIL:
 			debug("UNTIL")
 			return UNTIL
 		case tokenTypeNamespaceResolvedModule:
 			debug("NamespacedModule '%s'", token.value)
-			lval.genericValue = token.value
-			return NamespacedModule
+			lval.genericValue = ast.BareReference{Line: token.line, Name: token.value}
+			return NAMESPACED_CAPITAL_REF
 		case tokenTypeProcArg:
 			debug("ProcArg")
 			return ProcArg
