@@ -97,6 +97,13 @@ end`)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(vm.SingletonWithName("true")))
 		})
+
+		It("has a + method", func() {
+			val, err := vm.Run("11 + 31")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val.String()).To(Equal(NewFixnum(42, vm, vm).String()))
+		})
 	})
 
 	Describe("interpreting a float", func() {
