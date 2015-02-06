@@ -27,6 +27,15 @@ func NewFixnumClass(provider ClassProvider, singletonProvider SingletonProvider)
 		}
 	}))
 
+	class.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		arg, ok := args[0].(*fixnumInstance)
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("TypeError: %s can't be coerced into Fixnum", args[0].Class().String()))
+		}
+		asFixnum := self.(*fixnumInstance)
+		return NewFixnum(asFixnum.value+arg.value, provider, singletonProvider), nil
+	}))
+
 	return class
 }
 
