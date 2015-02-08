@@ -10,8 +10,8 @@ func NewCallStack() *CallStack {
 	return &CallStack{}
 }
 
-func (stack *CallStack) Unshift(method, file string) {
-	frame := callStackFrame{Method: method, File: file}
+func (stack *CallStack) Unshift(method, file string, lineNumber int) {
+	frame := callStackFrame{Method: method, File: file, LineNumber: lineNumber}
 	stack.Frames = append([]callStackFrame{frame}, stack.Frames...)
 }
 
@@ -22,13 +22,14 @@ func (stack *CallStack) Shift() {
 func (stack *CallStack) String() string {
 	str := ""
 	for _, frame := range stack.Frames {
-		str += fmt.Sprintf("\t%s:in `%s'\n", frame.File, frame.Method)
+		str += fmt.Sprintf("\t%s:%d in `%s'\n", frame.File, frame.LineNumber+1, frame.Method)
 	}
 
 	return str
 }
 
 type callStackFrame struct {
-	File   string
-	Method string
+	File       string
+	Method     string
+	LineNumber int
 }

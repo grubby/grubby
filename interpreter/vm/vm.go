@@ -258,7 +258,7 @@ func (vm *vm) Run(input string) (Value, error) {
 	}
 
 	main := vm.ObjectSpace["main"]
-	vm.stack.Unshift("main", vm.currentFilename)
+	vm.stack.Unshift("main", vm.currentFilename, 0)
 	defer vm.stack.Shift()
 
 	vm.localVariableStack.unshift()
@@ -461,8 +461,13 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				args = append(args, arg)
 			}
 
-			vm.stack.Unshift(method.Name(), vm.currentFilename)
-			defer vm.stack.Shift()
+			vm.stack.Unshift(method.Name(), vm.currentFilename, callExpr.LineNumber())
+			didShift := false
+			defer func() {
+				if didShift == false {
+					vm.stack.Shift()
+				}
+			}()
 
 			var block Block
 			if callExpr.OptionalBlock.Provided() {
@@ -476,6 +481,9 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			}
 
 			returnValue, returnErr = method.Execute(target, block, args...)
+			vm.stack.Shift()
+			didShift = true
+
 			if returnErr != nil {
 				return returnValue, returnErr
 			}

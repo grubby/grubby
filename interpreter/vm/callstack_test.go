@@ -19,7 +19,7 @@ var _ = Describe("The call stack", func() {
 
 	Describe("adding a method to the stack", func() {
 		BeforeEach(func() {
-			subject.Unshift("some-method", "some-file")
+			subject.Unshift("some-method", "some-file", 0)
 		})
 
 		It("should now have one item in its frames", func() {
@@ -40,8 +40,8 @@ var _ = Describe("The call stack", func() {
 
 		Context("when more frames are added", func() {
 			BeforeEach(func() {
-				subject.Unshift("method2", "file2")
-				subject.Unshift("method3", "file3")
+				subject.Unshift("method2", "file2", 1)
+				subject.Unshift("method3", "file3", 2)
 			})
 
 			It("should add the last frame to the front of the stack", func() {
