@@ -11,7 +11,7 @@ import (
 
 type haveMethodMatcher struct {
 	methodName   string
-	matchedValue builtins.Value
+	matchedValue interface{}
 }
 
 func HaveMethod(name string) GomegaMatcher {
@@ -19,12 +19,12 @@ func HaveMethod(name string) GomegaMatcher {
 }
 
 func (matcher *haveMethodMatcher) Match(actual interface{}) (bool, error) {
+	matcher.matchedValue = actual
+
 	val, ok := actual.(builtins.Value)
 	if !ok {
 		return false, nil
 	}
-
-	matcher.matchedValue = val
 
 	_, err := val.Method(matcher.methodName)
 	return err == nil, nil
@@ -38,9 +38,10 @@ func (matcher *haveMethodMatcher) NegatedFailureMessage(actual interface{}) stri
 	return fmt.Sprintf("Expected '%s' to not have method '%s', but it did", matcher.matchedValue, matcher.methodName)
 }
 
+// instance methods
 type haveInstanceMethodMatcher struct {
 	methodName   string
-	matchedValue builtins.Value
+	matchedValue interface{}
 }
 
 func HaveInstanceMethod(name string) GomegaMatcher {
@@ -48,12 +49,12 @@ func HaveInstanceMethod(name string) GomegaMatcher {
 }
 
 func (matcher *haveInstanceMethodMatcher) Match(actual interface{}) (bool, error) {
-	val, ok := actual.(*builtins.RubyModule)
+	matcher.matchedValue = actual
+
+	val, ok := actual.(builtins.Module)
 	if !ok {
 		return false, nil
 	}
-
-	matcher.matchedValue = val
 
 	for _, method := range val.InstanceMethods() {
 		if method.Name() == matcher.methodName {
@@ -70,4 +71,40 @@ func (matcher *haveInstanceMethodMatcher) FailureMessage(actual interface{}) str
 
 func (matcher *haveInstanceMethodMatcher) NegatedFailureMessage(actual interface{}) string {
 	return fmt.Sprintf("Expected '%s' to not have method '%s', but it did", matcher.matchedValue, matcher.methodName)
+}
+
+// private methods
+
+type havePrivateMethodMatcher struct {
+	methodName   string
+	matchedValue interface{}
+}
+
+func HavePrivateMethod(name string) GomegaMatcher {
+	return &havePrivateMethodMatcher{methodName: name}
+}
+
+func (matcher *havePrivateMethodMatcher) Match(actual interface{}) (bool, error) {
+	matcher.matchedValue = actual
+
+	val, ok := actual.(builtins.Module)
+	if !ok {
+		return false, nil
+	}
+
+	for _, method := range val.PrivateInstanceMethods() {
+		if method.Name() == matcher.methodName {
+			return true, nil
+		}
+	}
+
+	return false, errors.New(fmt.Sprintf("no such method '%s'", matcher.methodName))
+}
+
+func (matcher *havePrivateMethodMatcher) FailureMessage(actual interface{}) string {
+	return fmt.Sprintf("Expected '%#v' to have a private method '%s', but it did not", matcher.matchedValue, matcher.methodName)
+}
+
+func (matcher *havePrivateMethodMatcher) NegatedFailureMessage(actual interface{}) string {
+	return fmt.Sprintf("Expected '%v' to not have a private method '%s', but it did", matcher.matchedValue, matcher.methodName)
 }

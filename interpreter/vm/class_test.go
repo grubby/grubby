@@ -180,4 +180,18 @@ end
 		_, ok := classClass.(Module)
 		Expect(ok).To(BeTrue())
 	})
+
+	It("allows you to mark methods as being private", func() {
+		class, err := vm.Run(`
+class Foo
+  def from
+  end
+
+  private :from
+end
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(class).To(HavePrivateMethod("from"))
+	})
 })

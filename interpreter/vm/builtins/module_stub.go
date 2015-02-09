@@ -6,7 +6,8 @@ import (
 )
 
 type moduleStub struct {
-	instanceMethods map[string]Method
+	instanceMethods        map[string]Method
+	privateInstanceMethods map[string]Method
 }
 
 func (m *moduleStub) InstanceMethod(name string) (Method, error) {
@@ -26,9 +27,30 @@ func (m *moduleStub) AddInstanceMethod(method Method) {
 	m.instanceMethods[method.Name()] = method
 }
 
+func (m *moduleStub) RemoveInstanceMethod(method Method) {
+	delete(m.instanceMethods, method.Name())
+}
+
 func (m *moduleStub) InstanceMethods() []Method {
 	methods := make([]Method, 0, len(m.instanceMethods))
 	for _, method := range m.instanceMethods {
+		methods = append(methods, method)
+	}
+
+	return methods
+}
+
+func (m *moduleStub) AddPrivateInstanceMethod(method Method) {
+	if m.privateInstanceMethods == nil {
+		m.privateInstanceMethods = make(map[string]Method)
+	}
+
+	m.privateInstanceMethods[method.Name()] = method
+}
+
+func (m *moduleStub) PrivateInstanceMethods() []Method {
+	methods := make([]Method, 0, len(m.privateInstanceMethods))
+	for _, method := range m.privateInstanceMethods {
 		methods = append(methods, method)
 	}
 
