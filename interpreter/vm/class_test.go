@@ -194,4 +194,110 @@ end
 		Expect(err).ToNot(HaveOccurred())
 		Expect(class).To(HavePrivateMethod("from"))
 	})
+
+	Describe("defining a class", func() {
+		It("adds it to the global class cache", func() {
+			_, err := vm.Run(`
+class Foo
+end
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			_, err = vm.GetClass("Foo")
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("allows a user to construct an instance of the class", func() {
+			_, err := vm.Run(`
+class Foo
+end
+`)
+
+			fooClass := vm.MustGetClass("Foo")
+			method, err := fooClass.Method("new")
+			Expect(err).ToNot(HaveOccurred())
+
+			instance, err := method.Execute(fooClass, nil)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(instance.Class()).To(Equal(fooClass))
+		})
+
+		Context("when there are instance methods defined", func() {
+			It("makes instance methods available on new instances of the class", func() {
+				_, err := vm.Run(`
+class Foo
+  def hello
+    "world"
+  end
+end
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				fooClass, err := vm.GetClass("Foo")
+				Expect(fooClass).ToNot(BeNil())
+
+				fooInstance, err := fooClass.New(vm, vm)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(fooInstance).ToNot(BeNil())
+
+				method, err := fooInstance.Method("hello")
+				Expect(err).ToNot(HaveOccurred())
+
+				val, err := method.Execute(fooInstance, nil)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(BeAssignableToTypeOf(NewString("", vm, vm)))
+				Expect(val.String()).To(Equal(`"world"`))
+			})
+		})
+
+		Context("when it extends a module", func() {
+			It("makes the modules methods available on itself", func() {
+				_, err := vm.Run(`
+module Foo
+  def publication
+    'Chichimec-lipochrome'
+  end
+end
+
+class Bar
+  extend Foo
+end
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+
+				barClass := vm.MustGetClass("Bar")
+				Expect(barClass).To(HaveMethod("publication"))
+			})
+		})
+
+		Context("when it includes a module", func() {
+			It("makes the modules methods available on its instances", func() {
+				_, err := vm.Run(`
+module Foo
+  def superinquisitive
+    "tumescent-wasty"
+  end
+end
+
+class Bar
+  include Foo
+end
+`)
+				Expect(err).ToNot(HaveOccurred())
+
+				barClass := vm.MustGetClass("Bar")
+				bar, err := barClass.New(vm, vm)
+				Expect(err).ToNot(HaveOccurred())
+
+				method, err := bar.Method("superinquisitive")
+				Expect(err).ToNot(HaveOccurred())
+
+				val, err := method.Execute(bar, nil)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val.String()).To(Equal(`"tumescent-wasty"`))
+			})
+		})
+	})
 })
