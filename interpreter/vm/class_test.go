@@ -152,13 +152,8 @@ class Foo
   private_class_method :bar
 end
 `)
-
 			Expect(err).ToNot(HaveOccurred())
-
-			_, err = class.PrivateMethod("bar")
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(class).ToNot(HaveMethod("bar"))
+			Expect(class).To(HavePrivateMethod("bar"))
 		})
 	})
 
@@ -192,7 +187,7 @@ end
 `)
 
 		Expect(err).ToNot(HaveOccurred())
-		Expect(class).To(HavePrivateMethod("from"))
+		Expect(class).To(HavePrivateInstanceMethod("from"))
 	})
 
 	Describe("defining a class", func() {

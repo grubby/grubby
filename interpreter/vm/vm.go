@@ -350,7 +350,25 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue = method
 
 			if context == vm.ObjectSpace["main"] && funcNode.Target == nil {
-				vm.CurrentModules["Kernel"].AddPrivateMethod(method)
+				method = NewPrivateRubyMethod(
+					funcNode.MethodName(),
+					funcNode.MethodArgs(),
+					funcNode.Body,
+					vm,
+					vm,
+					func(self Value, method *RubyMethod) (Value, error) {
+						vm.localVariableStack.unshift()
+						defer vm.localVariableStack.shift()
+
+						for _, arg := range method.Args() {
+							vm.localVariableStack.store(arg.Name, arg.Value)
+						}
+
+						return vm.executeWithContext(self, method.Body()...)
+					})
+				returnValue = method
+				vm.CurrentModules["Kernel"].AddMethod(method)
+
 			} else {
 				switch funcNode.Target.(type) {
 				case ast.Self:
@@ -422,10 +440,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			var method Method
 			callExpr := statement.(ast.CallExpression)
 
-			var (
-				target           Value
-				usePrivateMethod bool // FIXME: this should be unnecessary now
-			)
+			var target Value
 
 			if callExpr.Target != nil {
 				target, returnErr = vm.executeWithContext(context, callExpr.Target)
@@ -433,7 +448,6 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 					return nil, returnErr
 				}
 			} else {
-				usePrivateMethod = true
 				target = context
 			}
 
@@ -443,10 +457,6 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			}
 
 			method, err := target.Method(callExpr.Func.Name)
-			if err != nil && usePrivateMethod {
-				method, err = target.PrivateMethod(callExpr.Func.Name)
-			}
-
 			if err != nil {
 				return nil, err
 			}

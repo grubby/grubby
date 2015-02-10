@@ -63,7 +63,17 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		}
 
 		self.RemoveMethod(method)
-		self.AddPrivateMethod(method)
+
+		native, ok := method.(*nativeMethod)
+		if ok {
+			native.private = true
+			self.AddMethod(native)
+		} else if rubyMethod, ok := method.(*RubyMethod); ok {
+			rubyMethod.private = true
+			self.AddMethod(rubyMethod)
+		} else {
+			panic(fmt.Sprintf("unknown method type: %T", method))
+		}
 
 		return methodName, nil
 	}))

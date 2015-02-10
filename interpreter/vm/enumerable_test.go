@@ -32,6 +32,7 @@ var _ = Describe("Enumerable collections", func() {
 		It("only keeps the elements for which the block yields a truthy value", func() {
 			value, err := vm.Run("[1,2,3].select { |o| o.even? }")
 			Expect(err).ToNot(HaveOccurred())
+			Expect(len(value.(*Array).Members())).To(Equal(1))
 			Expect(value.(*Array).Members()).To(ContainElement(NewFixnum(2, vm, vm)))
 		})
 	})

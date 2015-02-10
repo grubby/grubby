@@ -13,7 +13,8 @@ type methodArg struct {
 
 type RubyMethod struct {
 	valueStub
-	name string
+	name    string
+	private bool
 
 	args []ast.MethodParam
 
@@ -46,8 +47,34 @@ func NewRubyMethod(
 	return m
 }
 
+func NewPrivateRubyMethod(
+	name string,
+	args []ast.MethodParam,
+	rubyBody []ast.Node,
+	provider ClassProvider,
+	evaluator ArgEvaluator,
+	body func(self Value, method *RubyMethod) (Value, error),
+) Method {
+	m := &RubyMethod{
+		name:            name,
+		body:            body,
+		args:            args,
+		private:         true,
+		evaluator:       evaluator,
+		unevaluatedBody: rubyBody,
+	}
+	m.class = provider.ClassWithName("Method")
+	m.initialize()
+	m.setStringer(m.String)
+	return m
+}
+
 func (method *RubyMethod) Name() string {
 	return method.name
+}
+
+func (method *RubyMethod) IsPrivate() bool {
+	return method.private
 }
 
 func (method *RubyMethod) Args() []methodArg {

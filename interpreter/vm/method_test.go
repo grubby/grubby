@@ -23,6 +23,25 @@ var _ = Describe("methods", func() {
 		vm = NewVM(pathToExecutable, "fake-irb-under-test")
 	})
 
+	Describe("defined outside of a class", func() {
+		BeforeEach(func() {
+			_, err := vm.Run(`
+def foo
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should be defined on 'main'", func() {
+			Expect(vm.MustGet("Kernel")).To(HavePrivateMethod("foo"))
+		})
+
+		It("should be invokeable", func() {
+			_, err := vm.Run("foo()")
+			Expect(err).ToNot(HaveOccurred())
+		})
+	})
+
 	It("has a reference to self", func() {
 		_, err := vm.Run(`
 class Foo
@@ -84,10 +103,10 @@ Foo.my_puts 'hello world'
 			Expect(output).To(ContainSubstring("hello world"))
 		})
 
-		Describe("default values for named arguments", func() {
+		Describe("named arguments", func() {
 			var object Value
 
-			Context("when they are provided a value", func() {
+			Context("provided a value", func() {
 				BeforeEach(func() {
 					var err error
 					object, err = vm.Run(`
@@ -118,7 +137,7 @@ ace
 				})
 			})
 
-			Context("when they are not provided a value", func() {
+			Context("not provided a value", func() {
 				BeforeEach(func() {
 					var err error
 					object, err = vm.Run(`

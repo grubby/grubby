@@ -1,16 +1,10 @@
 package builtins
 
-import (
-	"errors"
-	"fmt"
-)
-
 // this type repesents the shared behavior and data of all Ruby Values
 // all values will need to store the methods that are defined on them
 // (in addition to their class, and other information)
 type valueStub struct {
 	eigenclass_methods map[string]Method
-	private_methods    map[string]Method
 	class              Class
 
 	stringer func() string
@@ -20,7 +14,6 @@ type valueStub struct {
 
 func (valueStub *valueStub) initialize() {
 	valueStub.eigenclass_methods = make(map[string]Method)
-	valueStub.private_methods = make(map[string]Method)
 	valueStub.instance_variables = make(map[string]Value)
 }
 
@@ -75,15 +68,6 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 	return nil, NewNoMethodError(name, valueStub.String(), valueStub.Class().String(), "")
 }
 
-func (valueStub *valueStub) PrivateMethod(name string) (Method, error) {
-	m, ok := valueStub.private_methods[name]
-	if !ok {
-		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
-	}
-
-	return m, nil
-}
-
 func (valueStub *valueStub) Methods() []Method {
 	values := make([]Method, 0, len(valueStub.eigenclass_methods))
 	for _, m := range valueStub.eigenclass_methods {
@@ -94,9 +78,11 @@ func (valueStub *valueStub) Methods() []Method {
 }
 
 func (valueStub *valueStub) PrivateMethods() []Method {
-	values := make([]Method, len(valueStub.private_methods))
-	for _, m := range valueStub.private_methods {
-		values = append(values, m)
+	values := make([]Method, 0)
+	for _, m := range valueStub.eigenclass_methods {
+		if m.IsPrivate() {
+			values = append(values, m)
+		}
 	}
 
 	return values
@@ -108,10 +94,6 @@ func (valueStub *valueStub) AddMethod(m Method) {
 
 func (valueStub *valueStub) RemoveMethod(m Method) {
 	delete(valueStub.eigenclass_methods, m.Name())
-}
-
-func (valueStub *valueStub) AddPrivateMethod(m Method) {
-	valueStub.private_methods[m.Name()] = m
 }
 
 func (valueStub *valueStub) String() string {

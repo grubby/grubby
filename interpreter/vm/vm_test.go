@@ -47,10 +47,11 @@ end`)
 
 		It("creates a private method on Kernel", func() {
 			kernel := vm.Modules()["Kernel"]
-			method, err := kernel.PrivateMethod("foo")
+			method, err := kernel.Method("foo")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(method.Name()).To(Equal("foo"))
+			Expect(method.IsPrivate()).To(Equal(true))
 		})
 
 		// FIXME: to fix this, methods should know about
@@ -108,7 +109,7 @@ end`)
 	})
 
 	Describe("a reference to a variable", func() {
-		Context("when it already is defined", func() {
+		Context("after it has been defined", func() {
 			BeforeEach(func() {
 				vm.Set("foo", NewString("superinquisitive-edacity", vm, vm))
 			})
@@ -166,9 +167,10 @@ end`)
 				Expect(err).ToNot(HaveOccurred())
 
 				kernel := vm.Modules()["Kernel"]
-				method, err := kernel.PrivateMethod("foo")
+				method, err := kernel.Method("foo")
 
 				Expect(err).ToNot(HaveOccurred())
+				Expect(method.IsPrivate()).To(Equal(true))
 				Expect(method.Name()).To(Equal("foo"))
 			})
 		})

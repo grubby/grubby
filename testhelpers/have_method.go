@@ -92,13 +92,13 @@ func (matcher *havePrivateMethodMatcher) Match(actual interface{}) (bool, error)
 		return false, nil
 	}
 
-	for _, method := range val.PrivateInstanceMethods() {
-		if method.Name() == matcher.methodName {
+	for _, method := range val.Methods() {
+		if method.Name() == matcher.methodName && method.IsPrivate() {
 			return true, nil
 		}
 	}
 
-	return false, errors.New(fmt.Sprintf("no such method '%s'", matcher.methodName))
+	return false, errors.New(fmt.Sprintf("Expected to find a private method '%s', but could not find it", matcher.methodName))
 }
 
 func (matcher *havePrivateMethodMatcher) FailureMessage(actual interface{}) string {
@@ -107,4 +107,39 @@ func (matcher *havePrivateMethodMatcher) FailureMessage(actual interface{}) stri
 
 func (matcher *havePrivateMethodMatcher) NegatedFailureMessage(actual interface{}) string {
 	return fmt.Sprintf("Expected '%v' to not have a private method '%s', but it did", matcher.matchedValue, matcher.methodName)
+}
+
+// private instance methods
+type havePrivateInstanceMethodMatcher struct {
+	methodName   string
+	matchedValue interface{}
+}
+
+func HavePrivateInstanceMethod(name string) GomegaMatcher {
+	return &havePrivateInstanceMethodMatcher{methodName: name}
+}
+
+func (matcher *havePrivateInstanceMethodMatcher) Match(actual interface{}) (bool, error) {
+	matcher.matchedValue = actual
+
+	val, ok := actual.(builtins.Module)
+	if !ok {
+		return false, nil
+	}
+
+	for _, method := range val.PrivateInstanceMethods() {
+		if method.Name() == matcher.methodName {
+			return true, nil
+		}
+	}
+
+	return false, errors.New(fmt.Sprintf("Expected to have a private instance method '%s' but could not find it", matcher.methodName))
+}
+
+func (matcher *havePrivateInstanceMethodMatcher) FailureMessage(actual interface{}) string {
+	return fmt.Sprintf("Expected '%s' to have method '%s', but it did not", matcher.matchedValue, matcher.methodName)
+}
+
+func (matcher *havePrivateInstanceMethodMatcher) NegatedFailureMessage(actual interface{}) string {
+	return fmt.Sprintf("Expected '%s' to not have method '%s', but it did", matcher.matchedValue, matcher.methodName)
 }
