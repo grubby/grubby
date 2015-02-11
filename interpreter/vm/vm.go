@@ -16,7 +16,6 @@ import (
 type vm struct {
 	currentFilename string
 
-	stack          *CallStack
 	ObjectSpace    map[string]Value
 	CurrentGlobals map[string]Value
 	CurrentSymbols map[string]Value
@@ -24,7 +23,8 @@ type vm struct {
 	CurrentModules map[string]Module
 	singletons     map[string]Value
 
-	localVariableStack *localVariableStack
+	stack              *CallStack
+	localVariableStack *LocalVariableStack
 }
 
 type VM interface {
@@ -54,7 +54,7 @@ func NewVM(rubyHome, name string) VM {
 		ObjectSpace:        make(map[string]Value),
 		CurrentSymbols:     make(map[string]Value),
 		CurrentModules:     make(map[string]Module),
-		localVariableStack: newLocalVariableStack(),
+		localVariableStack: NewLocalVariableStack(),
 		singletons:         make(map[string]Value),
 	}
 	vm.registerBuiltinClassesAndModules()
@@ -261,8 +261,8 @@ func (vm *vm) Run(input string) (Value, error) {
 	vm.stack.Unshift("main", vm.currentFilename, 0)
 	defer vm.stack.Shift()
 
-	vm.localVariableStack.unshift()
-	defer vm.localVariableStack.shift()
+	vm.localVariableStack.Unshift()
+	defer vm.localVariableStack.Shift()
 	return vm.executeWithContext(main, parser.Statements...)
 }
 
@@ -338,11 +338,11 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				vm,
 				vm,
 				func(self Value, method *RubyMethod) (Value, error) {
-					vm.localVariableStack.unshift()
-					defer vm.localVariableStack.shift()
+					vm.localVariableStack.Unshift()
+					defer vm.localVariableStack.Shift()
 
 					for _, arg := range method.Args() {
-						vm.localVariableStack.store(arg.Name, arg.Value)
+						vm.localVariableStack.Store(arg.Name, arg.Value)
 					}
 
 					return vm.executeWithContext(self, method.Body()...)
@@ -357,11 +357,11 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 					vm,
 					vm,
 					func(self Value, method *RubyMethod) (Value, error) {
-						vm.localVariableStack.unshift()
-						defer vm.localVariableStack.shift()
+						vm.localVariableStack.Unshift()
+						defer vm.localVariableStack.Shift()
 
 						for _, arg := range method.Args() {
-							vm.localVariableStack.store(arg.Name, arg.Value)
+							vm.localVariableStack.Store(arg.Name, arg.Value)
 						}
 
 						return vm.executeWithContext(self, method.Body()...)
@@ -414,7 +414,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			}
 		case ast.BareReference:
 			name := statement.(ast.BareReference).Name
-			maybe, err := vm.localVariableStack.retrieve(name)
+			maybe, err := vm.localVariableStack.Retrieve(name)
 			if err == nil {
 				returnValue = maybe
 			} else {
@@ -642,11 +642,11 @@ func (vm *vm) EvaluateBlockWithArgsInContext(
 	context Value,
 	args []BlockArg,
 	statements []ast.Node) (Value, error) {
-	vm.localVariableStack.unshift()
-	defer vm.localVariableStack.shift()
+	vm.localVariableStack.UnshiftCopyingCurrentFrame()
+	defer vm.localVariableStack.Shift()
 
 	for _, arg := range args {
-		vm.localVariableStack.store(arg.Name, arg.Value)
+		vm.localVariableStack.Store(arg.Name, arg.Value)
 	}
 
 	return vm.executeWithContext(context, statements...)

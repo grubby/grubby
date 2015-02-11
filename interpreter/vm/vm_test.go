@@ -108,6 +108,21 @@ end`)
 		})
 	})
 
+	Describe("blocks", func() {
+		It("can be used to close over variables", func() {
+			value, err := vm.Run(`
+def test(needle)
+  [1,2,3,4,5].select {|o| o == needle}
+end
+
+test(5)
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(value.(*Array).Members())).To(Equal(1))
+			Expect(value.(*Array).Members()).To(ContainElement(NewFixnum(5, vm, vm)))
+		})
+	})
+
 	Describe("a reference to a variable", func() {
 		Context("after it has been defined", func() {
 			BeforeEach(func() {

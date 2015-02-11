@@ -9,41 +9,53 @@ import (
 
 type frame map[string]builtins.Value
 
-type localVariableStack struct {
+type LocalVariableStack struct {
 	frames []frame
 }
 
-func newLocalVariableStack() *localVariableStack {
-	return &localVariableStack{
+func NewLocalVariableStack() *LocalVariableStack {
+	return &LocalVariableStack{
 		frames: make([]frame, 0),
 	}
 }
 
 func newEmptyFrame() []frame {
-	return []frame{
-		frame{},
-	}
+	return []frame{{}}
 }
 
-func (stack *localVariableStack) unshift() {
+func (stack *LocalVariableStack) Unshift() {
 	stack.frames = append(newEmptyFrame(), stack.frames...)
 }
 
-func (stack *localVariableStack) shift() {
+func (stack *LocalVariableStack) Shift() {
 	stack.frames = stack.frames[0 : len(stack.frames)-1]
 }
 
-func (stack *localVariableStack) store(key string, value builtins.Value) {
+func (stack *LocalVariableStack) UnshiftCopyingCurrentFrame() {
+	var lastFrame frame
+	if len(stack.frames) >= 1 {
+		lastFrame = stack.frames[0]
+	} else {
+		lastFrame = newEmptyFrame()[0]
+	}
+
+	newFrame := newEmptyFrame()
+	for key, value := range lastFrame {
+		newFrame[0][key] = value
+	}
+
+	stack.frames = append(newFrame, stack.frames...)
+}
+
+func (stack *LocalVariableStack) Store(key string, value builtins.Value) {
 	stack.frames[0][key] = value
 }
 
-func (stack *localVariableStack) retrieve(key string) (builtins.Value, error) {
-	for _, frame := range stack.frames {
-		val, ok := frame[key]
-		if ok {
-			return val, nil
-		}
+func (stack *LocalVariableStack) Retrieve(key string) (builtins.Value, error) {
+	maybe, ok := stack.frames[0][key]
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("No such key '%s'", key))
+	} else {
+		return maybe, nil
 	}
-
-	return nil, errors.New(fmt.Sprintf("No such key '%s'", key))
 }
