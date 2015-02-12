@@ -273,6 +273,9 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 	)
 	for _, statement := range statements {
 		switch statement.(type) {
+		case ast.Return:
+			returnNode := statement.(ast.Return)
+			return vm.executeWithContext(context, returnNode.Value)
 		case ast.IfBlock:
 			truthy := false
 			ifBlock := statement.(ast.IfBlock)

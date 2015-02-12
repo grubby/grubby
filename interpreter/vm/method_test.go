@@ -163,4 +163,50 @@ ace
 			})
 		})
 	})
+
+	Describe("return values", func() {
+		var (
+			result Value
+			err    error
+		)
+
+		Context("when there is an explicit return expression", func() {
+			BeforeEach(func() {
+				result, err = vm.Run(`
+def test
+	if true
+	  return 'hello'
+	else
+	  return 'world'
+  end
+end
+
+test()
+`)
+			})
+
+			It("returns the value provided", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result.(*StringValue).RawString()).To(Equal("hello"))
+			})
+		})
+
+		Context("when there is no explicit return expression", func() {
+			BeforeEach(func() {
+				result, err = vm.Run(`
+def test
+  'hello'
+	'world'
+end
+
+test()
+`)
+			})
+
+			It("returns the last value in the body of the method", func() {
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result.(*StringValue).RawString()).To(Equal("world"))
+			})
+		})
+	})
 })
