@@ -4,15 +4,22 @@ grubby [![Build Status](https://secure.travis-ci.org/grubby/grubby.png?branch=ma
 
 Grubby is an experimental ruby written in Golang
 
-Wat
----
+What? Why?
+----------
 
-Sure, why not? I've been interested in implementing a language for several years now and have finally reached a point where I feel comfortable exploring the idea further. While rewriting a ruby project in golang, I joked to some coworkers about just writing a Ruby implementation in Go to speed up our efforts; eventually the joke became real.
+Why not? Go is basically a modern C (given that it has Unicode support and concurrency primitives), and C is the language that a lot of other languages are implemented in. It seems like a worthy experiment to see if Go is a suitable language to implement other languages in.
 
-Why Golang?
------------
+Yes but Why Golang?
+-------------------
 
 Golang doesn't always feel like the best language to implement another language in. I do enjoy that it feels like a very modern C (albeit one without guarantees on how long **any** function can take because of heap allocation and GC). Ultimately, my goal is to learn more about Golang and Ruby through this project. If I find out that Golang is not ideal for implementing other languages, then that is fine.
+
+How you can help!
+-----------------
+1. Find some ruby behavior you would like to write
+2. Write a failing spec for it
+3. Write the code that that makes it pass
+4. Issue a pull request. It will bring a smile to my face.
 
 Running Tests
 -------------
@@ -29,9 +36,8 @@ Unfortunately, that's not very easy to parallelize between multiple people. Feel
 Some great things to work on include:
 
 * line numbers in stack traces
-* more builtin classes and methods (anything on Class, Kernel, Module, Object, etc... honestly)
+* more builtin classes and methods (e.g.: String, Array, Hash, Enumerable methods)
 * raising and rescuing from exceptions
-* while loops
 * blocks
 
-If you're not sure where to start, opening up a pull request is also fine. :)
+If you're not sure where to start, opening up an issue or pull request with failing tests is also fine. :)
