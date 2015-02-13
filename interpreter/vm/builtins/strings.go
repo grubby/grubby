@@ -1,6 +1,9 @@
 package builtins
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 type StringClass struct {
 	valueStub
@@ -9,21 +12,21 @@ type StringClass struct {
 	provider ClassProvider
 }
 
-func NewStringClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewStringClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
 	s := &StringClass{}
 	s.initialize()
 	s.setStringer(s.String)
 
-	s.provider = provider
-	s.class = provider.ClassWithName("Class")
-	s.superClass = provider.ClassWithName("Object")
+	s.provider = classProvider
+	s.class = classProvider.ClassWithName("Class")
+	s.superClass = classProvider.ClassWithName("Object")
 
-	s.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("+", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
 		selfAsStr := self.(*StringValue)
-		return NewString(selfAsStr.value+arg.value, provider, singletonProvider), nil
+		return NewString(selfAsStr.value+arg.value, classProvider, singletonProvider), nil
 	}))
-	s.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("==", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		asStr, ok := args[0].(*StringValue)
 		if !ok {
 			return singletonProvider.SingletonWithName("false"), nil
@@ -35,6 +38,12 @@ func NewStringClass(provider ClassProvider, singletonProvider SingletonProvider)
 		} else {
 			return singletonProvider.SingletonWithName("false"), nil
 		}
+	}))
+	s.AddMethod(NewNativeMethod("to_i", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsStr := self.(*StringValue)
+
+		intValue, _ := strconv.Atoi(selfAsStr.value)
+		return NewFixnum(intValue, classProvider, singletonProvider), nil
 	}))
 
 	return s
@@ -48,7 +57,7 @@ func (c *StringClass) Name() string {
 	return "String"
 }
 
-func (class *StringClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (class *StringClass) New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
 	str := &StringValue{}
 	str.initialize()
 	str.setStringer(str.String)
@@ -71,8 +80,8 @@ func (s *StringValue) RawString() string {
 	return s.value
 }
 
-func NewString(str string, provider ClassProvider, singletonProvider SingletonProvider) Value {
-	s, _ := provider.ClassWithName("String").New(provider, singletonProvider)
+func NewString(str string, classProvider ClassProvider, singletonProvider SingletonProvider) Value {
+	s, _ := classProvider.ClassWithName("String").New(classProvider, singletonProvider)
 	s.(*StringValue).value = str
 	return s
 }

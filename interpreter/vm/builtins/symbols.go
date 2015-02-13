@@ -10,12 +10,17 @@ type symbolClass struct {
 	classStub
 }
 
-func NewSymbolClass(provider ClassProvider) Class {
+func NewSymbolClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
 	s := &symbolClass{}
 	s.initialize()
 	s.setStringer(s.String)
-	s.class = provider.ClassWithName("Class")
-	s.superClass = provider.ClassWithName("Object")
+	s.class = classProvider.ClassWithName("Class")
+	s.superClass = classProvider.ClassWithName("Object")
+
+	s.AddMethod(NewNativeMethod("to_proc", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsSymbol := self.(*SymbolValue)
+		return NewProcInstance(selfAsSymbol.value, classProvider), nil
+	}))
 
 	return s
 }

@@ -157,8 +157,8 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["Integer"] = NewIntegerClass(vm)
 	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm, vm)
 	vm.CurrentClasses["Float"] = NewFloatClass(vm)
-	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm)
-
+	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm, vm)
+	vm.CurrentClasses["Proc"] = NewProcClass(vm, vm)
 	vm.singletons["nil"], _ = vm.CurrentClasses["NilClass"].New(vm, vm)
 	vm.singletons["true"], _ = vm.CurrentClasses["TrueClass"].New(vm, vm)
 	vm.singletons["false"], _ = vm.CurrentClasses["FalseClass"].New(vm, vm)

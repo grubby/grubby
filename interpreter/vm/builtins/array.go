@@ -99,6 +99,30 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 
 		return filteredArray, nil
 	}))
+	a.AddMethod(NewNativeMethod("map", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		arr, _ := classProvider.ClassWithName("Array").New(classProvider, singletonProvider)
+		newArray := arr.(*Array)
+		selfAsArray := self.(*Array)
+
+		var mapper Block
+
+		if len(args) == 1 {
+			mapper = args[0].(*Proc)
+		} else {
+			mapper = block
+		}
+
+		for _, element := range selfAsArray.members {
+			result, err := mapper.Call(element)
+			if err != nil {
+				return nil, err
+			}
+
+			newArray.members = append(newArray.members, result)
+		}
+
+		return newArray, nil
+	}))
 
 	return a
 }
