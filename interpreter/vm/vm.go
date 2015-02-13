@@ -277,117 +277,15 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnNode := statement.(ast.Return)
 			return vm.executeWithContext(context, returnNode.Value)
 		case ast.IfBlock:
-			truthy := false
-			ifBlock := statement.(ast.IfBlock)
-			switch ifBlock.Condition.(type) {
-			case ast.Boolean:
-				truthy = ifBlock.Condition.(ast.Boolean).Value
-			case ast.BareReference:
-				truthy = ifBlock.Condition.(ast.BareReference).Name == "nil"
-			default:
-				truthy = true
-			}
-
-			if truthy {
-				returnValue, returnErr = vm.executeWithContext(context, ifBlock.Body...)
-			} else {
-				returnValue, returnErr = vm.executeWithContext(context, ifBlock.Else...)
-			}
+			returnValue, returnErr = interpretIfStatementInContext(vm, statement.(ast.IfBlock), context)
 		case ast.Alias:
-			// FIXME: assumes that the context will be a module, but could also be a class
-			aliasNode := statement.(ast.Alias)
-			contextModule := context.(Module)
-
-			m, err := contextModule.InstanceMethod(aliasNode.From.Name)
-			if err != nil {
-				returnErr = NewNameError(aliasNode.From.Name, contextModule.String(), contextModule.String(), vm.stack.String())
-				return returnValue, returnErr
-			}
-
-			contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
-				return m.Execute(self, block, args...)
-			}))
-
+			returnValue, returnErr = interpretAliasInContext(vm, statement.(ast.Alias), context)
 		case ast.ModuleDecl:
-			moduleNode := statement.(ast.ModuleDecl)
-			theModule := NewModule(moduleNode.Name, vm, vm)
-			vm.CurrentModules[moduleNode.Name] = theModule
-
-			_, err := vm.executeWithContext(theModule, moduleNode.Body...)
-			if err != nil {
-				returnErr = err
-			}
-
-			returnValue = theModule
-
+			returnValue, returnErr = interpretModuleDeclarationInContext(vm, statement.(ast.ModuleDecl), context)
 		case ast.ClassDecl:
-			classNode := statement.(ast.ClassDecl)
-			theClass := NewUserDefinedClass(classNode.Name, vm, vm)
-			vm.CurrentClasses[classNode.FullName()] = theClass
-
-			_, err := vm.executeWithContext(theClass, classNode.Body...)
-			if err != nil {
-				returnErr = err
-			} else {
-				returnValue = theClass
-			}
-
+			returnValue, returnErr = interpretClassDeclarationInContext(vm, statement.(ast.ClassDecl), context)
 		case ast.FuncDecl:
-			funcNode := statement.(ast.FuncDecl)
-			method := NewRubyMethod(
-				funcNode.MethodName(),
-				funcNode.MethodArgs(),
-				funcNode.Body,
-				vm,
-				vm,
-				func(self Value, method *RubyMethod) (Value, error) {
-					vm.localVariableStack.Unshift()
-					defer vm.localVariableStack.Shift()
-
-					for _, arg := range method.Args() {
-						vm.localVariableStack.Store(arg.Name, arg.Value)
-					}
-
-					return vm.executeWithContext(self, method.Body()...)
-				})
-			returnValue = method
-
-			if context == vm.ObjectSpace["main"] && funcNode.Target == nil {
-				method = NewPrivateRubyMethod(
-					funcNode.MethodName(),
-					funcNode.MethodArgs(),
-					funcNode.Body,
-					vm,
-					vm,
-					func(self Value, method *RubyMethod) (Value, error) {
-						vm.localVariableStack.Unshift()
-						defer vm.localVariableStack.Shift()
-
-						for _, arg := range method.Args() {
-							vm.localVariableStack.Store(arg.Name, arg.Value)
-						}
-
-						return vm.executeWithContext(self, method.Body()...)
-					})
-				returnValue = method
-				vm.CurrentModules["Kernel"].AddMethod(method)
-
-			} else {
-				switch funcNode.Target.(type) {
-				case ast.Self:
-					context.AddMethod(method)
-				case nil:
-					context.(Module).AddInstanceMethod(method)
-				default:
-					value, err := vm.executeWithContext(context, funcNode.Target)
-					if err != nil {
-						return nil, err
-					}
-
-					value.AddMethod(method)
-				}
-			}
-
+			returnValue, returnErr = interpretMethdDeclarationInContext(vm, statement.(ast.FuncDecl), context)
 		case ast.Nil:
 			returnValue = vm.singletons["nil"]
 		case ast.SimpleString:
@@ -407,221 +305,33 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.ConstantFloat:
 			returnValue = NewFloat(statement.(ast.ConstantFloat).Value, vm)
 		case ast.Symbol:
-			name := statement.(ast.Symbol).Name
-			maybe, ok := vm.CurrentSymbols[name]
-			if !ok {
-				returnValue = NewSymbol(name, vm)
-				vm.CurrentSymbols[name] = returnValue
-			} else {
-				returnValue = maybe
-			}
+			returnValue = interpretSymbol(vm, statement.(ast.Symbol))
 		case ast.BareReference:
-			name := statement.(ast.BareReference).Name
-			maybe, err := vm.localVariableStack.Retrieve(name)
-			if err == nil {
-				returnValue = maybe
-			} else {
-				maybe, ok := vm.ObjectSpace[name]
-				if ok {
-					returnValue = maybe
-				} else {
-					maybe, ok := vm.CurrentClasses[name]
-					if ok {
-						returnValue = maybe
-					} else {
-						maybe, ok := vm.CurrentModules[name]
-						if ok {
-							returnValue = maybe
-						} else {
-							returnValue = nil
-							returnErr = NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
-						}
-					}
-				}
-			}
+			returnValue, returnErr = interpretBareReferenceInContext(vm, statement.(ast.BareReference), context)
 		case ast.CallExpression:
-			var method Method
-			callExpr := statement.(ast.CallExpression)
-
-			var target Value
-
-			if callExpr.Target != nil {
-				target, returnErr = vm.executeWithContext(context, callExpr.Target)
-				if returnErr != nil {
-					return nil, returnErr
-				}
-			} else {
-				target = context
-			}
-
-			if target == nil {
-				nilValue := vm.singletons["nil"]
-				return nil, NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
-			}
-
-			method, err := target.Method(callExpr.Func.Name)
-			if err != nil {
-				return nil, err
-			}
-
-			args := []Value{}
-			for _, astArgument := range callExpr.Args {
-				arg, err := vm.executeWithContext(context, astArgument)
-				if err != nil {
-					return nil, err
-				}
-
-				args = append(args, arg)
-			}
-
-			vm.stack.Unshift(method.Name(), vm.currentFilename, callExpr.LineNumber())
-			didShift := false
-			defer func() {
-				if didShift == false {
-					vm.stack.Shift()
-				}
-			}()
-
-			var block Block
-			if callExpr.OptionalBlock.Provided() {
-				blockValue, err := vm.executeWithContext(context, callExpr.OptionalBlock)
-
-				if err != nil {
-					return nil, err
-				}
-
-				block = blockValue.(Block)
-			}
-
-			returnValue, returnErr = method.Execute(target, block, args...)
-			vm.stack.Shift()
-			didShift = true
-
+			returnValue, returnErr = interpretCallExpressionInContext(vm, statement.(ast.CallExpression), context)
 			if returnErr != nil {
-				return returnValue, returnErr
+				return nil, returnErr
 			}
-
 		case ast.Block:
 			astBlock := statement.(ast.Block)
 			block := NewBlock(context, astBlock.Args, astBlock.Body, vm)
 			returnValue = block.(Value)
 
 		case ast.Assignment:
-			var err error
-			assignment := statement.(ast.Assignment)
-			returnValue, err = vm.executeWithContext(context, assignment.RHS)
-			if err != nil {
-				return nil, err
-			}
-
-			switch assignment.LHS.(type) {
-			case ast.BareReference:
-				ref := assignment.LHS.(ast.BareReference)
-				vm.ObjectSpace[ref.Name] = returnValue
-			case ast.GlobalVariable:
-				globalVar := assignment.LHS.(ast.GlobalVariable)
-				vm.CurrentGlobals[globalVar.Name] = returnValue
-			case ast.InstanceVariable:
-				iVar := assignment.LHS.(ast.InstanceVariable)
-				context.SetInstanceVariable(iVar.Name, returnValue)
-			default:
-				panic(fmt.Sprintf("unimplemented assignment failure: %#v", assignment.LHS))
-			}
-
+			returnValue, returnErr = interpretAssignmentInContext(vm, statement.(ast.Assignment), context)
 		case ast.FileNameConstReference:
 			returnValue = NewString(vm.currentFilename, vm, vm)
 		case ast.Begin:
-			begin := statement.(ast.Begin)
-			_, err := vm.executeWithContext(context, begin.Body...)
-
-			if err != nil {
-				matchingRescue := false
-
-				rubyErr, ok := err.(Value)
-				if !ok {
-					panic(context)
-					return nil, err
-				}
-
-				for _, rescue := range begin.Rescue {
-					if matchingRescue {
-						break
-					}
-
-					r := rescue.(ast.Rescue)
-					for _, exceptionClass := range r.Exception.Classes {
-						if exceptionClass.Name == rubyErr.String() {
-							_, err = vm.executeWithContext(context, r.Body...)
-							if err == nil {
-								matchingRescue = true
-								break
-							}
-						}
-					}
-				}
-			}
-
-			if err != nil {
-				returnErr = err
-			}
+			returnValue, returnErr = interpretBeginInContext(vm, statement.(ast.Begin), context)
 		case ast.Array:
-			arrayValue, _ := vm.CurrentClasses["Array"].New(vm, vm)
-			array := arrayValue.(*Array)
-			for _, node := range statement.(ast.Array).Nodes {
-				value, err := vm.executeWithContext(context, node)
-				if err != nil {
-					return nil, err
-				}
-
-				array.Append(value)
-			}
-
-			returnValue = array
-
+			returnValue, returnErr = interpretArrayInContext(vm, statement.(ast.Array), context)
 		case ast.Hash:
-			hashValue, _ := vm.CurrentClasses["Hash"].New(vm, vm)
-			hash := hashValue.(*Hash)
-			for _, keyPair := range statement.(ast.Hash).Pairs {
-				key, err := vm.executeWithContext(context, keyPair.Key)
-				if err != nil {
-					returnErr = err
-					break
-				}
-
-				val, err := vm.executeWithContext(context, keyPair.Value)
-				if err != nil {
-					returnErr = err
-					break
-				}
-
-				hash.Add(key, val)
-			}
-
-			returnValue = hash
+			returnValue, returnErr = interpretHashInContext(vm, statement.(ast.Hash), context)
 		case ast.Ternary:
-			ternary := statement.(ast.Ternary)
-			value, err := vm.executeWithContext(context, ternary.Condition)
-			if err != nil {
-				returnErr = err
-			} else {
-				if value.IsTruthy() {
-					returnValue, returnErr = vm.executeWithContext(context, ternary.True)
-				} else {
-					returnValue, returnErr = vm.executeWithContext(context, ternary.False)
-				}
-
-			}
-
+			returnValue, returnErr = interpretTernaryInContext(vm, statement.(ast.Ternary), context)
 		case ast.Class:
-			class := statement.(ast.Class)
-			className := class.FullName()
-			value, ok := vm.CurrentClasses[className]
-			if !ok {
-				returnErr = NewNameError(className, context.String(), context.Class().String(), vm.stack.String())
-			} else {
-				returnValue = value
-			}
-
+			returnValue, returnErr = interpretClassInContext(vm, statement.(ast.Class), context)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
