@@ -40,7 +40,7 @@ func main() {
 	case *vm.ParseError:
 		offendingFilename := err.(*vm.ParseError).Filename
 		println(fmt.Sprintf("Error parsing ruby script %s", offendingFilename))
-		println("last ten statements from the parser:")
+		println("last 20 statements from the parser:")
 		println("")
 
 		debugStatements := []string{}
@@ -48,7 +48,7 @@ func main() {
 			debugStatements = append(debugStatements, d)
 		}
 
-		threshold := 31
+		threshold := 61
 		debugCount := len(debugStatements)
 		if debugCount <= threshold {
 			for _, stmt := range debugStatements {
