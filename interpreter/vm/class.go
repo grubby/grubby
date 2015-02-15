@@ -12,10 +12,18 @@ func interpretClassInContext(
 	context Value,
 ) (Value, error) {
 
-	className := class.FullName()
-	value, ok := vm.CurrentClasses[className]
+	var (
+		value Value
+		ok    bool
+	)
+
+	name := class.FullName()
+	value, ok = vm.CurrentClasses[name]
 	if !ok {
-		return nil, NewNameError(className, context.String(), context.Class().String(), vm.stack.String())
+		value, ok = vm.CurrentModules[name]
+		if !ok {
+			return nil, NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+		}
 	}
 
 	return value, nil

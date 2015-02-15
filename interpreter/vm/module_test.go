@@ -74,4 +74,17 @@ end
 		Expect(module).To(HaveInstanceMethod("from"))
 		Expect(module).To(HaveInstanceMethod("to"))
 	})
+
+	It("can be referred to inside of its declaration", func() {
+		output := SwapStdout(func() {
+			_, err := vm.Run(`
+module Foo
+  puts ::Foo
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Expect(output).To(ContainSubstring("Foo"))
+	})
 })
