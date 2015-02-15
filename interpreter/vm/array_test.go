@@ -64,4 +64,24 @@ var _ = Describe("Arrays", func() {
 			Expect(array.Members()).To(ContainElement(NewFixnum(3, vm, vm)))
 		})
 	})
+
+	Describe("iterating over the items in an array", func() {
+		It("calls the provided block once with each item in the array", func() {
+			value, err := vm.Run(`
+array = []
+[1,2,3].each {|i| array.unshift(i) }
+array
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+
+			array, ok := value.(*Array)
+			Expect(ok).To(BeTrue())
+
+			Expect(len(array.Members())).To(Equal(3))
+			Expect(array.Members()).To(ContainElement(NewFixnum(1, vm, vm)))
+			Expect(array.Members()).To(ContainElement(NewFixnum(2, vm, vm)))
+			Expect(array.Members()).To(ContainElement(NewFixnum(3, vm, vm)))
+		})
+	})
 })

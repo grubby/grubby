@@ -123,6 +123,17 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 
 		return newArray, nil
 	}))
+	a.AddMethod(NewNativeMethod("each", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsArray := self.(*Array)
+		for _, element := range selfAsArray.members {
+			_, err := block.Call(element)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return selfAsArray, nil
+	}))
 
 	return a
 }
