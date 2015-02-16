@@ -88,7 +88,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	classClass := NewClassClass(vm, vm)
 	vm.CurrentClasses["Class"] = classClass
 
-	moduleClass := NewModuleClass(vm, vm)
+	moduleClass := NewModuleClass(vm, vm, vm)
 	vm.CurrentClasses["Module"] = moduleClass
 	vm.CurrentModules["Comparable"] = NewComparableModule(vm, vm)
 	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm, vm)
@@ -251,6 +251,10 @@ func (err *ParseError) Error() string {
 
 func (vm *vm) Run(input string) (Value, error) {
 	parser.Statements = []ast.Node{}
+	defer func() {
+		parser.Statements = []ast.Node{}
+	}()
+
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
 	if result != 0 {
@@ -285,7 +289,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.ClassDecl:
 			returnValue, returnErr = interpretClassDeclarationInContext(vm, statement.(ast.ClassDecl), context)
 		case ast.FuncDecl:
-			returnValue, returnErr = interpretMethdDeclarationInContext(vm, statement.(ast.FuncDecl), context)
+			returnValue, returnErr = interpretMethodDeclarationInContext(vm, statement.(ast.FuncDecl), context)
 		case ast.Nil:
 			returnValue = vm.singletons["nil"]
 		case ast.SimpleString:
@@ -381,4 +385,22 @@ func (vm *vm) SymbolWithName(name string) Value {
 func (vm *vm) AddSymbol(val Value) {
 	symbol := val.(*SymbolValue)
 	vm.CurrentSymbols[symbol.Name()] = symbol
+}
+
+// Evaluator
+func (vm *vm) EvaluateStringInContext(input string, context Value) (Value, error) {
+	parser.Statements = []ast.Node{}
+	defer func() {
+		parser.Statements = []ast.Node{}
+	}()
+
+	lexer := parser.NewLexer(input)
+	result := parser.RubyParse(lexer)
+	if result != 0 {
+		return nil, NewParseError(vm.currentFilename)
+	}
+
+	vm.localVariableStack.Unshift()
+	defer vm.localVariableStack.Shift()
+	return vm.executeWithContext(context, parser.Statements...)
 }

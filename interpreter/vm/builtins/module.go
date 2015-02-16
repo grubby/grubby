@@ -20,13 +20,17 @@ type Module interface {
 	Value
 }
 
+type Evaluator interface {
+	EvaluateStringInContext(string, Value) (Value, error)
+}
+
 // globlal Module class
 type ModuleClass struct {
 	valueStub
 	classStub
 }
 
-func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProvider, evaluator Evaluator) Class {
 	c := &ModuleClass{}
 	c.initialize()
 	c.setStringer(c.String)
@@ -78,6 +82,11 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		return methodName, nil
 	}))
 
+	c.AddMethod(NewNativeMethod("module_eval", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		input := args[0].(*StringValue).RawString()
+		return evaluator.EvaluateStringInContext(input, self)
+	}))
+
 	return c
 }
 
@@ -102,16 +111,16 @@ type RubyModule struct {
 	includedModules []Value
 }
 
-func NewModule(name string, provider ClassProvider, singletonProvider SingletonProvider) Module {
+func NewModule(name string, classProvider ClassProvider, singletonProvider SingletonProvider) Module {
 	c := &RubyModule{
 		name:            name,
 		includedModules: make([]Value, 0),
 	}
 	c.initialize()
 	c.setStringer(c.String)
-	c.class = provider.ClassWithName("Module")
+	c.class = classProvider.ClassWithName("Module")
 
-	c.AddMethod(NewNativeMethod("include", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("include", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, module := range args {
 			c.includedModules = append(c.includedModules, module)
 		}
@@ -119,7 +128,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("extend", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("extend", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, module := range args {
 			for _, method := range module.Methods() {
 				self.AddMethod(method)
@@ -129,7 +138,7 @@ func NewModule(name string, provider ClassProvider, singletonProvider SingletonP
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("module_function", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("module_function", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		if len(args) != 1 {
 			return nil, errors.New("expected exactly one arg")
 		}

@@ -87,4 +87,19 @@ end
 
 		Expect(output).To(ContainSubstring("Foo"))
 	})
+
+	Describe("#module_eval", func() {
+		It("can be used for evil", func() {
+			value, err := vm.Run(`
+class Foo
+end
+
+Foo.module_eval("def srs; 'bznz'; end")
+Foo.new.srs
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.String()).To(ContainSubstring("bznz"))
+		})
+	})
 })

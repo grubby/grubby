@@ -6,7 +6,7 @@ import (
 	. "github.com/grubby/grubby/interpreter/vm/builtins"
 )
 
-func interpretMethdDeclarationInContext(
+func interpretMethodDeclarationInContext(
 	vm *vm,
 	funcNode ast.FuncDecl,
 	context Value,
