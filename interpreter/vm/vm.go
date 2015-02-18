@@ -326,6 +326,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretAssignmentInContext(vm, statement.(ast.Assignment), context)
 		case ast.FileNameConstReference:
 			returnValue = NewString(vm.currentFilename, vm, vm)
+		case ast.LineNumberConstReference:
+			returnValue = NewFixnum(statement.(ast.LineNumberConstReference).LineNumber(), vm, vm)
 		case ast.Begin:
 			returnValue, returnErr = interpretBeginInContext(vm, statement.(ast.Begin), context)
 		case ast.Array:

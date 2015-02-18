@@ -249,6 +249,17 @@ test(5)
 				Expect(value.String()).To(ContainSubstring("foo.rb"))
 			})
 		})
+
+		Describe("__LINE__", func() {
+			It("is equal to the line number it appeared at", func() {
+				result, err := vm.Run(`
+__LINE__
+`)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(result).To(Equal(NewFixnum(1, vm, vm)))
+			})
+		})
 	})
 
 	Describe("ARGV", func() {
