@@ -56,7 +56,7 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 		}
 
 		selfAsArray := self.(*Array)
-		indicesToRemove := []int{}
+		indicesToRemove := map[int]bool{}
 		for _, otherMember := range argAsArray.members {
 			for index, member := range selfAsArray.members {
 				equalMethod, err := member.Method("==")
@@ -69,15 +69,20 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 				}
 
 				if equal.IsTruthy() {
-					indicesToRemove = append(indicesToRemove, index)
+					indicesToRemove[index] = true
 				}
 			}
 		}
 
-		for _, indexToRemove := range indicesToRemove {
-			a.members = append(a.members[:indexToRemove], a.members[indexToRemove+1:]...)
+		newMembers := []Value{}
+		for index, element := range a.members {
+			_, exists := indicesToRemove[index]
+			if !exists {
+				newMembers = append(newMembers, element)
+			}
 		}
 
+		a.members = newMembers
 		return self, nil
 	}))
 
