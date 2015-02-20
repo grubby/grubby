@@ -408,4 +408,45 @@ object.singleton_methods
 			})
 		})
 	})
+
+	Describe("self", func() {
+		var err error
+		var output string
+
+		JustBeforeEach(func() {
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		Context("outside of an instance method", func() {
+			BeforeEach(func() {
+				output = SwapStdout(func() {
+					_, err = vm.Run("puts self")
+				})
+			})
+
+			It("should be main", func() {
+				Expect(output).To(ContainSubstring("main"))
+			})
+		})
+
+		Context("inside an instance method", func() {
+			BeforeEach(func() {
+				output = SwapStdout(func() {
+					_, err = vm.Run(`
+class Foo
+  def inspect
+    self
+  end
+end
+
+puts Foo.new.inspect
+`)
+				})
+			})
+
+			It("should refer to the instance itself", func() {
+				Expect(output).To(ContainSubstring("<Foo:0x"))
+			})
+		})
+	})
 })

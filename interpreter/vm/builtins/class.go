@@ -91,7 +91,7 @@ type UserDefinedClassInstance struct {
 }
 
 func (i *UserDefinedClassInstance) String() string {
-	return fmt.Sprintf("%s:%p", i.Class().String(), i)
+	return fmt.Sprintf("<%s:%p>", i.Class().String(), i)
 }
 
 func NewUserDefinedClass(name string, provider ClassProvider, singletonProvider SingletonProvider) Class {

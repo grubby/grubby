@@ -54,7 +54,7 @@ type object struct {
 }
 
 func (o *object) String() string {
-	return fmt.Sprintf("%s:%p", o.Class().String(), o)
+	return fmt.Sprintf("<%s:%p>", o.Class().String(), o)
 }
 
 func (obj *ObjectClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {

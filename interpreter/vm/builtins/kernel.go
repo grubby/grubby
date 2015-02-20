@@ -16,7 +16,19 @@ func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonPr
 
 	k.AddMethod(NewNativeMethod("puts", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
-			os.Stdout.Write([]byte(arg.String() + "\n"))
+			var stringified string
+			to_s, err := arg.Method("to_s")
+			if err == nil {
+				value, err := to_s.Execute(arg, nil)
+				if err != nil {
+					return nil, err
+				}
+				stringified = value.String()
+			} else {
+				stringified = arg.String()
+			}
+
+			os.Stdout.Write([]byte(stringified + "\n"))
 		}
 
 		return nil, nil
