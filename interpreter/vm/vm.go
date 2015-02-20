@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/grubby/grubby/ast"
 	"github.com/grubby/grubby/parser"
@@ -300,38 +299,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.SimpleString:
 			returnValue = NewString(statement.(ast.SimpleString).Value, vm, vm)
 		case ast.InterpolatedString:
-			// walk through the value, find any interpolations
-			// evaluate each of those in the current context
-			// create the string
-
-			currentBytes := []byte{}
-			bytesToInterpret := [][]byte{}
-			insideInterpolation := false
-			str := statement.(ast.InterpolatedString).Value
-			for i := 0; i < len(str); i++ {
-				if insideInterpolation {
-					currentBytes = append(currentBytes, str[i])
-				}
-
-				if str[i] == '}' && i > 0 && str[i-1] != '\\' {
-					insideInterpolation = false
-					bytesToInterpret = append(bytesToInterpret, currentBytes)
-					currentBytes = []byte{}
-				} else if str[i] == '#' && len(str) > i && str[i+1] == '{' {
-					insideInterpolation = true
-				}
-			}
-
-			for _, bytes := range bytesToInterpret {
-				substringToReplace := string(bytes)
-				rubyValue, err := vm.EvaluateStringInContext(substringToReplace[1:len(substringToReplace)-1], context)
-				if err != nil {
-					return nil, err
-				}
-				str = strings.Replace(str, "#"+substringToReplace, rubyValue.String(), 1)
-			}
-
-			returnValue = NewString(str, vm, vm)
+			returnValue, returnErr = interpretDoubleQuotedStringInContext(vm, statement.(ast.InterpolatedString), context)
 		case ast.Boolean:
 			if statement.(ast.Boolean).Value {
 				returnValue = vm.singletons["true"]
