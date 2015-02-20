@@ -7,7 +7,8 @@ type valueStub struct {
 	eigenclass_methods map[string]Method
 	class              Class
 
-	stringer func() string
+	stringer      func() string
+	prettyPrinter func() string
 
 	instance_variables map[string]Value
 }
@@ -15,6 +16,7 @@ type valueStub struct {
 func (valueStub *valueStub) initialize() {
 	valueStub.eigenclass_methods = make(map[string]Method)
 	valueStub.instance_variables = make(map[string]Value)
+	valueStub.prettyPrinter = func() string { return valueStub.String() }
 }
 
 // Method Lookup //
@@ -65,7 +67,7 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 		super = super.SuperClass()
 	}
 
-	return nil, NewNoMethodError(name, valueStub.String(), valueStub.Class().String(), "")
+	return nil, NewNoMethodError(name, valueStub.PrettyPrint(), valueStub.Class().String(), "")
 }
 
 func (valueStub *valueStub) Methods() []Method {
@@ -100,8 +102,16 @@ func (valueStub *valueStub) String() string {
 	return valueStub.stringer()
 }
 
+func (valueStub *valueStub) PrettyPrint() string {
+	return valueStub.prettyPrinter()
+}
+
 func (valueStub *valueStub) setStringer(stringer func() string) {
 	valueStub.stringer = stringer
+}
+
+func (valueStub *valueStub) setPrettyPrinter(printer func() string) {
+	valueStub.prettyPrinter = printer
 }
 
 func (valueStub *valueStub) Class() Class {

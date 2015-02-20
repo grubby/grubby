@@ -61,7 +61,7 @@ func (class *StringClass) New(classProvider ClassProvider, singletonProvider Sin
 	str := &StringValue{}
 	str.initialize()
 	str.setStringer(str.String)
-	str.setStringer(str.String)
+	str.setPrettyPrinter(str.PrettyPrint)
 	str.class = class
 
 	return str, nil
@@ -73,7 +73,11 @@ type StringValue struct {
 }
 
 func (s *StringValue) String() string {
-	return fmt.Sprintf(`"%s"`, s.value)
+	return fmt.Sprintf("%s", s.value)
+}
+
+func (s *StringValue) PrettyPrint() string {
+	return fmt.Sprintf("\"%s\"", s.value)
 }
 
 func (s *StringValue) RawString() string {

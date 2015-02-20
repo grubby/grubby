@@ -242,7 +242,7 @@ end
 				val, err := method.Execute(fooInstance, nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val).To(BeAssignableToTypeOf(NewString("", vm, vm)))
-				Expect(val.String()).To(Equal(`"world"`))
+				Expect(val.String()).To(Equal("world"))
 			})
 		})
 
@@ -291,7 +291,7 @@ end
 
 				val, err := method.Execute(bar, nil)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(val.String()).To(Equal(`"tumescent-wasty"`))
+				Expect(val.String()).To(Equal("tumescent-wasty"))
 			})
 		})
 	})

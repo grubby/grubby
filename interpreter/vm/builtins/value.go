@@ -2,6 +2,8 @@ package builtins
 
 type Value interface {
 	String() string
+	PrettyPrint() string
+
 	Class() Class
 
 	AddMethod(Method)

@@ -66,23 +66,6 @@ end`)
 		})
 	})
 
-	Describe("strings", func() {
-		It("returns a ruby String object", func() {
-			val, err := vm.Run("'nonrestricted-consonantize'")
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(NewString("", vm, vm)))
-			Expect(val.String()).To(Equal(`"nonrestricted-consonantize"`))
-		})
-
-		It("has a + method", func() {
-			val, err := vm.Run("'foo' + 'bar'")
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal(NewString("foobar", vm, vm).String()))
-		})
-	})
-
 	Describe("nil", func() {
 		var (
 			val Value
@@ -133,7 +116,7 @@ test(5)
 				value, err := vm.Run("foo")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(value.String()).To(Equal(`"superinquisitive-edacity"`))
+				Expect(value.String()).To(Equal("superinquisitive-edacity"))
 			})
 		})
 
@@ -212,7 +195,7 @@ test(5)
 			result, err := method.Execute(fileClass, nil, NewString("~/foobar", vm, vm))
 			Expect(err).ToNot(HaveOccurred())
 
-			expectedPath := fmt.Sprintf(`"%s/%s"`, os.Getenv("HOME"), "foobar")
+			expectedPath := fmt.Sprintf("%s/%s", os.Getenv("HOME"), "foobar")
 			Expect(result.String()).To(Equal(expectedPath))
 		})
 	})
@@ -234,7 +217,7 @@ test(5)
 				value, err := vm.Run("__FILE__")
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(value.String()).To(Equal(`"fake-irb-under-test"`))
+				Expect(value.String()).To(Equal("fake-irb-under-test"))
 			})
 
 			It("uses the relative path to the file if used in a require'd file", func() {
@@ -348,14 +331,14 @@ foo = 0
 			val, err := vm.Run("foo = true ? 'a' : 'b'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal(`"a"`))
+			Expect(val.String()).To(Equal("a"))
 		})
 
 		It("picks the second value when the first is falsy", func() {
 			val, err := vm.Run("foo = nil ? 'a' : 'b'")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal(`"b"`))
+			Expect(val.String()).To(Equal("b"))
 		})
 	})
 
@@ -447,6 +430,37 @@ puts Foo.new.inspect
 			It("should refer to the instance itself", func() {
 				Expect(output).To(ContainSubstring("<Foo:0x"))
 			})
+		})
+	})
+
+	XDescribe("a weird bug with multiple hard-to-parse heredocs", func() {
+		var (
+			value Value
+			err   error
+		)
+
+		BeforeEach(func() {
+			value, err = vm.Run(`
+module DryRun
+  ["a", "b", "c"].each do |name|
+    module_eval(<<-FOO, __FILE__, __LINE__ + 1)
+		  def something(*args)
+		  end
+    FOO
+  end
+end
+
+
+`)
+		})
+
+		It("is all good", func() {
+			if err != nil {
+				println("an error!: " + err.Error())
+			}
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value).ToNot(BeNil())
 		})
 	})
 })
