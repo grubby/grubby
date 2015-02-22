@@ -41,6 +41,18 @@ func NewHashClass(provider ClassProvider, singletonProvider SingletonProvider) C
 		return values, nil
 	}))
 
+	class.AddMethod(NewNativeMethod("each", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsHash := self.(*Hash)
+		for key, value := range selfAsHash.hash {
+			_, err := block.Call(key, value)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return selfAsHash, nil
+	}))
+
 	class.AddMethod(NewNativeMethod("[]=", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		self.(*Hash).hash[args[0]] = args[1]
 		return args[1], nil

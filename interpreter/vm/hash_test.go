@@ -84,4 +84,44 @@ hash[:hello]
 		Expect(err).ToNot(HaveOccurred())
 		Expect(value).To(Equal(vm.Symbols()["world"]))
 	})
+
+	Describe("iterating over the keys and items", func() {
+		var err error
+
+		BeforeEach(func() {
+			_, err = vm.Run(`
+keys = []
+values = []
+
+{:foo => 1, :bar => 2}.each do |key, value|
+  keys.unshift(key)
+  values.unshift(value)
+end
+`)
+		})
+
+		It("calls the provided block once with each item in the hash", func() {
+			Expect(err).ToNot(HaveOccurred())
+
+			keysObj := vm.MustGet("keys")
+			keysArray, ok := keysObj.(*Array)
+			Expect(ok).To(BeTrue())
+
+			keys := keysArray.Members()
+
+			Expect(len(keys)).To(Equal(2))
+			Expect(keys).To(ContainElement(vm.Symbols()["foo"]))
+			Expect(keys).To(ContainElement(vm.Symbols()["bar"]))
+
+			valuesObj := vm.MustGet("values")
+			valuesArray, ok := valuesObj.(*Array)
+			Expect(ok).To(BeTrue())
+
+			values := valuesArray.Members()
+
+			Expect(len(values)).To(Equal(2))
+			Expect(values).To(ContainElement(NewFixnum(1, vm, vm)))
+			Expect(values).To(ContainElement(NewFixnum(2, vm, vm)))
+		})
+	})
 })
