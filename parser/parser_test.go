@@ -1653,7 +1653,7 @@ end
 						Line: 1,
 						Name: "Foo",
 						Body: []ast.Node{
-							ast.EigenClass{
+							ast.Eigenclass{
 								Line:   2,
 								Target: ast.Self{Line: 2},
 								Body: []ast.Node{

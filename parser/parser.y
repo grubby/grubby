@@ -796,7 +796,7 @@ eigenclass_declaration : CLASS OPERATOR single_node list END
       panic("FREAKOUT :: impossible operator after 'class' keyword (" + name + ")")
     }
 
-    class := ast.EigenClass{
+    class := ast.Eigenclass{
       Target: $3,
       Body: $4,
     }

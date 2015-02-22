@@ -26,6 +26,8 @@ type vm struct {
 
 	stack              *CallStack
 	localVariableStack *LocalVariableStack
+
+	inEigenclassBlock bool
 }
 
 type VM interface {
@@ -372,6 +374,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretTernaryInContext(vm, statement.(ast.Ternary), context)
 		case ast.Class:
 			returnValue, returnErr = interpretClassInContext(vm, statement.(ast.Class), context)
+		case ast.Eigenclass:
+			returnValue, returnErr = interpretEigenclassInContext(vm, statement.(ast.Eigenclass), context)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}

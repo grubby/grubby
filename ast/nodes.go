@@ -572,13 +572,13 @@ func (n Regex) LineNumber() int {
 	return n.Line
 }
 
-type EigenClass struct {
+type Eigenclass struct {
 	Line   int
 	Target Node
 	Body   []Node
 }
 
-func (n EigenClass) LineNumber() int {
+func (n Eigenclass) LineNumber() int {
 	return n.Line
 }
 

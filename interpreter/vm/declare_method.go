@@ -51,7 +51,8 @@ func interpretMethodDeclarationInContext(
 			})
 		returnValue = method
 		vm.CurrentModules["Kernel"].AddMethod(method)
-
+	} else if vm.inEigenclassBlock {
+		context.AddMethod(method)
 	} else {
 		switch funcNode.Target.(type) {
 		case ast.Self:

@@ -1980,7 +1980,7 @@ Rubydefault:
 				panic("FREAKOUT :: impossible operator after 'class' keyword (" + name + ")")
 			}
 
-			class := ast.EigenClass{
+			class := ast.Eigenclass{
 				Target: RubyS[Rubypt-2].genericValue,
 				Body:   RubyS[Rubypt-1].genericSlice,
 			}
