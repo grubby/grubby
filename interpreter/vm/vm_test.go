@@ -403,35 +403,4 @@ puts Foo.new.inspect
 			})
 		})
 	})
-
-	XDescribe("a weird bug with multiple hard-to-parse heredocs", func() {
-		var (
-			value Value
-			err   error
-		)
-
-		BeforeEach(func() {
-			value, err = vm.Run(`
-module DryRun
-  ["a", "b", "c"].each do |name|
-    module_eval(<<-FOO, __FILE__, __LINE__ + 1)
-		  def something(*args)
-		  end
-    FOO
-  end
-end
-
-
-`)
-		})
-
-		It("is all good", func() {
-			if err != nil {
-				println("an error!: " + err.Error())
-			}
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(value).ToNot(BeNil())
-		})
-	})
 })
