@@ -176,7 +176,7 @@ end
 		Expect(ok).To(BeTrue())
 	})
 
-	It("allows you to mark methods as being private", func() {
+	PIt("allows you to mark methods as being private", func() {
 		class, err := vm.Run(`
 class Foo
   def from

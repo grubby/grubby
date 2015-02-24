@@ -582,6 +582,33 @@ func (n Eigenclass) LineNumber() int {
 	return n.Line
 }
 
+type Public struct {
+	Line    int
+	Methods []Symbol
+}
+
+func (p Public) LineNumber() int {
+	return p.Line
+}
+
+type Private struct {
+	Line    int
+	Methods []Symbol
+}
+
+func (p Private) LineNumber() int {
+	return p.Line
+}
+
+type Protected struct {
+	Line    int
+	Methods []Symbol
+}
+
+func (p Protected) LineNumber() int {
+	return p.Line
+}
+
 type Alias struct {
 	Line int
 	To   Symbol

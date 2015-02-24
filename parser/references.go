@@ -91,19 +91,18 @@ func lexReference(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeSELF)
 	case "nil":
 		l.emit(tokenTypeNIL)
+	case "private":
+		l.emit(tokenTypePrivate)
+		readCommaDelimitedSymbolsUntilEOL(l)
+	case "protected":
+		l.emit(tokenTypeProtected)
+		readCommaDelimitedSymbolsUntilEOL(l)
+	case "public":
+		l.emit(tokenTypePublic)
+		readCommaDelimitedSymbolsUntilEOL(l)
 	case "alias":
 		l.emit(tokenTypeALIAS)
-		// keep reading references as symbols until EOL
-
-		l.acceptRun(whitespace)
-		l.ignore()
-		for l.accept(alphaNumericUnderscore) {
-			l.acceptRun(alphaNumericUnderscore)
-			l.accept("?!")
-			l.emit(tokenTypeSymbol)
-			l.acceptRun(whitespace)
-			l.ignore()
-		}
+		readCommaDelimitedSymbolsUntilEOL(l)
 
 	default:
 		r, _ := utf8.DecodeRuneInString(l.slice(l.startIndex(), l.startIndex()+1))
@@ -117,4 +116,32 @@ func lexReference(l StatefulRubyLexer) stateFn {
 		}
 	}
 	return lexSomething
+}
+
+func readSymbolsUntilEOL(l StatefulRubyLexer) {
+	l.acceptRun(whitespace)
+	l.ignore()
+	for l.accept(alphaNumericUnderscore) {
+		l.acceptRun(alphaNumericUnderscore)
+		l.accept("?!")
+		l.emit(tokenTypeSymbol)
+		l.acceptRun(whitespace)
+		l.ignore()
+	}
+}
+
+func readCommaDelimitedSymbolsUntilEOL(l StatefulRubyLexer) {
+	l.acceptRun(whitespace)
+	l.ignore()
+	for l.accept(alphaNumericUnderscore) {
+		l.acceptRun(alphaNumericUnderscore)
+		l.accept("?!")
+		l.emit(tokenTypeSymbol)
+		l.acceptRun(whitespace)
+		l.ignore()
+
+		l.accept(",")
+		l.acceptRun(whitespace)
+		l.ignore()
+	}
 }
