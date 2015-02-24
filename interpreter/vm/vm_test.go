@@ -311,17 +311,40 @@ baz()
 		})
 	})
 
-	Context("when an error occurs in the middle of a series of statements", func() {
-		It("halts execution at the error", func() {
-			_, err := vm.Run(`
+	Describe("when an error occurs", func() {
+		Context("in the middle of some statements", func() {
+			It("halts execution at the error", func() {
+				_, err := vm.Run(`
 foo = 1
 require 'some/file/that/does/not/exist/hopefully'
 foo = 0
 `)
-			Expect(err).To(HaveOccurred())
+				Expect(err).To(HaveOccurred())
 
-			value, _ := vm.Get("foo")
-			Expect(value).To(Equal(NewFixnum(1, vm, vm)))
+				value, _ := vm.Get("foo")
+				Expect(value).To(Equal(NewFixnum(1, vm, vm)))
+			})
+		})
+
+		Context("inside of a module declaration", func() {
+			BeforeEach(func() {
+				_, err := vm.Run(`
+counter = 1
+
+module Foo
+  counter = 2
+  foo # this should fail, no such method
+  counter = 3
+end
+
+counter = 4
+`)
+				Expect(err).To(HaveOccurred())
+			})
+
+			It("halts the module declaration", func() {
+				Expect(vm.MustGet("counter")).To(Equal(NewFixnum(2, vm, vm)))
+			})
 		})
 	})
 

@@ -278,6 +278,10 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		returnErr   error
 	)
 	for _, statement := range statements {
+		if returnErr != nil {
+			break
+		}
+
 		switch statement.(type) {
 		case ast.Self:
 			returnValue = context
@@ -318,9 +322,6 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretBareReferenceInContext(vm, statement.(ast.BareReference), context)
 		case ast.CallExpression:
 			returnValue, returnErr = interpretCallExpressionInContext(vm, statement.(ast.CallExpression), context)
-			if returnErr != nil {
-				return nil, returnErr
-			}
 		case ast.Block:
 			astBlock := statement.(ast.Block)
 			block := NewBlock(context, astBlock.Args, astBlock.Body, vm)
