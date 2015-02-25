@@ -176,18 +176,23 @@ end
 		Expect(ok).To(BeTrue())
 	})
 
-	PIt("allows you to mark methods as being private", func() {
+	It("allows you to mark methods as being private", func() {
 		class, err := vm.Run(`
 class Foo
   def from
   end
 
   private :from
+
+  private
+  def cant_touch_this
+  end
 end
 `)
 
 		Expect(err).ToNot(HaveOccurred())
 		Expect(class).To(HavePrivateInstanceMethod("from"))
+		Expect(class).To(HavePrivateInstanceMethod("cant_touch_this"))
 	})
 
 	Describe("defining a class", func() {

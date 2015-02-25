@@ -58,7 +58,12 @@ func interpretMethodDeclarationInContext(
 		case ast.Self:
 			context.AddMethod(method)
 		case nil:
-			context.(Module).AddInstanceMethod(method)
+			switch vm.methodDeclarationMode {
+			case public:
+				context.(Module).AddInstanceMethod(method)
+			case private:
+				context.(Module).AddPrivateInstanceMethod(method)
+			}
 		default:
 			value, err := vm.executeWithContext(context, funcNode.Target)
 			if err != nil {

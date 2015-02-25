@@ -27,6 +27,8 @@ type vm struct {
 	localVariableStack *LocalVariableStack
 
 	inEigenclassBlock bool
+
+	methodDeclarationMode methodVisibility
 }
 
 type VM interface {
@@ -292,6 +294,12 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretIfStatementInContext(vm, statement.(ast.IfBlock), context)
 		case ast.Alias:
 			returnValue, returnErr = interpretAliasInContext(vm, statement.(ast.Alias), context)
+		case ast.Public:
+			returnValue, returnErr = interpretMethodsWithVisibility(vm, statement.(ast.Public).Methods, public, context)
+		case ast.Protected:
+			returnValue, returnErr = interpretMethodsWithVisibility(vm, statement.(ast.Public).Methods, protected, context)
+		case ast.Private:
+			returnValue, returnErr = interpretMethodsWithVisibility(vm, statement.(ast.Private).Methods, private, context)
 		case ast.ModuleDecl:
 			returnValue, returnErr = interpretModuleDeclarationInContext(vm, statement.(ast.ModuleDecl), context)
 		case ast.ClassDecl:
