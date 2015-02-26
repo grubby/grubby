@@ -37,24 +37,6 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 	c.class = classProvider.ClassWithName("Class")
 	c.superClass = classProvider.ClassWithName("Object")
 
-	// c.AddMethod(NewNativeMethod("private", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-	// 	methodName, ok := args[0].(*SymbolValue)
-	// 	if !ok {
-	// 		return nil, errors.New(fmt.Sprintf("TypeError: %v is not a symbol", args[0]))
-	// 	}
-
-	// 	selfAsModule := self.(Module)
-	// 	method, err := selfAsModule.InstanceMethod(methodName.value)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-
-	// 	selfAsModule.RemoveInstanceMethod(method)
-	// 	selfAsModule.AddPrivateInstanceMethod(method)
-
-	// 	return methodName, nil
-	// }))
-
 	c.AddMethod(NewNativeMethod("private_class_method", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		methodName, ok := args[0].(*SymbolValue)
 		if !ok {
