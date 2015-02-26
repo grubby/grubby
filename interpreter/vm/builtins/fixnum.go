@@ -52,11 +52,11 @@ func (c *fixnumClass) New(provider ClassProvider, singletonProvider SingletonPro
 }
 
 type fixnumInstance struct {
-	value int
+	value int64
 	valueStub
 }
 
-func NewFixnum(val int, provider ClassProvider, singletonProvider SingletonProvider) Value {
+func NewFixnum(val int64, provider ClassProvider, singletonProvider SingletonProvider) Value {
 	name := fmt.Sprintf("%d", val)
 	singleton := singletonProvider.SingletonWithName(name)
 	if singleton == nil {
@@ -72,7 +72,7 @@ func NewFixnum(val int, provider ClassProvider, singletonProvider SingletonProvi
 	}
 }
 
-func (fixnumInstance *fixnumInstance) Value() int {
+func (fixnumInstance *fixnumInstance) Value() int64 {
 	return fixnumInstance.value
 }
 

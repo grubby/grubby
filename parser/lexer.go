@@ -443,7 +443,7 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		switch token.typ {
 		case tokenTypeInteger:
 			debug("integer: %s", token.value)
-			intVal, err := strconv.Atoi(token.value)
+			intVal, err := strconv.ParseInt(token.value, 0, 64)
 			if err != nil {
 				panic(err)
 			}

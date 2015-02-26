@@ -42,7 +42,7 @@ func NewStringClass(classProvider ClassProvider, singletonProvider SingletonProv
 	s.AddMethod(NewNativeMethod("to_i", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsStr := self.(*StringValue)
 
-		intValue, _ := strconv.Atoi(selfAsStr.value)
+		intValue, _ := strconv.ParseInt(selfAsStr.value, 0, 64)
 		return NewFixnum(intValue, classProvider, singletonProvider), nil
 	}))
 

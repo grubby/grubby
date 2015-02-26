@@ -36,14 +36,24 @@ var _ = Describe("goyacc parser", func() {
 		})
 
 		Describe("parsing an integer", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer("5")
+			Context("encoded as decimal", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("5")
+				})
+
+				It("returns a ConstantInt struct representing the value", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{ast.ConstantInt{Value: 5}}))
+				})
 			})
 
-			It("returns a ConstantInt struct representing the value", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.ConstantInt{Value: 5},
-				}))
+			Context("encoded as hexadecimal", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("0xD000")
+				})
+
+				It("returns a ConstantInt struct representing the value", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{ast.ConstantInt{Value: 53248}}))
+				})
 			})
 		})
 
@@ -2347,7 +2357,7 @@ File.lchmod mode & 01777, path
 									Line:   4,
 									Target: ast.BareReference{Line: 4, Name: "mode"},
 									Func:   ast.BareReference{Line: 4, Name: "&"},
-									Args:   []ast.Node{ast.ConstantInt{Line: 4, Value: 1777}},
+									Args:   []ast.Node{ast.ConstantInt{Line: 4, Value: 1023}},
 								},
 								ast.BareReference{Line: 4, Name: "path"},
 							},

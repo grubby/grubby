@@ -12,7 +12,7 @@ func (nodes Nodes) LineNumber() int {
 // builtin types
 type ConstantInt struct {
 	Line  int
-	Value int
+	Value int64
 }
 
 func (n ConstantInt) LineNumber() int {
