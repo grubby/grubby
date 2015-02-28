@@ -12,6 +12,10 @@ func interpretClassDeclarationInContext(
 	context Value,
 ) (Value, error) {
 
+	defer func() {
+		vm.methodDeclarationMode = public
+	}()
+
 	theClass := NewUserDefinedClass(classNode.Name, vm, vm)
 	vm.CurrentClasses[classNode.FullName()] = theClass
 

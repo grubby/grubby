@@ -12,6 +12,10 @@ func interpretModuleDeclarationInContext(
 	context Value,
 ) (Value, error) {
 
+	defer func() {
+		vm.methodDeclarationMode = public
+	}()
+
 	theModule := NewModule(moduleNode.Name, vm, vm)
 	vm.CurrentModules[moduleNode.Name] = theModule
 

@@ -195,6 +195,27 @@ end
 		Expect(class).To(HavePrivateInstanceMethod("cant_touch_this"))
 	})
 
+	It("should not pollute the VM after declaring private methods", func() {
+		_, err := vm.Run(`
+class Foo
+  private
+  def cant_see_me; end
+end
+
+class Bar
+  def this_is_visible; end
+end
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+
+		fooClass := vm.MustGetClass("Foo")
+		Expect(fooClass).To(HavePrivateInstanceMethod("cant_see_me"))
+
+		barClass := vm.MustGetClass("Bar")
+		Expect(barClass).To(HaveInstanceMethod("this_is_visible"))
+	})
+
 	Describe("defining a class", func() {
 		It("adds it to the global class cache", func() {
 			_, err := vm.Run(`
