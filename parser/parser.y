@@ -926,7 +926,9 @@ assignment : REF EQUALTO single_node
     }
     eql.Line = $1.LineNumber()
     $$ = eql
-  };
+  }
+| class_name_with_modules EQUALTO expr
+  { $$ = ast.Assignment{LHS: $1, RHS: $3, Line: $1.LineNumber()} };
 
 multiple_assignment : assignable_variables EQUALTO expr
   {

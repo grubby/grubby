@@ -1908,6 +1908,24 @@ a ||= 'aftergrass-Dowieite'
 				})
 			})
 
+			Context("to a constant scoped to a module", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("Foo::Bar = 12")
+				})
+
+				It("is parsed as an assignment", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.Class{
+								Name:      "Bar",
+								Namespace: "Foo",
+							},
+							RHS: ast.ConstantInt{Value: 12},
+						},
+					}))
+				})
+			})
+
 			Context("to multiple keys in a hash", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
