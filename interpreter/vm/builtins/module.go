@@ -17,6 +17,9 @@ type Module interface {
 	AddPrivateInstanceMethod(Method)
 	PrivateInstanceMethods() []Method
 
+	Constant(string) (Value, error)
+	SetConstant(string, Value)
+
 	Value
 }
 

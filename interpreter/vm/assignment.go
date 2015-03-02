@@ -2,6 +2,7 @@ package vm
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/grubby/grubby/ast"
 
@@ -29,6 +30,26 @@ func interpretAssignmentInContext(
 	case ast.InstanceVariable:
 		iVar := assignment.LHS.(ast.InstanceVariable)
 		context.SetInstanceVariable(iVar.Name, returnValue)
+	case ast.Class:
+		asClass := assignment.LHS.(ast.Class)
+		if asClass.Namespace != "" {
+			var target Value
+			namespace := asClass.Namespace
+			for _, nameToLookup := range strings.Split(namespace, "::") {
+				class, err := vm.GetClass(nameToLookup)
+				if err != nil {
+					module, err := vm.GetModule(nameToLookup)
+					if err != nil {
+						return nil, err
+					}
+					target = module
+				} else {
+					target = class
+				}
+			}
+
+			target.(Module).SetConstant(asClass.Name, returnValue)
+		}
 	default:
 		panic(fmt.Sprintf("unimplemented assignment failure: %#v", assignment.LHS))
 	}

@@ -211,6 +211,16 @@ test(5)
 		})
 	})
 
+	Describe("constants", func() {
+		It("can be nested inside of a module", func() {
+			_, err := vm.Run("Kernel::Foobar = 1")
+			Expect(err).ToNot(HaveOccurred())
+
+			kernel := vm.MustGet("Kernel").(Module)
+			Expect(kernel.Constant("Foobar")).To(Equal(NewFixnum(1, vm, vm)))
+		})
+	})
+
 	Describe("special global variables", func() {
 		Describe("__FILE__", func() {
 			It("inherits the name given to the vm initially", func() {
