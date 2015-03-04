@@ -39,6 +39,9 @@ type VM interface {
 	GetClass(string) (Class, error)
 	MustGetClass(string) Class
 
+	GetModule(string) (Module, error)
+	MustGetModule(string) Module
+
 	Set(string, Value)
 
 	Symbols() map[string]Value
@@ -220,6 +223,25 @@ func (vm *vm) MustGetClass(name string) Class {
 	}
 
 	panic(fmt.Sprintf("class '%s' requested, but does not exist", name))
+}
+
+func (vm *vm) GetModule(name string) (Module, error) {
+	for keyName, module := range vm.CurrentModules {
+		if keyName == name {
+			return module, nil
+		}
+	}
+
+	return nil, errors.New(fmt.Sprintf("Module '%s' not found", name))
+}
+
+func (vm *vm) MustGetModule(name string) Module {
+	module, err := vm.GetModule(name)
+	if err != nil {
+		panic(fmt.Sprintf("module '%s' requested, but does not exist", name))
+	}
+
+	return module
 }
 
 func (vm *vm) Set(key string, value Value) {

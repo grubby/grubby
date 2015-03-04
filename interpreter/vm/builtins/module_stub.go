@@ -8,6 +8,7 @@ import (
 type moduleStub struct {
 	instanceMethods        map[string]Method
 	privateInstanceMethods map[string]Method
+	constants              map[string]Value
 }
 
 func (m *moduleStub) InstanceMethod(name string) (Method, error) {
@@ -55,4 +56,21 @@ func (m *moduleStub) PrivateInstanceMethods() []Method {
 	}
 
 	return methods
+}
+
+func (m *moduleStub) Constant(name string) (Value, error) {
+	value, ok := m.constants[name]
+	if !ok {
+		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
+	}
+
+	return value, nil
+}
+
+func (m *moduleStub) SetConstant(name string, value Value) {
+	if m.constants == nil {
+		m.constants = make(map[string]Value)
+	}
+
+	m.constants[name] = value
 }
