@@ -15,6 +15,7 @@ func interpretClassInContext(
 	var (
 		value Value
 		ok    bool
+		err   error
 	)
 
 	name := class.FullName()
@@ -22,7 +23,23 @@ func interpretClassInContext(
 	if !ok {
 		value, ok = vm.CurrentModules[name]
 		if !ok {
-			return nil, NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+			module, ok := vm.CurrentClasses[class.Namespace]
+			if !ok {
+				module, ok := vm.CurrentModules[class.Namespace]
+				if !ok {
+					return nil, NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+				} else {
+					value, err = module.Constant(class.Name)
+					if err != nil {
+						return nil, NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+					}
+				}
+			} else {
+				value, err = module.Constant(class.Name)
+				if err != nil {
+					return nil, NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+				}
+			}
 		}
 	}
 

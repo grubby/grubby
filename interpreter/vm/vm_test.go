@@ -213,8 +213,9 @@ test(5)
 
 	Describe("constants", func() {
 		It("can be nested inside of a module", func() {
-			_, err := vm.Run("Kernel::Foobar = 1")
+			value, err := vm.Run("Kernel::Foobar = 1; Kernel::Foobar")
 			Expect(err).ToNot(HaveOccurred())
+			Expect(value).To(Equal(NewFixnum(1, vm, vm)))
 
 			kernel := vm.MustGet("Kernel").(Module)
 			Expect(kernel.Constant("Foobar")).To(Equal(NewFixnum(1, vm, vm)))
