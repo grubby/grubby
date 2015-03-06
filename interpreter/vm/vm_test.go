@@ -437,4 +437,20 @@ puts Foo.new.inspect
 			})
 		})
 	})
+
+	Describe("truthiness", func() {
+		It("considers nil to be falsey", func() {
+			value, err := vm.Run(`
+value = 'okay'
+if nil
+  value = 'whack'
+end
+
+value
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.String()).To(ContainSubstring("okay"))
+		})
+	})
 })

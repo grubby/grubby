@@ -15,10 +15,13 @@ func interpretIfStatementInContext(
 	switch ifBlock.Condition.(type) {
 	case ast.Boolean:
 		truthy = ifBlock.Condition.(ast.Boolean).Value
-	case ast.BareReference:
-		truthy = ifBlock.Condition.(ast.BareReference).Name == "nil"
 	default:
-		truthy = true
+		value, err := vm.executeWithContext(context, ifBlock.Condition)
+		if err != nil {
+			return nil, err
+		}
+
+		truthy = value.IsTruthy()
 	}
 
 	if truthy {
