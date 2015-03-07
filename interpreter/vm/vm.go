@@ -152,13 +152,17 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	basicObjectClass.(*BasicObjectClass).SetSuperClass()
 	// END RUNTIME TRICKERY
 
+	vm.CurrentClasses["NilClass"] = NewNilClass(vm)
+	vm.CurrentClasses["TrueClass"] = NewTrueClass(vm)
+	vm.CurrentClasses["FalseClass"] = NewFalseClass(vm)
+
+	vm.singletons["nil"], _ = vm.CurrentClasses["NilClass"].New(vm, vm)
+	vm.singletons["true"], _ = vm.CurrentClasses["TrueClass"].New(vm, vm)
+	vm.singletons["false"], _ = vm.CurrentClasses["FalseClass"].New(vm, vm)
+
 	vm.CurrentClasses["IO"] = NewIOClass(vm)
 	vm.CurrentClasses["Array"] = NewArrayClass(vm, vm)
 	vm.CurrentClasses["Hash"] = NewHashClass(vm, vm)
-	vm.CurrentClasses["TrueClass"] = NewTrueClass(vm)
-	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
-	vm.CurrentClasses["FalseClass"] = NewFalseClass(vm)
-	vm.CurrentClasses["NilClass"] = NewNilClass(vm)
 	vm.CurrentClasses["String"] = NewStringClass(vm, vm)
 	vm.CurrentClasses["Numeric"] = NewNumericClass(vm)
 	vm.CurrentClasses["Integer"] = NewIntegerClass(vm)
@@ -167,9 +171,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm, vm)
 	vm.CurrentClasses["Proc"] = NewProcClass(vm, vm)
 	vm.CurrentClasses["Regexp"] = NewRegexpClass(vm, vm)
-	vm.singletons["nil"], _ = vm.CurrentClasses["NilClass"].New(vm, vm)
-	vm.singletons["true"], _ = vm.CurrentClasses["TrueClass"].New(vm, vm)
-	vm.singletons["false"], _ = vm.CurrentClasses["FalseClass"].New(vm, vm)
+	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
 }
 
 func (vm *vm) MustGet(key string) Value {
