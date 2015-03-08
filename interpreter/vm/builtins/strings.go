@@ -1,6 +1,7 @@
 package builtins
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -39,11 +40,26 @@ func NewStringClass(classProvider ClassProvider, singletonProvider SingletonProv
 			return singletonProvider.SingletonWithName("false"), nil
 		}
 	}))
+	s.AddMethod(NewNativeMethod("<<", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		arg := args[0].(*StringValue)
+		selfAsStr := self.(*StringValue)
+		if selfAsStr.frozen {
+			return nil, errors.New("RuntimeError: can't modify frozen String")
+		}
+
+		selfAsStr.value += arg.value
+		return selfAsStr, nil
+	}))
 	s.AddMethod(NewNativeMethod("to_i", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsStr := self.(*StringValue)
 
 		intValue, _ := strconv.ParseInt(selfAsStr.value, 0, 64)
 		return NewFixnum(intValue, classProvider, singletonProvider), nil
+	}))
+	s.AddMethod(NewNativeMethod("freeze", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsStr := self.(*StringValue)
+		selfAsStr.frozen = true
+		return selfAsStr, nil
 	}))
 
 	return s
@@ -70,6 +86,7 @@ func (class *StringClass) New(classProvider ClassProvider, singletonProvider Sin
 type StringValue struct {
 	value string
 	valueStub
+	frozen bool
 }
 
 func (s *StringValue) String() string {

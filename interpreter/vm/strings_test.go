@@ -59,4 +59,20 @@ adj = 'cruel'
 			Expect(value.(*StringValue).RawString()).To(Equal("hello #{adj} world"))
 		})
 	})
+
+	Describe("concatenating strings", func() {
+		It("can be done with the shovel operator", func() {
+			value, err := vm.Run("'hello' << ' world'")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.(*StringValue).RawString()).To(Equal("hello world"))
+		})
+	})
+
+	Describe("#freeze", func() {
+		It("can be used to turn a string into an immutable string", func() {
+			_, err := vm.Run("str = 'hello'.freeze; str << 'world'")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("RuntimeError: can't modify frozen String"))
+		})
+	})
 })
