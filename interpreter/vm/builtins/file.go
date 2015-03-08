@@ -19,6 +19,7 @@ func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) C
 	f.superClass = provider.ClassWithName("IO")
 
 	f.SetConstant("ALT_SEPARATOR", singletonProvider.SingletonWithName("nil"))
+	f.SetConstant("FNM_SYSCASE", NewFixnum(0, provider, singletonProvider))
 
 	f.AddMethod(NewNativeMethod("expand_path", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg1 := args[0].(*StringValue).RawString()
