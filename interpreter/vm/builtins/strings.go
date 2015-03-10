@@ -61,6 +61,17 @@ func NewStringClass(classProvider ClassProvider, singletonProvider SingletonProv
 		selfAsStr.frozen = true
 		return selfAsStr, nil
 	}))
+	s.AddMethod(NewNativeMethod("intern", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsStr := self.(*StringValue)
+		maybeSymbol := singletonProvider.SymbolWithName(selfAsStr.value)
+		if maybeSymbol != nil {
+			return maybeSymbol, nil
+		}
+
+		symbolFromString := NewSymbol(selfAsStr.value, classProvider)
+		singletonProvider.AddSymbol(symbolFromString)
+		return symbolFromString, nil
+	}))
 
 	return s
 }

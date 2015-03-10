@@ -75,4 +75,15 @@ adj = 'cruel'
 			Expect(err.Error()).To(ContainSubstring("RuntimeError: can't modify frozen String"))
 		})
 	})
+
+	Describe("#intern", func() {
+		It("can be used to create a symbol with string's value as its name", func() {
+			value, err := vm.Run("'hello world'.intern")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(value).ToNot(BeNil())
+			Expect(value).To(BeAssignableToTypeOf(&SymbolValue{}))
+			Expect(value).To(Equal(vm.SymbolWithName("hello world"))) // singleton instance
+		})
+	})
 })
