@@ -36,6 +36,15 @@ func NewFixnumClass(provider ClassProvider, singletonProvider SingletonProvider)
 		return NewFixnum(asFixnum.value+arg.value, provider, singletonProvider), nil
 	}))
 
+	class.AddMethod(NewNativeMethod("nonzero?", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		asFixnum := self.(*fixnumInstance)
+		if asFixnum.value == 0 {
+			return singletonProvider.SingletonWithName("nil"), nil
+		} else {
+			return self, nil
+		}
+	}))
+
 	return class
 }
 

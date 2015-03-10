@@ -43,6 +43,16 @@ var _ = Describe("numbers", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val.String()).To(Equal(NewFixnum(42, vm, vm).String()))
 		})
+
+		It("has a #nonzero? method", func() {
+			val, err := vm.Run("5.nonzero?")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(vm.SingletonWithName("5")))
+
+			val, err = vm.Run("0.nonzero?")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(vm.SingletonWithName("nil")))
+		})
 	})
 
 	Describe("floats", func() {
