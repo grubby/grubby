@@ -17,6 +17,7 @@ type Module interface {
 	AddPrivateInstanceMethod(Method)
 	PrivateInstanceMethods() []Method
 
+	Constants() []Value
 	Constant(string) (Value, error)
 	SetConstant(string, Value)
 
@@ -151,5 +152,5 @@ func (m RubyModule) Name() string {
 }
 
 func (m *RubyModule) String() string {
-	return fmt.Sprintf("%s:Module", m.name)
+	return m.name
 }

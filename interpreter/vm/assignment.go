@@ -30,6 +30,22 @@ func interpretAssignmentInContext(
 	case ast.InstanceVariable:
 		iVar := assignment.LHS.(ast.InstanceVariable)
 		context.SetInstanceVariable(iVar.Name, returnValue)
+	case ast.Constant:
+		var target Module
+		if vm.currentModuleName == "" {
+			target = vm.CurrentClasses["Object"]
+		} else {
+			target = vm.CurrentClasses[vm.currentModuleName]
+			if target == nil {
+				target = vm.CurrentModules[vm.currentModuleName]
+			}
+
+			if target == nil {
+				panic(fmt.Sprintf("unexpected nil target when looking up module %s to set constant %s", vm.currentModuleName, assignment.LHS.(ast.Constant).Name))
+			}
+		}
+
+		target.SetConstant(assignment.LHS.(ast.Constant).Name, returnValue)
 	case ast.Class:
 		asClass := assignment.LHS.(ast.Class)
 		if asClass.Namespace != "" {

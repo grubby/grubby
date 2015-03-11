@@ -527,13 +527,13 @@ end
 				It("is parsed as a call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "Proc"},
+							Target: ast.Constant{Name: "Proc"},
 							Func:   ast.BareReference{Name: "new"},
 							Args:   []ast.Node{},
 							OptionalBlock: ast.Block{
 								Body: []ast.Node{
 									ast.CallExpression{
-										Target: ast.BareReference{Name: "Mock"},
+										Target: ast.Constant{Name: "Mock"},
 										Func:   ast.BareReference{Name: "verify_count"},
 									},
 								},
@@ -660,7 +660,7 @@ end
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Line:   1,
-							Target: ast.BareReference{Line: 1, Name: "Signal"},
+							Target: ast.Constant{Line: 1, Name: "Signal"},
 							Func:   ast.BareReference{Line: 1, Name: "trap"},
 							Args: []ast.Node{
 								ast.InterpolatedString{Line: 1, Value: "INT"},
@@ -671,7 +671,7 @@ end
 								Body: []ast.Node{
 									ast.CallExpression{
 										Line:   2,
-										Target: ast.BareReference{Line: 2, Name: "MSpec"},
+										Target: ast.Constant{Line: 2, Name: "MSpec"},
 										Func:   ast.BareReference{Line: 2, Name: "actions"},
 										Args:   []ast.Node{ast.Symbol{Line: 2, Name: "abort"}},
 									},
@@ -827,7 +827,7 @@ end
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Target: ast.CallExpression{
-								Target: ast.BareReference{Name: "MSpec"},
+								Target: ast.Constant{Name: "MSpec"},
 								Func:   ast.BareReference{Name: "retrieve"},
 								Args: []ast.Node{
 									ast.Symbol{Name: "files"},
@@ -874,7 +874,7 @@ end
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Target: ast.CallExpression{
-								Target: ast.BareReference{Name: "SpecVersion"},
+								Target: ast.Constant{Name: "SpecVersion"},
 								Func:   ast.BareReference{Name: "new"},
 								Args: []ast.Node{
 									ast.CallExpression{
@@ -1036,7 +1036,7 @@ ARGV.shift
 						},
 						ast.CallExpression{
 							Line:   2,
-							Target: ast.BareReference{Line: 2, Name: "ARGV"},
+							Target: ast.Constant{Line: 2, Name: "ARGV"},
 							Func:   ast.BareReference{Line: 2, Name: "shift"},
 						},
 					}))
@@ -1051,7 +1051,7 @@ ARGV.shift
 				It("parsed correctly", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "File"},
+							Target: ast.Constant{Name: "File"},
 							Func:   ast.BareReference{Name: "expand_path"},
 							Args: []ast.Node{
 								ast.SimpleString{Value: "../../lib"},
@@ -1074,7 +1074,7 @@ ARGV.shift
 							Target: ast.GlobalVariable{Name: ":"},
 							Args: []ast.Node{
 								ast.CallExpression{
-									Target: ast.BareReference{Name: "File"}, // TODO: should be a class
+									Target: ast.Constant{Name: "File"},
 									Func:   ast.BareReference{Name: "expand_path"},
 									Args: []ast.Node{
 										ast.SimpleString{Value: "../../lib"},
@@ -1099,12 +1099,12 @@ ARGV.shift
 							Func:   ast.BareReference{Name: "unshift"},
 							Args: []ast.Node{
 								ast.CallExpression{
-									Target: ast.BareReference{Name: "File"},
+									Target: ast.Constant{Name: "File"},
 									Func:   ast.BareReference{Name: "expand_path"},
 									Args: []ast.Node{
 										ast.CallExpression{
 											Target: ast.CallExpression{
-												Target: ast.BareReference{Name: "File"},
+												Target: ast.Constant{Name: "File"},
 												Func:   ast.BareReference{Name: "dirname"},
 												Args:   []ast.Node{ast.FileNameConstReference{}},
 											},
@@ -1197,7 +1197,7 @@ end
 							LHS:  ast.BareReference{Line: 1, Name: "obj"},
 							RHS: ast.CallExpression{
 								Line:   1,
-								Target: ast.BareReference{Line: 1, Name: "Object"},
+								Target: ast.Constant{Line: 1, Name: "Object"},
 								Func:   ast.BareReference{Line: 1, Name: "new"},
 							},
 						},
@@ -1938,13 +1938,13 @@ HASH['second_key'] = [:something]
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
 							Line:   1,
-							Target: ast.BareReference{Line: 1, Name: "HASH"},
+							Target: ast.Constant{Line: 1, Name: "HASH"},
 							Func:   ast.BareReference{Line: 1, Name: "[]="},
 							Args: []ast.Node{
 								ast.SimpleString{Line: 1, Value: "first_key"},
 								ast.CallExpression{
 									Line:   2,
-									Target: ast.BareReference{Line: 2, Name: "HASH"},
+									Target: ast.Constant{Line: 2, Name: "HASH"},
 									Func:   ast.BareReference{Line: 2, Name: "[]="},
 									Args: []ast.Node{
 										ast.SimpleString{Line: 2, Value: "second_key"},
@@ -2368,7 +2368,7 @@ File.lchmod mode & 01777, path
 						},
 						ast.CallExpression{
 							Line:   4,
-							Target: ast.BareReference{Line: 4, Name: "File"},
+							Target: ast.Constant{Line: 4, Name: "File"},
 							Func:   ast.BareReference{Line: 4, Name: "lchmod"},
 							Args: []ast.Node{
 								ast.CallExpression{
@@ -2739,7 +2739,7 @@ File.lchmod mode & 01777, path
 				It("is parsed as a call expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.CallExpression{
-							Target: ast.BareReference{Name: "Sharpware"},
+							Target: ast.Constant{Name: "Sharpware"},
 							Func:   ast.BareReference{Name: "nasality="},
 							Args: []ast.Node{
 								ast.SimpleString{Value: "cladosiphonic-capillitial"},
@@ -3157,12 +3157,12 @@ end
 											Line: 3,
 											Condition: ast.CallExpression{
 												Line:   3,
-												Target: ast.BareReference{Line: 3, Name: "File"},
+												Target: ast.Constant{Line: 3, Name: "File"},
 												Func:   ast.BareReference{Line: 3, Name: "exist?"},
 												Args: []ast.Node{
 													ast.CallExpression{
 														Line:   3,
-														Target: ast.BareReference{Line: 3, Name: "File"},
+														Target: ast.Constant{Line: 3, Name: "File"},
 														Func:   ast.BareReference{Line: 3, Name: "expand_path"},
 														Args:   []ast.Node{ast.BareReference{Line: 3, Name: "name"}},
 													},
@@ -3173,7 +3173,7 @@ end
 													Line: 3,
 													Value: ast.CallExpression{
 														Line:   3,
-														Target: ast.BareReference{Line: 3, Name: "Kernel"},
+														Target: ast.Constant{Line: 3, Name: "Kernel"},
 														Func:   ast.BareReference{Line: 3, Name: "load"},
 														Args:   []ast.Node{ast.BareReference{Line: 3, Name: "name"}},
 													},
@@ -3563,7 +3563,7 @@ raise OptionError, "description" if args.size < 2
 									Line: 3,
 									Func: ast.BareReference{Line: 3, Name: "raise"},
 									Args: []ast.Node{
-										ast.BareReference{Line: 3, Name: "OptionError"},
+										ast.Constant{Line: 3, Name: "OptionError"},
 										ast.InterpolatedString{Line: 3, Value: "description"},
 									},
 								},

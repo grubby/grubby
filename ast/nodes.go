@@ -73,6 +73,15 @@ func (n BareReference) LineNumber() int {
 	return n.Line
 }
 
+type Constant struct {
+	Line int
+	Name string
+}
+
+func (n Constant) LineNumber() int {
+	return n.Line
+}
+
 type CallExpression struct {
 	Line          int
 	Target        Node
@@ -159,6 +168,14 @@ type ModuleDecl struct {
 
 func (n ModuleDecl) LineNumber() int {
 	return n.Line
+}
+
+func (m ModuleDecl) FullName() string {
+	if m.Namespace != "" {
+		return m.Namespace + "::" + m.Name
+	} else {
+		return m.Name
+	}
 }
 
 type Assignment struct {

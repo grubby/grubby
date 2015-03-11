@@ -28,6 +28,7 @@ type vm struct {
 
 	inEigenclassBlock bool
 
+	currentModuleName     string
 	methodDeclarationMode methodVisibility
 }
 
@@ -71,7 +72,12 @@ func NewVM(rubyHome, name string) VM {
 
 	vm.CurrentGlobals["LOAD_PATH"] = loadPath
 	vm.CurrentGlobals[":"] = loadPath
-	vm.ObjectSpace["ARGV"], _ = vm.CurrentClasses["Array"].New(vm, vm)
+
+	argvArray, err := vm.CurrentClasses["Array"].New(vm, vm)
+	if err != nil {
+		panic(err)
+	}
+	vm.CurrentClasses["Object"].SetConstant("ARGV", argvArray)
 
 	main, _ := vm.CurrentClasses["Object"].New(vm, vm)
 	main.AddMethod(NewNativeMethod("to_s", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
@@ -379,6 +385,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretClassInContext(vm, statement.(ast.Class), context)
 		case ast.Eigenclass:
 			returnValue, returnErr = interpretEigenclassInContext(vm, statement.(ast.Eigenclass), context)
+		case ast.Constant:
+			returnValue, returnErr = interpretConstantInContext(vm, statement.(ast.Constant), context)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}

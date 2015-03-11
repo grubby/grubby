@@ -61,7 +61,7 @@ func (m *moduleStub) PrivateInstanceMethods() []Method {
 func (m *moduleStub) Constant(name string) (Value, error) {
 	value, ok := m.constants[name]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
+		return nil, errors.New(fmt.Sprintf("constant '%s' does not exist", name))
 	}
 
 	return value, nil
@@ -73,4 +73,13 @@ func (m *moduleStub) SetConstant(name string, value Value) {
 	}
 
 	m.constants[name] = value
+}
+
+func (m *moduleStub) Constants() []Value {
+	constants := []Value{}
+	for _, c := range m.constants {
+		constants = append(constants, c)
+	}
+
+	return constants
 }

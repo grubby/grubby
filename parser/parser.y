@@ -31,7 +31,7 @@ var Statements []ast.Node
 %token <genericValue> REF
 %token <genericValue> SYMBOL
 %token <genericValue> SPECIAL_CHAR_REF
-%token <genericValue> CAPITAL_REF
+%token <genericValue> CONSTANT
 %token <genericValue> NAMESPACED_CAPITAL_REF
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
@@ -260,7 +260,7 @@ list : /* empty */
 | list expr
 {  $$ = append($$, $2) };
 
-simple_node : SYMBOL | NODE | REF | CAPITAL_REF | instance_variable | class_variable | global | LINE_CONST_REF | FILE_CONST_REF | self | nil;
+simple_node : SYMBOL | NODE | REF | CONSTANT | instance_variable | class_variable | global | LINE_CONST_REF | FILE_CONST_REF | self | nil;
 
 single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression;
 
@@ -308,10 +308,10 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| CAPITAL_REF LPAREN nodes_with_commas RPAREN
+| CONSTANT LPAREN nodes_with_commas RPAREN
   {
     callExpr := ast.CallExpression{
-      Func: $1.(ast.BareReference),
+      Func: ast.BareReference{Name: $1.(ast.Constant).Name, Line: $1.LineNumber()},
       Args: $3,
     }
     callExpr.Line = $1.LineNumber()
@@ -482,7 +482,7 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| CAPITAL_REF LBRACKET single_node RBRACKET
+| CONSTANT LBRACKET single_node RBRACKET
   {
     callExpr := ast.CallExpression{
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
@@ -512,7 +512,7 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| CAPITAL_REF LBRACKET range RBRACKET
+| CONSTANT LBRACKET range RBRACKET
   {
     callExpr := ast.CallExpression{
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
@@ -532,7 +532,7 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| CAPITAL_REF LBRACKET nonempty_nodes_with_commas RBRACKET
+| CONSTANT LBRACKET nonempty_nodes_with_commas RBRACKET
   {
     callExpr := ast.CallExpression{
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
@@ -574,11 +574,8 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| CAPITAL_REF LBRACKET single_node RBRACKET EQUALTO optional_newlines expr
-{
-  if $7 == nil {
-      panic("WHAT THE EVER COMPILING FUCK")
-    }
+| CONSTANT LBRACKET single_node RBRACKET EQUALTO optional_newlines expr
+  {
     callExpr := ast.CallExpression{
       Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
       Target: $1,
@@ -824,18 +821,18 @@ module_declaration : MODULE class_name_with_modules list END
     $$ = module
   };
 
-class_name_with_modules : CAPITAL_REF
+class_name_with_modules : CONSTANT
   {
     class := ast.Class{
-      Name: $1.(ast.BareReference).Name,
+      Name: $1.(ast.Constant).Name,
       IsGlobalNamespace: false,
     }
     class.Line = $1.LineNumber()
     $$ = class
   }
-| CAPITAL_REF NAMESPACED_CAPITAL_REF
+| CONSTANT NAMESPACED_CAPITAL_REF
   {
-    firstPart := $1.(ast.BareReference).Name
+    firstPart := $1.(ast.Constant).Name
     fullName := strings.Join([]string{firstPart, $2.(ast.BareReference).Name}, "")
     pieces := strings.Split(fullName, "::")
     name := pieces[len(pieces)-1]
@@ -891,7 +888,7 @@ assignment : REF EQUALTO single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| CAPITAL_REF EQUALTO expr
+| CONSTANT EQUALTO expr
   {
     eql := ast.Assignment{
       LHS: $1,
@@ -985,7 +982,7 @@ conditional_assignment : REF OR_EQUALS single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| CAPITAL_REF OR_EQUALS expr
+| CONSTANT OR_EQUALS expr
   {
     eql := ast.ConditionalAssignment{
       LHS: $1,
@@ -1030,8 +1027,8 @@ conditional_assignment : REF OR_EQUALS single_node
 
 global : DOLLARSIGN REF
   { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
-| DOLLARSIGN CAPITAL_REF
-  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} };
+| DOLLARSIGN CONSTANT
+  { $$ = ast.GlobalVariable{Name: $2.(ast.Constant).Name} };
 
 instance_variable : ATSIGN REF
   {
@@ -1039,9 +1036,9 @@ instance_variable : ATSIGN REF
     ivar.Line = $2.LineNumber()
     $$ = ivar
   }
-| ATSIGN CAPITAL_REF
+| ATSIGN CONSTANT
   {
-    ivar := ast.InstanceVariable{Name: $2.(ast.BareReference).Name}
+    ivar := ast.InstanceVariable{Name: $2.(ast.Constant).Name}
     ivar.Line = $2.LineNumber()
     $$ = ivar
   };
@@ -1052,9 +1049,9 @@ class_variable : ATSIGN ATSIGN REF
     classvar.Line = $3.LineNumber()
     $$ = classvar
   }
-| ATSIGN ATSIGN CAPITAL_REF
+| ATSIGN ATSIGN CONSTANT
   {
-    classvar := ast.ClassVariable{Name: $3.(ast.BareReference).Name}
+    classvar := ast.ClassVariable{Name: $3.(ast.Constant).Name}
     classvar.Line = $3.LineNumber()
     $$ = classvar
   };

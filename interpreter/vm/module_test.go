@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	. "github.com/grubby/grubby/interpreter/vm"
+	. "github.com/grubby/grubby/interpreter/vm/builtins"
 	. "github.com/grubby/grubby/testhelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -100,6 +101,25 @@ Foo.new.srs
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value.String()).To(ContainSubstring("bznz"))
+		})
+	})
+
+	Describe("nested modules", func() {
+		It("can be used to refer to constants defined in the parent module", func() {
+			value, err := vm.Run(`
+module Foo
+  FOO_CONSTANT = 'hello'
+  module Bar
+    def self.test
+      ::Foo::FOO_CONSTANT
+    end
+  end
+end
+
+::Foo::Bar.test
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.(*StringValue).RawString()).To(Equal("hello"))
 		})
 	})
 })
