@@ -121,5 +121,24 @@ end
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value.(*StringValue).RawString()).To(Equal("hello"))
 		})
+
+		It("can be referred to by the parent module", func() {
+			value, err := vm.Run(`
+module Foo
+  module Bar
+    def self.test
+      'drink your ovaltine'
+    end
+  end
+
+  FOO_CONSTANT = Bar.test
+end
+
+Foo::FOO_CONSTANT
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.(*StringValue).RawString()).To(Equal("drink your ovaltine"))
+		})
 	})
 })

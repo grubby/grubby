@@ -21,15 +21,25 @@ func interpretModuleDeclarationInContext(
 		vm.methodDeclarationMode = public
 	}()
 
+	var currentModule Module
 	var fullModuleName string
 	if vm.currentModuleName != "" {
 		fullModuleName = strings.Join([]string{vm.currentModuleName, moduleNode.FullName()}, "::")
+		var ok bool
+		currentModule, ok = vm.CurrentClasses[vm.currentModuleName]
+		if !ok {
+			currentModule = vm.CurrentModules[vm.currentModuleName]
+		}
 	} else {
 		fullModuleName = moduleNode.FullName()
 	}
 
 	theModule := NewModule(moduleNode.Name, vm, vm)
 	vm.CurrentModules[fullModuleName] = theModule
+
+	if currentModule != nil {
+		currentModule.SetConstant(moduleNode.Name, theModule)
+	}
 
 	vm.currentModuleName = fullModuleName
 	_, err := vm.executeWithContext(theModule, moduleNode.Body...)
