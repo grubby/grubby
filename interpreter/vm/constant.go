@@ -1,9 +1,8 @@
 package vm
 
 import (
-	"fmt"
-
 	"github.com/grubby/grubby/ast"
+	"github.com/tjarratt/gomads"
 
 	. "github.com/grubby/grubby/interpreter/vm/builtins"
 )
@@ -14,34 +13,43 @@ func interpretConstantInContext(
 	context Value,
 ) (Value, error) {
 
-	var target Module
-	if vm.currentModuleName == "" {
-		target = vm.CurrentClasses["Object"]
+	maybeTarget := gomads.Maybe(func() interface{} {
+		if vm.currentModuleName == "" {
+			return vm.CurrentClasses["Object"]
+		} else {
+			return nil
+		}
+	}).OrSome(gomads.Maybe(func() interface{} {
+		return vm.CurrentClasses[vm.currentModuleName]
+	})).OrSome(gomads.Maybe(func() interface{} {
+		return vm.CurrentModules[vm.currentModuleName]
+	}))
+
+	target, ok := maybeTarget.Value().(Module)
+
+	maybeConstant := gomads.Maybe(func() interface{} {
+		constant, err := target.Constant(constantNode.Name)
+		if err == nil {
+			return constant
+		} else {
+			return nil
+		}
+	}).OrSome(gomads.Maybe(func() interface{} {
+		return vm.CurrentClasses[constantNode.Name]
+	})).OrSome(gomads.Maybe(func() interface{} {
+		return vm.CurrentModules[constantNode.Name]
+	}))
+
+	constant, ok := maybeConstant.Value().(Value)
+	if ok {
+		return constant, nil
 	} else {
-		target = vm.CurrentClasses[vm.currentModuleName]
-		if target == nil {
-			target = vm.CurrentModules[vm.currentModuleName]
-		}
-
-		if target == nil {
-			panic(fmt.Sprintf("unexpected nil target when looking up module %s to find constant %s", vm.currentModuleName, constantNode.Name))
-		}
+		return nil, NewNameError(
+			constantNode.Name,
+			context.String(),
+			context.Class().String(),
+			vm.stack.String(),
+		)
 	}
 
-	constant, err := target.Constant(constantNode.Name)
-	if err != nil {
-		maybeClass, ok := vm.CurrentClasses[constantNode.Name]
-		if ok {
-			return maybeClass, nil
-		}
-
-		maybeModule, ok := vm.CurrentModules[constantNode.Name]
-		if ok {
-			return maybeModule, nil
-		}
-
-		return nil, err
-	}
-
-	return constant, nil
 }
