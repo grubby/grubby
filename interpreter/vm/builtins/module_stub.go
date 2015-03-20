@@ -83,3 +83,7 @@ func (m *moduleStub) Constants() []Value {
 
 	return constants
 }
+
+func (m *moduleStub) ConstantsWithNames() map[string]Value {
+	return m.constants
+}

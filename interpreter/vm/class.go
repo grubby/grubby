@@ -1,6 +1,8 @@
 package vm
 
 import (
+	"strings"
+
 	"github.com/grubby/grubby/ast"
 	"github.com/tjarratt/gomads"
 
@@ -47,6 +49,30 @@ func interpretClassInContext(
 		}
 
 		return value
+	})).OrSome(gomads.Maybe(func() interface{} {
+		if vm.currentModuleName == "" {
+			return nil
+		}
+
+		parts := strings.Split(vm.currentModuleName, "::")
+		count := len(parts) - 1
+		for index, _ := range parts {
+			namespace := append(parts[0:(count-index)], name)
+			nameToLookup := strings.Join(namespace, "::")
+
+			maybe := gomads.Maybe(func() interface{} {
+				return vm.CurrentClasses[nameToLookup]
+			}).OrSome(gomads.Maybe(func() interface{} {
+				return vm.CurrentModules[nameToLookup]
+			}))
+
+			something, ok := maybe.Value().(Value)
+			if ok {
+				return something
+			}
+		}
+
+		return nil
 	})).OrSome(
 		NewNameError(
 			name,

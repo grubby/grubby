@@ -18,6 +18,7 @@ type Module interface {
 	PrivateInstanceMethods() []Method
 
 	Constants() []Value
+	ConstantsWithNames() map[string]Value
 	Constant(string) (Value, error)
 	SetConstant(string, Value)
 
@@ -94,21 +95,32 @@ type RubyModule struct {
 	valueStub
 	moduleStub
 
-	includedModules []Value
+	includedModules []Module
 }
 
 func NewModule(name string, classProvider ClassProvider, singletonProvider SingletonProvider) Module {
 	c := &RubyModule{
 		name:            name,
-		includedModules: make([]Value, 0),
+		includedModules: make([]Module, 0),
 	}
 	c.initialize()
 	c.setStringer(c.String)
 	c.class = classProvider.ClassWithName("Module")
 
 	c.AddMethod(NewNativeMethod("include", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		for _, module := range args {
-			c.includedModules = append(c.includedModules, module)
+		selfAsModule := self.(Module)
+		for _, val := range args {
+			moduleToInclude, ok := val.(Module)
+			if !ok {
+				return nil, errors.New("TypeError: wrong argument type (expected Module)")
+			}
+
+			for name, constant := range moduleToInclude.ConstantsWithNames() {
+				selfAsModule.SetConstant(name, constant)
+			}
+
+			c.includedModules = append(c.includedModules, moduleToInclude)
+
 		}
 
 		return c, nil

@@ -126,19 +126,46 @@ end
 			value, err := vm.Run(`
 module Foo
   module Bar
-    def self.test
-      'drink your ovaltine'
-    end
+    MESSAGE = 'drink your ovaltine'
   end
 
-  FOO_CONSTANT = Bar.test
+  include Bar
 end
-
-Foo::FOO_CONSTANT
 `)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value.(*StringValue).RawString()).To(Equal("drink your ovaltine"))
+
+			module, ok := value.(Module)
+			Expect(ok).To(BeTrue())
+
+			constant, err := module.Constant("MESSAGE")
+			Expect(err).ToNot(HaveOccurred())
+
+			stringValue, ok := constant.(*StringValue)
+			Expect(ok).To(BeTrue())
+			Expect(stringValue.RawString()).To(Equal("drink your ovaltine"))
 		})
+	})
+
+	It("can be referred to by modules declared alongside it", func() {
+		value, err := vm.Run(`
+module Foo
+  module Bar
+    MESSAGE = 'drink your ovaltine'
+  end
+
+  module Baz
+    include Bar
+  end
+end
+
+Foo::Baz::MESSAGE
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+
+		stringValue, ok := value.(*StringValue)
+		Expect(ok).To(BeTrue())
+		Expect(stringValue.RawString()).To(Equal("drink your ovaltine"))
 	})
 })
