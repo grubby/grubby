@@ -27,6 +27,7 @@ type Module interface {
 
 type Evaluator interface {
 	EvaluateStringInContext(string, Value) (Value, error)
+	EvaluateStringInContextAndNewStack(string, Value) (Value, error)
 }
 
 // globlal Module class
@@ -71,7 +72,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 
 	c.AddMethod(NewNativeMethod("module_eval", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		input := args[0].(*StringValue).RawString()
-		return evaluator.EvaluateStringInContext(input, self)
+		return evaluator.EvaluateStringInContextAndNewStack(input, self)
 	}))
 
 	return c

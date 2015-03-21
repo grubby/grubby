@@ -104,6 +104,14 @@ test(5)
 			Expect(len(value.(*Array).Members())).To(Equal(1))
 			Expect(value.(*Array).Members()).To(ContainElement(NewFixnum(5, vm, vm)))
 		})
+
+		It("can handle string interpolation", func() {
+			value, err := vm.Run(`[1,2,3].map {|o| "foo #{o} bar" }`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(value.(*Array).Members())).To(Equal(3))
+			Expect(value.(*Array).Members()[0].(*StringValue).RawString()).To(ContainSubstring("foo 1 bar"))
+		})
 	})
 
 	Describe("a reference to a variable", func() {

@@ -451,6 +451,21 @@ func (vm *vm) EvaluateStringInContext(input string, context Value) (Value, error
 		return nil, NewParseError(vm.currentFilename)
 	}
 
+	return vm.executeWithContext(context, parser.Statements...)
+}
+
+func (vm *vm) EvaluateStringInContextAndNewStack(input string, context Value) (Value, error) {
+	parser.Statements = []ast.Node{}
+	defer func() {
+		parser.Statements = []ast.Node{}
+	}()
+
+	lexer := parser.NewLexer(input)
+	result := parser.RubyParse(lexer)
+	if result != 0 {
+		return nil, NewParseError(vm.currentFilename)
+	}
+
 	vm.localVariableStack.Unshift()
 	defer vm.localVariableStack.Shift()
 	return vm.executeWithContext(context, parser.Statements...)
