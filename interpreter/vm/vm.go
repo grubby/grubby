@@ -285,10 +285,7 @@ func (err *ParseError) Error() string {
 }
 
 func (vm *vm) Run(input string) (Value, error) {
-	parser.Statements = []ast.Node{}
-	defer func() {
-		parser.Statements = []ast.Node{}
-	}()
+	parser.Reset()
 
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
@@ -440,10 +437,7 @@ func (vm *vm) AddSymbol(val Value) {
 
 // Evaluator
 func (vm *vm) EvaluateStringInContext(input string, context Value) (Value, error) {
-	parser.Statements = []ast.Node{}
-	defer func() {
-		parser.Statements = []ast.Node{}
-	}()
+	parser.Reset()
 
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
@@ -455,10 +449,7 @@ func (vm *vm) EvaluateStringInContext(input string, context Value) (Value, error
 }
 
 func (vm *vm) EvaluateStringInContextAndNewStack(input string, context Value) (Value, error) {
-	parser.Statements = []ast.Node{}
-	defer func() {
-		parser.Statements = []ast.Node{}
-	}()
+	parser.Reset()
 
 	lexer := parser.NewLexer(input)
 	result := parser.RubyParse(lexer)
