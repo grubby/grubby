@@ -3,6 +3,7 @@ package builtins
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type ArrayClass struct {
@@ -138,6 +139,18 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 		}
 
 		return selfAsArray, nil
+	}))
+	a.AddMethod(NewNativeMethod("join", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+
+		selfAsArray := self.(*Array)
+		separator := args[0].(*StringValue).value
+		pieces := make([]string, len(selfAsArray.members))
+
+		for index, element := range selfAsArray.members {
+			pieces[index] = element.String()
+		}
+
+		return NewString(strings.Join(pieces, separator), classProvider, singletonProvider), nil
 	}))
 
 	return a

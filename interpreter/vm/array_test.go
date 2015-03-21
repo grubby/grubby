@@ -43,6 +43,17 @@ var _ = Describe("Arrays", func() {
 		})
 	})
 
+	Describe("joining the elements of an array together", func() {
+		It("returns the elements joined with the given string separator", func() {
+			value, err := vm.Run("[1,2,3].join(':')")
+			Expect(err).ToNot(HaveOccurred())
+
+			asStr, ok := value.(*StringValue)
+			Expect(ok).To(BeTrue())
+			Expect(asStr.RawString()).To(Equal("1:2:3"))
+		})
+	})
+
 	Describe("mapping over the items in an array", func() {
 		var (
 			value Value
