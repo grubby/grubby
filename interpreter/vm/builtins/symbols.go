@@ -21,6 +21,10 @@ func NewSymbolClass(classProvider ClassProvider, singletonProvider SingletonProv
 		selfAsSymbol := self.(*SymbolValue)
 		return NewProcInstance(selfAsSymbol.value, classProvider), nil
 	}))
+	s.AddMethod(NewNativeMethod("to_s", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsSymbol := self.(*SymbolValue)
+		return NewString(selfAsSymbol.value, classProvider, singletonProvider), nil
+	}))
 
 	return s
 }

@@ -40,6 +40,16 @@ var _ = Describe("symbols", func() {
 		Expect(val).To(Equal(vm.Symbols()["foo"]))
 	})
 
+	It("stringifies itself by stripping off the colon", func() {
+		method, err := val.Method("to_s")
+		Expect(err).ToNot(HaveOccurred())
+
+		value, err := method.Execute(val, nil)
+		Expect(err).ToNot(HaveOccurred())
+
+		Expect(value.(*StringValue).RawString()).To(Equal("foo"))
+	})
+
 	It("is registered once, globally", func() {
 		Expect(val).To(Equal(vm.Symbols()["foo"]))
 	})
