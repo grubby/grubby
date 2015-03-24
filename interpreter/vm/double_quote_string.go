@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/grubby/grubby/ast"
+	"github.com/tjarratt/gomads"
 
 	. "github.com/grubby/grubby/interpreter/vm/builtins"
 )
@@ -39,7 +40,21 @@ func interpretDoubleQuotedStringInContext(
 			return nil, err
 		}
 
-		str = strings.Replace(str, "#"+substringToReplace, rubyValue.String(), 1)
+		valueAsString := gomads.Maybe(func() interface{} {
+			method, err := rubyValue.Method("to_s")
+			if err != nil {
+				return nil
+			}
+
+			result, err := method.Execute(rubyValue, nil)
+			if err != nil {
+				return nil
+			}
+
+			return result.(*StringValue).RawString()
+		}).OrSome(rubyValue.String()).Value().(string)
+
+		str = strings.Replace(str, "#"+substringToReplace, valueAsString, 1)
 	}
 
 	return NewString(str, vm, vm), nil

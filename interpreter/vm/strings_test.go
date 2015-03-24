@@ -49,6 +49,12 @@ place     = 'world'
 			Expect(value.(*StringValue).RawString()).To(Equal("hello cruel world"))
 		})
 
+		It("calls to_s on the values being interpolated", func() {
+			value, err := vm.Run(`"whoops all #{:crunchberries}"`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.(*StringValue).RawString()).To(Equal("whoops all crunchberries"))
+		})
+
 		It("cannot be done with single quoted strings", func() {
 			value, err := vm.Run(`
 adj = 'cruel'
