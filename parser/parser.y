@@ -755,7 +755,9 @@ method_declaration : DEF REF method_args list END
 method_args : comma_delimited_args_with_default_values
   { $$ = $1 }
 | LPAREN comma_delimited_args_with_default_values RPAREN
-  { $$ = $2 };
+  { $$ = $2 }
+| LPAREN STAR RPAREN
+  { $$ = []ast.Node{ast.MethodParam{Name: ast.BareReference{}, IsSplat: true}} };
 
 comma_delimited_args_with_default_values : /* empty */ { $$ = ast.Nodes{} }
 | default_value_arg

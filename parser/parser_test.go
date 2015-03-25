@@ -1269,6 +1269,31 @@ end
 				})
 			})
 
+			Context("with splat-args but no name at all", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def on(*)
+end
+`)
+				})
+
+				It("has a splat param, but no name", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "on"},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name:    ast.BareReference{Name: ""},
+									IsSplat: true,
+								},
+							},
+							Body: []ast.Node{},
+						},
+					}))
+				})
+			})
+
 			Context("with a named proc parameter", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
