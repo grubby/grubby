@@ -58,11 +58,13 @@ func interpretMethodDeclarationInContext(
 		case ast.Self:
 			context.AddMethod(method)
 		case nil:
-			switch vm.methodDeclarationMode {
-			case public:
+			switch context.(Module).ActiveVisibility() {
+			case Public:
 				context.(Module).AddInstanceMethod(method)
-			case private:
+			case Private:
 				context.(Module).AddPrivateInstanceMethod(method)
+			case Protected:
+				context.(Module).AddProtectedInstanceMethod(method)
 			}
 		default:
 			value, err := vm.executeWithContext(context, funcNode.Target)

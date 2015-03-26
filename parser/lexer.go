@@ -106,9 +106,6 @@ const (
 	tokenType__FILE__
 	tokenType__LINE__
 	tokenType__ENCODING__
-	tokenTypePublic
-	tokenTypeProtected
-	tokenTypePrivate
 )
 
 type StatefulRubyLexer interface {
@@ -769,18 +766,6 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeProcArg:
 			debug("ProcArg")
 			return ProcArg
-		case tokenTypePublic:
-			debug("public")
-			lval.genericValue = ast.Nil{Line: token.line}
-			return PUBLIC
-		case tokenTypeProtected:
-			debug("protected")
-			lval.genericValue = ast.Nil{Line: token.line}
-			return PROTECTED
-		case tokenTypePrivate:
-			debug("private")
-			lval.genericValue = ast.Nil{Line: token.line}
-			return PRIVATE
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:

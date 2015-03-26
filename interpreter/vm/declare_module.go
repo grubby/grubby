@@ -18,7 +18,6 @@ func interpretModuleDeclarationInContext(
 
 	defer func() {
 		vm.currentModuleName = originalName
-		vm.methodDeclarationMode = public
 	}()
 
 	var currentModule Module

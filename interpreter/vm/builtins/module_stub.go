@@ -9,7 +9,17 @@ type moduleStub struct {
 	instanceMethods        map[string]Method
 	privateInstanceMethods map[string]Method
 	constants              map[string]Value
+
+	methodVisibility MethodVisibility
 }
+
+type MethodVisibility int
+
+const (
+	Public MethodVisibility = iota
+	Private
+	Protected
+)
 
 func (m *moduleStub) InstanceMethod(name string) (Method, error) {
 	method := m.instanceMethods[name]
@@ -58,6 +68,23 @@ func (m *moduleStub) PrivateInstanceMethods() []Method {
 	return methods
 }
 
+func (m *moduleStub) AddProtectedInstanceMethod(method Method) {
+	if m.privateInstanceMethods == nil {
+		m.privateInstanceMethods = make(map[string]Method)
+	}
+
+	m.privateInstanceMethods[method.Name()] = method
+}
+
+func (m *moduleStub) ProtectedInstanceMethods() []Method {
+	methods := make([]Method, 0, len(m.privateInstanceMethods))
+	for _, method := range m.privateInstanceMethods {
+		methods = append(methods, method)
+	}
+
+	return methods
+}
+
 func (m *moduleStub) Constant(name string) (Value, error) {
 	value, ok := m.constants[name]
 	if !ok {
@@ -86,4 +113,12 @@ func (m *moduleStub) Constants() []Value {
 
 func (m *moduleStub) ConstantsWithNames() map[string]Value {
 	return m.constants
+}
+
+func (m *moduleStub) ActiveVisibility() MethodVisibility {
+	return m.methodVisibility
+}
+
+func (m *moduleStub) SetActiveVisibility(visibility MethodVisibility) {
+	m.methodVisibility = visibility
 }

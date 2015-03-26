@@ -3015,74 +3015,63 @@ end
 		})
 
 		Describe("public, private and protected", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(`
+			Context("with method names as symbols", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
 class Grigri
-
-  def foo; end
-  def bar; end
-  def baz; end
-  def buz; end
-
   public
   public :foo, :bar
-  private
-  private :bar, :baz
-  protected
-  protected :baz, :buz
-
 end
 `)
+				})
+
+				It("can be used to change methods' visibility", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.ClassDecl{
+							Line: 1,
+							Name: "Grigri",
+							Body: []ast.Node{
+								ast.BareReference{Line: 2, Name: "public"},
+								ast.CallExpression{
+									Line: 3,
+									Func: ast.BareReference{Line: 3, Name: "public"},
+									Args: []ast.Node{
+										ast.Symbol{Line: 3, Name: "foo"},
+										ast.Symbol{Line: 3, Name: "bar"},
+									},
+								},
+							},
+						},
+					}))
+				})
 			})
 
-			It("can be used to change methods' visibility", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.ClassDecl{
-						Line: 1,
-						Name: "Grigri",
-						Body: []ast.Node{
-							ast.FuncDecl{
-								Line: 3,
-								Name: ast.BareReference{Line: 3, Name: "foo"},
-								Args: []ast.Node{},
-								Body: []ast.Node{},
+			Context("with a variable referencing a method name", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+class CynicistTransactionally
+  public method_name
+end
+`)
+				})
+
+				It("changes the visibility of the method with the given name at runtime", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.ClassDecl{
+							Line: 1,
+							Name: "CynicistTransactionally",
+							Body: []ast.Node{
+								ast.CallExpression{
+									Line: 2,
+									Func: ast.BareReference{Line: 2, Name: "public"},
+									Args: []ast.Node{
+										ast.BareReference{Line: 2, Name: "method_name"},
+									},
+								},
 							},
-							ast.FuncDecl{
-								Line: 4,
-								Name: ast.BareReference{Line: 4, Name: "bar"},
-								Args: []ast.Node{},
-								Body: []ast.Node{},
-							},
-							ast.FuncDecl{
-								Line: 5,
-								Name: ast.BareReference{Line: 5, Name: "baz"},
-								Args: []ast.Node{},
-								Body: []ast.Node{},
-							},
-							ast.FuncDecl{
-								Line: 6,
-								Name: ast.BareReference{Line: 6, Name: "buz"},
-								Args: []ast.Node{},
-								Body: []ast.Node{},
-							},
-							ast.Public{Line: 8},
-							ast.Public{Line: 9, Methods: []ast.Symbol{
-								{Line: 9, Name: "foo"},
-								{Line: 9, Name: "bar"},
-							}},
-							ast.Private{Line: 10},
-							ast.Private{Line: 11, Methods: []ast.Symbol{
-								{Line: 11, Name: "bar"},
-								{Line: 11, Name: "baz"},
-							}},
-							ast.Protected{Line: 12},
-							ast.Protected{Line: 13, Methods: []ast.Symbol{
-								{Line: 13, Name: "baz"},
-								{Line: 13, Name: "buz"},
-							}},
 						},
-					},
-				}))
+					}))
+				})
 			})
 		})
 

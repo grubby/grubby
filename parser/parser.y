@@ -20,7 +20,6 @@ var Statements []ast.Node
   genericString   string
   stringSlice     []string
   switchCaseSlice []ast.SwitchCase
-  symbolSlice     []ast.Symbol
 }
 
 %token <genericValue> OPERATOR
@@ -70,9 +69,6 @@ var Statements []ast.Node
 %token <genericValue> ALIAS
 %token <genericValue> SELF
 %token <genericValue> NIL
-%token <genericValue> PUBLIC
-%token <genericValue> PROTECTED
-%token <genericValue> PRIVATE
 
 // operators
 %token <genericValue> LESSTHAN
@@ -132,12 +128,9 @@ var Statements []ast.Node
 %type <genericValue> global
 %type <genericValue> lambda
 %type <genericValue> rescue
-%type <genericValue> public
-%type <genericValue> private
 %type <genericValue> ternary
 %type <genericValue> if_block
 %type <genericValue> proc_arg
-%type <genericValue> protected
 %type <genericValue> splat_arg
 %type <genericValue> assignment
 %type <genericValue> multiple_assignment
@@ -164,8 +157,6 @@ var Statements []ast.Node
 
 %type <switchCaseSlice> switch_cases;
 %type <genericValue> switch_statement;
-
-%type <symbolSlice> one_or_more_symbols;
 
 %type <genericValue> logical_or;
 %type <genericValue> logical_and;
@@ -266,7 +257,7 @@ single_node : simple_node | array | hash | class_name_with_modules | call_expres
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias | public | private | protected;
+expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias;
 
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
@@ -1737,26 +1728,5 @@ alias : ALIAS SYMBOL SYMBOL
     alias.Line = $1.LineNumber()
     $$ = alias
   };
-
-public: PUBLIC
-  { $$ = ast.Public{Line: $1.LineNumber()} }
-| PUBLIC one_or_more_symbols
-  { $$ = ast.Public{Line: $1.LineNumber(), Methods: $2} };
-
-private: PRIVATE
-  { $$ = ast.Private{Line: $1.LineNumber()} }
-| PRIVATE one_or_more_symbols
-  { $$ = ast.Private{Line: $1.LineNumber(), Methods: $2} };
-
-protected: PROTECTED
-  { $$ = ast.Protected{Line: $1.LineNumber()} }
-| PROTECTED one_or_more_symbols
-  { $$ = ast.Protected{Line: $1.LineNumber(), Methods: $2} };
-
-
-one_or_more_symbols : SYMBOL
-  { $$ = append($$, $1.(ast.Symbol)) }
-| one_or_more_symbols COMMA SYMBOL
-  { $$ = append($$, $3.(ast.Symbol)) };
 
 %%

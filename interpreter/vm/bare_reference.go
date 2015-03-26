@@ -33,8 +33,13 @@ func interpretBareReferenceInContext(
 				if ok {
 					returnValue = maybe
 				} else {
-					returnValue = nil
-					returnErr = NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+					maybeMethod, err := context.Method(name)
+					if err == nil {
+						returnValue, returnErr = maybeMethod.Execute(context, nil)
+					} else {
+						returnValue = nil
+						returnErr = NewNameError(name, context.String(), context.Class().String(), vm.stack.String())
+					}
 				}
 			}
 		}

@@ -18,12 +18,18 @@ type Module interface {
 	AddPrivateInstanceMethod(Method)
 	PrivateInstanceMethods() []Method
 
+	AddProtectedInstanceMethod(Method)
+	ProtectedInstanceMethods() []Method
+
 	Constants() []Value
 	ConstantsWithNames() map[string]Value
 	Constant(string) (Value, error)
 	SetConstant(string, Value)
 
 	Value
+
+	ActiveVisibility() MethodVisibility
+	SetActiveVisibility(MethodVisibility)
 }
 
 type Evaluator interface {
@@ -69,6 +75,78 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		}
 
 		return methodName, nil
+	}))
+
+	c.AddMethod(NewNativeMethod("public", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsModule := self.(Module)
+		if len(args) == 0 {
+			selfAsModule.SetActiveVisibility(Public)
+			return nil, nil
+		}
+
+		for _, arg := range args {
+			argAsSym, ok := arg.(*SymbolValue)
+			if !ok {
+				return nil, errors.New(fmt.Sprintf("TypeError: '%s' is not a symbol", arg))
+			}
+
+			method, err := selfAsModule.InstanceMethod(argAsSym.value)
+			if err != nil {
+				return nil, err
+			}
+
+			selfAsModule.RemoveInstanceMethod(method)
+			selfAsModule.AddInstanceMethod(method)
+		}
+
+		return nil, nil
+	}))
+	c.AddMethod(NewNativeMethod("private", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsModule := self.(Module)
+
+		if len(args) == 0 {
+			selfAsModule.SetActiveVisibility(Private)
+			return nil, nil
+		}
+
+		for _, arg := range args {
+			argAsSym, ok := arg.(*SymbolValue)
+			if !ok {
+				return nil, errors.New(fmt.Sprintf("TypeError: '%s' is not a symbol", arg))
+			}
+
+			method, err := selfAsModule.InstanceMethod(argAsSym.value)
+			if err != nil {
+				return nil, err
+			}
+
+			selfAsModule.RemoveInstanceMethod(method)
+			selfAsModule.AddPrivateInstanceMethod(method)
+		}
+		return nil, nil
+	}))
+	c.AddMethod(NewNativeMethod("protected", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsModule := self.(Module)
+		if len(args) == 0 {
+			selfAsModule.SetActiveVisibility(Protected)
+			return nil, nil
+		}
+
+		for _, arg := range args {
+			argAsSym, ok := arg.(*SymbolValue)
+			if !ok {
+				return nil, errors.New(fmt.Sprintf("TypeError: '%s' is not a symbol", arg))
+			}
+
+			method, err := selfAsModule.InstanceMethod(argAsSym.value)
+			if err != nil {
+				return nil, err
+			}
+
+			selfAsModule.RemoveInstanceMethod(method)
+			selfAsModule.AddProtectedInstanceMethod(method)
+		}
+		return nil, nil
 	}))
 
 	c.AddMethod(NewNativeMethod("module_eval", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {

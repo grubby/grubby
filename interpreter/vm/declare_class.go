@@ -18,7 +18,6 @@ func interpretClassDeclarationInContext(
 
 	defer func() {
 		vm.currentModuleName = originalName
-		vm.methodDeclarationMode = public
 	}()
 
 	var fullClassName string

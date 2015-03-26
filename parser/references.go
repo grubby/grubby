@@ -91,15 +91,6 @@ func lexReference(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeSELF)
 	case "nil":
 		l.emit(tokenTypeNIL)
-	case "private":
-		l.emit(tokenTypePrivate)
-		readCommaDelimitedSymbolsUntilEOL(l)
-	case "protected":
-		l.emit(tokenTypeProtected)
-		readCommaDelimitedSymbolsUntilEOL(l)
-	case "public":
-		l.emit(tokenTypePublic)
-		readCommaDelimitedSymbolsUntilEOL(l)
 	case "alias":
 		l.emit(tokenTypeALIAS)
 		readCommaDelimitedSymbolsUntilEOL(l)
