@@ -3,6 +3,7 @@ package builtins
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // abstract module interface
@@ -72,6 +73,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 
 	c.AddMethod(NewNativeMethod("module_eval", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		input := args[0].(*StringValue).RawString()
+		input = strings.Replace(input, "\\n", "\n", -1)
 		return evaluator.EvaluateStringInContextAndNewStack(input, self)
 	}))
 

@@ -95,7 +95,7 @@ end
 class Foo
 end
 
-Foo.module_eval("def srs; 'bznz'; end")
+Foo.module_eval("def srs()\n'bznz'\nend")
 Foo.new.srs
 `)
 
