@@ -81,7 +81,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		selfAsModule := self.(Module)
 		if len(args) == 0 {
 			selfAsModule.SetActiveVisibility(Public)
-			return nil, nil
+			return singletonProvider.SingletonWithName("nil"), nil
 		}
 
 		for _, arg := range args {
@@ -99,14 +99,14 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			selfAsModule.AddInstanceMethod(method)
 		}
 
-		return nil, nil
+		return singletonProvider.SingletonWithName("nil"), nil
 	}))
 	c.AddMethod(NewNativeMethod("private", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 
 		if len(args) == 0 {
 			selfAsModule.SetActiveVisibility(Private)
-			return nil, nil
+			return singletonProvider.SingletonWithName("nil"), nil
 		}
 
 		for _, arg := range args {
@@ -123,13 +123,14 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			selfAsModule.RemoveInstanceMethod(method)
 			selfAsModule.AddPrivateInstanceMethod(method)
 		}
-		return nil, nil
+
+		return singletonProvider.SingletonWithName("nil"), nil
 	}))
 	c.AddMethod(NewNativeMethod("protected", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 		if len(args) == 0 {
 			selfAsModule.SetActiveVisibility(Protected)
-			return nil, nil
+			return singletonProvider.SingletonWithName("nil"), nil
 		}
 
 		for _, arg := range args {
@@ -146,7 +147,8 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			selfAsModule.RemoveInstanceMethod(method)
 			selfAsModule.AddProtectedInstanceMethod(method)
 		}
-		return nil, nil
+
+		return singletonProvider.SingletonWithName("nil"), nil
 	}))
 
 	c.AddMethod(NewNativeMethod("module_eval", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
