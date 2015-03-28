@@ -17,9 +17,11 @@ type Module interface {
 
 	AddPrivateInstanceMethod(Method)
 	PrivateInstanceMethods() []Method
+	PrivateInstanceMethod(string) (Method, error)
 
 	AddProtectedInstanceMethod(Method)
 	ProtectedInstanceMethods() []Method
+	ProtectedInstanceMethod(string) (Method, error)
 
 	Constants() []Value
 	ConstantsWithNames() map[string]Value
@@ -230,6 +232,10 @@ func NewModule(name string, classProvider ClassProvider, singletonProvider Singl
 		}
 
 		instanceMethod, err := self.(*RubyModule).InstanceMethod(symbol.value)
+		if err != nil {
+			instanceMethod, err = self.(*RubyModule).PrivateInstanceMethod(symbol.value)
+		}
+
 		if err != nil {
 			return nil, err
 		}

@@ -54,11 +54,16 @@ module Foo
 
   alias something whatever
   module_function :something
+
+  private
+  def private_whatever; end
+  module_function :private_whatever
 end
 `)
 
 		Expect(err).ToNot(HaveOccurred())
 		Expect(module).To(HaveMethod("whatever"))
+		Expect(module).To(HaveMethod("private_whatever"))
 	})
 
 	It("supports the 'alias' keyword", func() {
