@@ -41,6 +41,10 @@ func NewGlobalKernelModule(provider ClassProvider, singletonProvider SingletonPr
 		}
 
 		for _, method := range self.eigenclassMethods() {
+			if !method.IsPublic() {
+				continue
+			}
+
 			symbol := singletonProvider.SymbolWithName(method.Name())
 
 			if symbol == nil {

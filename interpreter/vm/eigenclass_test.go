@@ -47,7 +47,12 @@ object.singleton_methods
 `)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(list.(*Array).Members()).To(ContainElement(vm.Symbols()["whatever"]))
+
+			listAsArray, ok := list.(*Array)
+			Expect(ok).To(BeTrue())
+
+			Expect(listAsArray.Members()).To(ContainElement(vm.Symbols()["whatever"]))
+			Expect(listAsArray.Members()).ToNot(ContainElement(vm.Symbols()["puts"]))
 		})
 	})
 
