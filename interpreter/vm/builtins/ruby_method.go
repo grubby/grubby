@@ -13,8 +13,8 @@ type methodArg struct {
 
 type RubyMethod struct {
 	valueStub
-	name    string
-	private bool
+	name       string
+	visibility MethodVisibility
 
 	args []ast.MethodParam
 
@@ -38,6 +38,7 @@ func NewRubyMethod(
 		name:            name,
 		body:            body,
 		args:            args,
+		visibility:      Public,
 		evaluator:       evaluator,
 		unevaluatedBody: rubyBody,
 	}
@@ -59,7 +60,7 @@ func NewPrivateRubyMethod(
 		name:            name,
 		body:            body,
 		args:            args,
-		private:         true,
+		visibility:      Private,
 		evaluator:       evaluator,
 		unevaluatedBody: rubyBody,
 	}
@@ -74,7 +75,15 @@ func (method *RubyMethod) Name() string {
 }
 
 func (method *RubyMethod) IsPrivate() bool {
-	return method.private
+	return method.visibility == Private
+}
+
+func (method *RubyMethod) IsPublic() bool {
+	return method.visibility == Public
+}
+
+func (method *RubyMethod) IsProtected() bool {
+	return method.visibility == Protected
 }
 
 func (method *RubyMethod) Args() []methodArg {
@@ -124,7 +133,11 @@ func (method *RubyMethod) Execute(self Value, block Block, args ...Value) (Value
 	return method.body(self, method)
 }
 
-// FIXME: in order to fix this, the method needs to know "self"
+// FIXME: in order to fix this, the method needs to know what it is attached to
 func (method *RubyMethod) String() string {
 	return fmt.Sprintf("#Method: FIXME(ClassNameGoesHere)#%s", method.name)
+}
+
+func (method *RubyMethod) SetVisibility(visibility MethodVisibility) {
+	method.visibility = visibility
 }

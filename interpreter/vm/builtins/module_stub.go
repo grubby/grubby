@@ -6,10 +6,8 @@ import (
 )
 
 type moduleStub struct {
-	instanceMethods          map[string]Method
-	privateInstanceMethods   map[string]Method
-	protectedInstanceMethods map[string]Method
-	constants                map[string]Value
+	instanceMethods map[string]Method
+	constants       map[string]Value
 
 	methodVisibility MethodVisibility
 }
@@ -46,58 +44,6 @@ func (m *moduleStub) RemoveInstanceMethod(method Method) {
 func (m *moduleStub) InstanceMethods() []Method {
 	methods := make([]Method, 0, len(m.instanceMethods))
 	for _, method := range m.instanceMethods {
-		methods = append(methods, method)
-	}
-
-	return methods
-}
-
-func (m *moduleStub) PrivateInstanceMethod(name string) (Method, error) {
-	method := m.privateInstanceMethods[name]
-	if method == nil {
-		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
-	}
-
-	return method, nil
-}
-
-func (m *moduleStub) AddPrivateInstanceMethod(method Method) {
-	if m.privateInstanceMethods == nil {
-		m.privateInstanceMethods = make(map[string]Method)
-	}
-
-	m.privateInstanceMethods[method.Name()] = method
-}
-
-func (m *moduleStub) PrivateInstanceMethods() []Method {
-	methods := make([]Method, 0, len(m.privateInstanceMethods))
-	for _, method := range m.privateInstanceMethods {
-		methods = append(methods, method)
-	}
-
-	return methods
-}
-
-func (m *moduleStub) ProtectedInstanceMethod(name string) (Method, error) {
-	method := m.protectedInstanceMethods[name]
-	if method == nil {
-		return nil, errors.New(fmt.Sprintf("method: '%s' does not exist", name))
-	}
-
-	return method, nil
-}
-
-func (m *moduleStub) AddProtectedInstanceMethod(method Method) {
-	if m.privateInstanceMethods == nil {
-		m.privateInstanceMethods = make(map[string]Method)
-	}
-
-	m.privateInstanceMethods[method.Name()] = method
-}
-
-func (m *moduleStub) ProtectedInstanceMethods() []Method {
-	methods := make([]Method, 0, len(m.privateInstanceMethods))
-	for _, method := range m.privateInstanceMethods {
 		methods = append(methods, method)
 	}
 

@@ -127,8 +127,8 @@ func (matcher *havePrivateInstanceMethodMatcher) Match(actual interface{}) (bool
 		return false, nil
 	}
 
-	for _, method := range val.PrivateInstanceMethods() {
-		if method.Name() == matcher.methodName {
+	for _, method := range val.InstanceMethods() {
+		if method.Name() == matcher.methodName && method.IsPrivate() {
 			return true, nil
 		}
 	}

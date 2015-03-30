@@ -60,12 +60,14 @@ func interpretMethodDeclarationInContext(
 		case nil:
 			switch context.(Module).ActiveVisibility() {
 			case Public:
-				context.(Module).AddInstanceMethod(method)
+				method.SetVisibility(Public)
 			case Private:
-				context.(Module).AddPrivateInstanceMethod(method)
+				method.SetVisibility(Private)
 			case Protected:
-				context.(Module).AddProtectedInstanceMethod(method)
+				method.SetVisibility(Protected)
 			}
+
+			context.(Module).AddInstanceMethod(method)
 		default:
 			value, err := vm.executeWithContext(context, funcNode.Target)
 			if err != nil {

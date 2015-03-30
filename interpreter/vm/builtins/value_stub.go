@@ -79,17 +79,6 @@ func (valueStub *valueStub) Methods() []Method {
 	return values
 }
 
-func (valueStub *valueStub) PrivateMethods() []Method {
-	values := make([]Method, 0)
-	for _, m := range valueStub.eigenclass_methods {
-		if m.IsPrivate() {
-			values = append(values, m)
-		}
-	}
-
-	return values
-}
-
 func (valueStub *valueStub) AddMethod(m Method) {
 	valueStub.eigenclass_methods[m.Name()] = m
 }

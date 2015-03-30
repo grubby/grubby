@@ -15,14 +15,6 @@ type Module interface {
 	InstanceMethods() []Method
 	InstanceMethod(string) (Method, error)
 
-	AddPrivateInstanceMethod(Method)
-	PrivateInstanceMethods() []Method
-	PrivateInstanceMethod(string) (Method, error)
-
-	AddProtectedInstanceMethod(Method)
-	ProtectedInstanceMethods() []Method
-	ProtectedInstanceMethod(string) (Method, error)
-
 	Constants() []Value
 	ConstantsWithNames() map[string]Value
 	Constant(string) (Value, error)
@@ -67,10 +59,10 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 
 		native, ok := method.(*nativeMethod)
 		if ok {
-			native.private = true
+			native.visibility = Private
 			self.AddMethod(native)
 		} else if rubyMethod, ok := method.(*RubyMethod); ok {
-			rubyMethod.private = true
+			rubyMethod.visibility = Private
 			self.AddMethod(rubyMethod)
 		} else {
 			panic(fmt.Sprintf("unknown method type: %T", method))
@@ -97,8 +89,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 				return nil, err
 			}
 
-			selfAsModule.RemoveInstanceMethod(method)
-			selfAsModule.AddInstanceMethod(method)
+			method.SetVisibility(Public)
 		}
 
 		return singletonProvider.SingletonWithName("nil"), nil
@@ -122,8 +113,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 				return nil, err
 			}
 
-			selfAsModule.RemoveInstanceMethod(method)
-			selfAsModule.AddPrivateInstanceMethod(method)
+			method.SetVisibility(Private)
 		}
 
 		return singletonProvider.SingletonWithName("nil"), nil
@@ -146,8 +136,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 				return nil, err
 			}
 
-			selfAsModule.RemoveInstanceMethod(method)
-			selfAsModule.AddProtectedInstanceMethod(method)
+			method.SetVisibility(Protected)
 		}
 
 		return singletonProvider.SingletonWithName("nil"), nil
@@ -232,16 +221,13 @@ func NewModule(name string, classProvider ClassProvider, singletonProvider Singl
 		}
 
 		instanceMethod, err := self.(*RubyModule).InstanceMethod(symbol.value)
-		if err != nil {
-			instanceMethod, err = self.(*RubyModule).PrivateInstanceMethod(symbol.value)
-		}
 
 		if err != nil {
 			return nil, err
 		}
 
 		self.(*RubyModule).AddMethod(instanceMethod)
-		// FIXME: this should mark the original instance method as private
+		instanceMethod.SetVisibility(Private)
 		return self, nil
 	}))
 

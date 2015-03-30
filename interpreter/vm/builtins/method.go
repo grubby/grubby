@@ -7,32 +7,36 @@ type Method interface {
 
 	Name() string
 	IsPrivate() bool
+	IsPublic() bool
+	IsProtected() bool
 
 	Execute(self Value, block Block, args ...Value) (Value, error)
+
+	SetVisibility(MethodVisibility)
 }
 
 type nativeMethod struct {
 	valueStub
 	name              string
-	private           bool
+	visibility        MethodVisibility
 	body              func(self Value, block Block, args ...Value) (Value, error)
 	classProvider     ClassProvider
 	singletonProvider SingletonProvider
 }
 
 func NewNativeMethod(name string, classProvider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
-	return newNativeMethod(name, false, classProvider, singletonProvider, body)
+	return newNativeMethod(name, Public, classProvider, singletonProvider, body)
 }
 
 func NewNativePrivateMethod(name string, classProvider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
-	return newNativeMethod(name, true, classProvider, singletonProvider, body)
+	return newNativeMethod(name, Private, classProvider, singletonProvider, body)
 }
 
-func newNativeMethod(name string, private bool, provider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
+func newNativeMethod(name string, visibility MethodVisibility, provider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
 	m := &nativeMethod{
 		name:              name,
 		body:              body,
-		private:           private,
+		visibility:        visibility,
 		classProvider:     provider,
 		singletonProvider: singletonProvider,
 	}
@@ -47,7 +51,15 @@ func (method *nativeMethod) Name() string {
 }
 
 func (method *nativeMethod) IsPrivate() bool {
-	return method.private
+	return method.visibility == Private
+}
+
+func (method *nativeMethod) IsPublic() bool {
+	return method.visibility == Public
+}
+
+func (method *nativeMethod) IsProtected() bool {
+	return method.visibility == Protected
 }
 
 func (method *nativeMethod) Execute(self Value, block Block, args ...Value) (Value, error) {
@@ -56,4 +68,8 @@ func (method *nativeMethod) Execute(self Value, block Block, args ...Value) (Val
 
 func (method *nativeMethod) String() string {
 	return fmt.Sprintf("#Method: FIXME(ClassNameGoesHere)#%s", method.name)
+}
+
+func (method *nativeMethod) SetVisibility(visibility MethodVisibility) {
+	method.visibility = visibility
 }

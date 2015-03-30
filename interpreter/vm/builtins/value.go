@@ -10,7 +10,6 @@ type Value interface {
 	RemoveMethod(Method)
 	Method(string) (Method, error)
 	Methods() []Method
-	PrivateMethods() []Method
 
 	eigenclassMethods() map[string]Method
 
