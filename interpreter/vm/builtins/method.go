@@ -13,6 +13,8 @@ type Method interface {
 	Execute(self Value, block Block, args ...Value) (Value, error)
 
 	SetVisibility(MethodVisibility)
+
+	methodBody() func(self Value, block Block, args ...Value) (Value, error)
 }
 
 type nativeMethod struct {
@@ -72,4 +74,8 @@ func (method *nativeMethod) String() string {
 
 func (method *nativeMethod) SetVisibility(visibility MethodVisibility) {
 	method.visibility = visibility
+}
+
+func (method *nativeMethod) methodBody() func(self Value, block Block, args ...Value) (Value, error) {
+	return method.body
 }

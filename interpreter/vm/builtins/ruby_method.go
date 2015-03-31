@@ -141,3 +141,7 @@ func (method *RubyMethod) String() string {
 func (method *RubyMethod) SetVisibility(visibility MethodVisibility) {
 	method.visibility = visibility
 }
+
+func (method *RubyMethod) methodBody() func(self Value, block Block, args ...Value) (Value, error) {
+	return method.Execute
+}

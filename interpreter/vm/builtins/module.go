@@ -199,6 +199,28 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		return self, nil
 	}))
 
+	c.AddMethod(NewNativeMethod("alias_method", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsModule := self.(Module)
+
+		firstSymbol, ok := args[0].(*SymbolValue)
+		if !ok {
+			return nil, errors.New("expected method name to be a symbol")
+		}
+		secondSymbol, ok := args[1].(*SymbolValue)
+		if !ok {
+			return nil, errors.New("expected method name to be a symbol")
+		}
+
+		method, err := selfAsModule.InstanceMethod(secondSymbol.Name())
+		if err != nil {
+			return nil, err
+		}
+
+		selfAsModule.AddInstanceMethod(NewNativeMethod(firstSymbol.Name(), classProvider, singletonProvider, method.methodBody()))
+
+		return nil, nil
+	}))
+
 	return c
 }
 

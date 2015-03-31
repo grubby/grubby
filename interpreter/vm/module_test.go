@@ -81,6 +81,19 @@ end
 		Expect(module).To(HaveInstanceMethod("to"))
 	})
 
+	It("supports aliasing methods with #alias_method", func() {
+		module, err := vm.Run(`
+module Foo
+  def foo; end
+  alias_method :bar, :foo
+end
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(module).To(HaveInstanceMethod("foo"))
+		Expect(module).To(HaveInstanceMethod("bar"))
+	})
+
 	It("can be referred to inside of its declaration", func() {
 		output := SwapStdout(func() {
 			_, err := vm.Run(`
