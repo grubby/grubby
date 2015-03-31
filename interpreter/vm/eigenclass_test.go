@@ -51,8 +51,8 @@ object.singleton_methods
 			listAsArray, ok := list.(*Array)
 			Expect(ok).To(BeTrue())
 
+			Expect(len(listAsArray.Members())).To(Equal(1))
 			Expect(listAsArray.Members()).To(ContainElement(vm.Symbols()["whatever"]))
-			Expect(listAsArray.Members()).ToNot(ContainElement(vm.Symbols()["puts"]))
 		})
 	})
 

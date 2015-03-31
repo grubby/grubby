@@ -148,39 +148,6 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		return evaluator.EvaluateStringInContextAndNewStack(input, self)
 	}))
 
-	return c
-}
-
-func (c ModuleClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
-	return nil, nil
-}
-
-func (c ModuleClass) Name() string {
-	return "Module"
-}
-
-func (c ModuleClass) String() string {
-	return "Module"
-}
-
-// user defined module type
-type RubyModule struct {
-	name string
-	valueStub
-	moduleStub
-
-	includedModules []Module
-}
-
-func NewModule(name string, classProvider ClassProvider, singletonProvider SingletonProvider) Module {
-	c := &RubyModule{
-		name:            name,
-		includedModules: make([]Module, 0),
-	}
-	c.initialize()
-	c.setStringer(c.String)
-	c.class = classProvider.ClassWithName("Module")
-
 	c.AddMethod(NewNativeMethod("include", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 		for _, val := range args {
@@ -189,12 +156,13 @@ func NewModule(name string, classProvider ClassProvider, singletonProvider Singl
 				return nil, errors.New("TypeError: wrong argument type (expected Module)")
 			}
 
+			for _, method := range moduleToInclude.InstanceMethods() {
+				selfAsModule.AddInstanceMethod(method)
+			}
+
 			for name, constant := range moduleToInclude.ConstantsWithNames() {
 				selfAsModule.SetConstant(name, constant)
 			}
-
-			c.includedModules = append(c.includedModules, moduleToInclude)
-
 		}
 
 		return c, nil
@@ -230,6 +198,36 @@ func NewModule(name string, classProvider ClassProvider, singletonProvider Singl
 		instanceMethod.SetVisibility(Private)
 		return self, nil
 	}))
+
+	return c
+}
+
+func (c ModuleClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+	return nil, nil
+}
+
+func (c ModuleClass) Name() string {
+	return "Module"
+}
+
+func (c ModuleClass) String() string {
+	return "Module"
+}
+
+// user defined module type
+type RubyModule struct {
+	name string
+	valueStub
+	moduleStub
+}
+
+func NewModule(name string, classProvider ClassProvider, singletonProvider SingletonProvider) Module {
+	c := &RubyModule{
+		name: name,
+	}
+	c.initialize()
+	c.setStringer(c.String)
+	c.class = classProvider.ClassWithName("Module")
 
 	return c
 }
