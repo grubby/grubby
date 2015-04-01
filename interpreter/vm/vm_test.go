@@ -137,10 +137,10 @@ test(5)
 		})
 	})
 
-	PDescribe("the standard lib", func() {
+	Describe("the standard lib", func() {
 		It("is available to require", func() {
 			_, err := vm.Run("require 'fileutils'")
-			Expect(err).ToNot(BeAssignableToTypeOf(NewLoadError("", "")))
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 
