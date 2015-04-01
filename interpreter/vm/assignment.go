@@ -30,6 +30,9 @@ func interpretAssignmentInContext(
 	case ast.InstanceVariable:
 		iVar := assignment.LHS.(ast.InstanceVariable)
 		context.SetInstanceVariable(iVar.Name, returnValue)
+	case ast.ClassVariable:
+		cVar := assignment.LHS.(ast.ClassVariable)
+		context.SetClassVariable(cVar.Name, returnValue)
 	case ast.Constant:
 		var target Module
 		if vm.currentModuleName == "" {

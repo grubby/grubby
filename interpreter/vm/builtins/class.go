@@ -16,6 +16,8 @@ type Class interface {
 	Include(Module)
 
 	includedModules() []Module
+	classVariable(string) Value
+	setClassVariable(string, Value)
 }
 
 // globlal Class class

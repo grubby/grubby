@@ -119,6 +119,14 @@ func (valueStub *valueStub) SetInstanceVariable(name string, value Value) {
 	valueStub.instance_variables[name] = value
 }
 
+func (valueStub *valueStub) GetClassVariable(name string) Value {
+	return valueStub.class.classVariable(name)
+}
+
+func (valueStub *valueStub) SetClassVariable(name string, value Value) {
+	valueStub.class.setClassVariable(name, value)
+}
+
 func (v *valueStub) IsTruthy() bool {
 	return true
 }
