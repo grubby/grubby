@@ -26,7 +26,15 @@ func lexReference(l StatefulRubyLexer) stateFn {
 			l.acceptRun(validMethodNameRunes)
 			l.accept("=")
 			l.emit(tokenTypeReference)
+		} else if l.accept("<") {
+			l.accept("=")
+			l.accept(">")
+			l.emit(tokenTypeOperator)
+		} else if l.accept(">") {
+			l.accept("=")
+			l.emit(tokenTypeOperator)
 		}
+
 	case "do":
 		l.emit(tokenTypeDO)
 	case "end":

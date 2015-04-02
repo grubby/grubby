@@ -1215,8 +1215,12 @@ end
 			Context("with special names", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
-def <=>
+def <=>(other)
   self.to_i <=> other
+end
+
+def <(other)
+  self.to_i < other
 end
 `)
 				})
@@ -1226,7 +1230,11 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "<=>"},
-							Args: []ast.Node{},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name: ast.BareReference{Line: 1, Name: "other"},
+								},
+							},
 							Body: []ast.Node{
 								ast.CallExpression{
 									Line: 2,
@@ -1237,6 +1245,27 @@ end
 									},
 									Func: ast.BareReference{Line: 2, Name: "<=>"},
 									Args: []ast.Node{ast.BareReference{Line: 2, Name: "other"}},
+								},
+							},
+						},
+						ast.FuncDecl{
+							Line: 5,
+							Name: ast.BareReference{Line: 5, Name: "<"},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name: ast.BareReference{Line: 5, Name: "other"},
+								},
+							},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Line: 6,
+									Target: ast.CallExpression{
+										Line:   6,
+										Target: ast.Self{Line: 6},
+										Func:   ast.BareReference{Line: 6, Name: "to_i"},
+									},
+									Func: ast.BareReference{Line: 6, Name: "<"},
+									Args: []ast.Node{ast.BareReference{Line: 6, Name: "other"}},
 								},
 							},
 						},
