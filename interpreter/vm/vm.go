@@ -377,6 +377,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretEigenclassInContext(vm, statement.(ast.Eigenclass), context)
 		case ast.Constant:
 			returnValue, returnErr = interpretConstantInContext(vm, statement.(ast.Constant), context)
+		case ast.Negation:
+			returnValue, returnErr = interpretNegationInContext(vm, statement.(ast.Negation), context)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}

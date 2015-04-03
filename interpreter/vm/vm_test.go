@@ -461,4 +461,12 @@ value
 			Expect(value.String()).To(ContainSubstring("okay"))
 		})
 	})
+
+	It("considers negated nil to be truthy", func() {
+		value, err := vm.Run("!nil")
+		Expect(err).ToNot(HaveOccurred())
+
+		trueValue := vm.SingletonWithName("true")
+		Expect(value).To(Equal(trueValue))
+	})
 })
