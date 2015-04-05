@@ -41,8 +41,8 @@ func interpretDoubleQuotedStringInContext(
 		}
 
 		valueAsString := gomads.Maybe(func() interface{} {
-			method, err := rubyValue.Method("to_s")
-			if err != nil {
+			method := rubyValue.Method("to_s")
+			if method == nil {
 				return nil
 			}
 
@@ -57,5 +57,5 @@ func interpretDoubleQuotedStringInContext(
 		str = strings.Replace(str, "#"+substringToReplace, valueAsString, 1)
 	}
 
-	return NewString(str, vm, vm), nil
+	return NewString(str, vm), nil
 }

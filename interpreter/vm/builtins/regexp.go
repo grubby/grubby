@@ -11,18 +11,18 @@ type regexpClass struct {
 	classStub
 }
 
-func NewRegexpClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewRegexpClass(provider Provider) Class {
 	class := &regexpClass{}
 	class.initialize()
 	class.setStringer(class.String)
-	class.class = provider.ClassWithName("Class")
-	class.superClass = provider.ClassWithName("Object")
+	class.class = provider.ClassProvider().ClassWithName("Class")
+	class.superClass = provider.ClassProvider().ClassWithName("Object")
 
-	class.AddMethod(NewNativeMethod("quote", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	class.AddMethod(NewNativeMethod("quote", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		argAsString := args[0].(*StringValue).value
 
 		quoted := regexp.QuoteMeta(argAsString)
-		return NewString(strings.Replace(quoted, " ", "\\ ", -1), provider, singletonProvider), nil
+		return NewString(strings.Replace(quoted, " ", "\\ ", -1), provider), nil
 	}))
 
 	return class
@@ -36,6 +36,6 @@ func (c *regexpClass) Name() string {
 	return "Regexp"
 }
 
-func (c *regexpClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (c *regexpClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, errors.New("undefined method 'new' for Regexp:Class")
 }

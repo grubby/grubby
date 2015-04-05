@@ -49,8 +49,11 @@ type VM interface {
 	Classes() map[string]Class
 	Modules() map[string]Module
 
+	Provider
+	ArgEvaluator
 	ClassProvider
 	SingletonProvider
+	StackProvider
 }
 
 func NewVM(rubyHome, name string) VM {
@@ -66,21 +69,21 @@ func NewVM(rubyHome, name string) VM {
 	}
 	vm.registerBuiltinClassesAndModules()
 
-	loadPath, _ := vm.CurrentClasses["Array"].New(vm, vm)
-	loadPath.(*Array).Append(NewString(filepath.Join(rubyHome, "lib"), vm, vm))
+	loadPath, _ := vm.CurrentClasses["Array"].New(vm)
+	loadPath.(*Array).Append(NewString(filepath.Join(rubyHome, "lib"), vm))
 
 	vm.CurrentGlobals["LOAD_PATH"] = loadPath
 	vm.CurrentGlobals[":"] = loadPath
 
-	argvArray, err := vm.CurrentClasses["Array"].New(vm, vm)
+	argvArray, err := vm.CurrentClasses["Array"].New(vm)
 	if err != nil {
 		panic(err)
 	}
 	vm.CurrentClasses["Object"].SetConstant("ARGV", argvArray)
 
-	main, _ := vm.CurrentClasses["Object"].New(vm, vm)
-	main.AddMethod(NewNativeMethod("to_s", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
-		return NewString("main", vm, vm), nil
+	main, _ := vm.CurrentClasses["Object"].New(vm)
+	main.AddMethod(NewNativeMethod("to_s", vm, func(self Value, block Block, args ...Value) (Value, error) {
+		return NewString("main", vm), nil
 	}))
 	vm.ObjectSpace["main"] = main
 
@@ -94,20 +97,20 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	basicObjectClass := NewBasicObjectClass(vm)
 	vm.CurrentClasses["BasicObject"] = basicObjectClass
 
-	objectClass := NewGlobalObjectClass(vm, vm)
+	objectClass := NewGlobalObjectClass(vm)
 	vm.CurrentClasses["Object"] = objectClass
 
-	classClass := NewClassClass(vm, vm)
+	classClass := NewClassClass(vm)
 	vm.CurrentClasses["Class"] = classClass
 
-	moduleClass := NewModuleClass(vm, vm, vm)
+	moduleClass := NewModuleClass(vm, vm)
 	vm.CurrentClasses["Module"] = moduleClass
-	vm.CurrentModules["Comparable"] = NewComparableModule(vm, vm)
-	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm, vm)
+	vm.CurrentModules["Comparable"] = NewComparableModule(vm)
+	vm.CurrentModules["Kernel"] = NewGlobalKernelModule(vm)
 	vm.CurrentModules["Process"] = NewProcessModule(vm)
 
 	// FIXME: this should be private, but method resolution fails
-	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("require", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
+	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("require", vm, func(self Value, block Block, args ...Value) (Value, error) {
 		fileName := args[0].(*StringValue).RawString()
 		if fileName == "rubygems" {
 			// don't "require 'rubygems'"
@@ -161,22 +164,22 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["TrueClass"] = NewTrueClass(vm)
 	vm.CurrentClasses["FalseClass"] = NewFalseClass(vm)
 
-	vm.singletons["nil"], _ = vm.CurrentClasses["NilClass"].New(vm, vm)
-	vm.singletons["true"], _ = vm.CurrentClasses["TrueClass"].New(vm, vm)
-	vm.singletons["false"], _ = vm.CurrentClasses["FalseClass"].New(vm, vm)
+	vm.singletons["nil"], _ = vm.CurrentClasses["NilClass"].New(vm)
+	vm.singletons["true"], _ = vm.CurrentClasses["TrueClass"].New(vm)
+	vm.singletons["false"], _ = vm.CurrentClasses["FalseClass"].New(vm)
 
 	vm.CurrentClasses["IO"] = NewIOClass(vm)
-	vm.CurrentClasses["Array"] = NewArrayClass(vm, vm)
-	vm.CurrentClasses["Hash"] = NewHashClass(vm, vm)
-	vm.CurrentClasses["String"] = NewStringClass(vm, vm)
+	vm.CurrentClasses["Array"] = NewArrayClass(vm)
+	vm.CurrentClasses["Hash"] = NewHashClass(vm)
+	vm.CurrentClasses["String"] = NewStringClass(vm)
 	vm.CurrentClasses["Numeric"] = NewNumericClass(vm)
 	vm.CurrentClasses["Integer"] = NewIntegerClass(vm)
-	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm, vm)
+	vm.CurrentClasses["Fixnum"] = NewFixnumClass(vm)
 	vm.CurrentClasses["Float"] = NewFloatClass(vm)
-	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm, vm)
-	vm.CurrentClasses["Proc"] = NewProcClass(vm, vm)
-	vm.CurrentClasses["Regexp"] = NewRegexpClass(vm, vm)
-	vm.CurrentClasses["File"] = NewFileClass(vm, vm)
+	vm.CurrentClasses["Symbol"] = NewSymbolClass(vm)
+	vm.CurrentClasses["Proc"] = NewProcClass(vm)
+	vm.CurrentClasses["Regexp"] = NewRegexpClass(vm)
+	vm.CurrentClasses["File"] = NewFileClass(vm)
 }
 
 func (vm *vm) MustGet(key string) Value {
@@ -330,7 +333,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.Nil:
 			returnValue = vm.singletons["nil"]
 		case ast.SimpleString:
-			returnValue = NewString(statement.(ast.SimpleString).Value, vm, vm)
+			returnValue = NewString(statement.(ast.SimpleString).Value, vm)
 		case ast.InterpolatedString:
 			returnValue, returnErr = interpretDoubleQuotedStringInContext(vm, statement.(ast.InterpolatedString), context)
 		case ast.Boolean:
@@ -342,7 +345,7 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.GlobalVariable:
 			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
 		case ast.ConstantInt:
-			returnValue = NewFixnum(statement.(ast.ConstantInt).Value, vm, vm)
+			returnValue = NewFixnum(statement.(ast.ConstantInt).Value, vm)
 		case ast.ConstantFloat:
 			returnValue = NewFloat(statement.(ast.ConstantFloat).Value, vm)
 		case ast.Symbol:
@@ -359,10 +362,10 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 		case ast.Assignment:
 			returnValue, returnErr = interpretAssignmentInContext(vm, statement.(ast.Assignment), context)
 		case ast.FileNameConstReference:
-			returnValue = NewString(vm.currentFilename, vm, vm)
+			returnValue = NewString(vm.currentFilename, vm)
 		case ast.LineNumberConstReference:
 			lineNumber := int64(statement.(ast.LineNumberConstReference).LineNumber())
-			returnValue = NewFixnum(lineNumber, vm, vm)
+			returnValue = NewFixnum(lineNumber, vm)
 		case ast.Begin:
 			returnValue, returnErr = interpretBeginInContext(vm, statement.(ast.Begin), context)
 		case ast.Array:
@@ -455,4 +458,23 @@ func (vm *vm) EvaluateStringInContextAndNewStack(input string, context Value) (V
 	vm.localVariableStack.Unshift()
 	defer vm.localVariableStack.Shift()
 	return vm.executeWithContext(context, parser.Statements...)
+}
+
+// StackProvider
+func (vm *vm) CurrentStack() string {
+	return vm.stack.String()
+}
+
+// General Purpose Provider
+func (vm *vm) ArgEvaluator() ArgEvaluator {
+	return vm
+}
+func (vm *vm) ClassProvider() ClassProvider {
+	return vm
+}
+func (vm *vm) SingletonProvider() SingletonProvider {
+	return vm
+}
+func (vm *vm) StackProvider() StackProvider {
+	return vm
 }

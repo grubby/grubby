@@ -5,12 +5,12 @@ type NilClass struct {
 	classStub
 }
 
-func NewNilClass(provider ClassProvider) Class {
+func NewNilClass(provider Provider) Class {
 	n := &NilClass{}
 	n.initialize()
 	n.setStringer(n.String)
-	n.class = provider.ClassWithName("Class")
-	n.superClass = provider.ClassWithName("Object")
+	n.class = provider.ClassProvider().ClassWithName("Class")
+	n.superClass = provider.ClassProvider().ClassWithName("Object")
 	return n
 }
 
@@ -26,7 +26,7 @@ type nilInstance struct {
 	valueStub
 }
 
-func (class *NilClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (class *NilClass) New(provider Provider, args ...Value) (Value, error) {
 	n := &nilInstance{}
 	n.initialize()
 	n.setStringer(n.String)

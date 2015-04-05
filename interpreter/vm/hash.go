@@ -12,7 +12,7 @@ func interpretHashInContext(
 	context Value,
 ) (Value, error) {
 
-	hashValue, _ := vm.CurrentClasses["Hash"].New(vm, vm)
+	hashValue, _ := vm.CurrentClasses["Hash"].New(vm)
 	hash := hashValue.(*Hash)
 	for _, keyPair := range hashNode.Pairs {
 		key, err := vm.executeWithContext(context, keyPair.Key)

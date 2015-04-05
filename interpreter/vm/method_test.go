@@ -50,18 +50,18 @@ end
 
 		Expect(err).ToNot(HaveOccurred())
 
-		foo, err := vm.MustGetClass("Foo").New(vm, vm)
+		foo, err := vm.MustGetClass("Foo").New(vm)
 		Expect(err).ToNot(HaveOccurred())
 
 		var capturedSelf Value
-		foo.AddMethod(NewNativeMethod("fasciculated_stripe", vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
+		foo.AddMethod(NewNativeMethod("fasciculated_stripe", vm, func(self Value, block Block, args ...Value) (Value, error) {
 			capturedSelf = self
 			return nil, nil
 		}))
 
-		m, err := foo.Method("fasciculated_stripe")
-		Expect(err).ToNot(HaveOccurred())
-		m.Execute(foo, nil)
+		method := foo.Method("fasciculated_stripe")
+		Expect(method).ToNot(BeNil())
+		method.Execute(foo, nil)
 
 		Expect(capturedSelf).To(Equal(foo))
 	})
@@ -158,7 +158,7 @@ ace
 				It("takes on the default value", func() {
 					Expect(object).ToNot(BeNil())
 					Expect(object.GetInstanceVariable("foo")).To(EqualRubyString("abc"))
-					Expect(object.GetInstanceVariable("bar")).To(Equal(NewFixnum(1, vm, vm)))
+					Expect(object.GetInstanceVariable("bar")).To(Equal(NewFixnum(1, vm)))
 				})
 			})
 		})

@@ -33,7 +33,7 @@ var _ = Describe("Enumerable collections", func() {
 			value, err := vm.Run("[1,2,3].select { |o| o.even? }")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(value.(*Array).Members())).To(Equal(1))
-			Expect(value.(*Array).Members()).To(ContainElement(NewFixnum(2, vm, vm)))
+			Expect(value.(*Array).Members()).To(ContainElement(NewFixnum(2, vm)))
 		})
 	})
 })

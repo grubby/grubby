@@ -41,8 +41,8 @@ var _ = Describe("symbols", func() {
 	})
 
 	It("stringifies itself by stripping off the colon", func() {
-		method, err := val.Method("to_s")
-		Expect(err).ToNot(HaveOccurred())
+		method := val.Method("to_s")
+		Expect(method).ToNot(BeNil())
 
 		value, err := method.Execute(val, nil)
 		Expect(err).ToNot(HaveOccurred())

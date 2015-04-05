@@ -26,8 +26,8 @@ var _ = Describe("Hashes", func() {
 		hash, err := vm.Run("{:key => :value}")
 		Expect(err).ToNot(HaveOccurred())
 
-		keysMethod, err := hash.Method("keys")
-		Expect(err).ToNot(HaveOccurred())
+		keysMethod := hash.Method("keys")
+		Expect(keysMethod).ToNot(BeNil())
 
 		keys, err := keysMethod.Execute(hash, nil)
 		Expect(err).ToNot(HaveOccurred())
@@ -36,8 +36,8 @@ var _ = Describe("Hashes", func() {
 		Expect(ok).To(BeTrue())
 		Expect(keyArray.Members()).To(ContainElement(vm.Symbols()["key"]))
 
-		valuesMethod, err := hash.Method("values")
-		Expect(err).ToNot(HaveOccurred())
+		valuesMethod := hash.Method("values")
+		Expect(valuesMethod).ToNot(BeNil())
 
 		values, err := valuesMethod.Execute(hash, nil)
 		Expect(err).ToNot(HaveOccurred())
@@ -46,8 +46,8 @@ var _ = Describe("Hashes", func() {
 		Expect(ok).To(BeTrue())
 		Expect(valueArray.Members()).To(ContainElement(vm.Symbols()["value"]))
 
-		method, err := hash.Method("[]=")
-		Expect(err).ToNot(HaveOccurred())
+		method := hash.Method("[]=")
+		Expect(method).ToNot(BeNil())
 
 		fooSymbol := NewSymbol("foo", vm)
 		barSymbol := NewSymbol("bar", vm)
@@ -120,8 +120,8 @@ end
 			values := valuesArray.Members()
 
 			Expect(len(values)).To(Equal(2))
-			Expect(values).To(ContainElement(NewFixnum(1, vm, vm)))
-			Expect(values).To(ContainElement(NewFixnum(2, vm, vm)))
+			Expect(values).To(ContainElement(NewFixnum(1, vm)))
+			Expect(values).To(ContainElement(NewFixnum(2, vm)))
 		})
 	})
 })

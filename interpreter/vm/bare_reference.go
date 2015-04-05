@@ -45,8 +45,8 @@ func interpretBareReferenceInContext(
 			return nil
 		}
 	})).OrSome(gomads.Maybe(func() interface{} {
-		maybeMethod, err := context.Method(name)
-		if err != nil {
+		maybeMethod := context.Method(name)
+		if maybeMethod == nil {
 			return nil
 		}
 

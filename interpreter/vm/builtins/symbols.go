@@ -10,20 +10,20 @@ type symbolClass struct {
 	classStub
 }
 
-func NewSymbolClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewSymbolClass(provider Provider) Class {
 	s := &symbolClass{}
 	s.initialize()
 	s.setStringer(s.String)
-	s.class = classProvider.ClassWithName("Class")
-	s.superClass = classProvider.ClassWithName("Object")
+	s.class = provider.ClassProvider().ClassWithName("Class")
+	s.superClass = provider.ClassProvider().ClassWithName("Object")
 
-	s.AddMethod(NewNativeMethod("to_proc", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("to_proc", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsSymbol := self.(*SymbolValue)
-		return NewProcInstance(selfAsSymbol.value, classProvider), nil
+		return NewProcInstance(selfAsSymbol.value, provider), nil
 	}))
-	s.AddMethod(NewNativeMethod("to_s", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("to_s", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsSymbol := self.(*SymbolValue)
-		return NewString(selfAsSymbol.value, classProvider, singletonProvider), nil
+		return NewString(selfAsSymbol.value, provider), nil
 	}))
 
 	return s
@@ -37,7 +37,7 @@ func (c *symbolClass) Name() string {
 	return "Symbol"
 }
 
-func (c *symbolClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (c *symbolClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, errors.New("undefined method 'new' for Symbol:Class")
 }
 
@@ -46,9 +46,9 @@ type SymbolValue struct {
 	valueStub
 }
 
-func NewSymbol(val string, provider ClassProvider) Value {
+func NewSymbol(val string, provider Provider) Value {
 	s := &SymbolValue{value: val}
-	s.class = provider.ClassWithName("Symbol")
+	s.class = provider.ClassProvider().ClassWithName("Symbol")
 	s.initialize()
 	s.setStringer(s.String)
 	return s

@@ -7,12 +7,12 @@ type integerClass struct {
 	classStub
 }
 
-func NewIntegerClass(provider ClassProvider) Class {
+func NewIntegerClass(provider Provider) Class {
 	class := &integerClass{}
 	class.initialize()
 	class.setStringer(class.String)
-	class.class = provider.ClassWithName("Class")
-	class.superClass = provider.ClassWithName("Numeric")
+	class.class = provider.ClassProvider().ClassWithName("Class")
+	class.superClass = provider.ClassProvider().ClassWithName("Numeric")
 
 	return class
 }
@@ -25,6 +25,6 @@ func (c *integerClass) Name() string {
 	return "Integer"
 }
 
-func (c *integerClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (c *integerClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, errors.New("undefined method 'new' for Integer:Class")
 }

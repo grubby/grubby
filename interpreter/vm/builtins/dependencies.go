@@ -19,3 +19,14 @@ type SingletonProvider interface {
 	SymbolWithName(string) Value
 	AddSymbol(Value)
 }
+
+type StackProvider interface {
+	CurrentStack() string
+}
+
+type Provider interface {
+	ArgEvaluator() ArgEvaluator
+	ClassProvider() ClassProvider
+	SingletonProvider() SingletonProvider
+	StackProvider() StackProvider
+}

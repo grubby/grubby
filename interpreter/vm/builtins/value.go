@@ -8,7 +8,7 @@ type Value interface {
 
 	AddMethod(Method)
 	RemoveMethod(Method)
-	Method(string) (Method, error)
+	Method(string) Method
 	Methods() []Method
 
 	eigenclassMethods() map[string]Method

@@ -6,12 +6,12 @@ type ioClass struct {
 	instanceMethods []Method
 }
 
-func NewIOClass(provider ClassProvider) Class {
+func NewIOClass(provider Provider) Class {
 	i := &ioClass{}
 	i.initialize()
 	i.setStringer(i.String)
-	i.class = provider.ClassWithName("Class")
-	i.superClass = provider.ClassWithName("Object")
+	i.class = provider.ClassProvider().ClassWithName("Class")
+	i.superClass = provider.ClassProvider().ClassWithName("Object")
 	return i
 }
 
@@ -27,6 +27,6 @@ func (io *ioClass) AddInstanceMethod(m Method) {
 	io.instanceMethods = append(io.instanceMethods, m)
 }
 
-func (io *ioClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (io *ioClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, nil
 }

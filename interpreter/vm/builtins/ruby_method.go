@@ -30,7 +30,7 @@ func NewRubyMethod(
 	name string,
 	args []ast.MethodParam,
 	rubyBody []ast.Node,
-	provider ClassProvider,
+	provider Provider,
 	evaluator ArgEvaluator,
 	body func(self Value, method *RubyMethod) (Value, error),
 ) Method {
@@ -42,7 +42,7 @@ func NewRubyMethod(
 		evaluator:       evaluator,
 		unevaluatedBody: rubyBody,
 	}
-	m.class = provider.ClassWithName("Method")
+	m.class = provider.ClassProvider().ClassWithName("Method")
 	m.initialize()
 	m.setStringer(m.String)
 	return m
@@ -52,7 +52,7 @@ func NewPrivateRubyMethod(
 	name string,
 	args []ast.MethodParam,
 	rubyBody []ast.Node,
-	provider ClassProvider,
+	provider Provider,
 	evaluator ArgEvaluator,
 	body func(self Value, method *RubyMethod) (Value, error),
 ) Method {
@@ -64,7 +64,7 @@ func NewPrivateRubyMethod(
 		evaluator:       evaluator,
 		unevaluatedBody: rubyBody,
 	}
-	m.class = provider.ClassWithName("Method")
+	m.class = provider.ClassProvider().ClassWithName("Method")
 	m.initialize()
 	m.setStringer(m.String)
 	return m

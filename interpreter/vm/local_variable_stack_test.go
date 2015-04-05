@@ -20,7 +20,7 @@ var _ = Describe("The local variable stack", func() {
 	Describe("stores values", func() {
 		var storedValue Value
 		BeforeEach(func() {
-			storedValue = NewFixnum(5, vm, vm)
+			storedValue = NewFixnum(5, vm)
 			subject.Store("foo", storedValue)
 		})
 

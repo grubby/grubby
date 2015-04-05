@@ -11,17 +11,17 @@ type fileClass struct {
 	instanceMethods []Method
 }
 
-func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewFileClass(provider Provider) Class {
 	f := &fileClass{}
 	f.initialize()
 	f.setStringer(f.String)
-	f.class = provider.ClassWithName("Class")
-	f.superClass = provider.ClassWithName("IO")
+	f.class = provider.ClassProvider().ClassWithName("Class")
+	f.superClass = provider.ClassProvider().ClassWithName("IO")
 
-	f.SetConstant("ALT_SEPARATOR", singletonProvider.SingletonWithName("nil"))
-	f.SetConstant("FNM_SYSCASE", NewFixnum(0, provider, singletonProvider))
+	f.SetConstant("ALT_SEPARATOR", provider.SingletonProvider().SingletonWithName("nil"))
+	f.SetConstant("FNM_SYSCASE", NewFixnum(0, provider))
 
-	f.AddMethod(NewNativeMethod("expand_path", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	f.AddMethod(NewNativeMethod("expand_path", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg1 := args[0].(*StringValue).RawString()
 
 		if arg1[0] == '~' {
@@ -35,13 +35,13 @@ func NewFileClass(provider ClassProvider, singletonProvider SingletonProvider) C
 			path, _ = filepath.Abs(arg1)
 		}
 
-		return NewString(path, provider, singletonProvider), nil
+		return NewString(path, provider), nil
 	}))
 
-	f.AddMethod(NewNativeMethod("dirname", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	f.AddMethod(NewNativeMethod("dirname", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		filename := args[0].(*StringValue).RawString()
 
-		return NewString(filepath.Base(filename), provider, singletonProvider), nil
+		return NewString(filepath.Base(filename), provider), nil
 	}))
 
 	return f
@@ -59,6 +59,6 @@ func (file *fileClass) String() string {
 	return "File"
 }
 
-func (file *fileClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (file *fileClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, nil
 }

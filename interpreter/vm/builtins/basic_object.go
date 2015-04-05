@@ -4,10 +4,10 @@ type BasicObjectClass struct {
 	valueStub
 	classStub
 
-	provider ClassProvider
+	provider Provider
 }
 
-func NewBasicObjectClass(provider ClassProvider) Class {
+func NewBasicObjectClass(provider Provider) Class {
 	o := &BasicObjectClass{}
 	o.initialize()
 	o.setStringer(o.String)
@@ -16,7 +16,7 @@ func NewBasicObjectClass(provider ClassProvider) Class {
 }
 
 func (c *BasicObjectClass) SetSuperClass() {
-	class := c.provider.ClassWithName("Class")
+	class := c.provider.ClassProvider().ClassWithName("Class")
 	if class == nil {
 		panic("Expected Class class to exist")
 	}
@@ -31,6 +31,6 @@ func (obj *BasicObjectClass) Name() string {
 	return "BasicObject"
 }
 
-func (obj *BasicObjectClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (obj *BasicObjectClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, nil
 }

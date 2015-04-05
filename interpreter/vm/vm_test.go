@@ -47,9 +47,9 @@ end`)
 
 		It("creates a private method on Kernel", func() {
 			kernel := vm.Modules()["Kernel"]
-			method, err := kernel.Method("foo")
+			method := kernel.Method("foo")
 
-			Expect(err).ToNot(HaveOccurred())
+			Expect(method).ToNot(BeNil())
 			Expect(method.Name()).To(Equal("foo"))
 			Expect(method.IsPrivate()).To(Equal(true))
 		})
@@ -102,7 +102,7 @@ test(5)
 `)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(value.(*Array).Members())).To(Equal(1))
-			Expect(value.(*Array).Members()).To(ContainElement(NewFixnum(5, vm, vm)))
+			Expect(value.(*Array).Members()).To(ContainElement(NewFixnum(5, vm)))
 		})
 
 		It("can handle string interpolation", func() {
@@ -117,7 +117,7 @@ test(5)
 	Describe("a reference to a variable", func() {
 		Context("after it has been defined", func() {
 			BeforeEach(func() {
-				vm.Set("foo", NewString("superinquisitive-edacity", vm, vm))
+				vm.Set("foo", NewString("superinquisitive-edacity", vm))
 			})
 
 			It("returns the variable referenced", func() {
@@ -173,9 +173,9 @@ test(5)
 				Expect(err).ToNot(HaveOccurred())
 
 				kernel := vm.Modules()["Kernel"]
-				method, err := kernel.Method("foo")
+				method := kernel.Method("foo")
 
-				Expect(err).ToNot(HaveOccurred())
+				Expect(method).ToNot(BeNil())
 				Expect(method.IsPrivate()).To(Equal(true))
 				Expect(method.Name()).To(Equal("foo"))
 			})
@@ -185,7 +185,7 @@ test(5)
 	Describe("the load path", func() {
 		It("is represented by $LOAD_PATH and $:", func() {
 			path := vm.MustGet("LOAD_PATH")
-			str := NewString("foo", vm, vm)
+			str := NewString("foo", vm)
 			path.(*Array).Append(str)
 
 			Expect(vm.MustGet(":").(*Array).Members()).To(ContainElement(str))
@@ -197,10 +197,10 @@ test(5)
 			fileClass := vm.ClassWithName("File")
 			Expect(fileClass).ToNot(BeNil())
 
-			method, err := fileClass.Method("expand_path")
-			Expect(err).ToNot(HaveOccurred())
+			method := fileClass.Method("expand_path")
+			Expect(method).ToNot(BeNil())
 
-			result, err := method.Execute(fileClass, nil, NewString("~/foobar", vm, vm))
+			result, err := method.Execute(fileClass, nil, NewString("~/foobar", vm))
 			Expect(err).ToNot(HaveOccurred())
 
 			expectedPath := fmt.Sprintf("%s/%s", os.Getenv("HOME"), "foobar")
@@ -223,10 +223,10 @@ test(5)
 		It("can be nested inside of a module", func() {
 			value, err := vm.Run("Kernel::Foobar = 1; Kernel::Foobar")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value).To(Equal(NewFixnum(1, vm, vm)))
+			Expect(value).To(Equal(NewFixnum(1, vm)))
 
 			kernel := vm.MustGet("Kernel").(Module)
-			Expect(kernel.Constant("Foobar")).To(Equal(NewFixnum(1, vm, vm)))
+			Expect(kernel.Constant("Foobar")).To(Equal(NewFixnum(1, vm)))
 		})
 	})
 
@@ -259,7 +259,7 @@ __LINE__
 `)
 
 				Expect(err).ToNot(HaveOccurred())
-				Expect(result).To(Equal(NewFixnum(1, vm, vm)))
+				Expect(result).To(Equal(NewFixnum(1, vm)))
 			})
 		})
 	})
@@ -341,7 +341,7 @@ foo = 0
 				Expect(err).To(HaveOccurred())
 
 				value, _ := vm.Get("foo")
-				Expect(value).To(Equal(NewFixnum(1, vm, vm)))
+				Expect(value).To(Equal(NewFixnum(1, vm)))
 			})
 		})
 
@@ -362,7 +362,7 @@ counter = 4
 			})
 
 			It("halts the module declaration", func() {
-				Expect(vm.MustGet("counter")).To(Equal(NewFixnum(2, vm, vm)))
+				Expect(vm.MustGet("counter")).To(Equal(NewFixnum(2, vm)))
 			})
 		})
 	})

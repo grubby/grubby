@@ -26,23 +26,23 @@ type nativeMethod struct {
 	singletonProvider SingletonProvider
 }
 
-func NewNativeMethod(name string, classProvider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
-	return newNativeMethod(name, Public, classProvider, singletonProvider, body)
+func NewNativeMethod(name string, provider Provider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
+	return newNativeMethod(name, Public, provider, body)
 }
 
-func NewNativePrivateMethod(name string, classProvider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
-	return newNativeMethod(name, Private, classProvider, singletonProvider, body)
+func NewNativePrivateMethod(name string, provider Provider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
+	return newNativeMethod(name, Private, provider, body)
 }
 
-func newNativeMethod(name string, visibility MethodVisibility, provider ClassProvider, singletonProvider SingletonProvider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
+func newNativeMethod(name string, visibility MethodVisibility, provider Provider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
 	m := &nativeMethod{
 		name:              name,
 		body:              body,
 		visibility:        visibility,
-		classProvider:     provider,
-		singletonProvider: singletonProvider,
+		classProvider:     provider.ClassProvider(),
+		singletonProvider: provider.SingletonProvider(),
 	}
-	m.class = provider.ClassWithName("Method")
+	m.class = provider.ClassProvider().ClassWithName("Method")
 	m.initialize()
 	m.setStringer(m.String)
 	return m

@@ -31,11 +31,11 @@ func (valueStub *valueStub) initialize() {
   7. Fail. Loudly.
 */
 
-func (valueStub *valueStub) Method(name string) (Method, error) {
+func (valueStub *valueStub) Method(name string) Method {
 	//	  1. Methods defined in the object's singleton class (i.e. the object itself)
 	m, ok := valueStub.eigenclass_methods[name]
 	if ok {
-		return m, nil
+		return m
 	}
 
 	//    2. Modules mixed into the singleton class in reverse order of inclusion
@@ -44,7 +44,7 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 	//	  3. Methods defined by the object's class
 	m, ok = valueStub.class.eigenclassMethods()[name]
 	if ok {
-		return m, nil
+		return m
 	}
 
 	//		4. Modules included into the object's class in reverse order of inclusion
@@ -52,7 +52,7 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 	for _, module := range valueStub.class.includedModules() {
 		m, ok := module.eigenclassMethods()[name]
 		if ok {
-			return m, nil
+			return m
 		}
 	}
 
@@ -61,13 +61,13 @@ func (valueStub *valueStub) Method(name string) (Method, error) {
 	for super != nil {
 		m, ok := super.eigenclassMethods()[name]
 		if ok {
-			return m, nil
+			return m
 		}
 
 		super = super.SuperClass()
 	}
 
-	return nil, NewNoMethodError(name, valueStub.PrettyPrint(), valueStub.Class().String(), "")
+	return nil
 }
 
 func (valueStub *valueStub) Methods() []Method {

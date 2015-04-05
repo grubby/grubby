@@ -26,7 +26,7 @@ var _ = Describe("numbers", func() {
 			val, err := vm.Run("5")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(BeAssignableToTypeOf(NewFixnum(0, vm, vm)))
+			Expect(val).To(BeAssignableToTypeOf(NewFixnum(0, vm)))
 			Expect(val.String()).To(Equal("5"))
 			Expect(val.Class()).To(Equal(vm.MustGetClass("Fixnum")))
 		})
@@ -41,7 +41,7 @@ var _ = Describe("numbers", func() {
 			val, err := vm.Run("11 + 31")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val.String()).To(Equal(NewFixnum(42, vm, vm).String()))
+			Expect(val.String()).To(Equal(NewFixnum(42, vm).String()))
 		})
 
 		It("has a #nonzero? method", func() {

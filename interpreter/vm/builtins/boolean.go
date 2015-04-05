@@ -6,12 +6,12 @@ type trueClass struct {
 	instanceMethods []Method
 }
 
-func NewTrueClass(provider ClassProvider) Class {
+func NewTrueClass(provider Provider) Class {
 	o := &trueClass{}
 	o.initialize()
 	o.setStringer(o.String)
-	o.class = provider.ClassWithName("Class")
-	o.superClass = provider.ClassWithName("Object")
+	o.class = provider.ClassProvider().ClassWithName("Class")
+	o.superClass = provider.ClassProvider().ClassWithName("Object")
 	return o
 }
 
@@ -35,7 +35,7 @@ func (t *trueInstance) String() string {
 	return "true"
 }
 
-func (obj *trueClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (obj *trueClass) New(provider Provider, args ...Value) (Value, error) {
 	o := &trueInstance{}
 	o.initialize()
 	o.setStringer(o.String)
@@ -50,12 +50,12 @@ type falseClass struct {
 	instanceMethods []Method
 }
 
-func NewFalseClass(provider ClassProvider) Class {
+func NewFalseClass(provider Provider) Class {
 	o := &falseClass{}
 	o.initialize()
 	o.setStringer(o.String)
-	o.class = provider.ClassWithName("Class")
-	o.superClass = provider.ClassWithName("Object")
+	o.class = provider.ClassProvider().ClassWithName("Class")
+	o.superClass = provider.ClassProvider().ClassWithName("Object")
 	return o
 }
 
@@ -79,7 +79,7 @@ func (f *falseInstance) String() string {
 	return "false"
 }
 
-func (obj *falseClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (obj *falseClass) New(provider Provider, args ...Value) (Value, error) {
 	o := &falseInstance{}
 	o.initialize()
 	o.setStringer(o.String)

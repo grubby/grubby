@@ -37,22 +37,22 @@ type ModuleClass struct {
 	classStub
 }
 
-func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProvider, evaluator Evaluator) Class {
+func NewModuleClass(provider Provider, evaluator Evaluator) Class {
 	c := &ModuleClass{}
 	c.initialize()
 	c.setStringer(c.String)
-	c.class = classProvider.ClassWithName("Class")
-	c.superClass = classProvider.ClassWithName("Object")
+	c.class = provider.ClassProvider().ClassWithName("Class")
+	c.superClass = provider.ClassProvider().ClassWithName("Object")
 
-	c.AddMethod(NewNativeMethod("private_class_method", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("private_class_method", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		methodName, ok := args[0].(*SymbolValue)
 		if !ok {
 			return nil, errors.New(fmt.Sprintf("TypeError: %v is not a symbol", args[0]))
 		}
 
-		method, err := self.Method(methodName.value)
-		if err != nil {
-			return nil, err
+		method := self.Method(methodName.value)
+		if method == nil {
+			return nil, NewNoMethodError(methodName.value, self.String(), self.Class().String(), provider.StackProvider().CurrentStack())
 		}
 
 		self.RemoveMethod(method)
@@ -71,11 +71,11 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		return methodName, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("public", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("public", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 		if len(args) == 0 {
 			selfAsModule.SetActiveVisibility(Public)
-			return singletonProvider.SingletonWithName("nil"), nil
+			return provider.SingletonProvider().SingletonWithName("nil"), nil
 		}
 
 		for _, arg := range args {
@@ -92,14 +92,14 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			method.SetVisibility(Public)
 		}
 
-		return singletonProvider.SingletonWithName("nil"), nil
+		return provider.SingletonProvider().SingletonWithName("nil"), nil
 	}))
-	c.AddMethod(NewNativeMethod("private", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("private", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 
 		if len(args) == 0 {
 			selfAsModule.SetActiveVisibility(Private)
-			return singletonProvider.SingletonWithName("nil"), nil
+			return provider.SingletonProvider().SingletonWithName("nil"), nil
 		}
 
 		for _, arg := range args {
@@ -116,13 +116,13 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			method.SetVisibility(Private)
 		}
 
-		return singletonProvider.SingletonWithName("nil"), nil
+		return provider.SingletonProvider().SingletonWithName("nil"), nil
 	}))
-	c.AddMethod(NewNativeMethod("protected", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("protected", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 		if len(args) == 0 {
 			selfAsModule.SetActiveVisibility(Protected)
-			return singletonProvider.SingletonWithName("nil"), nil
+			return provider.SingletonProvider().SingletonWithName("nil"), nil
 		}
 
 		for _, arg := range args {
@@ -139,16 +139,16 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			method.SetVisibility(Protected)
 		}
 
-		return singletonProvider.SingletonWithName("nil"), nil
+		return provider.SingletonProvider().SingletonWithName("nil"), nil
 	}))
 
-	c.AddMethod(NewNativeMethod("module_eval", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("module_eval", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		input := args[0].(*StringValue).RawString()
 		input = strings.Replace(input, "\\n", "\n", -1)
 		return evaluator.EvaluateStringInContextAndNewStack(input, self)
 	}))
 
-	c.AddMethod(NewNativeMethod("include", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("include", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 		for _, val := range args {
 			moduleToInclude, ok := val.(Module)
@@ -168,7 +168,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("extend", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("extend", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, module := range args {
 			for _, method := range module.Methods() {
 				self.AddMethod(method)
@@ -178,7 +178,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		return c, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("module_function", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("module_function", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		if len(args) != 1 {
 			return nil, errors.New("expected exactly one arg")
 		}
@@ -199,7 +199,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 		return self, nil
 	}))
 
-	c.AddMethod(NewNativeMethod("alias_method", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	c.AddMethod(NewNativeMethod("alias_method", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsModule := self.(Module)
 
 		firstSymbol, ok := args[0].(*SymbolValue)
@@ -216,7 +216,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 			return nil, err
 		}
 
-		selfAsModule.AddInstanceMethod(NewNativeMethod(firstSymbol.Name(), classProvider, singletonProvider, method.methodBody()))
+		selfAsModule.AddInstanceMethod(NewNativeMethod(firstSymbol.Name(), provider, method.methodBody()))
 
 		return nil, nil
 	}))
@@ -224,7 +224,7 @@ func NewModuleClass(classProvider ClassProvider, singletonProvider SingletonProv
 	return c
 }
 
-func (c ModuleClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (c ModuleClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, nil
 }
 
@@ -243,13 +243,13 @@ type RubyModule struct {
 	moduleStub
 }
 
-func NewModule(name string, classProvider ClassProvider, singletonProvider SingletonProvider) Module {
+func NewModule(name string, provider Provider) Module {
 	c := &RubyModule{
 		name: name,
 	}
 	c.initialize()
 	c.setStringer(c.String)
-	c.class = classProvider.ClassWithName("Module")
+	c.class = provider.ClassProvider().ClassWithName("Module")
 
 	return c
 }

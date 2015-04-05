@@ -6,11 +6,11 @@ type processModule struct {
 	moduleStub
 }
 
-func NewProcessModule(provider ClassProvider) Module {
+func NewProcessModule(provider Provider) Module {
 	f := &processModule{}
 	f.initialize()
 	f.setStringer(f.String)
-	f.class = provider.ClassWithName("Module")
+	f.class = provider.ClassProvider().ClassWithName("Module")
 	return f
 }
 

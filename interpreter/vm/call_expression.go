@@ -32,9 +32,9 @@ func interpretCallExpressionInContext(
 		return nil, NewNoMethodError(callExpr.Func.Name, nilValue.String(), nilValue.Class().String(), vm.stack.String())
 	}
 
-	method, err = target.Method(callExpr.Func.Name)
-	if err != nil {
-		return nil, err
+	method = target.Method(callExpr.Func.Name)
+	if method == nil {
+		return nil, NewNoMethodError(callExpr.Func.Name, target.PrettyPrint(), target.Class().String(), vm.CurrentStack())
 	}
 
 	args := []Value{}

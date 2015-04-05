@@ -26,8 +26,8 @@ func (matcher *haveMethodMatcher) Match(actual interface{}) (bool, error) {
 		return false, nil
 	}
 
-	_, err := val.Method(matcher.methodName)
-	return err == nil, nil
+	method := val.Method(matcher.methodName)
+	return method != nil, nil
 }
 
 func (matcher *haveMethodMatcher) FailureMessage(actual interface{}) string {

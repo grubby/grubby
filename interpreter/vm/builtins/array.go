@@ -14,17 +14,17 @@ type ArrayClass struct {
 	singletonProvider SingletonProvider
 }
 
-func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewArrayClass(provider Provider) Class {
 	a := &ArrayClass{}
-	a.class = classProvider.ClassWithName("Class")
-	a.superClass = classProvider.ClassWithName("Object")
+	a.class = provider.ClassProvider().ClassWithName("Class")
+	a.superClass = provider.ClassProvider().ClassWithName("Object")
 	a.initialize()
 	a.setStringer(a.String)
 
-	a.AddMethod(NewNativeMethod("shift", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("shift", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		a := self.(*Array)
 		if len(a.members) == 0 {
-			return singletonProvider.SingletonWithName("nil"), nil
+			return provider.SingletonProvider().SingletonWithName("nil"), nil
 		}
 
 		val := a.members[0]
@@ -32,24 +32,24 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 		return val, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("unshift", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("unshift", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		a := self.(*Array)
 		a.members = append([]Value{args[0]}, a.members[0:]...)
 		return a, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("include?", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("include?", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		a := self.(*Array)
 		for _, m := range a.members {
 			if m == args[0] {
-				return singletonProvider.SingletonWithName("true"), nil
+				return provider.SingletonProvider().SingletonWithName("true"), nil
 			}
 		}
 
-		return singletonProvider.SingletonWithName("false"), nil
+		return provider.SingletonProvider().SingletonWithName("false"), nil
 	}))
 
-	a.AddMethod(NewNativeMethod("-", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("-", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		a := self.(*Array)
 		argAsArray, ok := args[0].(*Array)
 		if !ok {
@@ -60,9 +60,9 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 		indicesToRemove := map[int]bool{}
 		for _, otherMember := range argAsArray.members {
 			for index, member := range selfAsArray.members {
-				equalMethod, err := member.Method("==")
-				if err != nil {
-					return nil, err
+				equalMethod := member.Method("==")
+				if equalMethod == nil {
+					return nil, NewNoMethodError("==", member.String(), member.Class().String(), provider.StackProvider().CurrentStack())
 				}
 				equal, err := equalMethod.Execute(member, block, otherMember)
 				if err != nil {
@@ -87,8 +87,8 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 		return self, nil
 	}))
 
-	a.AddMethod(NewNativeMethod("select", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		arr, _ := classProvider.ClassWithName("Array").New(classProvider, singletonProvider)
+	a.AddMethod(NewNativeMethod("select", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		arr, _ := provider.ClassProvider().ClassWithName("Array").New(provider)
 		filteredArray := arr.(*Array)
 		selfAsArray := self.(*Array)
 
@@ -105,8 +105,8 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 
 		return filteredArray, nil
 	}))
-	a.AddMethod(NewNativeMethod("map", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
-		arr, _ := classProvider.ClassWithName("Array").New(classProvider, singletonProvider)
+	a.AddMethod(NewNativeMethod("map", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		arr, _ := provider.ClassProvider().ClassWithName("Array").New(provider)
 		newArray := arr.(*Array)
 		selfAsArray := self.(*Array)
 
@@ -129,7 +129,7 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 
 		return newArray, nil
 	}))
-	a.AddMethod(NewNativeMethod("each", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("each", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsArray := self.(*Array)
 		for _, element := range selfAsArray.members {
 			_, err := block.Call(element)
@@ -140,7 +140,7 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 
 		return selfAsArray, nil
 	}))
-	a.AddMethod(NewNativeMethod("join", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	a.AddMethod(NewNativeMethod("join", provider, func(self Value, block Block, args ...Value) (Value, error) {
 
 		selfAsArray := self.(*Array)
 		separator := args[0].(*StringValue).value
@@ -150,7 +150,7 @@ func NewArrayClass(classProvider ClassProvider, singletonProvider SingletonProvi
 			pieces[index] = element.String()
 		}
 
-		return NewString(strings.Join(pieces, separator), classProvider, singletonProvider), nil
+		return NewString(strings.Join(pieces, separator), provider), nil
 	}))
 
 	return a
@@ -160,7 +160,7 @@ func (klass *ArrayClass) AddInstanceMethod(m Method) {
 	klass.instanceMethods = append(klass.instanceMethods, m)
 }
 
-func (klass *ArrayClass) New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (klass *ArrayClass) New(provider Provider, args ...Value) (Value, error) {
 	a := &Array{}
 	a.initialize()
 	a.setStringer(a.String)

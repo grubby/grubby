@@ -19,7 +19,7 @@ func interpretAliasInContext(
 		return nil, NewNameError(aliasNode.From.Name, contextModule.String(), contextModule.String(), vm.stack.String())
 	}
 
-	contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, vm, func(self Value, block Block, args ...Value) (Value, error) {
+	contextModule.AddInstanceMethod(NewNativeMethod(aliasNode.To.Name, vm, func(self Value, block Block, args ...Value) (Value, error) {
 		return m.Execute(self, block, args...)
 	}))
 

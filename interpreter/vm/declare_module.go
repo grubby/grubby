@@ -33,7 +33,7 @@ func interpretModuleDeclarationInContext(
 		fullModuleName = moduleNode.FullName()
 	}
 
-	theModule := NewModule(moduleNode.Name, vm, vm)
+	theModule := NewModule(moduleNode.Name, vm)
 	vm.CurrentModules[fullModuleName] = theModule
 
 	if currentModule != nil {

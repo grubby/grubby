@@ -10,36 +10,36 @@ type fixnumClass struct {
 	classStub
 }
 
-func NewFixnumClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewFixnumClass(provider Provider) Class {
 	class := &fixnumClass{}
 	class.initialize()
 	class.setStringer(class.String)
-	class.class = provider.ClassWithName("Class")
-	class.superClass = provider.ClassWithName("Integer")
+	class.class = provider.ClassProvider().ClassWithName("Class")
+	class.superClass = provider.ClassProvider().ClassWithName("Integer")
 
-	class.AddMethod(NewNativeMethod("even?", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	class.AddMethod(NewNativeMethod("even?", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		asFixnum := self.(*fixnumInstance)
 
 		if asFixnum.value%2 == 0 {
-			return singletonProvider.SingletonWithName("true"), nil
+			return provider.SingletonProvider().SingletonWithName("true"), nil
 		} else {
-			return singletonProvider.SingletonWithName("false"), nil
+			return provider.SingletonProvider().SingletonWithName("false"), nil
 		}
 	}))
 
-	class.AddMethod(NewNativeMethod("+", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	class.AddMethod(NewNativeMethod("+", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg, ok := args[0].(*fixnumInstance)
 		if !ok {
 			return nil, errors.New(fmt.Sprintf("TypeError: %s can't be coerced into Fixnum", args[0].Class().String()))
 		}
 		asFixnum := self.(*fixnumInstance)
-		return NewFixnum(asFixnum.value+arg.value, provider, singletonProvider), nil
+		return NewFixnum(asFixnum.value+arg.value, provider), nil
 	}))
 
-	class.AddMethod(NewNativeMethod("nonzero?", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	class.AddMethod(NewNativeMethod("nonzero?", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		asFixnum := self.(*fixnumInstance)
 		if asFixnum.value == 0 {
-			return singletonProvider.SingletonWithName("nil"), nil
+			return provider.SingletonProvider().SingletonWithName("nil"), nil
 		} else {
 			return self, nil
 		}
@@ -56,7 +56,7 @@ func (c *fixnumClass) Name() string {
 	return "Fixnum"
 }
 
-func (c *fixnumClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (c *fixnumClass) New(provider Provider, args ...Value) (Value, error) {
 	return nil, errors.New("undefined method 'new' for Fixnum:Class")
 }
 
@@ -65,16 +65,16 @@ type fixnumInstance struct {
 	valueStub
 }
 
-func NewFixnum(val int64, provider ClassProvider, singletonProvider SingletonProvider) Value {
+func NewFixnum(val int64, provider Provider) Value {
 	name := fmt.Sprintf("%d", val)
-	singleton := singletonProvider.SingletonWithName(name)
+	singleton := provider.SingletonProvider().SingletonWithName(name)
 	if singleton == nil {
 		i := &fixnumInstance{value: val}
-		i.class = provider.ClassWithName("Fixnum")
+		i.class = provider.ClassProvider().ClassWithName("Fixnum")
 		i.initialize()
 		i.setStringer(i.String)
 
-		singletonProvider.NewSingletonWithName(name, i)
+		provider.SingletonProvider().NewSingletonWithName(name, i)
 		return i
 	} else {
 		return singleton

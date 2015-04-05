@@ -10,37 +10,37 @@ type StringClass struct {
 	valueStub
 	classStub
 
-	provider ClassProvider
+	provider Provider
 }
 
-func NewStringClass(classProvider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewStringClass(provider Provider) Class {
 	s := &StringClass{}
 	s.initialize()
 	s.setStringer(s.String)
 
-	s.provider = classProvider
-	s.class = classProvider.ClassWithName("Class")
-	s.superClass = classProvider.ClassWithName("Object")
+	s.provider = provider
+	s.class = provider.ClassProvider().ClassWithName("Class")
+	s.superClass = provider.ClassProvider().ClassWithName("Object")
 
-	s.AddMethod(NewNativeMethod("+", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("+", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
 		selfAsStr := self.(*StringValue)
-		return NewString(selfAsStr.value+arg.value, classProvider, singletonProvider), nil
+		return NewString(selfAsStr.value+arg.value, provider), nil
 	}))
-	s.AddMethod(NewNativeMethod("==", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("==", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		asStr, ok := args[0].(*StringValue)
 		if !ok {
-			return singletonProvider.SingletonWithName("false"), nil
+			return provider.SingletonProvider().SingletonWithName("false"), nil
 		}
 
 		selfAsStr := self.(*StringValue)
 		if selfAsStr.value == asStr.value {
-			return singletonProvider.SingletonWithName("true"), nil
+			return provider.SingletonProvider().SingletonWithName("true"), nil
 		} else {
-			return singletonProvider.SingletonWithName("false"), nil
+			return provider.SingletonProvider().SingletonWithName("false"), nil
 		}
 	}))
-	s.AddMethod(NewNativeMethod("<<", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("<<", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
 		selfAsStr := self.(*StringValue)
 		if selfAsStr.frozen {
@@ -50,26 +50,26 @@ func NewStringClass(classProvider ClassProvider, singletonProvider SingletonProv
 		selfAsStr.value += arg.value
 		return selfAsStr, nil
 	}))
-	s.AddMethod(NewNativeMethod("to_i", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("to_i", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsStr := self.(*StringValue)
 
 		intValue, _ := strconv.ParseInt(selfAsStr.value, 0, 64)
-		return NewFixnum(intValue, classProvider, singletonProvider), nil
+		return NewFixnum(intValue, provider), nil
 	}))
-	s.AddMethod(NewNativeMethod("freeze", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("freeze", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsStr := self.(*StringValue)
 		selfAsStr.frozen = true
 		return selfAsStr, nil
 	}))
-	s.AddMethod(NewNativeMethod("intern", classProvider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	s.AddMethod(NewNativeMethod("intern", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		selfAsStr := self.(*StringValue)
-		maybeSymbol := singletonProvider.SymbolWithName(selfAsStr.value)
+		maybeSymbol := provider.SingletonProvider().SymbolWithName(selfAsStr.value)
 		if maybeSymbol != nil {
 			return maybeSymbol, nil
 		}
 
-		symbolFromString := NewSymbol(selfAsStr.value, classProvider)
-		singletonProvider.AddSymbol(symbolFromString)
+		symbolFromString := NewSymbol(selfAsStr.value, provider)
+		provider.SingletonProvider().AddSymbol(symbolFromString)
 		return symbolFromString, nil
 	}))
 
@@ -84,7 +84,7 @@ func (c *StringClass) Name() string {
 	return "String"
 }
 
-func (class *StringClass) New(classProvider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (class *StringClass) New(provider Provider, args ...Value) (Value, error) {
 	str := &StringValue{}
 	str.initialize()
 	str.setStringer(str.String)
@@ -112,8 +112,8 @@ func (s *StringValue) RawString() string {
 	return s.value
 }
 
-func NewString(str string, classProvider ClassProvider, singletonProvider SingletonProvider) Value {
-	s, _ := classProvider.ClassWithName("String").New(classProvider, singletonProvider)
+func NewString(str string, provider Provider) Value {
+	s, _ := provider.ClassProvider().ClassWithName("String").New(provider)
 	s.(*StringValue).value = str
 	return s
 }

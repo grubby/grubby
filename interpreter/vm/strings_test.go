@@ -26,7 +26,7 @@ var _ = Describe("Strings", func() {
 		val, err := vm.Run("'nonrestricted-consonantize'")
 
 		Expect(err).ToNot(HaveOccurred())
-		Expect(val).To(BeAssignableToTypeOf(NewString("", vm, vm)))
+		Expect(val).To(BeAssignableToTypeOf(NewString("", vm)))
 		Expect(val.String()).To(Equal("nonrestricted-consonantize"))
 	})
 
@@ -34,7 +34,7 @@ var _ = Describe("Strings", func() {
 		val, err := vm.Run("'foo' + 'bar'")
 
 		Expect(err).ToNot(HaveOccurred())
-		Expect(val.String()).To(Equal(NewString("foobar", vm, vm).String()))
+		Expect(val.String()).To(Equal(NewString("foobar", vm).String()))
 	})
 
 	Describe("interpolating values inside of a string", func() {

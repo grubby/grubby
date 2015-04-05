@@ -43,7 +43,7 @@ end
 		fooClass = vm.ClassWithName("Foo")
 		Expect(fooClass).ToNot(BeNil())
 
-		fooInstance, err = fooClass.New(vm, vm)
+		fooInstance, err = fooClass.New(vm)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -53,13 +53,14 @@ end
 	})
 
 	It("can be used to write values", func() {
-		anotherFoo, err := fooClass.New(vm, vm)
+		anotherFoo, err := fooClass.New(vm)
 		Expect(err).ToNot(HaveOccurred())
 
-		method, err := anotherFoo.Method("test=")
-		Expect(err).ToNot(HaveOccurred())
+		method := anotherFoo.Method("test=")
+		Expect(method).ToNot(BeNil())
 
-		method.Execute(anotherFoo, nil, NewString("world", vm, vm))
+		_, err = method.Execute(anotherFoo, nil, NewString("world", vm))
+		Expect(err).ToNot(HaveOccurred())
 		Expect(fooInstance.GetClassVariable("foo")).To(Equal(anotherFoo.GetClassVariable("foo")))
 	})
 })

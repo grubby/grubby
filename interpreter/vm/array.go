@@ -12,7 +12,7 @@ func interpretArrayInContext(
 	context Value,
 ) (Value, error) {
 
-	arrayValue, _ := vm.CurrentClasses["Array"].New(vm, vm)
+	arrayValue, _ := vm.CurrentClasses["Array"].New(vm)
 	array := arrayValue.(*Array)
 
 	for _, node := range arrayNode.Nodes {

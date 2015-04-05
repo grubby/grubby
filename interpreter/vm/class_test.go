@@ -65,11 +65,11 @@ end
 
 				Expect(err).ToNot(HaveOccurred())
 
-				foo, err := vm.MustGetClass("Foo").New(vm, vm)
+				foo, err := vm.MustGetClass("Foo").New(vm)
 				Expect(err).ToNot(HaveOccurred())
 
-				reader, err := foo.Method("quaternion_vinic")
-				Expect(err).ToNot(HaveOccurred())
+				reader := foo.Method("quaternion_vinic")
+				Expect(reader).ToNot(BeNil())
 
 				val, err := reader.Execute(foo, nil)
 				Expect(err).ToNot(HaveOccurred())
@@ -92,13 +92,13 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				fooClass := vm.MustGetClass("Foo")
-				foo, err := fooClass.New(vm, vm)
+				foo, err := fooClass.New(vm)
 				Expect(err).ToNot(HaveOccurred())
 
-				reader, err := foo.Method("chrysobull_nonmonarchist=")
-				Expect(err).ToNot(HaveOccurred())
+				reader := foo.Method("chrysobull_nonmonarchist=")
+				Expect(reader).ToNot(BeNil())
 
-				_, err = reader.Execute(foo, nil, NewString("lyncher-mudslinger", vm, vm))
+				_, err = reader.Execute(foo, nil, NewString("lyncher-mudslinger", vm))
 				Expect(err).ToNot(HaveOccurred())
 
 				// TODO: assert on the instance variable via instance_variable_get
@@ -116,11 +116,11 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				fooClass := vm.MustGetClass("Foo")
-				foo, err := fooClass.New(vm, vm)
+				foo, err := fooClass.New(vm)
 				Expect(err).ToNot(HaveOccurred())
 
-				reader, err := foo.Method("pieless_bothlike")
-				Expect(err).ToNot(HaveOccurred())
+				reader := foo.Method("pieless_bothlike")
+				Expect(reader).ToNot(BeNil())
 
 				val, err := reader.Execute(foo, nil)
 				Expect(err).ToNot(HaveOccurred())
@@ -129,10 +129,10 @@ end
 				Expect(err).ToNot(HaveOccurred())
 				Expect(val).To(Equal(nilInstance))
 
-				writer, err := foo.Method("pieless_bothlike=")
-				Expect(err).ToNot(HaveOccurred())
+				writer := foo.Method("pieless_bothlike=")
+				Expect(writer).ToNot(BeNil())
 
-				_, err = writer.Execute(foo, nil, NewString("unordainable-luthier", vm, vm))
+				_, err = writer.Execute(foo, nil, NewString("unordainable-luthier", vm))
 				Expect(err).ToNot(HaveOccurred())
 
 				val, err = reader.Execute(foo, nil)
@@ -235,8 +235,8 @@ end
 `)
 
 			fooClass := vm.MustGetClass("Foo")
-			method, err := fooClass.Method("new")
-			Expect(err).ToNot(HaveOccurred())
+			method := fooClass.Method("new")
+			Expect(method).ToNot(BeNil())
 
 			instance, err := method.Execute(fooClass, nil)
 			Expect(err).ToNot(HaveOccurred())
@@ -258,16 +258,16 @@ end
 				fooClass, err := vm.GetClass("Foo")
 				Expect(fooClass).ToNot(BeNil())
 
-				fooInstance, err := fooClass.New(vm, vm)
+				fooInstance, err := fooClass.New(vm)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fooInstance).ToNot(BeNil())
 
-				method, err := fooInstance.Method("hello")
-				Expect(err).ToNot(HaveOccurred())
+				method := fooInstance.Method("hello")
+				Expect(method).ToNot(BeNil())
 
 				val, err := method.Execute(fooInstance, nil)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(val).To(BeAssignableToTypeOf(NewString("", vm, vm)))
+				Expect(val).To(BeAssignableToTypeOf(NewString("", vm)))
 				Expect(val.String()).To(Equal("world"))
 			})
 		})
@@ -309,11 +309,11 @@ end
 				Expect(err).ToNot(HaveOccurred())
 
 				barClass := vm.MustGetClass("Bar")
-				bar, err := barClass.New(vm, vm)
+				bar, err := barClass.New(vm)
 				Expect(err).ToNot(HaveOccurred())
 
-				method, err := bar.Method("superinquisitive")
-				Expect(err).ToNot(HaveOccurred())
+				method := bar.Method("superinquisitive")
+				Expect(method).ToNot(BeNil())
 
 				val, err := method.Execute(bar, nil)
 				Expect(err).ToNot(HaveOccurred())

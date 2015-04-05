@@ -33,7 +33,7 @@ end
 		fooClass := vm.ClassWithName("Foo")
 		Expect(fooClass).ToNot(BeNil())
 
-		fooInstance, err := fooClass.New(vm, vm)
+		fooInstance, err := fooClass.New(vm)
 
 		Expect(err).ToNot(HaveOccurred())
 

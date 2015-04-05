@@ -6,20 +6,20 @@ type ObjectClass struct {
 	valueStub
 	classStub
 
-	provider ClassProvider
+	provider Provider
 }
 
-func NewGlobalObjectClass(provider ClassProvider, singletonProvider SingletonProvider) Class {
+func NewGlobalObjectClass(provider Provider) Class {
 	o := &ObjectClass{}
 	o.initialize()
 	o.setStringer(o.String)
 	o.provider = provider
 
-	o.AddMethod(NewNativeMethod("==", provider, singletonProvider, func(self Value, block Block, args ...Value) (Value, error) {
+	o.AddMethod(NewNativeMethod("==", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		if self == args[0] {
-			return singletonProvider.SingletonWithName("true"), nil
+			return provider.SingletonProvider().SingletonWithName("true"), nil
 		} else {
-			return singletonProvider.SingletonWithName("false"), nil
+			return provider.SingletonProvider().SingletonWithName("false"), nil
 		}
 	}))
 
@@ -27,12 +27,12 @@ func NewGlobalObjectClass(provider ClassProvider, singletonProvider SingletonPro
 }
 
 func (c *ObjectClass) SetSuperClass() {
-	class := c.provider.ClassWithName("Class")
+	class := c.provider.ClassProvider().ClassWithName("Class")
 	if class == nil {
 		panic("Expected Class class to exist")
 	}
 
-	superClass := c.provider.ClassWithName("BasicObject")
+	superClass := c.provider.ClassProvider().ClassWithName("BasicObject")
 	if superClass == nil {
 		panic("Expected BasicObject class to exist")
 	}
@@ -57,7 +57,7 @@ func (o *object) String() string {
 	return fmt.Sprintf("<%s:%p>", o.Class().String(), o)
 }
 
-func (obj *ObjectClass) New(provider ClassProvider, singletonProvider SingletonProvider, args ...Value) (Value, error) {
+func (obj *ObjectClass) New(provider Provider, args ...Value) (Value, error) {
 	o := &object{}
 	o.initialize()
 	o.setStringer(o.String)
