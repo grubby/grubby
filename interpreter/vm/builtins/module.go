@@ -221,6 +221,16 @@ func NewModuleClass(provider Provider, evaluator Evaluator) Class {
 		return nil, nil
 	}))
 
+	c.AddMethod(NewNativeMethod("const_defined?", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		objClass := provider.ClassProvider().ClassWithName("Object")
+		_, err := objClass.Constant(args[0].(*SymbolValue).Name())
+		if err == nil {
+			return provider.SingletonProvider().SingletonWithName("true"), nil
+		} else {
+			return provider.SingletonProvider().SingletonWithName("false"), nil
+		}
+	}))
+
 	return c
 }
 

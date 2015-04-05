@@ -186,4 +186,14 @@ Foo::Baz::MESSAGE
 		Expect(ok).To(BeTrue())
 		Expect(stringValue.RawString()).To(Equal("drink your ovaltine"))
 	})
+
+	It("can tell you if constants are defined", func() {
+		value, err := vm.Run(`
+FOO = 'yep'
+Object.const_defined?(:FOO)
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(value).To(Equal(vm.SingletonWithName("true")))
+	})
 })
