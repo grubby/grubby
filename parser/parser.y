@@ -1534,6 +1534,8 @@ return_expression : RETURN comma_delimited_nodes
       $$ = ast.Return{Line: $1.LineNumber(), Value: $2}
     }
   }
+| RETURN ternary
+  { $$ = ast.Return{Line: $1.LineNumber(), Value: $2} }
 | RETURN
   { $$ = ast.Return{Line: $1.LineNumber(), } };
 

@@ -3933,6 +3933,40 @@ s = short ? short.dup : "  "
 					}))
 				})
 			})
+
+			Context("as a return value", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def something
+  return foo.empty? ? false : true
+end`)
+				})
+
+				It("should be parsed as a Ternary node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "something"},
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.Return{
+									Line: 2,
+									Value: ast.Ternary{
+										Line: 2,
+										Condition: ast.CallExpression{
+											Line:   2,
+											Target: ast.BareReference{Line: 2, Name: "foo"},
+											Func:   ast.BareReference{Line: 2, Name: "empty?"},
+										},
+										True:  ast.Boolean{Line: 2, Value: false},
+										False: ast.Boolean{Line: 2, Value: true},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("semicolons", func() {
