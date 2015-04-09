@@ -101,6 +101,7 @@ type FuncDecl struct {
 	Args    []Node
 	Body    []Node
 	Rescues []Node
+	Ensure  []Node
 }
 
 func (n FuncDecl) LineNumber() int {

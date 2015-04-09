@@ -195,6 +195,7 @@ var Statements []ast.Node
 %type <genericSlice> method_args
 %type <genericSlice> key_value_pairs
 %type <genericSlice> loop_expressions
+%type <genericSlice> optional_ensure
 %type <genericSlice> optional_rescues
 %type <genericSlice> nodes_with_commas
 %type <genericSlice> comma_delimited_refs
@@ -652,51 +653,59 @@ nonempty_nodes_with_commas : single_node
 | nonempty_nodes_with_commas COMMA single_node
   { $$ = append($$, $3); }
 
+optional_ensure : /* nothing */
+ { $$ = nil }
+| ENSURE list
+  { $$ = $2 };
 
-method_declaration : DEF REF method_args list END
+method_declaration : DEF REF method_args list optional_ensure END
   {
 		method := ast.FuncDecl{
 			Name: $2.(ast.BareReference),
       Args: $3,
 			Body: $4,
+      Ensure: $5,
     }
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF REF method_args list rescues END
+| DEF REF method_args list rescues optional_ensure END
   {
 		method := ast.FuncDecl{
 			Name: $2.(ast.BareReference),
       Args: $3,
 			Body: $4,
       Rescues: $5,
+      Ensure: $6,
     }
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF REF DOT REF method_args list END
+| DEF REF DOT REF method_args list optional_ensure END
   {
 		method := ast.FuncDecl{
       Target: $2,
 			Name: $4.(ast.BareReference),
       Args: $5,
 			Body: $6,
+      Ensure: $7,
     }
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF self DOT REF method_args list END
+| DEF self DOT REF method_args list optional_ensure END
   {
 		method := ast.FuncDecl{
       Target: $2,
 			Name: $4.(ast.BareReference),
       Args: $5,
 			Body: $6,
+      Ensure: $7,
     }
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF REF DOT REF method_args list rescues END
+| DEF REF DOT REF method_args list rescues optional_ensure END
   {
 		method := ast.FuncDecl{
       Target: $2,
@@ -704,11 +713,12 @@ method_declaration : DEF REF method_args list END
       Args: $5,
 			Body: $6,
       Rescues: $7,
+      Ensure: $8,
     }
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF self DOT REF method_args list rescues END
+| DEF self DOT REF method_args list rescues optional_ensure END
   {
 		method := ast.FuncDecl{
       Target: $2,
@@ -716,27 +726,30 @@ method_declaration : DEF REF method_args list END
       Args: $5,
 			Body: $6,
       Rescues: $7,
+      Ensure: $8,
     }
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF OPERATOR method_args list END
+| DEF OPERATOR method_args list optional_ensure END
   {
 		method := ast.FuncDecl{
 			Name: $2.(ast.BareReference),
       Args: $3,
       Body: $4,
+      Ensure: $5,
     }
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF OPERATOR method_args list rescues END
+| DEF OPERATOR method_args list rescues optional_ensure END
   {
 		method := ast.FuncDecl{
 			Name: $2.(ast.BareReference),
       Args: $3,
       Body: $4,
       Rescues: $5,
+      Ensure: $6,
     }
     method.Line = $2.LineNumber()
     $$ = method

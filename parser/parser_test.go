@@ -1273,6 +1273,34 @@ end
 				})
 			})
 
+			Context("with an ensure statement", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def yep
+  'woah'
+ensure
+  'nope'
+end
+`)
+				})
+
+				It("is included in the method declaration node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "yep"},
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.SimpleString{Line: 2, Value: "woah"},
+							},
+							Ensure: []ast.Node{
+								ast.SimpleString{Line: 4, Value: "nope"},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with splat-args", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
