@@ -270,7 +270,7 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 	case r == '}':
 		l.emit(tokenTypeRBrace)
 	case r == '$':
-		validGlobalNameRunes := alphaNumericUnderscore + ":"
+		validGlobalNameRunes := alphaNumericUnderscore + ":\\$"
 		if l.accept(validGlobalNameRunes) {
 			l.backup()
 			l.ignore()
