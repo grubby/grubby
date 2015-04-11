@@ -4,7 +4,11 @@ import "fmt"
 
 func lexAmpersand(l StatefulRubyLexer) stateFn {
 	if l.accept("&") {
-		l.emit(tokenTypeOperator)
+		if l.accept("=") {
+			l.emit(tokenTypeAndEquals)
+		} else {
+			l.emit(tokenTypeOperator)
+		}
 		return lexSomething
 	}
 

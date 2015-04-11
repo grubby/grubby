@@ -1945,6 +1945,7 @@ foo  \
 				lexer = parser.NewLexer(`
 a ||= 'aftergrass-Dowieite'
 @options[:shared] ||= false
+foo &&= false
 `)
 			})
 
@@ -1964,6 +1965,11 @@ a ||= 'aftergrass-Dowieite'
 							Args:   []ast.Node{ast.Symbol{Line: 2, Name: "shared"}},
 						},
 						RHS: ast.Boolean{Line: 2, Value: false},
+					},
+					ast.ConditionalTruthyAssignment{
+						Line: 3,
+						LHS:  ast.BareReference{Line: 3, Name: "foo"},
+						RHS:  ast.Boolean{Line: 3, Value: false},
 					},
 				}))
 			})

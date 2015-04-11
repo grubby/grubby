@@ -552,6 +552,16 @@ func (n ConditionalAssignment) LineNumber() int {
 	return n.Line
 }
 
+type ConditionalTruthyAssignment struct {
+	Line int
+	LHS  Node
+	RHS  Node
+}
+
+func (n ConditionalTruthyAssignment) LineNumber() int {
+	return n.Line
+}
+
 type Range struct {
 	Line  int
 	Start Node

@@ -87,6 +87,7 @@ var Statements []ast.Node
 %token <genericValue> RANGE
 
 %token <genericValue> OR_EQUALS
+%token <genericValue> AND_EQUALS
 
 // misc
 %token <genericValue> WHITESPACE
@@ -1027,6 +1028,66 @@ conditional_assignment : REF OR_EQUALS single_node
 | call_expression OR_EQUALS expr
   {
     eql := ast.ConditionalAssignment{LHS: $1, RHS: $3}
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+
+// &&= cases
+
+| REF AND_EQUALS single_node
+  {
+    eql := ast.ConditionalTruthyAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+| REF AND_EQUALS ternary
+  {
+    eql := ast.ConditionalTruthyAssignment{LHS: $1, RHS: $3}
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+| CONSTANT AND_EQUALS expr
+  {
+    eql := ast.ConditionalTruthyAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+| instance_variable AND_EQUALS expr
+  {
+    eql := ast.ConditionalTruthyAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+| class_variable AND_EQUALS expr
+  {
+    eql := ast.ConditionalTruthyAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+| global AND_EQUALS expr
+  {
+    eql := ast.ConditionalTruthyAssignment{
+      LHS: $1,
+      RHS: $3,
+    }
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+| call_expression AND_EQUALS expr
+  {
+    eql := ast.ConditionalTruthyAssignment{LHS: $1, RHS: $3}
     eql.Line = $1.LineNumber()
     $$ = eql
   };

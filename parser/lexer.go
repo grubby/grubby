@@ -79,6 +79,7 @@ const (
 	tokenTypeRange
 	tokenTypePipe
 	tokenTypeOrEquals
+	tokenTypeAndEquals
 	tokenTypeForwardSlash
 	tokenTypeAmpersand
 	tokenTypeSubshell
@@ -747,6 +748,9 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeOrEquals:
 			debug("||=")
 			return OR_EQUALS
+		case tokenTypeAndEquals:
+			debug("&&=")
+			return AND_EQUALS
 		case tokenTypeRange:
 			debug(".. (range)")
 			return RANGE
