@@ -3445,6 +3445,18 @@ end
 					ast.Regex{Value: "^foo.*bar$"},
 				}))
 			})
+
+			Context("with interpolation", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("/foo #{biz / baz} bar/")
+				})
+
+				It("is parsed as an ast.Regex", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Regex{Value: "foo #{biz / baz} bar"},
+					}))
+				})
+			})
 		})
 
 		Describe("unless", func() {

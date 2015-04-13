@@ -158,6 +158,10 @@ func parseAsRegex(l StatefulRubyLexer) {
 			l.accept("/")
 			l.ignore() // ignore closing slash
 			shouldBreak = true
+		case r == '#':
+			if l.accept("{") {
+				lexUntilClosingMatchingBraces('{', '}')(l)
+			}
 		case r == eof:
 			l.emit(tokenTypeError)
 			shouldBreak = true
