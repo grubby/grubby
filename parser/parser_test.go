@@ -252,6 +252,7 @@ FOO
 %<this is the worst>
 %{GET OUT}
 %(DONT EVER WRITE CODE LIKE THIS)
+%Q{#{pretty}="#{please}"}
 `)
 				})
 
@@ -261,6 +262,7 @@ FOO
 						ast.InterpolatedString{Line: 2, Value: "this is the worst"},
 						ast.InterpolatedString{Line: 3, Value: "GET OUT"},
 						ast.InterpolatedString{Line: 4, Value: "DONT EVER WRITE CODE LIKE THIS"},
+						ast.InterpolatedString{Line: 5, Value: "#{pretty}=\"#{please}\""},
 					}))
 				})
 			})

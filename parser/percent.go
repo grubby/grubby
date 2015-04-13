@@ -5,6 +5,8 @@ func lexPercentSign(l StatefulRubyLexer) stateFn {
 	if l.accept("r") {
 		stringType = tokenTypeRegex
 		l.moveCurrentTokenStartIndex(1)
+	} else if l.accept("Q") {
+		l.moveCurrentTokenStartIndex(1)
 	}
 
 	if l.accept("`~!@#$%^&*-_=+()[]{}<>\\|;:'\",./?") {
@@ -21,6 +23,8 @@ func lexPercentSign(l StatefulRubyLexer) stateFn {
 				l.next()
 				l.ignore() // ignore closing delimiter
 				return lexSomething
+			case r == '#' && l.accept("{"):
+				lexUntilClosingMatchingBraces('{', '}')(l)
 			case r == eof:
 				l.emit(tokenTypeError)
 				return lexSomething
