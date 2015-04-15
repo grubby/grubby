@@ -20,4 +20,7 @@ type Value interface {
 	SetClassVariable(string, Value)
 
 	IsTruthy() bool
+
+	GetAttribute(string) (Value, bool)
+	SetAttribute(string, Value)
 }

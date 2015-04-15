@@ -11,11 +11,13 @@ type valueStub struct {
 	prettyPrinter func() string
 
 	instance_variables map[string]Value
+	attrs              map[string]Value
 }
 
 func (valueStub *valueStub) initialize() {
 	valueStub.eigenclass_methods = make(map[string]Method)
 	valueStub.instance_variables = make(map[string]Value)
+	valueStub.attrs = make(map[string]Value)
 	valueStub.prettyPrinter = func() string { return valueStub.String() }
 }
 
@@ -129,4 +131,13 @@ func (valueStub *valueStub) SetClassVariable(name string, value Value) {
 
 func (v *valueStub) IsTruthy() bool {
 	return true
+}
+
+func (v *valueStub) GetAttribute(name string) (Value, bool) {
+	something, ok := v.attrs[name]
+	return something, ok
+}
+
+func (v *valueStub) SetAttribute(name string, value Value) {
+	v.attrs[name] = value
 }

@@ -467,6 +467,15 @@ func (vm *vm) CurrentStack() string {
 	return vm.stack.String()
 }
 
+// MethodProvider
+func (vm *vm) AddMethod(name string, context Value, body func(self Value, block Block, args ...Value) (Value, error)) {
+	if vm.inEigenclassBlock {
+		context.AddMethod(NewNativeMethod(name, vm, body))
+	} else {
+		context.(Module).AddInstanceMethod(NewNativeMethod(name, vm, body))
+	}
+}
+
 // General Purpose Provider
 func (vm *vm) ArgEvaluator() ArgEvaluator {
 	return vm
@@ -478,5 +487,8 @@ func (vm *vm) SingletonProvider() SingletonProvider {
 	return vm
 }
 func (vm *vm) StackProvider() StackProvider {
+	return vm
+}
+func (vm *vm) MethodProvider() MethodProvider {
 	return vm
 }

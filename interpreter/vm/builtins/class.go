@@ -80,9 +80,6 @@ type UserDefinedClass struct {
 	name string
 	valueStub
 	classStub
-
-	attr_readers []string
-	attr_writers []string
 }
 
 type UserDefinedClassInstance struct {
@@ -125,6 +122,7 @@ func NewUserDefinedClass(name string, provider Provider) Class {
 		return c, nil
 	}))
 
+	//FIXME : these should be on module
 	c.AddMethod(NewNativeMethod("attr_accessor", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
 			symbol, ok := arg.(*SymbolValue)
@@ -132,9 +130,18 @@ func NewUserDefinedClass(name string, provider Provider) Class {
 				return nil, errors.New("not a symbol or a string")
 			}
 
-			class := self.(*UserDefinedClass)
-			class.attr_readers = append(class.attr_readers, symbol.Name())
-			class.attr_writers = append(class.attr_writers, symbol.Name())
+			provider.MethodProvider().AddMethod(symbol.Name(), self, func(self Value, block Block, args ...Value) (Value, error) {
+				value, ok := self.GetAttribute(symbol.Name())
+				if !ok {
+					return provider.SingletonProvider().SingletonWithName("nil"), nil
+				}
+
+				return value, nil
+			})
+			provider.MethodProvider().AddMethod(symbol.Name()+"=", self, func(self Value, block Block, args ...Value) (Value, error) {
+				self.SetAttribute(symbol.Name(), args[0])
+				return nil, nil
+			})
 		}
 
 		return nil, nil
@@ -146,8 +153,14 @@ func NewUserDefinedClass(name string, provider Provider) Class {
 				return nil, errors.New("not a symbol or a string")
 			}
 
-			class := self.(*UserDefinedClass)
-			class.attr_readers = append(class.attr_readers, symbol.Name())
+			provider.MethodProvider().AddMethod(symbol.Name(), self, func(self Value, block Block, args ...Value) (Value, error) {
+				value, ok := self.GetAttribute(symbol.Name())
+				if !ok {
+					return provider.SingletonProvider().SingletonWithName("nil"), nil
+				}
+
+				return value, nil
+			})
 		}
 
 		return nil, nil
@@ -159,8 +172,10 @@ func NewUserDefinedClass(name string, provider Provider) Class {
 				return nil, errors.New("not a symbol or a string")
 			}
 
-			class := self.(*UserDefinedClass)
-			class.attr_writers = append(class.attr_writers, symbol.Name())
+			provider.MethodProvider().AddMethod(symbol.Name()+"=", self, func(self Value, block Block, args ...Value) (Value, error) {
+				self.SetAttribute(symbol.Name(), args[0])
+				return nil, nil
+			})
 		}
 
 		return nil, nil
@@ -185,27 +200,6 @@ func (c *UserDefinedClass) New(provider Provider, args ...Value) (Value, error) 
 		for _, method := range module.(Module).InstanceMethods() {
 			instance.AddMethod(method)
 		}
-	}
-
-	// FIXME: these should be defined on Module
-	for _, attr := range c.attr_readers {
-		instance.AddMethod(NewNativeMethod(attr, provider, func(self Value, block Block, args ...Value) (Value, error) {
-			this := self.(*UserDefinedClassInstance)
-			value, ok := this.attrs[attr]
-			if !ok {
-				return provider.SingletonProvider().SingletonWithName("nil"), nil
-			}
-
-			return value, nil
-		}))
-	}
-
-	for _, attr := range c.attr_writers {
-		instance.AddMethod(NewNativeMethod(attr+"=", provider, func(self Value, block Block, args ...Value) (Value, error) {
-			this := self.(*UserDefinedClassInstance)
-			this.attrs[attr] = args[0]
-			return nil, nil
-		}))
 	}
 
 	method := instance.Method("initialize")
