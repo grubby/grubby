@@ -27,7 +27,7 @@ func interpretClassDeclarationInContext(
 		fullClassName = classNode.FullName()
 	}
 
-	theClass := NewUserDefinedClass(classNode.Name, vm)
+	theClass := NewUserDefinedClass(classNode.Name, classNode.SuperClass.FullName(), vm)
 	vm.CurrentClasses[fullClassName] = theClass
 
 	vm.currentModuleName = fullClassName

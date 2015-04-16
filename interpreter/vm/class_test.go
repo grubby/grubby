@@ -54,6 +54,20 @@ Microclimatology.new
 		})
 	})
 
+	Describe("superclasses", func() {
+		It("can be provided when declaring a class", func() {
+			value, err := vm.Run(`
+class Foo
+end
+
+class Bar < Foo
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.(Class).SuperClass().String()).To(Equal(vm.ClassWithName("Foo").String()))
+		})
+	})
+
 	Describe("class attribute methods", func() {
 		Describe(".attr_reader :symbol", func() {
 			It("creates a getter and setter on instances of the class", func() {

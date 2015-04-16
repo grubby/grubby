@@ -93,7 +93,7 @@ func (i *UserDefinedClassInstance) String() string {
 	return fmt.Sprintf("<%s:%p>", i.Class().String(), i)
 }
 
-func NewUserDefinedClass(name string, provider Provider) Class {
+func NewUserDefinedClass(name, superclassName string, provider Provider) Class {
 	c := &UserDefinedClass{
 		name: name,
 	}
@@ -101,8 +101,15 @@ func NewUserDefinedClass(name string, provider Provider) Class {
 	c.setStringer(c.String)
 	c.class = provider.ClassProvider().ClassWithName("Class")
 
-	// FIXME: should be provided as an argument
-	c.superClass = provider.ClassProvider().ClassWithName("Object")
+	if superclassName == "" {
+		superclassName = "Object"
+	}
+
+	superclass := provider.ClassProvider().ClassWithName(superclassName)
+	if superclass == nil {
+		panic(fmt.Sprintf("Class '%s' not found", superclassName))
+	}
+	c.superClass = superclass
 
 	c.AddMethod(NewNativeMethod("include", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
