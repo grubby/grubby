@@ -180,6 +180,8 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["Proc"] = NewProcClass(vm)
 	vm.CurrentClasses["Regexp"] = NewRegexpClass(vm)
 	vm.CurrentClasses["File"] = NewFileClass(vm)
+	vm.CurrentClasses["Exception"] = NewExceptionClass(vm)
+	vm.CurrentClasses["StandardError"] = NewStandardErrorClass(vm)
 }
 
 func (vm *vm) MustGet(key string) Value {
