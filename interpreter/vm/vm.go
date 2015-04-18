@@ -182,6 +182,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["File"] = NewFileClass(vm)
 	vm.CurrentClasses["Exception"] = NewExceptionClass(vm)
 	vm.CurrentClasses["StandardError"] = NewStandardErrorClass(vm)
+	vm.CurrentClasses["ArgumentError"] = NewArgumentErrorClass(vm)
 }
 
 func (vm *vm) MustGet(key string) Value {
