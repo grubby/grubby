@@ -92,4 +92,17 @@ adj = 'cruel'
 			Expect(value).To(Equal(vm.SymbolWithName("hello world"))) // singleton instance
 		})
 	})
+
+	Describe("#split", func() {
+		It("splits on the given separator", func() {
+			result, err := vm.Run("'hello world'.split(' ')")
+			Expect(err).ToNot(HaveOccurred())
+
+			array, ok := result.(*Array)
+			Expect(ok).To(BeTrue())
+			Expect(len(array.Members())).To(Equal(2))
+			Expect(array.Members()[0].String()).To(Equal("hello"))
+			Expect(array.Members()[1].String()).To(Equal("world"))
+		})
+	})
 })

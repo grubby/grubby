@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type StringClass struct {
@@ -71,6 +72,24 @@ func NewStringClass(provider Provider) Class {
 		symbolFromString := NewSymbol(selfAsStr.value, provider)
 		provider.SingletonProvider().AddSymbol(symbolFromString)
 		return symbolFromString, nil
+	}))
+	s.AddMethod(NewNativeMethod("split", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsStr := self.(*StringValue)
+		separator := args[0].(*StringValue)
+
+		val, err := provider.ClassProvider().ClassWithName("Array").New(provider)
+		if err != nil {
+			return nil, err
+		}
+
+		array := val.(*Array)
+		pieces := strings.Split(selfAsStr.value, separator.value)
+		for _, piece := range pieces {
+			str := NewString(piece, provider)
+			array.Append(str)
+		}
+
+		return array, nil
 	}))
 
 	return s
