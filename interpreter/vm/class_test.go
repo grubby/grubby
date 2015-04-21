@@ -156,7 +156,7 @@ end
 		})
 
 		Describe("attr_accessor on a class", func() {
-			FIt("exposes attributes on the class itself", func() {
+			It("exposes attributes on the class itself", func() {
 				result, err := vm.Run(`
 class Base
   class << self
