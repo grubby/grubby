@@ -58,8 +58,7 @@ func (valueStub *valueStub) Method(name string) Method {
 		}
 	}
 
-	//		5. Methods defined by the object's superclass, i.e. inherited methods
-	super := valueStub.Class().SuperClass()
+	super := valueStub.class.SuperClass()
 	for super != nil {
 		m, ok := super.eigenclassMethods()[name]
 		if ok {

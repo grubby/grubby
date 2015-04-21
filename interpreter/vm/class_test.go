@@ -154,6 +154,30 @@ end
 				Expect(val).To(EqualRubyString("unordainable-luthier"))
 			})
 		})
+
+		Describe("attr_accessor on a class", func() {
+			FIt("exposes attributes on the class itself", func() {
+				result, err := vm.Run(`
+class Base
+  class << self
+    # this needs to call into interpretMethodDeclarationInContext
+    attr_accessor :foo
+  end
+end
+
+class Foo < Base
+  self.foo = 'foobar'
+end
+
+Foo.foo
+`)
+				Expect(err).ToNot(HaveOccurred())
+
+				str, ok := result.(*StringValue)
+				Expect(ok).To(BeTrue())
+				Expect(str.RawString()).To(Equal("foobar"))
+			})
+		})
 	})
 
 	Describe("private methods", func() {

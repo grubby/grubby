@@ -111,6 +111,12 @@ func NewUserDefinedClass(name, superclassName string, provider Provider) Class {
 	}
 	c.superClass = superclass
 
+	// FIXME : in reality, the singleton class for us should be
+	// the singleton class of our superclass, but this is a short-term fix
+	for _, method := range superclass.eigenclassMethods() {
+		c.AddMethod(method)
+	}
+
 	c.AddMethod(NewNativeMethod("include", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		for _, arg := range args {
 			c.Include(arg.(Module))
