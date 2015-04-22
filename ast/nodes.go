@@ -401,7 +401,7 @@ func (n Rescue) LineNumber() int {
 
 type RescueException struct {
 	Line    int
-	Var     BareReference
+	Var     Node
 	Classes []Class
 }
 

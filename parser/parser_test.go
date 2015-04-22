@@ -3000,6 +3000,10 @@ rescue Nope
   puts 'unlikely'
 rescue NotThisEither => e
   puts 'contrived'
+rescue ThisIsABadIdea => @e
+  puts '0xabad1dea'
+rescue MoreBadIdeas => @@e
+  puts 'badder idea'
 rescue Errno::ENOTEMPTY, Errno::ENOENT
   puts 'less contrived'
 rescue
@@ -3048,31 +3052,55 @@ end
 							ast.Rescue{
 								Line: 7,
 								Exception: ast.RescueException{
+									Classes: []ast.Class{{Line: 7, Name: "ThisIsABadIdea"}},
+									Var:     ast.InstanceVariable{Line: 7, Name: "e"},
+								},
+								Body: []ast.Node{ast.CallExpression{
+									Line: 8,
+									Func: ast.BareReference{Line: 8, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 8, Value: "0xabad1dea"}},
+								}},
+							},
+							ast.Rescue{
+								Line: 9,
+								Exception: ast.RescueException{
+									Classes: []ast.Class{{Line: 9, Name: "MoreBadIdeas"}},
+									Var:     ast.ClassVariable{Line: 9, Name: "e"},
+								},
+								Body: []ast.Node{ast.CallExpression{
+									Line: 10,
+									Func: ast.BareReference{Line: 10, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 10, Value: "badder idea"}},
+								}},
+							},
+							ast.Rescue{
+								Line: 11,
+								Exception: ast.RescueException{
 									Classes: []ast.Class{
 										{
-											Line:      7,
+											Line:      11,
 											Name:      "ENOTEMPTY",
 											Namespace: "Errno",
 										}, {
-											Line:      7,
+											Line:      11,
 											Name:      "ENOENT",
 											Namespace: "Errno",
 										},
 									},
 								},
 								Body: []ast.Node{ast.CallExpression{
-									Line: 8,
-									Func: ast.BareReference{Line: 8, Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Line: 8, Value: "less contrived"}},
+									Line: 12,
+									Func: ast.BareReference{Line: 12, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 12, Value: "less contrived"}},
 								}},
 							},
 							ast.Rescue{
-								Line:      9,
+								Line:      13,
 								Exception: ast.RescueException{},
 								Body: []ast.Node{ast.CallExpression{
-									Line: 10,
-									Func: ast.BareReference{Line: 10, Name: "puts"},
-									Args: []ast.Node{ast.SimpleString{Line: 10, Value: "aww yisss"}},
+									Line: 14,
+									Func: ast.BareReference{Line: 14, Name: "puts"},
+									Args: []ast.Node{ast.SimpleString{Line: 14, Value: "aww yisss"}},
 								}},
 							},
 						},

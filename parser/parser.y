@@ -1557,6 +1557,48 @@ rescue : RESCUE list
       },
     }
   }
+| RESCUE comma_delimited_class_names OPERATOR instance_variable list
+  {
+    name := $3.(ast.BareReference).Name
+    if name != "=>" {
+      panic("FREAKOUT")
+    }
+
+    classes := []ast.Class{}
+    for _, class := range $2 {
+      classes = append(classes, class.(ast.Class))
+    }
+
+    $$ = ast.Rescue{
+      Line: $1.LineNumber(),
+      Body: $5,
+      Exception: ast.RescueException{
+        Var: $4,
+        Classes: classes,
+      },
+    }
+  }
+| RESCUE comma_delimited_class_names OPERATOR class_variable list
+  {
+    name := $3.(ast.BareReference).Name
+    if name != "=>" {
+      panic("FREAKOUT")
+    }
+
+    classes := []ast.Class{}
+    for _, class := range $2 {
+      classes = append(classes, class.(ast.Class))
+    }
+
+    $$ = ast.Rescue{
+      Line: $1.LineNumber(),
+      Body: $5,
+      Exception: ast.RescueException{
+        Var: $4,
+        Classes: classes,
+      },
+    }
+  }
 | RESCUE OPERATOR REF list
   {
     name := $2.(ast.BareReference).Name
@@ -1568,10 +1610,41 @@ rescue : RESCUE list
       Line: $1.LineNumber(),
       Body: $4,
       Exception: ast.RescueException{
-        Var: $3.(ast.BareReference),
+        Var: $3,
+      },
+    }
+  }
+| RESCUE OPERATOR instance_variable list
+  {
+    name := $2.(ast.BareReference).Name
+    if name != "=>" {
+      panic("FREAKOUT")
+    }
+
+    $$ = ast.Rescue{
+      Line: $1.LineNumber(),
+      Body: $4,
+      Exception: ast.RescueException{
+        Var: $3,
+      },
+    }
+  }
+| RESCUE OPERATOR class_variable list
+  {
+    name := $2.(ast.BareReference).Name
+    if name != "=>" {
+      panic("FREAKOUT")
+    }
+
+    $$ = ast.Rescue{
+      Line: $1.LineNumber(),
+      Body: $4,
+      Exception: ast.RescueException{
+        Var: $3,
       },
     }
   };
+
 
 comma_delimited_class_names : class_name_with_modules
   { $$ = append($$, $1) }
