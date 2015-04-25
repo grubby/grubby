@@ -934,7 +934,16 @@ assignment : REF EQUALTO single_node
 | class_name_with_modules EQUALTO expr
   { $$ = ast.Assignment{LHS: $1, RHS: $3, Line: $1.LineNumber()} };
 
-multiple_assignment : assignable_variables EQUALTO expr
+multiple_assignment : assignable_variables EQUALTO assignable_variables
+  {
+    eql := ast.Assignment{
+      LHS: $1,
+      RHS: $3,
+    }
+    eql.Line = $1.LineNumber()
+    $$ = eql
+  }
+| assignable_variables EQUALTO expr
   {
     eql := ast.Assignment{
       LHS: $1,

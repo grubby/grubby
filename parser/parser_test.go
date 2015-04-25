@@ -2161,12 +2161,37 @@ HASH['second_key'] = [:something]
 				})
 			})
 
+			Context("to ivars from local variables", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("@to, @from = to, from")
+				})
+
+				It("is parsed as an assignment expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.InstanceVariable{Name: "to"},
+									ast.InstanceVariable{Name: "from"},
+								},
+							},
+							RHS: ast.Array{
+								Nodes: []ast.Node{
+									ast.BareReference{Name: "to"},
+									ast.BareReference{Name: "from"},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to indices in an array or hash", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("array[i], array[r] = array[r], array[i]")
 				})
 
-				It("be parsed as an assignment expression", func() {
+				It("is parsed as an assignment expression", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Assignment{
 							LHS: ast.Array{
