@@ -35,10 +35,9 @@ Unfortunately, that's not very easy to parallelize between multiple people. Feel
 
 Some great things to work on include:
 
-* line numbers in stack traces
 * more builtin classes and methods (e.g.: String, Array, Hash, Enumerable methods)
 * raising and rescuing from exceptions
-* blocks
+* finding edge cases in the parser (using grubby with existing gems would be quite helpful)
 
 If you're not sure where to start, opening up an issue or pull request with failing tests is also fine. :)
 
