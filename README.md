@@ -41,3 +41,11 @@ Some great things to work on include:
 * blocks
 
 If you're not sure where to start, opening up an issue or pull request with failing tests is also fine. :)
+
+Contributors
+------------
+
+* [John Foley](https://github.com/jfoley)
+* [Brian Butz](https://github.com/butzopower)
+* [Trent Ogren](https://github.com/misfo)
+* [Tim Jarratt](https://github.com/tjarratt)
