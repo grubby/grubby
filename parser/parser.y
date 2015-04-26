@@ -1528,6 +1528,25 @@ begin_block : BEGIN list optional_rescues END
     begin.Line = $1.LineNumber()
     $$ = begin
   };
+| BEGIN list optional_rescues ELSE list ENSURE list END
+  {
+    $$ = ast.Begin{
+      Line: $1.LineNumber(),
+      Body: $2,
+      Rescue: $3,
+      Else: $5,
+      Ensure: $7,
+    }
+  }
+| BEGIN list optional_rescues ENSURE list END
+  {
+    $$ = ast.Begin{
+      Line: $1.LineNumber(),
+      Body: $2,
+      Rescue: $3,
+      Ensure: $5,
+    }
+  };
 
 rescue : RESCUE list
   { $$ = ast.Rescue{Line: $1.LineNumber(), Body: $2} }

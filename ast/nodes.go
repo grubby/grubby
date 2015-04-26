@@ -383,6 +383,7 @@ type Begin struct {
 	Body   []Node
 	Rescue []Node
 	Else   []Node
+	Ensure []Node
 }
 
 func (n Begin) LineNumber() int {

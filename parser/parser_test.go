@@ -1570,6 +1570,49 @@ end
 			})
 		})
 
+		Describe("ensure", func() {
+			Context("nested inside of another ensure", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def nested_ensures
+  'woah'
+ensure
+  begin
+    'too spooky'
+  ensure
+    'for me'
+  end
+end
+`)
+				})
+
+				It("can be nested inside of another ensure", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "nested_ensures"},
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.SimpleString{Line: 2, Value: "woah"},
+							},
+							Ensure: []ast.Node{
+								ast.Begin{
+									Line: 4,
+									Body: []ast.Node{
+										ast.SimpleString{Line: 5, Value: "too spooky"},
+									},
+									Rescue: []ast.Node{},
+									Ensure: []ast.Node{
+										ast.SimpleString{Line: 7, Value: "for me"},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+		})
+
 		Describe("comments", func() {
 			Context("on a single line", func() {
 				BeforeEach(func() {
