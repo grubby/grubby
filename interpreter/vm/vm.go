@@ -180,6 +180,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["Proc"] = NewProcClass(vm)
 	vm.CurrentClasses["Regexp"] = NewRegexpClass(vm)
 	vm.CurrentClasses["File"] = NewFileClass(vm)
+	vm.CurrentClasses["Dir"] = NewDirClass(vm)
 	vm.CurrentClasses["Exception"] = NewExceptionClass(vm)
 	vm.CurrentClasses["StandardError"] = NewStandardErrorClass(vm)
 	vm.CurrentClasses["ArgumentError"] = NewArgumentErrorClass(vm)

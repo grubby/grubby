@@ -192,7 +192,7 @@ test(5)
 		})
 	})
 
-	Describe("File class", func() {
+	Describe("the File class", func() {
 		It("has a reasonable .expand_path method", func() {
 			fileClass := vm.ClassWithName("File")
 			Expect(fileClass).ToNot(BeNil())
@@ -205,6 +205,22 @@ test(5)
 
 			expectedPath := fmt.Sprintf("%s/%s", os.Getenv("HOME"), "foobar")
 			Expect(result.String()).To(Equal(expectedPath))
+		})
+	})
+
+	Describe("the Dir class", func() {
+		Describe(".pwd", func() {
+			It("returns the current working directory of the process", func() {
+				value, err := vm.Run("Dir.pwd")
+				Expect(err).ToNot(HaveOccurred())
+
+				dir, ok := value.(*StringValue)
+				Expect(ok).To(BeTrue())
+
+				cwd, _ := os.Getwd()
+
+				Expect(dir.RawString()).To(Equal(cwd))
+			})
 		})
 	})
 
