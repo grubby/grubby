@@ -224,6 +224,17 @@ test(5)
 		})
 	})
 
+	Describe("the Process class", func() {
+		Describe(".pid", func() {
+			It("returns the id of the current process", func() {
+				value, err := vm.Run("Process.pid")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(value.String()).To(Equal(fmt.Sprintf("%d", os.Getpid())))
+			})
+		})
+	})
+
 	Describe("assignment to a variable", func() {
 		It("stores the value assigned", func() {
 			_, err := vm.Run("foo = 'albitite-compotor'")

@@ -1,23 +1,16 @@
 package builtins
 
-type processModule struct {
-	valueStub
-	classStub
-	moduleStub
-}
+import (
+	"fmt"
+	"os"
+)
 
 func NewProcessModule(provider Provider) Module {
-	f := &processModule{}
-	f.initialize()
-	f.setStringer(f.String)
-	f.class = provider.ClassProvider().ClassWithName("Module")
-	return f
-}
+	module := NewGenericModule("Process", provider)
 
-func (c *processModule) String() string {
-	return "Process"
-}
+	module.AddMethod(NewNativeMethod("pid", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		return NewString(fmt.Sprintf("%d", os.Getpid()), provider), nil
+	}))
 
-func (c *processModule) Name() string {
-	return "Process"
+	return module
 }
