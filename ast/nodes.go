@@ -346,7 +346,7 @@ func (n Block) LineNumber() int {
 }
 
 func (b *Block) Provided() bool {
-	return b.Args != nil && b.Body != nil
+	return b.Body != nil
 }
 
 type IfBlock struct {

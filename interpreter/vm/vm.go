@@ -29,10 +29,14 @@ type vm struct {
 	inEigenclassBlock bool
 
 	currentModuleName string // FIXME: I bet this could be determined from context
+
+	exitCallbacks []Block
 }
 
 type VM interface {
 	Run(string) (Value, error)
+	Exit()
+
 	Get(string) (Value, error)
 	MustGet(string) Value
 
@@ -146,6 +150,13 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 
 		errorMessage := fmt.Sprintf("LoadError: cannot load such file -- %s", fileName)
 		return nil, NewLoadError(errorMessage, vm.stack.String())
+	}))
+	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("at_exit", vm, func(self Value, block Block, args ...Value) (Value, error) {
+		if block != nil {
+			vm.exitCallbacks = append(vm.exitCallbacks, block)
+		}
+
+		return nil, nil
 	}))
 
 	/* BEGIN RUNTIME TRICKERY
@@ -306,6 +317,12 @@ func (vm *vm) Run(input string) (Value, error) {
 	vm.localVariableStack.Unshift()
 	defer vm.localVariableStack.Shift()
 	return vm.executeWithContext(main, parser.Statements...)
+}
+
+func (vm *vm) Exit() {
+	for _, block := range vm.exitCallbacks {
+		block.Call()
+	}
 }
 
 func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, error) {

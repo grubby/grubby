@@ -34,7 +34,10 @@ func main() {
 	home := os.Getenv("HOME")
 	grubbyHome := filepath.Join(home, ".grubby")
 
-	_, err = vm.NewVM(grubbyHome, flag.Args()[0]).Run(string(bytes))
+	rubyVM := vm.NewVM(grubbyHome, flag.Args()[0])
+	defer rubyVM.Exit()
+
+	_, err = rubyVM.Run(string(bytes))
 
 	switch err.(type) {
 	case *vm.ParseError:

@@ -14,6 +14,7 @@ func main() {
 	grubbyHome := filepath.Join(home, ".grubby")
 
 	vm := vm.NewVM(grubbyHome, "(grubby irb")
+	defer vm.Exit()
 
 	for {
 		result, err := vm.Run(readInput())

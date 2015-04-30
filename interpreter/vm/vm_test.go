@@ -487,13 +487,29 @@ value
 			Expect(err).ToNot(HaveOccurred())
 			Expect(value.String()).To(ContainSubstring("okay"))
 		})
+
+		It("considers negated nil to be truthy", func() {
+			value, err := vm.Run("!nil")
+			Expect(err).ToNot(HaveOccurred())
+
+			trueValue := vm.SingletonWithName("true")
+			Expect(value).To(Equal(trueValue))
+		})
 	})
 
-	It("considers negated nil to be truthy", func() {
-		value, err := vm.Run("!nil")
-		Expect(err).ToNot(HaveOccurred())
+	Describe("Kernel#at_exit", func() {
+		It("can be triggered by calling vm.exit", func() {
+			_, err := vm.Run(`
+value = 'too soon'
 
-		trueValue := vm.SingletonWithName("true")
-		Expect(value).To(Equal(trueValue))
+at_exit do
+  value = 'just right'
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+
+			vm.Exit()
+			Expect(vm.MustGet("value").String()).To(ContainSubstring("just right"))
+		})
 	})
 })
