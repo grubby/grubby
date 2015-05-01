@@ -895,6 +895,8 @@ assignment : REF EQUALTO single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
+| REF EQUALTO switch_statement
+  { $$ = ast.Assignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | CONSTANT EQUALTO expr
   {
     eql := ast.Assignment{

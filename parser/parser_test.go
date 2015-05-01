@@ -389,6 +389,42 @@ FOO
 		})
 
 		Describe("case statements", func() {
+			Context("yielding a value", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+foo = case bar
+when nil
+  'zilch'
+else
+  'something for nothing'
+end
+`)
+				})
+
+				It("can be used as the RHS of an assignment", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							Line: 1,
+							LHS: ast.BareReference{
+								Line: 1,
+								Name: "foo",
+							},
+							RHS: ast.SwitchStatement{
+								Line:      1,
+								Condition: ast.BareReference{Line: 1, Name: "bar"},
+								Cases: []ast.SwitchCase{
+									{
+										Conditions: []ast.Node{ast.Nil{Line: 2}},
+										Body:       []ast.Node{ast.SimpleString{Line: 3, Value: "zilch"}},
+									},
+								},
+								Else: []ast.Node{ast.SimpleString{Line: 5, Value: "something for nothing"}},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("without a value to compare against", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
