@@ -94,6 +94,18 @@ var _ = Describe("goyacc parser", func() {
 				})
 			})
 
+			Describe("separated by only whitespace", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("'foo' 'bar'")
+				})
+
+				It("is implicitly concatenated", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.InterpolatedString{Value: "foobar"},
+					}))
+				})
+			})
+
 			Context("with escaped single quotes", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("'hello \\' world'")
@@ -1999,25 +2011,42 @@ end
 			})
 		})
 
-		Describe("preventing line breaks from terminating an expression", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(`
+		Describe("backslashes", func() {
+			Context("in the middle of a multi-line method invocation", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
 # all whitespace is ignored after the / until a nonwhitespace char is seen
 foo  \
    # comments here are ignored, as are newlines
    \
    .inspect
 `)
+				})
+
+				It("prevents the newline from breaking apart the call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Line:   2,
+							Target: ast.BareReference{Line: 2, Name: "foo"},
+							Func:   ast.BareReference{Line: 5, Name: "inspect"},
+						},
+					}))
+				})
 			})
 
-			It("can be done using a backslash at the end of a line", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.CallExpression{
-						Line:   2,
-						Target: ast.BareReference{Line: 2, Name: "foo"},
-						Func:   ast.BareReference{Line: 5, Name: "inspect"},
-					},
-				}))
+			Context("after a string, with another string on a following line", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+"this is a " \
+"multiline string"
+`)
+				})
+
+				It("implicitly concatenates the strings", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.InterpolatedString{Line: 1, Value: "this is a multiline string"}},
+					))
+				})
 			})
 		})
 
@@ -4739,6 +4768,10 @@ class Foo<Bar
     false
   b = a and
     true
+  self.puts(
+    "woah what the fuck",
+    "is going on here",
+    'this is quite weird')
 end
 
 with_a_block { |foo| puts foo.inspect } # comment goes here

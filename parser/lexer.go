@@ -463,14 +463,14 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("string: '%s'", token.value)
 			someValue := ast.SimpleString{Value: token.value}
 			someValue.Line = token.line
-			lval.genericValue = someValue
-			return NODE
+			lval.astString = someValue
+			return STRING
 		case tokenTypeDoubleQuoteString:
 			debug("string: '%s'", token.value)
 			someValue := ast.InterpolatedString{Value: token.value}
 			someValue.Line = token.line
-			lval.genericValue = someValue
-			return NODE
+			lval.astString = someValue
+			return STRING
 		case tokenTypeCharacter:
 			debug("char: '%s'", token.value)
 			someValue := ast.CharacterLiteral{Value: token.value}

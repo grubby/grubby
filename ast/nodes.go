@@ -37,6 +37,10 @@ func (n SimpleString) LineNumber() int {
 	return n.Line
 }
 
+func (n SimpleString) StringValue() string {
+	return n.Value
+}
+
 type InterpolatedString struct {
 	Line  int
 	Value string
@@ -44,6 +48,15 @@ type InterpolatedString struct {
 
 func (n InterpolatedString) LineNumber() int {
 	return n.Line
+}
+
+func (n InterpolatedString) StringValue() string {
+	return n.Value
+}
+
+type String interface {
+	Node
+	StringValue() string
 }
 
 type CharacterLiteral struct {

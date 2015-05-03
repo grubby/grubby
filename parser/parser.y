@@ -20,6 +20,7 @@ var Statements []ast.Node
   genericString   string
   stringSlice     []string
   switchCaseSlice []ast.SwitchCase
+  astString       ast.String
 }
 
 %token <genericValue> OPERATOR
@@ -35,6 +36,8 @@ var Statements []ast.Node
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
 %token <genericValue> COMMA
+
+%token <astString> STRING
 
 %token <genericString> NamespacedModule
 %token <genericValue> ProcArg
@@ -134,6 +137,7 @@ var Statements []ast.Node
 %type <genericValue> proc_arg
 %type <genericValue> splat_arg
 %type <genericValue> assignment
+%type <genericValue> string_literal
 %type <genericValue> multiple_assignment
 %type <genericValue> begin_block
 %type <genericValue> single_node
@@ -253,7 +257,7 @@ list : /* empty */
 | list expr
 {  $$ = append($$, $2) };
 
-simple_node : SYMBOL | NODE | REF | CONSTANT | instance_variable | class_variable | global | LINE_CONST_REF | FILE_CONST_REF | self | nil;
+simple_node : SYMBOL | NODE | string_literal | REF | CONSTANT | instance_variable | class_variable | global | LINE_CONST_REF | FILE_CONST_REF | self | nil;
 
 single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression;
 
@@ -261,27 +265,37 @@ binary_expression : binary_addition | binary_subtraction | binary_multiplication
 
 expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias;
 
+string_literal : STRING
+  { $$ = $1 }
+| string_literal STRING
+  {
+    $$ = ast.InterpolatedString{
+      Line: $1.LineNumber(),
+      Value: $1.(ast.String).StringValue() + $2.StringValue(),
+    }
+  };
+
 rescue_modifier : single_node RESCUE single_node
   { $$ = ast.RescueModifier{Statement: $1, Rescue: $3} };
 
 splat_arg : STAR single_node
   { $$ = ast.StarSplat{Value: $2} };
 
-call_expression : REF LPAREN nodes_with_commas RPAREN
+call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlines RPAREN
   {
     callExpr := ast.CallExpression{
       Func: $1.(ast.BareReference),
-      Args: $3,
+      Args: $4,
     }
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| REF LPAREN nodes_with_commas RPAREN block
+| REF LPAREN optional_newlines nodes_with_commas optional_newlines RPAREN block
   {
     callExpr := ast.CallExpression{
       Func: $1.(ast.BareReference),
-      Args: $3,
-      OptionalBlock: $5,
+      Args: $4,
+      OptionalBlock: $7,
     }
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
@@ -292,20 +306,20 @@ call_expression : REF LPAREN nodes_with_commas RPAREN
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| SPECIAL_CHAR_REF LPAREN nodes_with_commas RPAREN
+| SPECIAL_CHAR_REF LPAREN optional_newlines nodes_with_commas optional_newlines RPAREN
   {
     callExpr := ast.CallExpression{
       Func: $1.(ast.BareReference),
-      Args: $3,
+      Args: $4,
     }
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| CONSTANT LPAREN nodes_with_commas RPAREN
+| CONSTANT LPAREN optional_newlines nodes_with_commas optional_newlines RPAREN
   {
     callExpr := ast.CallExpression{
       Func: ast.BareReference{Name: $1.(ast.Constant).Name, Line: $1.LineNumber()},
-      Args: $3,
+      Args: $4,
     }
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
@@ -611,10 +625,10 @@ operator_expression : single_node OPERATOR optional_newlines single_node
   };
 
 
-call_args : LPAREN nodes_with_commas RPAREN
-  { $$ = $2 }
-| LPAREN nodes_with_commas COMMA optional_newlines proc_arg RPAREN
-  { $$ = append($2, $5) }
+call_args : LPAREN optional_newlines nodes_with_commas optional_newlines RPAREN
+  { $$ = $3 }
+| LPAREN optional_newlines nodes_with_commas COMMA optional_newlines proc_arg optional_newlines RPAREN
+  { $$ = append($3, $6) }
 | nonempty_nodes_with_commas
   { $$ = $1 }
 | nonempty_nodes_with_commas COMMA optional_newlines proc_arg
