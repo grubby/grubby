@@ -971,7 +971,7 @@ end
 
 			Context("with methods containing ! and ?", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("5.even?;5.taint!; block_given?; search_and_destroy!")
+					lexer = parser.NewLexer("5.even?;5.taint!; block_given?; search_and_destroy!; thanks! :for, :all, :the, :fish")
 				})
 
 				It("is parsed just fine", func() {
@@ -989,6 +989,15 @@ end
 						},
 						ast.CallExpression{
 							Func: ast.BareReference{Name: "search_and_destroy!"},
+						},
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "thanks!"},
+							Args: []ast.Node{
+								ast.Symbol{Name: "for"},
+								ast.Symbol{Name: "all"},
+								ast.Symbol{Name: "the"},
+								ast.Symbol{Name: "fish"},
+							},
 						},
 					}))
 				})

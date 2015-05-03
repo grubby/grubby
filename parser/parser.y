@@ -306,6 +306,14 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
+| SPECIAL_CHAR_REF nodes_with_commas
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: $1.(ast.BareReference),
+      Args: $2,
+    }
+  }
 | SPECIAL_CHAR_REF LPAREN optional_newlines nodes_with_commas optional_newlines RPAREN
   {
     callExpr := ast.CallExpression{
