@@ -17,12 +17,8 @@ var _ = Describe("VM", func() {
 	var vm VM
 
 	BeforeEach(func() {
-		pathToExecutable, err := filepath.Abs(filepath.Dir(filepath.Dir(filepath.Dir(os.Args[0]))))
-		if err != nil {
-			panic(err)
-		}
-
-		vm = NewVM(pathToExecutable, "fake-irb-under-test")
+		grubbyHome := filepath.Join(os.Getenv("HOME"), ".grubby")
+		vm = NewVM(grubbyHome, "fake-irb-under-test")
 	})
 
 	Describe("the global Object", func() {
