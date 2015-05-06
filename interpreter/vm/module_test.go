@@ -196,4 +196,28 @@ Object.const_defined?(:FOO)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(value).To(Equal(vm.SingletonWithName("true")))
 	})
+
+	It("can tell you if methods are defined", func() {
+		value, err := vm.Run(`
+module Foo
+  def bar
+  end
+
+  BAR = method_defined?(:bar)
+  BAZ = method_defined?(:baz)
+end
+`)
+
+		Expect(err).ToNot(HaveOccurred())
+		module, ok := value.(Module)
+		Expect(ok).To(BeTrue())
+
+		constant, err := module.Constant("BAR")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(constant).To(Equal(vm.SingletonWithName("true")))
+
+		constant, err = module.Constant("BAZ")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(constant).To(Equal(vm.SingletonWithName("false")))
+	})
 })

@@ -230,6 +230,16 @@ func NewModuleClass(provider Provider, evaluator Evaluator) Class {
 			return provider.SingletonProvider().SingletonWithName("false"), nil
 		}
 	}))
+	c.AddMethod(NewNativeMethod("method_defined?", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsModule := self.(Module)
+		_, err := selfAsModule.InstanceMethod(args[0].(*SymbolValue).value)
+
+		if err == nil {
+			return provider.SingletonProvider().SingletonWithName("true"), nil
+		} else {
+			return provider.SingletonProvider().SingletonWithName("false"), nil
+		}
+	}))
 
 	return c
 }
