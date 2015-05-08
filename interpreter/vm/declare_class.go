@@ -1,6 +1,8 @@
 package vm
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/grubby/grubby/ast"
@@ -27,8 +29,15 @@ func interpretClassDeclarationInContext(
 		fullClassName = classNode.FullName()
 	}
 
-	theClass := NewUserDefinedClass(classNode.Name, classNode.SuperClass.FullName(), vm)
-	vm.CurrentClasses[fullClassName] = theClass
+	theClass, ok := vm.CurrentClasses[fullClassName]
+	if !ok {
+		theClass = NewUserDefinedClass(classNode.Name, classNode.SuperClass.FullName(), vm)
+		vm.CurrentClasses[fullClassName] = theClass
+	} else {
+		if classNode.SuperClass.FullName() != "" {
+			return nil, errors.New(fmt.Sprintf("TypeError: superclass mismatch for class %s", classNode.Name))
+		}
+	}
 
 	vm.currentModuleName = fullClassName
 	_, err := vm.executeWithContext(theClass, classNode.Body...)

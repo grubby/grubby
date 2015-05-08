@@ -508,4 +508,23 @@ end
 			Expect(vm.MustGet("value").String()).To(ContainSubstring("just right"))
 		})
 	})
+
+	Describe("opening up a class again", func() {
+		It("preserves the earlier definition of the class", func() {
+			value, err := vm.Run(`
+class Foo
+  def initial_method
+  end
+end
+
+class Foo
+  def monkey_patched_method
+  end
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.(Class)).To(HaveInstanceMethod("initial_method"))
+			Expect(value.(Class)).To(HaveInstanceMethod("monkey_patched_method"))
+		})
+	})
 })
