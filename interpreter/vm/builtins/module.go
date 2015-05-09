@@ -189,7 +189,6 @@ func NewModuleClass(provider Provider, evaluator Evaluator) Class {
 		}
 
 		instanceMethod, err := self.(*RubyModule).InstanceMethod(symbol.value)
-
 		if err != nil {
 			return nil, err
 		}
@@ -213,7 +212,10 @@ func NewModuleClass(provider Provider, evaluator Evaluator) Class {
 
 		method, err := selfAsModule.InstanceMethod(secondSymbol.Name())
 		if err != nil {
-			return nil, err
+			method = self.Method(secondSymbol.Name())
+			if method == nil {
+				return nil, err
+			}
 		}
 
 		selfAsModule.AddInstanceMethod(NewNativeMethod(firstSymbol.Name(), provider, method.methodBody()))

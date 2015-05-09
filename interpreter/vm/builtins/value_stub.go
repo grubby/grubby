@@ -66,6 +66,17 @@ func (valueStub *valueStub) Method(name string) Method {
 			return m
 		}
 
+		for _, module := range super.includedModules() {
+			m, ok := module.eigenclassMethods()[name]
+			if ok {
+				return m
+			}
+		}
+
+		if super.String() == "BasicObject" {
+			break
+		}
+
 		super = super.SuperClass()
 	}
 

@@ -21,14 +21,30 @@ var _ = Describe("VM", func() {
 		vm = NewVM(grubbyHome, "fake-irb-under-test")
 	})
 
-	Describe("the global Object", func() {
-		It("exists", func() {
-			Expect(vm.MustGet("Object")).ToNot(BeNil())
-		})
-
-		It("reports its class as being 'Class'", func() {
+	Describe("Object", func() {
+		It("is a Class", func() {
 			o := vm.MustGet("Object")
 			Expect(o.Class().String()).To(Equal("Class"))
+		})
+
+		It("inherits from BasicObject", func() {
+			Expect(vm.MustGet("Object").(Class).SuperClass().String()).To(Equal("BasicObject"))
+		})
+
+		Describe("#object_id", func() {
+			It("is available to call", func() {
+				_, err := vm.Run("Object.new.object_id")
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("can be aliased", func() {
+				_, err := vm.Run(`
+class Object
+  alias_method :my_object_id, :object_id
+end
+`)
+				Expect(err).ToNot(HaveOccurred())
+			})
 		})
 	})
 

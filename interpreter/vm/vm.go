@@ -158,6 +158,9 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 
 		return nil, nil
 	}))
+	vm.CurrentModules["Kernel"].AddMethod(NewNativeMethod("object_id", vm, func(self Value, block Block, args ...Value) (Value, error) {
+		return NewFixnum(1, vm), nil
+	}))
 
 	/* BEGIN RUNTIME TRICKERY
 	There's a cycle in ruby's builtin object graph
