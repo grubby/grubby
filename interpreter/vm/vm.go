@@ -31,6 +31,8 @@ type vm struct {
 	currentModuleName string // FIXME: I bet this could be determined from context
 
 	exitCallbacks []Block
+
+	required_files map[string]bool
 }
 
 type VM interface {
@@ -70,6 +72,7 @@ func NewVM(rubyHome, name string) VM {
 		CurrentModules:     make(map[string]Module),
 		localVariableStack: NewLocalVariableStack(),
 		singletons:         make(map[string]Value),
+		required_files:     make(map[string]bool),
 	}
 	vm.registerBuiltinClassesAndModules()
 
@@ -130,8 +133,18 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 				continue
 			}
 
-			contents, err := ioutil.ReadAll(file)
+			absolutePath, err := filepath.Abs(fullPath)
+			if err != nil {
+				return nil, err
+			}
 
+			_, ok := vm.required_files[absolutePath]
+			if ok {
+				return vm.singletons["false"], nil
+			}
+			vm.required_files[absolutePath] = true
+
+			contents, err := ioutil.ReadAll(file)
 			if err == nil {
 				originalName := vm.currentFilename
 				defer func() {

@@ -16,6 +16,9 @@ func SetupLoadPathWithAFileToRequire(vm vm.VM) {
 
 	err = ioutil.WriteFile(filepath.Join(tempPath, "foo.rb"), []byte(`
 def foo
+
+FOO_CONST = 'foo'
+
 end
 `), 0600)
 

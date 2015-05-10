@@ -192,6 +192,24 @@ test(5)
 				Expect(method.Name()).To(Equal("foo"))
 			})
 		})
+
+		Describe("with the same file twice", func() {
+			BeforeEach(func() {
+				SetupLoadPathWithAFileToRequire(vm)
+			})
+
+			It("does not require the same file twice", func() {
+				value, err := vm.Run(`
+require 'foo'
+
+FOO_CONST = 'bar'
+
+require 'foo'
+`)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value.String()).ToNot(ContainSubstring("bar"))
+			})
+		})
 	})
 
 	Describe("the load path", func() {
