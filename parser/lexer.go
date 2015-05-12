@@ -271,15 +271,9 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 	case r == '}':
 		l.emit(tokenTypeRBrace)
 	case r == '$':
-		validGlobalNameRunes := alphaNumericUnderscore + ":\\$"
-		if l.accept(validGlobalNameRunes) {
-			l.backup()
-			l.ignore()
-			l.acceptRun(validGlobalNameRunes)
-			l.emit(tokenTypeGlobal)
-		} else {
-			l.emit(tokenTypeDollarSign)
-		}
+		l.ignore()
+		l.acceptRun(alphaNumericUnderscore + ":\\$")
+		l.emit(tokenTypeGlobal)
 	case r == '@':
 		l.emit(tokenTypeAtSign)
 	case r == '.':
@@ -496,11 +490,11 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			lval.genericValue = someValue
 			return CONSTANT
 		case tokenTypeGlobal:
-			debug("REF: '%s'", token.value)
+			debug("GLOBAL: '$%s'", token.value)
 			someValue := ast.GlobalVariable{Name: token.value}
 			someValue.Line = token.line
 			lval.genericValue = someValue
-			return REF
+			return GLOBAL_VARIABLE
 		case tokenTypeLParen:
 			debug("(")
 			lval.genericValue = ast.Nil{Line: token.line}
@@ -618,9 +612,6 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeRBrace:
 			debug("}")
 			return RBRACE
-		case tokenTypeDollarSign:
-			debug("$")
-			return DOLLARSIGN
 		case tokenTypeAtSign:
 			debug("@")
 			return ATSIGN

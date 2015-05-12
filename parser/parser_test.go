@@ -2137,6 +2137,21 @@ foo &&= false
 				})
 			})
 
+			Context("to a global variable", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("$foo_bar_baz = :biz")
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.GlobalVariable{Name: "foo_bar_baz"},
+							RHS: ast.Symbol{Name: "biz"},
+						},
+					}))
+				})
+			})
+
 			Context("to a constant scoped to a module", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("Foo::Bar = 12")

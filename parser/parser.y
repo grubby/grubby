@@ -33,6 +33,8 @@ var Statements []ast.Node
 %token <genericValue> SPECIAL_CHAR_REF
 %token <genericValue> CONSTANT
 %token <genericValue> NAMESPACED_CAPITAL_REF
+%token <genericValue> GLOBAL_VARIABLE
+
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
 %token <genericValue> COMMA
@@ -107,7 +109,6 @@ var Statements []ast.Node
 %token <genericValue> RBRACKET      // "]"
 %token <genericValue> LBRACE        // "{"
 %token <genericValue> RBRACE        // "}"
-%token <genericValue> DOLLARSIGN    // "$"
 %token <genericValue> ATSIGN        // "@"
 %token <genericValue> FILE_CONST_REF // __FILE__
 %token <genericValue> LINE_CONST_REF // __LINE__
@@ -129,7 +130,6 @@ var Statements []ast.Node
 %type <genericValue> alias
 %type <genericValue> array
 %type <genericValue> group
-%type <genericValue> global
 %type <genericValue> lambda
 %type <genericValue> rescue
 %type <genericValue> ternary
@@ -257,7 +257,7 @@ list : /* empty */
 | list expr
 {  $$ = append($$, $2) };
 
-simple_node : SYMBOL | NODE | string_literal | REF | CONSTANT | instance_variable | class_variable | global | LINE_CONST_REF | FILE_CONST_REF | self | nil;
+simple_node : SYMBOL | NODE | string_literal | REF | CONSTANT | GLOBAL_VARIABLE | instance_variable | class_variable | LINE_CONST_REF | FILE_CONST_REF | self | nil;
 
 single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression;
 
@@ -959,15 +959,8 @@ assignment : REF EQUALTO single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| global EQUALTO expr
-  {
-    eql := ast.Assignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
+| GLOBAL_VARIABLE EQUALTO expr
+  { $$ = ast.Assignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | class_name_with_modules EQUALTO expr
   { $$ = ast.Assignment{LHS: $1, RHS: $3, Line: $1.LineNumber()} };
 
@@ -1062,15 +1055,8 @@ conditional_assignment : REF OR_EQUALS single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| global OR_EQUALS expr
-  {
-    eql := ast.ConditionalAssignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
+| GLOBAL_VARIABLE OR_EQUALS expr
+  { $$ = ast.ConditionalAssignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | call_expression OR_EQUALS expr
   {
     eql := ast.ConditionalAssignment{LHS: $1, RHS: $3}
@@ -1122,26 +1108,14 @@ conditional_assignment : REF OR_EQUALS single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| global AND_EQUALS expr
-  {
-    eql := ast.ConditionalTruthyAssignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
+| GLOBAL_VARIABLE AND_EQUALS expr
+  { $$ = ast.ConditionalTruthyAssignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | call_expression AND_EQUALS expr
   {
     eql := ast.ConditionalTruthyAssignment{LHS: $1, RHS: $3}
     eql.Line = $1.LineNumber()
     $$ = eql
   };
-
-global : DOLLARSIGN REF
-  { $$ = ast.GlobalVariable{Name: $2.(ast.BareReference).Name} }
-| DOLLARSIGN CONSTANT
-  { $$ = ast.GlobalVariable{Name: $2.(ast.Constant).Name} };
 
 instance_variable : ATSIGN REF
   {
