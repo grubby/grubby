@@ -618,7 +618,20 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
     }
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
-  };
+  }
+| single_node DOT REF LBRACKET single_node RBRACKET EQUALTO expr
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $1.LineNumber(), Name: "[]="},
+      Target: ast.CallExpression{
+        Line: $1.LineNumber(),
+        Func: $3.(ast.BareReference),
+        Target: $1,
+      },
+      Args: []ast.Node{$5, $8},
+    }
+  }
 
 
 operator_expression : single_node OPERATOR optional_newlines single_node

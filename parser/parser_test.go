@@ -767,6 +767,28 @@ end
 				})
 			})
 
+			Context("that return a hash and assign a value in-line", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("Foo.bar[:key] = :value")
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "[]="},
+							Args: []ast.Node{
+								ast.Symbol{Name: "key"},
+								ast.Symbol{Name: "value"},
+							},
+							Target: ast.CallExpression{
+								Target: ast.Constant{Name: "Foo"},
+								Func:   ast.BareReference{Name: "bar"},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with args and a block split across newlines", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
