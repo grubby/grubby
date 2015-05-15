@@ -84,6 +84,7 @@ const (
 	tokenTypeAmpersand
 	tokenTypeSubshell
 	tokenTypeOperator
+	tokenTypeHashRocket
 	tokenTypeQuestionMark
 	tokenTypeProcArg
 	tokenTypeFOR
@@ -236,7 +237,7 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 		} else if l.accept("~") {
 			l.emit(tokenTypeOperator)
 		} else if l.accept(">") {
-			l.emit(tokenTypeOperator)
+			l.emit(tokenTypeHashRocket)
 		} else {
 			l.emit(tokenTypeEqual)
 		}
@@ -653,6 +654,9 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			someValue := ast.BareReference{Name: token.value, Line: token.line}
 			lval.genericValue = someValue
 			return OPERATOR
+		case tokenTypeHashRocket:
+			debug("=>")
+			return HASH_ROCKET
 		case tokenTypeBEGIN:
 			debug("BEGIN")
 			someValue := ast.Nil{Line: token.line}

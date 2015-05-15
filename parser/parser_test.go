@@ -595,6 +595,30 @@ end
 		})
 
 		Describe("call expressions", func() {
+			Context("with :key => value arguments", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo(:bar => :baz)")
+				})
+
+				It("parses the args as a hash", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "foo"},
+							Args: []ast.Node{
+								ast.Hash{
+									Pairs: []ast.HashKeyValuePair{
+										{
+											Key:   ast.Symbol{Name: "bar"},
+											Value: ast.Symbol{Name: "baz"},
+										},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with a value that should be converted to a proc", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("describe(&blocks); explain(&:it_well)")

@@ -20,10 +20,12 @@ var Statements []ast.Node
   genericString   string
   stringSlice     []string
   switchCaseSlice []ast.SwitchCase
+  hashPairSlice   []ast.HashKeyValuePair
   astString       ast.String
 }
 
 %token <genericValue> OPERATOR
+%token <genericValue> HASH_ROCKET
 
 // any non-terminal which returns a value needs a type, which is
 // really a field name in the above union struct
@@ -198,7 +200,7 @@ var Statements []ast.Node
 %type <genericSlice> elsif_block
 %type <genericSlice> capture_list
 %type <genericSlice> method_args
-%type <genericSlice> key_value_pairs
+%type <hashPairSlice> key_value_pairs
 %type <genericSlice> loop_expressions
 %type <genericSlice> optional_ensure
 %type <genericSlice> optional_rescues
@@ -680,12 +682,28 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
   { $$ = append($$, $1) }
 | proc_arg
   { $$ = append($$, $1) }
+| key_value_pairs
+  {
+    $$ = append($$, ast.Hash{
+      Line: $1[0].LineNumber(),
+      Pairs: $1,
+    })
+  }
 | nodes_with_commas COMMA optional_newlines single_node
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines assignment
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines proc_arg
   { $$ = append($$, $4) };
+| nodes_with_commas COMMA optional_newlines key_value_pairs
+  {
+    $$ = append($$, ast.Hash{
+      Line: $2.LineNumber(),
+      Pairs: $4,
+    })
+  };
+
+
 
 proc_arg : ProcArg single_node
   {
@@ -697,10 +715,12 @@ proc_arg : ProcArg single_node
     $$ = callExpr
   };
 
+
 nonempty_nodes_with_commas : single_node
   { $$ = append($$, $1); }
 | nonempty_nodes_with_commas COMMA single_node
   { $$ = append($$, $3); }
+
 
 optional_ensure : /* nothing */
  { $$ = nil }
@@ -852,17 +872,15 @@ class_declaration : CLASS class_name_with_modules list END
 
 eigenclass_declaration : CLASS OPERATOR single_node list END
   {
-    name := $2.(ast.BareReference).Name
-    if name != "<<" {
-      panic("FREAKOUT :: impossible operator after 'class' keyword (" + name + ")")
+    if $2.(ast.BareReference).Name != "<<" {
+        panic("FREAKOUT")
     }
 
-    class := ast.Eigenclass{
+    $$ = ast.Eigenclass{
+      Line: $3.LineNumber(),
       Target: $3,
       Body: $4,
     }
-    class.Line = $2.LineNumber()
-    $$ = class
   };
 
 module_declaration : MODULE class_name_with_modules list END
@@ -1292,11 +1310,7 @@ hash : LBRACE optional_newlines RBRACE
   { $$ = ast.Hash{Line: $1.LineNumber()} }
 | LBRACE optional_newlines key_value_pairs optional_newlines RBRACE
   {
-    pairs := []ast.HashKeyValuePair{}
-    for _, node := range $3 {
-      pairs = append(pairs, node.(ast.HashKeyValuePair))
-    }
-    $$ = ast.Hash{Line: $1.LineNumber(), Pairs: pairs}
+    $$ = ast.Hash{Line: $1.LineNumber(), Pairs: $3}
   }
 | LBRACE optional_newlines symbol_key_value_pairs optional_newlines RBRACE
   {
@@ -1307,20 +1321,12 @@ hash : LBRACE optional_newlines RBRACE
     $$ = ast.Hash{Line: $1.LineNumber(), Pairs: pairs}
   };
 
-key_value_pairs : single_node OPERATOR expr
+key_value_pairs : single_node HASH_ROCKET single_node
   {
-    name := $2.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-        }
     $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $3})
   }
-| key_value_pairs COMMA optional_newlines single_node OPERATOR expr optional_comma
+| key_value_pairs COMMA optional_newlines single_node HASH_ROCKET single_node optional_comma
   {
-    name := $5.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-    }
     $$ = append($$, ast.HashKeyValuePair{Key: $4, Value: $6})
   };
 
@@ -1588,13 +1594,8 @@ rescue : RESCUE list
       },
     }
   }
-| RESCUE comma_delimited_class_names OPERATOR REF list
+| RESCUE comma_delimited_class_names HASH_ROCKET REF list
   {
-    name := $3.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-    }
-
     classes := []ast.Class{}
     for _, class := range $2 {
       classes = append(classes, class.(ast.Class))
@@ -1609,13 +1610,8 @@ rescue : RESCUE list
       },
     }
   }
-| RESCUE comma_delimited_class_names OPERATOR instance_variable list
+| RESCUE comma_delimited_class_names HASH_ROCKET instance_variable list
   {
-    name := $3.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-    }
-
     classes := []ast.Class{}
     for _, class := range $2 {
       classes = append(classes, class.(ast.Class))
@@ -1630,13 +1626,8 @@ rescue : RESCUE list
       },
     }
   }
-| RESCUE comma_delimited_class_names OPERATOR class_variable list
+| RESCUE comma_delimited_class_names HASH_ROCKET class_variable list
   {
-    name := $3.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-    }
-
     classes := []ast.Class{}
     for _, class := range $2 {
       classes = append(classes, class.(ast.Class))
@@ -1651,13 +1642,8 @@ rescue : RESCUE list
       },
     }
   }
-| RESCUE OPERATOR REF list
+| RESCUE HASH_ROCKET REF list
   {
-    name := $2.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-    }
-
     $$ = ast.Rescue{
       Line: $1.LineNumber(),
       Body: $4,
@@ -1666,13 +1652,8 @@ rescue : RESCUE list
       },
     }
   }
-| RESCUE OPERATOR instance_variable list
+| RESCUE HASH_ROCKET instance_variable list
   {
-    name := $2.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-    }
-
     $$ = ast.Rescue{
       Line: $1.LineNumber(),
       Body: $4,
@@ -1681,13 +1662,8 @@ rescue : RESCUE list
       },
     }
   }
-| RESCUE OPERATOR class_variable list
+| RESCUE HASH_ROCKET class_variable list
   {
-    name := $2.(ast.BareReference).Name
-    if name != "=>" {
-      panic("FREAKOUT")
-    }
-
     $$ = ast.Rescue{
       Line: $1.LineNumber(),
       Body: $4,
