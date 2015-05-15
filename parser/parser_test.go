@@ -3815,6 +3815,7 @@ end`)
 exit(1) if false
 foo = :bar if something.truthy_method
 raise OptionError, "description" if args.size < 2
+option.block[arg] if true
 `)
 				})
 
@@ -3866,6 +3867,22 @@ raise OptionError, "description" if args.size < 2
 										ast.Constant{Line: 3, Name: "OptionError"},
 										ast.InterpolatedString{Line: 3, Value: "description"},
 									},
+								},
+							},
+						},
+						ast.IfBlock{
+							Line:      4,
+							Condition: ast.Boolean{Line: 4, Value: true},
+							Body: []ast.Node{
+								ast.CallExpression{
+									Line: 4,
+									Func: ast.BareReference{Line: 4, Name: "[]"},
+									Target: ast.CallExpression{
+										Line:   4,
+										Func:   ast.BareReference{Line: 4, Name: "block"},
+										Target: ast.BareReference{Line: 4, Name: "option"},
+									},
+									Args: []ast.Node{ast.BareReference{Line: 4, Name: "arg"}},
 								},
 							},
 						},

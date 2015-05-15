@@ -180,7 +180,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:1920
+//line parser.y:1933
 
 //line yacctab:1
 var RubyExca = []int{
@@ -188,40 +188,40 @@ var RubyExca = []int{
 	1, -1,
 	-2, 0,
 	-1, 134,
-	19, 258,
-	21, 258,
-	24, 258,
-	25, 258,
-	26, 258,
-	28, 258,
-	29, 258,
-	30, 258,
-	33, 258,
-	34, 258,
-	36, 258,
-	37, 258,
-	38, 258,
-	42, 258,
-	44, 258,
-	62, 258,
+	19, 259,
+	21, 259,
+	24, 259,
+	25, 259,
+	26, 259,
+	28, 259,
+	29, 259,
+	30, 259,
+	33, 259,
+	34, 259,
+	36, 259,
+	37, 259,
+	38, 259,
+	42, 259,
+	44, 259,
+	62, 259,
 	-2, 13,
 	-1, 205,
-	19, 258,
-	21, 258,
-	24, 258,
-	25, 258,
-	26, 258,
-	28, 258,
-	29, 258,
-	30, 258,
-	33, 258,
-	34, 258,
-	36, 258,
-	37, 258,
-	38, 258,
-	42, 258,
-	44, 258,
-	62, 258,
+	19, 259,
+	21, 259,
+	24, 259,
+	25, 259,
+	26, 259,
+	28, 259,
+	29, 259,
+	30, 259,
+	33, 259,
+	34, 259,
+	36, 259,
+	37, 259,
+	38, 259,
+	42, 259,
+	44, 259,
+	62, 259,
 	-2, 13,
 	-1, 348,
 	4, 22,
@@ -235,24 +235,24 @@ var RubyExca = []int{
 	65, 22,
 	66, 22,
 	67, 22,
-	-2, 120,
+	-2, 121,
 	-1, 360,
-	19, 258,
-	21, 258,
-	24, 258,
-	25, 258,
-	26, 258,
-	28, 258,
-	29, 258,
-	30, 258,
-	33, 258,
-	34, 258,
-	36, 258,
-	37, 258,
-	38, 258,
-	42, 258,
-	44, 258,
-	62, 258,
+	19, 259,
+	21, 259,
+	24, 259,
+	25, 259,
+	26, 259,
+	28, 259,
+	29, 259,
+	30, 259,
+	33, 259,
+	34, 259,
+	36, 259,
+	37, 259,
+	38, 259,
+	42, 259,
+	44, 259,
+	62, 259,
 	-2, 13,
 	-1, 398,
 	4, 35,
@@ -269,11 +269,11 @@ var RubyExca = []int{
 	73, 13,
 	-2, 15,
 	-1, 576,
-	14, 126,
+	14, 127,
 	-2, 13,
 }
 
-const RubyNprod = 321
+const RubyNprod = 322
 const RubyPrivate = 57344
 
 var RubyTokenNames []string
@@ -818,28 +818,28 @@ var RubyR1 = []int{
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
 	23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-	23, 23, 23, 24, 61, 61, 61, 61, 72, 72,
-	70, 70, 70, 70, 70, 70, 70, 14, 74, 74,
-	68, 68, 25, 25, 25, 25, 25, 25, 25, 25,
-	65, 65, 65, 76, 76, 76, 34, 34, 34, 34,
-	32, 32, 33, 36, 38, 38, 38, 16, 16, 16,
-	16, 16, 16, 16, 16, 16, 18, 18, 18, 75,
-	75, 37, 37, 37, 37, 37, 37, 37, 37, 37,
-	37, 37, 37, 37, 37, 35, 35, 22, 22, 47,
+	23, 23, 23, 23, 24, 61, 61, 61, 61, 72,
+	72, 70, 70, 70, 70, 70, 70, 70, 14, 74,
+	74, 68, 68, 25, 25, 25, 25, 25, 25, 25,
+	25, 65, 65, 65, 76, 76, 76, 34, 34, 34,
+	34, 32, 32, 33, 36, 38, 38, 38, 16, 16,
+	16, 16, 16, 16, 16, 16, 16, 18, 18, 18,
+	75, 75, 37, 37, 37, 37, 37, 37, 37, 37,
+	37, 37, 37, 37, 37, 37, 35, 35, 22, 22,
 	47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
-	47, 47, 47, 47, 47, 48, 49, 50, 51, 52,
-	53, 54, 55, 56, 57, 8, 3, 1, 78, 78,
-	78, 78, 78, 78, 78, 4, 4, 4, 66, 66,
-	73, 73, 73, 6, 6, 6, 6, 6, 6, 62,
-	71, 71, 71, 13, 13, 13, 13, 13, 13, 13,
-	13, 13, 13, 13, 63, 63, 63, 63, 59, 59,
-	59, 9, 19, 19, 19, 19, 11, 11, 11, 11,
-	11, 11, 11, 11, 77, 77, 69, 69, 60, 60,
-	26, 26, 27, 28, 28, 28, 30, 30, 30, 29,
-	29, 29, 12, 44, 44, 44, 67, 67, 67, 67,
-	67, 45, 45, 45, 45, 45, 46, 46, 46, 46,
-	42, 41, 10, 40, 40, 40, 40, 39, 39, 5,
-	7,
+	47, 47, 47, 47, 47, 47, 48, 49, 50, 51,
+	52, 53, 54, 55, 56, 57, 8, 3, 1, 78,
+	78, 78, 78, 78, 78, 78, 4, 4, 4, 66,
+	66, 73, 73, 73, 6, 6, 6, 6, 6, 6,
+	62, 71, 71, 71, 13, 13, 13, 13, 13, 13,
+	13, 13, 13, 13, 13, 63, 63, 63, 63, 59,
+	59, 59, 9, 19, 19, 19, 19, 11, 11, 11,
+	11, 11, 11, 11, 11, 77, 77, 69, 69, 60,
+	60, 26, 26, 27, 28, 28, 28, 30, 30, 30,
+	29, 29, 29, 12, 44, 44, 44, 67, 67, 67,
+	67, 67, 45, 45, 45, 45, 45, 46, 46, 46,
+	46, 42, 41, 10, 40, 40, 40, 40, 39, 39,
+	5, 7,
 }
 var RubyR2 = []int{
 
@@ -853,29 +853,29 @@ var RubyR2 = []int{
 	1, 1, 1, 1, 1, 2, 3, 2, 6, 7,
 	1, 2, 6, 6, 2, 3, 2, 3, 4, 5,
 	4, 3, 4, 5, 2, 3, 3, 3, 3, 4,
-	4, 4, 4, 4, 4, 4, 4, 4, 6, 7,
-	6, 6, 8, 4, 5, 8, 1, 4, 1, 3,
-	0, 1, 1, 1, 4, 4, 4, 2, 1, 3,
-	0, 2, 6, 7, 8, 8, 9, 9, 6, 7,
-	1, 3, 3, 0, 1, 3, 1, 2, 3, 2,
-	4, 6, 5, 4, 1, 2, 1, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 9,
-	6, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 2, 2, 3, 3, 3,
-	3, 3, 4, 3, 3, 3, 4, 3, 3, 3,
-	4, 3, 3, 3, 4, 2, 2, 2, 2, 3,
-	3, 3, 3, 3, 3, 5, 1, 1, 0, 1,
-	1, 1, 4, 4, 4, 3, 5, 5, 3, 7,
-	3, 7, 8, 3, 4, 5, 5, 5, 6, 3,
-	0, 1, 3, 4, 5, 3, 3, 3, 3, 3,
-	5, 6, 5, 3, 4, 3, 3, 2, 0, 2,
-	2, 3, 4, 6, 8, 6, 2, 3, 5, 5,
-	5, 4, 4, 4, 1, 3, 0, 2, 1, 2,
-	2, 1, 1, 2, 2, 1, 1, 3, 3, 1,
-	3, 3, 5, 5, 5, 3, 0, 2, 2, 2,
-	2, 5, 6, 5, 6, 5, 4, 3, 3, 2,
-	4, 4, 2, 5, 7, 4, 6, 4, 5, 3,
-	3,
+	4, 4, 4, 4, 4, 4, 4, 4, 6, 6,
+	7, 6, 6, 8, 4, 5, 8, 1, 4, 1,
+	3, 0, 1, 1, 1, 4, 4, 4, 2, 1,
+	3, 0, 2, 6, 7, 8, 8, 9, 9, 6,
+	7, 1, 3, 3, 0, 1, 3, 1, 2, 3,
+	2, 4, 6, 5, 4, 1, 2, 1, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	9, 6, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 2, 2, 3, 3,
+	3, 3, 3, 4, 3, 3, 3, 4, 3, 3,
+	3, 4, 3, 3, 3, 4, 2, 2, 2, 2,
+	3, 3, 3, 3, 3, 3, 5, 1, 1, 0,
+	1, 1, 1, 4, 4, 4, 3, 5, 5, 3,
+	7, 3, 7, 8, 3, 4, 5, 5, 5, 6,
+	3, 0, 1, 3, 4, 5, 3, 3, 3, 3,
+	3, 5, 6, 5, 3, 4, 3, 3, 2, 0,
+	2, 2, 3, 4, 6, 8, 6, 2, 3, 5,
+	5, 5, 4, 4, 4, 1, 3, 0, 2, 1,
+	2, 2, 1, 1, 2, 2, 1, 1, 3, 3,
+	1, 3, 3, 5, 5, 5, 3, 0, 2, 2,
+	2, 2, 5, 6, 5, 6, 5, 4, 3, 3,
+	2, 4, 4, 2, 5, 7, 4, 6, 4, 5,
+	3, 3,
 }
 var RubyChk = []int{
 
@@ -951,65 +951,65 @@ var RubyDef = []int{
 	64, 65, 66, 67, 68, 69, 70, 71, 72, 73,
 	31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
 	41, 42, 43, 44, 45, 46, 0, 0, 0, 22,
-	23, 25, 26, 24, 0, 0, 0, 0, 15, 281,
-	0, 0, 13, 285, 289, 286, 282, 0, 19, 20,
-	21, 27, 28, 29, 30, 13, 13, 156, 80, 258,
+	23, 25, 26, 24, 0, 0, 0, 0, 15, 282,
+	0, 0, 13, 286, 290, 287, 283, 0, 19, 20,
+	21, 27, 28, 29, 30, 13, 13, 157, 80, 259,
 	0, 0, 0, 0, 0, 0, 47, 48, 49, 50,
-	51, 52, 0, 74, 216, 217, 5, 6, 7, 0,
+	51, 52, 0, 74, 217, 218, 5, 6, 7, 0,
 	0, 0, 0, 0, 0, 0, 13, 0, 0, 0,
 	0, 0, 0, 0, 0, 13, 13, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 143, 0, 143,
-	15, 0, 154, 15, -2, 84, 86, 94, 13, 0,
-	0, 0, 0, 116, 15, 13, 121, 122, 123, 35,
-	22, 23, 25, 26, 24, 0, 13, 0, 155, 0,
+	0, 0, 0, 0, 0, 0, 0, 144, 0, 144,
+	15, 0, 155, 15, -2, 84, 86, 94, 13, 0,
+	0, 0, 0, 117, 15, 13, 122, 123, 124, 35,
+	22, 23, 25, 26, 24, 0, 13, 0, 156, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 15, 0,
-	276, 280, 118, 34, 22, 23, 24, 25, 26, 0,
-	0, 13, 0, 283, 284, 118, 0, 0, 0, 0,
-	0, 75, 218, 0, 81, -2, 121, 0, 312, 13,
-	205, 206, 207, 208, 77, 185, 186, 0, 245, 253,
-	295, 76, 87, 96, 98, 0, 209, 210, 211, 212,
-	213, 214, 247, 0, 0, 0, 319, 249, 165, 97,
-	0, 128, 177, 184, 246, 248, 91, 15, 0, 140,
-	143, 144, 146, 0, 0, 0, 15, 0, 0, 15,
-	0, 120, 85, 95, 13, 128, 0, 0, 157, 158,
-	159, 160, 171, 172, 178, 179, 189, 190, 191, 0,
-	13, 0, 15, 240, 15, 13, 127, 120, 128, 0,
-	0, 161, 173, 180, 0, 162, 174, 181, 193, 194,
-	195, 0, 163, 175, 182, 197, 198, 199, 0, 164,
-	176, 183, 166, 167, 201, 202, 203, 0, 168, 0,
-	0, 0, 15, 15, 16, 17, 18, 0, 0, 296,
-	296, 0, 14, 0, 0, 290, 291, 287, 288, 320,
-	13, 219, 220, 221, 225, 13, 13, 0, -2, 120,
-	259, 260, 261, 15, 187, 188, 88, 90, 0, 13,
-	-2, 128, 113, 0, 310, 311, 106, 0, 107, 92,
-	130, 143, 0, 0, 0, 0, 147, 149, 143, 130,
-	150, 15, 0, 153, 13, 0, 99, 102, 104, 192,
-	0, 129, 233, 0, 0, 241, 13, 15, -2, 128,
-	13, 100, 103, 105, 101, 196, 200, 204, 0, 0,
-	243, 0, 0, 15, 0, 0, 262, 15, 15, 277,
-	15, 119, 0, 0, 0, 315, 15, 0, 15, 0,
+	277, 281, 119, 34, 22, 23, 24, 25, 26, 0,
+	0, 13, 0, 284, 285, 119, 0, 0, 0, 0,
+	0, 75, 219, 0, 81, -2, 122, 0, 313, 13,
+	206, 207, 208, 209, 77, 186, 187, 0, 246, 254,
+	296, 76, 87, 96, 98, 0, 210, 211, 212, 213,
+	214, 215, 248, 0, 0, 0, 320, 250, 166, 97,
+	0, 129, 178, 185, 247, 249, 91, 15, 0, 141,
+	144, 145, 147, 0, 0, 0, 15, 0, 0, 15,
+	0, 121, 85, 95, 13, 129, 0, 0, 158, 159,
+	160, 161, 172, 173, 179, 180, 190, 191, 192, 0,
+	13, 0, 15, 241, 15, 13, 128, 121, 129, 0,
+	0, 162, 174, 181, 0, 163, 175, 182, 194, 195,
+	196, 0, 164, 176, 183, 198, 199, 200, 0, 165,
+	177, 184, 167, 168, 202, 203, 204, 0, 169, 0,
+	0, 0, 15, 15, 16, 17, 18, 0, 0, 297,
+	297, 0, 14, 0, 0, 291, 292, 288, 289, 321,
+	13, 220, 221, 222, 226, 13, 13, 0, -2, 121,
+	260, 261, 262, 15, 188, 189, 88, 90, 0, 13,
+	-2, 129, 114, 0, 311, 312, 106, 0, 107, 92,
+	131, 144, 0, 0, 0, 0, 148, 150, 144, 131,
+	151, 15, 0, 154, 13, 0, 99, 102, 104, 193,
+	0, 130, 234, 0, 0, 242, 13, 15, -2, 129,
+	13, 100, 103, 105, 101, 197, 201, 205, 0, 0,
+	244, 0, 0, 15, 0, 0, 263, 15, 15, 278,
+	15, 120, 0, 0, 0, 316, 15, 0, 15, 0,
 	13, 0, 13, 0, 13, 13, 0, 13, 0, 89,
-	93, 0, 120, 292, 0, 0, 130, 15, 278, 15,
-	145, 141, 142, 148, 15, 0, 130, 0, 152, 0,
-	13, 124, 125, 126, 0, 0, 117, 234, 239, 0,
+	93, 0, 121, 293, 0, 0, 131, 15, 279, 15,
+	146, 142, 143, 149, 15, 0, 131, 0, 153, 0,
+	13, 125, 126, 127, 0, 0, 118, 235, 240, 0,
 	0, 0, 0, 13, 99, 0, 13, 0, 0, 0,
-	244, 0, 15, 15, 257, 250, 0, 252, 0, 0,
-	266, 15, 0, 274, 293, 297, 298, 299, 300, 0,
-	0, 294, 313, 15, 0, 15, 13, 215, 0, 226,
-	0, 227, 0, 228, 230, 0, 0, 13, 111, 132,
-	0, 279, 131, 130, 130, 138, 0, 151, 78, 0,
-	108, 0, 242, 235, 236, 237, 0, 83, 0, 110,
-	0, 170, 15, 255, 256, 251, 263, 15, 265, 267,
-	0, 0, 15, 15, 15, 15, 0, 0, 316, 13,
-	317, 222, 223, 224, 0, 0, 82, 0, 0, 133,
-	0, 130, 0, 130, 139, 79, -2, 0, 238, 109,
-	254, 0, 15, 15, 15, 275, 271, 272, 273, 296,
-	15, 15, 314, 318, 13, 0, 112, 114, 134, 0,
-	135, 0, 0, 0, 264, 268, 269, 270, 0, 0,
-	0, 11, 13, 136, 137, 115, 169, 301, 0, 0,
-	296, 303, 0, 305, 229, 12, 231, 13, 302, 0,
-	296, 296, 309, 304, 232, 296, 307, 308, 306,
+	245, 0, 15, 15, 258, 251, 0, 253, 0, 0,
+	267, 15, 0, 275, 294, 298, 299, 300, 301, 0,
+	0, 295, 314, 15, 0, 15, 13, 216, 0, 227,
+	0, 228, 0, 229, 231, 0, 108, 13, 112, 133,
+	0, 280, 132, 131, 131, 139, 0, 152, 78, 0,
+	109, 0, 243, 236, 237, 238, 0, 83, 0, 111,
+	0, 171, 15, 256, 257, 252, 264, 15, 266, 268,
+	0, 0, 15, 15, 15, 15, 0, 0, 317, 13,
+	318, 223, 224, 225, 0, 0, 82, 0, 0, 134,
+	0, 131, 0, 131, 140, 79, -2, 0, 239, 110,
+	255, 0, 15, 15, 15, 276, 272, 273, 274, 297,
+	15, 15, 315, 319, 13, 0, 113, 115, 135, 0,
+	136, 0, 0, 0, 265, 269, 270, 271, 0, 0,
+	0, 11, 13, 137, 138, 116, 170, 302, 0, 0,
+	297, 304, 0, 306, 230, 12, 232, 13, 303, 0,
+	297, 297, 310, 305, 233, 297, 308, 309, 307,
 }
 var RubyTok1 = []int{
 
@@ -1785,7 +1785,21 @@ Rubydefault:
 			RubyVAL.genericValue = callExpr
 		}
 	case 108:
-		//line parser.y:583
+		//line parser.y:581
+		{
+			RubyVAL.genericValue = ast.CallExpression{
+				Line: RubyS[Rubypt-5].genericValue.LineNumber(),
+				Func: ast.BareReference{Line: RubyS[Rubypt-5].genericValue.LineNumber(), Name: "[]"},
+				Target: ast.CallExpression{
+					Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
+					Target: RubyS[Rubypt-5].genericValue,
+					Func:   RubyS[Rubypt-3].genericValue.(ast.BareReference),
+				},
+				Args: []ast.Node{RubyS[Rubypt-1].genericValue},
+			}
+		}
+	case 109:
+		//line parser.y:596
 		{
 			callExpr := ast.CallExpression{
 				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: "[]="},
@@ -1795,8 +1809,8 @@ Rubydefault:
 			callExpr.Line = RubyS[Rubypt-5].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
-	case 109:
-		//line parser.y:593
+	case 110:
+		//line parser.y:606
 		{
 			callExpr := ast.CallExpression{
 				Func:   ast.BareReference{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Name: "[]="},
@@ -1806,19 +1820,8 @@ Rubydefault:
 			callExpr.Line = RubyS[Rubypt-6].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
-	case 110:
-		//line parser.y:603
-		{
-			callExpr := ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-5].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-3].genericValue, RubyS[Rubypt-0].genericValue},
-			}
-			callExpr.Line = RubyS[Rubypt-5].genericValue.LineNumber()
-			RubyVAL.genericValue = callExpr
-		}
 	case 111:
-		//line parser.y:613
+		//line parser.y:616
 		{
 			callExpr := ast.CallExpression{
 				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: "[]="},
@@ -1829,7 +1832,18 @@ Rubydefault:
 			RubyVAL.genericValue = callExpr
 		}
 	case 112:
-		//line parser.y:623
+		//line parser.y:626
+		{
+			callExpr := ast.CallExpression{
+				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: "[]="},
+				Target: RubyS[Rubypt-5].genericValue,
+				Args:   []ast.Node{RubyS[Rubypt-3].genericValue, RubyS[Rubypt-0].genericValue},
+			}
+			callExpr.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			RubyVAL.genericValue = callExpr
+		}
+	case 113:
+		//line parser.y:636
 		{
 			RubyVAL.genericValue = ast.CallExpression{
 				Line: RubyS[Rubypt-7].genericValue.LineNumber(),
@@ -1842,8 +1856,8 @@ Rubydefault:
 				Args: []ast.Node{RubyS[Rubypt-3].genericValue, RubyS[Rubypt-0].genericValue},
 			}
 		}
-	case 113:
-		//line parser.y:638
+	case 114:
+		//line parser.y:651
 		{
 			callExpr := ast.CallExpression{
 				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -1853,73 +1867,73 @@ Rubydefault:
 			}
 			RubyVAL.genericValue = callExpr
 		}
-	case 114:
-		//line parser.y:650
+	case 115:
+		//line parser.y:663
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-2].genericSlice
 		}
-	case 115:
-		//line parser.y:652
+	case 116:
+		//line parser.y:665
 		{
 			RubyVAL.genericSlice = append(RubyS[Rubypt-5].genericSlice, RubyS[Rubypt-2].genericValue)
 		}
-	case 116:
-		//line parser.y:654
+	case 117:
+		//line parser.y:667
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
 		}
-	case 117:
-		//line parser.y:656
+	case 118:
+		//line parser.y:669
 		{
 			RubyVAL.genericSlice = append(RubyS[Rubypt-3].genericSlice, RubyS[Rubypt-0].genericValue)
 		}
-	case 118:
-		//line parser.y:659
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
 	case 119:
-		//line parser.y:661
+		//line parser.y:672
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 120:
-		//line parser.y:663
-		{
-			RubyVAL.genericSlice = ast.Nodes{}
-		}
-	case 121:
-		//line parser.y:665
+		//line parser.y:674
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
+	case 121:
+		//line parser.y:676
+		{
+			RubyVAL.genericSlice = ast.Nodes{}
+		}
 	case 122:
-		//line parser.y:667
+		//line parser.y:678
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 123:
-		//line parser.y:669
+		//line parser.y:680
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 124:
-		//line parser.y:671
+		//line parser.y:682
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 125:
-		//line parser.y:673
+		//line parser.y:684
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 126:
-		//line parser.y:675
+		//line parser.y:686
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 127:
-		//line parser.y:678
+		//line parser.y:688
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 128:
+		//line parser.y:691
 		{
 			callExpr := ast.CallExpression{
 				Line:   RubyS[Rubypt-0].genericValue.LineNumber(),
@@ -1928,28 +1942,28 @@ Rubydefault:
 			}
 			RubyVAL.genericValue = callExpr
 		}
-	case 128:
-		//line parser.y:688
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
 	case 129:
-		//line parser.y:690
+		//line parser.y:701
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 130:
-		//line parser.y:693
+		//line parser.y:703
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 131:
+		//line parser.y:706
 		{
 			RubyVAL.genericSlice = nil
 		}
-	case 131:
-		//line parser.y:695
+	case 132:
+		//line parser.y:708
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
 		}
-	case 132:
-		//line parser.y:698
+	case 133:
+		//line parser.y:711
 		{
 			method := ast.FuncDecl{
 				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
@@ -1960,8 +1974,8 @@ Rubydefault:
 			method.Line = RubyS[Rubypt-4].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
-	case 133:
-		//line parser.y:709
+	case 134:
+		//line parser.y:722
 		{
 			method := ast.FuncDecl{
 				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
@@ -1973,21 +1987,8 @@ Rubydefault:
 			method.Line = RubyS[Rubypt-5].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
-	case 134:
-		//line parser.y:721
-		{
-			method := ast.FuncDecl{
-				Target: RubyS[Rubypt-6].genericValue,
-				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-3].genericSlice,
-				Body:   RubyS[Rubypt-2].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
-			}
-			method.Line = RubyS[Rubypt-6].genericValue.LineNumber()
-			RubyVAL.genericValue = method
-		}
 	case 135:
-		//line parser.y:733
+		//line parser.y:734
 		{
 			method := ast.FuncDecl{
 				Target: RubyS[Rubypt-6].genericValue,
@@ -2000,17 +2001,16 @@ Rubydefault:
 			RubyVAL.genericValue = method
 		}
 	case 136:
-		//line parser.y:745
+		//line parser.y:746
 		{
 			method := ast.FuncDecl{
-				Target:  RubyS[Rubypt-7].genericValue,
-				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args:    RubyS[Rubypt-4].genericSlice,
-				Body:    RubyS[Rubypt-3].genericSlice,
-				Rescues: RubyS[Rubypt-2].genericSlice,
-				Ensure:  RubyS[Rubypt-1].genericSlice,
+				Target: RubyS[Rubypt-6].genericValue,
+				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
+				Args:   RubyS[Rubypt-3].genericSlice,
+				Body:   RubyS[Rubypt-2].genericSlice,
+				Ensure: RubyS[Rubypt-1].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-7].genericValue.LineNumber()
+			method.Line = RubyS[Rubypt-6].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 137:
@@ -2031,6 +2031,20 @@ Rubydefault:
 		//line parser.y:771
 		{
 			method := ast.FuncDecl{
+				Target:  RubyS[Rubypt-7].genericValue,
+				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
+				Args:    RubyS[Rubypt-4].genericSlice,
+				Body:    RubyS[Rubypt-3].genericSlice,
+				Rescues: RubyS[Rubypt-2].genericSlice,
+				Ensure:  RubyS[Rubypt-1].genericSlice,
+			}
+			method.Line = RubyS[Rubypt-7].genericValue.LineNumber()
+			RubyVAL.genericValue = method
+		}
+	case 139:
+		//line parser.y:784
+		{
+			method := ast.FuncDecl{
 				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
 				Args:   RubyS[Rubypt-3].genericSlice,
 				Body:   RubyS[Rubypt-2].genericSlice,
@@ -2039,8 +2053,8 @@ Rubydefault:
 			method.Line = RubyS[Rubypt-4].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
-	case 139:
-		//line parser.y:782
+	case 140:
+		//line parser.y:795
 		{
 			method := ast.FuncDecl{
 				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
@@ -2052,58 +2066,58 @@ Rubydefault:
 			method.Line = RubyS[Rubypt-5].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
-	case 140:
-		//line parser.y:796
+	case 141:
+		//line parser.y:809
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
 		}
-	case 141:
-		//line parser.y:798
+	case 142:
+		//line parser.y:811
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
 		}
-	case 142:
-		//line parser.y:800
+	case 143:
+		//line parser.y:813
 		{
 			RubyVAL.genericSlice = []ast.Node{ast.MethodParam{Name: ast.BareReference{}, IsSplat: true}}
 		}
-	case 143:
-		//line parser.y:802
+	case 144:
+		//line parser.y:815
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
-	case 144:
-		//line parser.y:804
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
 	case 145:
-		//line parser.y:806
+		//line parser.y:817
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 146:
-		//line parser.y:809
+		//line parser.y:819
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 147:
+		//line parser.y:822
 		{
 			RubyVAL.genericValue = ast.MethodParam{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference)}
 		}
-	case 147:
-		//line parser.y:811
+	case 148:
+		//line parser.y:824
 		{
 			RubyVAL.genericValue = ast.MethodParam{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference), IsSplat: true}
 		}
-	case 148:
-		//line parser.y:813
+	case 149:
+		//line parser.y:826
 		{
 			RubyVAL.genericValue = ast.MethodParam{Name: RubyS[Rubypt-2].genericValue.(ast.BareReference), DefaultValue: RubyS[Rubypt-0].genericValue}
 		}
-	case 149:
-		//line parser.y:815
+	case 150:
+		//line parser.y:828
 		{
 			RubyVAL.genericValue = ast.MethodParam{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference), IsProc: true}
 		}
-	case 150:
-		//line parser.y:819
+	case 151:
+		//line parser.y:832
 		{
 			class := ast.ClassDecl{
 				Name:      RubyS[Rubypt-2].genericValue.(ast.Class).Name,
@@ -2113,8 +2127,8 @@ Rubydefault:
 			class.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
-	case 151:
-		//line parser.y:829
+	case 152:
+		//line parser.y:842
 		{
 			class := ast.ClassDecl{
 				Name:       RubyS[Rubypt-4].genericValue.(ast.Class).Name,
@@ -2125,8 +2139,8 @@ Rubydefault:
 			class.Line = RubyS[Rubypt-4].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
-	case 152:
-		//line parser.y:841
+	case 153:
+		//line parser.y:854
 		{
 			name := RubyS[Rubypt-3].genericValue.(ast.BareReference).Name
 			if name != "<<" {
@@ -2140,8 +2154,8 @@ Rubydefault:
 			class.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
-	case 153:
-		//line parser.y:856
+	case 154:
+		//line parser.y:869
 		{
 			module := ast.ModuleDecl{
 				Name:      RubyS[Rubypt-2].genericValue.(ast.Class).Name,
@@ -2151,8 +2165,8 @@ Rubydefault:
 			module.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = module
 		}
-	case 154:
-		//line parser.y:867
+	case 155:
+		//line parser.y:880
 		{
 			class := ast.Class{
 				Name:              RubyS[Rubypt-0].genericValue.(ast.Constant).Name,
@@ -2161,8 +2175,8 @@ Rubydefault:
 			class.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
-	case 155:
-		//line parser.y:876
+	case 156:
+		//line parser.y:889
 		{
 			firstPart := RubyS[Rubypt-1].genericValue.(ast.Constant).Name
 			fullName := strings.Join([]string{firstPart, RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}, "")
@@ -2181,8 +2195,8 @@ Rubydefault:
 			class.Line = RubyS[Rubypt-1].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
-	case 156:
-		//line parser.y:895
+	case 157:
+		//line parser.y:908
 		{
 			pieces := strings.Split(RubyS[Rubypt-0].genericValue.(ast.BareReference).Name, "::")
 			name := pieces[len(pieces)-1]
@@ -2198,8 +2212,8 @@ Rubydefault:
 				IsGlobalNamespace: true,
 			}
 		}
-	case 157:
-		//line parser.y:913
+	case 158:
+		//line parser.y:926
 		{
 			eql := ast.Assignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2208,37 +2222,27 @@ Rubydefault:
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 158:
-		//line parser.y:922
-		{
-			eql := ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = eql
-		}
 	case 159:
-		//line parser.y:928
+		//line parser.y:935
 		{
 			eql := ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 160:
-		//line parser.y:934
+		//line parser.y:941
 		{
-			RubyVAL.genericValue = ast.Assignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-		}
-	case 161:
-		//line parser.y:936
-		{
-			eql := ast.Assignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
-			}
+			eql := ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
+	case 161:
+		//line parser.y:947
+		{
+			RubyVAL.genericValue = ast.Assignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+		}
 	case 162:
-		//line parser.y:945
+		//line parser.y:949
 		{
 			eql := ast.Assignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2248,7 +2252,7 @@ Rubydefault:
 			RubyVAL.genericValue = eql
 		}
 	case 163:
-		//line parser.y:954
+		//line parser.y:958
 		{
 			eql := ast.Assignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2258,17 +2262,7 @@ Rubydefault:
 			RubyVAL.genericValue = eql
 		}
 	case 164:
-		//line parser.y:963
-		{
-			RubyVAL.genericValue = ast.Assignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-		}
-	case 165:
-		//line parser.y:965
-		{
-			RubyVAL.genericValue = ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue, Line: RubyS[Rubypt-2].genericValue.LineNumber()}
-		}
-	case 166:
-		//line parser.y:968
+		//line parser.y:967
 		{
 			eql := ast.Assignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2277,8 +2271,18 @@ Rubydefault:
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
+	case 165:
+		//line parser.y:976
+		{
+			RubyVAL.genericValue = ast.Assignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+		}
+	case 166:
+		//line parser.y:978
+		{
+			RubyVAL.genericValue = ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue, Line: RubyS[Rubypt-2].genericValue.LineNumber()}
+		}
 	case 167:
-		//line parser.y:977
+		//line parser.y:981
 		{
 			eql := ast.Assignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2288,7 +2292,17 @@ Rubydefault:
 			RubyVAL.genericValue = eql
 		}
 	case 168:
-		//line parser.y:986
+		//line parser.y:990
+		{
+			eql := ast.Assignment{
+				LHS: RubyS[Rubypt-2].genericValue,
+				RHS: RubyS[Rubypt-0].genericValue,
+			}
+			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = eql
+		}
+	case 169:
+		//line parser.y:999
 		{
 			eql := ast.Assignment{
 				LHS: ast.Array{Nodes: RubyS[Rubypt-2].genericSlice},
@@ -2297,8 +2311,8 @@ Rubydefault:
 			eql.Line = RubyS[Rubypt-2].genericSlice[0].(ast.CallExpression).Target.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 169:
-		//line parser.y:996
+	case 170:
+		//line parser.y:1009
 		{
 			RubyVAL.genericSlice = []ast.Node{
 				ast.CallExpression{
@@ -2313,14 +2327,14 @@ Rubydefault:
 				},
 			}
 		}
-	case 170:
-		//line parser.y:1011
+	case 171:
+		//line parser.y:1024
 		{
 			tail := ast.CallExpression{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue, Func: ast.BareReference{Name: "[]="}, Args: []ast.Node{RubyS[Rubypt-1].genericValue}}
 			RubyVAL.genericSlice = append(RubyS[Rubypt-5].genericSlice, tail)
 		}
-	case 171:
-		//line parser.y:1017
+	case 172:
+		//line parser.y:1030
 		{
 			eql := ast.ConditionalAssignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2329,25 +2343,15 @@ Rubydefault:
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 172:
-		//line parser.y:1026
+	case 173:
+		//line parser.y:1039
 		{
 			eql := ast.ConditionalAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 173:
-		//line parser.y:1032
-		{
-			eql := ast.ConditionalAssignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
-			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = eql
-		}
 	case 174:
-		//line parser.y:1041
+		//line parser.y:1045
 		{
 			eql := ast.ConditionalAssignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2357,7 +2361,7 @@ Rubydefault:
 			RubyVAL.genericValue = eql
 		}
 	case 175:
-		//line parser.y:1050
+		//line parser.y:1054
 		{
 			eql := ast.ConditionalAssignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2367,19 +2371,29 @@ Rubydefault:
 			RubyVAL.genericValue = eql
 		}
 	case 176:
-		//line parser.y:1059
+		//line parser.y:1063
+		{
+			eql := ast.ConditionalAssignment{
+				LHS: RubyS[Rubypt-2].genericValue,
+				RHS: RubyS[Rubypt-0].genericValue,
+			}
+			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = eql
+		}
+	case 177:
+		//line parser.y:1072
 		{
 			RubyVAL.genericValue = ast.ConditionalAssignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 		}
-	case 177:
-		//line parser.y:1061
+	case 178:
+		//line parser.y:1074
 		{
 			eql := ast.ConditionalAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 178:
-		//line parser.y:1070
+	case 179:
+		//line parser.y:1083
 		{
 			eql := ast.ConditionalTruthyAssignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2388,25 +2402,15 @@ Rubydefault:
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 179:
-		//line parser.y:1079
+	case 180:
+		//line parser.y:1092
 		{
 			eql := ast.ConditionalTruthyAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 180:
-		//line parser.y:1085
-		{
-			eql := ast.ConditionalTruthyAssignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
-			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = eql
-		}
 	case 181:
-		//line parser.y:1094
+		//line parser.y:1098
 		{
 			eql := ast.ConditionalTruthyAssignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2416,7 +2420,7 @@ Rubydefault:
 			RubyVAL.genericValue = eql
 		}
 	case 182:
-		//line parser.y:1103
+		//line parser.y:1107
 		{
 			eql := ast.ConditionalTruthyAssignment{
 				LHS: RubyS[Rubypt-2].genericValue,
@@ -2426,187 +2430,197 @@ Rubydefault:
 			RubyVAL.genericValue = eql
 		}
 	case 183:
-		//line parser.y:1112
+		//line parser.y:1116
+		{
+			eql := ast.ConditionalTruthyAssignment{
+				LHS: RubyS[Rubypt-2].genericValue,
+				RHS: RubyS[Rubypt-0].genericValue,
+			}
+			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = eql
+		}
+	case 184:
+		//line parser.y:1125
 		{
 			RubyVAL.genericValue = ast.ConditionalTruthyAssignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 		}
-	case 184:
-		//line parser.y:1114
+	case 185:
+		//line parser.y:1127
 		{
 			eql := ast.ConditionalTruthyAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
-	case 185:
-		//line parser.y:1121
+	case 186:
+		//line parser.y:1134
 		{
 			ivar := ast.InstanceVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 			ivar.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = ivar
 		}
-	case 186:
-		//line parser.y:1127
+	case 187:
+		//line parser.y:1140
 		{
 			ivar := ast.InstanceVariable{Name: RubyS[Rubypt-0].genericValue.(ast.Constant).Name}
 			ivar.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = ivar
 		}
-	case 187:
-		//line parser.y:1134
+	case 188:
+		//line parser.y:1147
 		{
 			classvar := ast.ClassVariable{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
 			classvar.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = classvar
 		}
-	case 188:
-		//line parser.y:1140
+	case 189:
+		//line parser.y:1153
 		{
 			classvar := ast.ClassVariable{Name: RubyS[Rubypt-0].genericValue.(ast.Constant).Name}
 			classvar.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = classvar
 		}
-	case 189:
-		//line parser.y:1147
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
 	case 190:
-		//line parser.y:1149
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
-	case 191:
-		//line parser.y:1151
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
-	case 192:
-		//line parser.y:1153
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
-			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
-	case 193:
-		//line parser.y:1156
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
-	case 194:
-		//line parser.y:1158
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
-	case 195:
 		//line parser.y:1160
 		{
 			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
 			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
-	case 196:
+	case 191:
 		//line parser.y:1162
+		{
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
+			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
+	case 192:
+		//line parser.y:1164
+		{
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
+			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
+	case 193:
+		//line parser.y:1166
 		{
 			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
 			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
-	case 197:
-		//line parser.y:1165
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
-	case 198:
-		//line parser.y:1167
-		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = vars
-		}
-	case 199:
+	case 194:
 		//line parser.y:1169
 		{
 			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
 			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
-	case 200:
+	case 195:
 		//line parser.y:1171
+		{
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
+			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
+	case 196:
+		//line parser.y:1173
+		{
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
+			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
+	case 197:
+		//line parser.y:1175
 		{
 			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
 			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
-	case 201:
-		//line parser.y:1174
+	case 198:
+		//line parser.y:1178
 		{
-			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyS[Rubypt-0].genericValue)}
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
 			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
+	case 199:
+		//line parser.y:1180
+		{
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
+			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
+	case 200:
+		//line parser.y:1182
+		{
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
+			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
+	case 201:
+		//line parser.y:1184
+		{
+			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
+			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
 	case 202:
-		//line parser.y:1176
+		//line parser.y:1187
 		{
 			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyS[Rubypt-0].genericValue)}
 			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 203:
-		//line parser.y:1178
+		//line parser.y:1189
 		{
 			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyS[Rubypt-0].genericValue)}
 			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 204:
-		//line parser.y:1180
+		//line parser.y:1191
+		{
+			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyS[Rubypt-0].genericValue)}
+			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = vars
+		}
+	case 205:
+		//line parser.y:1193
 		{
 			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
 			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
-	case 205:
-		//line parser.y:1184
+	case 206:
+		//line parser.y:1197
 		{
 			bang := ast.Negation{Target: RubyS[Rubypt-0].genericValue}
 			bang.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = bang
 		}
-	case 206:
-		//line parser.y:1186
+	case 207:
+		//line parser.y:1199
 		{
 			comp := ast.Complement{Target: RubyS[Rubypt-0].genericValue}
 			comp.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = comp
 		}
-	case 207:
-		//line parser.y:1188
+	case 208:
+		//line parser.y:1201
 		{
 			plus := ast.Positive{Target: RubyS[Rubypt-0].genericValue}
 			plus.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = plus
 		}
-	case 208:
-		//line parser.y:1190
+	case 209:
+		//line parser.y:1203
 		{
 			minus := ast.Negative{Target: RubyS[Rubypt-0].genericValue}
 			minus.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = minus
 		}
-	case 209:
-		//line parser.y:1193
+	case 210:
+		//line parser.y:1206
 		{
 			add := ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -2616,8 +2630,8 @@ Rubydefault:
 			add.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = add
 		}
-	case 210:
-		//line parser.y:1204
+	case 211:
+		//line parser.y:1217
 		{
 			sub := ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -2627,8 +2641,8 @@ Rubydefault:
 			sub.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = sub
 		}
-	case 211:
-		//line parser.y:1215
+	case 212:
+		//line parser.y:1228
 		{
 			mult := ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -2638,8 +2652,8 @@ Rubydefault:
 			mult.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = mult
 		}
-	case 212:
-		//line parser.y:1226
+	case 213:
+		//line parser.y:1239
 		{
 			divis := ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -2649,8 +2663,8 @@ Rubydefault:
 			divis.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = divis
 		}
-	case 213:
-		//line parser.y:1237
+	case 214:
+		//line parser.y:1250
 		{
 			and := ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -2660,8 +2674,8 @@ Rubydefault:
 			and.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = and
 		}
-	case 214:
-		//line parser.y:1248
+	case 215:
+		//line parser.y:1261
 		{
 			or := ast.CallExpression{
 				Target: RubyS[Rubypt-2].genericValue,
@@ -2671,70 +2685,61 @@ Rubydefault:
 			or.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = or
 		}
-	case 215:
-		//line parser.y:1259
+	case 216:
+		//line parser.y:1272
 		{
 			RubyVAL.genericValue = ast.Array{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Nodes: RubyS[Rubypt-2].genericSlice}
 		}
-	case 216:
-		//line parser.y:1261
-		{
-		}
 	case 217:
-		//line parser.y:1262
+		//line parser.y:1274
 		{
 		}
 	case 218:
-		//line parser.y:1264
+		//line parser.y:1275
+		{
+		}
+	case 219:
+		//line parser.y:1277
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
-	case 219:
-		//line parser.y:1266
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
 	case 220:
-		//line parser.y:1268
+		//line parser.y:1279
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 221:
-		//line parser.y:1270
+		//line parser.y:1281
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 222:
-		//line parser.y:1272
+		//line parser.y:1283
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 223:
-		//line parser.y:1274
+		//line parser.y:1285
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 224:
-		//line parser.y:1276
+		//line parser.y:1287
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 225:
-		//line parser.y:1279
+		//line parser.y:1289
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 226:
+		//line parser.y:1292
 		{
 			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-2].genericValue.LineNumber()}
 		}
-	case 226:
-		//line parser.y:1281
-		{
-			pairs := []ast.HashKeyValuePair{}
-			for _, node := range RubyS[Rubypt-2].genericSlice {
-				pairs = append(pairs, node.(ast.HashKeyValuePair))
-			}
-			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Pairs: pairs}
-		}
 	case 227:
-		//line parser.y:1289
+		//line parser.y:1294
 		{
 			pairs := []ast.HashKeyValuePair{}
 			for _, node := range RubyS[Rubypt-2].genericSlice {
@@ -2743,7 +2748,16 @@ Rubydefault:
 			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Pairs: pairs}
 		}
 	case 228:
-		//line parser.y:1298
+		//line parser.y:1302
+		{
+			pairs := []ast.HashKeyValuePair{}
+			for _, node := range RubyS[Rubypt-2].genericSlice {
+				pairs = append(pairs, node.(ast.HashKeyValuePair))
+			}
+			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Pairs: pairs}
+		}
+	case 229:
+		//line parser.y:1311
 		{
 			name := RubyS[Rubypt-1].genericValue.(ast.BareReference).Name
 			if name != "=>" {
@@ -2751,8 +2765,8 @@ Rubydefault:
 			}
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{Key: RubyS[Rubypt-2].genericValue, Value: RubyS[Rubypt-0].genericValue})
 		}
-	case 229:
-		//line parser.y:1306
+	case 230:
+		//line parser.y:1319
 		{
 			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
 			if name != "=>" {
@@ -2760,62 +2774,62 @@ Rubydefault:
 			}
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{Key: RubyS[Rubypt-3].genericValue, Value: RubyS[Rubypt-1].genericValue})
 		}
-	case 230:
-		//line parser.y:1315
+	case 231:
+		//line parser.y:1328
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
 				Key:   ast.Symbol{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: RubyS[Rubypt-2].genericValue.(ast.BareReference).Name},
 				Value: RubyS[Rubypt-0].genericValue,
 			})
 		}
-	case 231:
-		//line parser.y:1322
+	case 232:
+		//line parser.y:1335
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
 				Key:   ast.Symbol{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: RubyS[Rubypt-3].genericValue.(ast.BareReference).Name},
 				Value: RubyS[Rubypt-1].genericValue,
 			})
 		}
-	case 232:
-		//line parser.y:1329
+	case 233:
+		//line parser.y:1342
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
 				Key:   ast.Symbol{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Name: RubyS[Rubypt-4].genericValue.(ast.BareReference).Name},
 				Value: RubyS[Rubypt-2].genericValue,
 			})
 		}
-	case 233:
-		//line parser.y:1337
+	case 234:
+		//line parser.y:1350
 		{
 			block := ast.Block{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Body: RubyS[Rubypt-1].genericSlice}
 			RubyVAL.genericBlock = block
 		}
-	case 234:
-		//line parser.y:1342
+	case 235:
+		//line parser.y:1355
 		{
 			block := ast.Block{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Args: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice}
 			RubyVAL.genericBlock = block
 		}
-	case 235:
-		//line parser.y:1347
+	case 236:
+		//line parser.y:1360
 		{
 			block := ast.Block{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Body: RubyS[Rubypt-2].genericSlice}
 			RubyVAL.genericBlock = block
 		}
-	case 236:
-		//line parser.y:1352
+	case 237:
+		//line parser.y:1365
 		{
 			block := ast.Block{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Args: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice}
 			RubyVAL.genericBlock = block
 		}
-	case 237:
-		//line parser.y:1357
+	case 238:
+		//line parser.y:1370
 		{
 			block := ast.Block{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Body: []ast.Node{RubyS[Rubypt-2].genericValue}}
 			RubyVAL.genericBlock = block
 		}
-	case 238:
-		//line parser.y:1362
+	case 239:
+		//line parser.y:1375
 		{
 			head := []ast.Node{RubyS[Rubypt-3].genericValue}
 			tail := RubyS[Rubypt-2].genericSlice
@@ -2823,28 +2837,28 @@ Rubydefault:
 			block := ast.Block{Line: RubyS[Rubypt-5].genericValue.LineNumber(), Body: body}
 			RubyVAL.genericBlock = block
 		}
-	case 239:
-		//line parser.y:1371
+	case 240:
+		//line parser.y:1384
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
 		}
-	case 240:
-		//line parser.y:1373
+	case 241:
+		//line parser.y:1386
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
-	case 241:
-		//line parser.y:1375
-		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
-		}
 	case 242:
-		//line parser.y:1377
+		//line parser.y:1388
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 243:
-		//line parser.y:1380
+		//line parser.y:1390
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 244:
+		//line parser.y:1393
 		{
 			cond := ast.IfBlock{
 				Condition: RubyS[Rubypt-2].genericValue,
@@ -2853,8 +2867,8 @@ Rubydefault:
 			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
-	case 244:
-		//line parser.y:1389
+	case 245:
+		//line parser.y:1402
 		{
 			cond := ast.IfBlock{
 				Condition: RubyS[Rubypt-3].genericValue,
@@ -2864,18 +2878,8 @@ Rubydefault:
 			cond.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
-	case 245:
-		//line parser.y:1399
-		{
-			cond := ast.IfBlock{
-				Condition: RubyS[Rubypt-0].genericValue,
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
-			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = cond
-		}
 	case 246:
-		//line parser.y:1408
+		//line parser.y:1412
 		{
 			cond := ast.IfBlock{
 				Condition: RubyS[Rubypt-0].genericValue,
@@ -2885,7 +2889,17 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 247:
-		//line parser.y:1417
+		//line parser.y:1421
+		{
+			cond := ast.IfBlock{
+				Condition: RubyS[Rubypt-0].genericValue,
+				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+			}
+			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = cond
+		}
+	case 248:
+		//line parser.y:1430
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
@@ -2894,18 +2908,8 @@ Rubydefault:
 			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
-	case 248:
-		//line parser.y:1426
-		{
-			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
-				Body:      ast.Nodes{RubyS[Rubypt-2].genericValue},
-			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
-			RubyVAL.genericValue = cond
-		}
 	case 249:
-		//line parser.y:1435
+		//line parser.y:1439
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
@@ -2915,7 +2919,17 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 250:
-		//line parser.y:1444
+		//line parser.y:1448
+		{
+			cond := ast.IfBlock{
+				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
+				Body:      ast.Nodes{RubyS[Rubypt-2].genericValue},
+			}
+			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			RubyVAL.genericValue = cond
+		}
+	case 251:
+		//line parser.y:1457
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
@@ -2924,8 +2938,8 @@ Rubydefault:
 			cond.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
-	case 251:
-		//line parser.y:1453
+	case 252:
+		//line parser.y:1466
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Target: RubyS[Rubypt-4].genericValue},
@@ -2935,8 +2949,8 @@ Rubydefault:
 			cond.Line = RubyS[Rubypt-4].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
-	case 252:
-		//line parser.y:1463
+	case 253:
+		//line parser.y:1476
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
@@ -2945,8 +2959,8 @@ Rubydefault:
 			cond.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
-	case 253:
-		//line parser.y:1472
+	case 254:
+		//line parser.y:1485
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
@@ -2955,8 +2969,8 @@ Rubydefault:
 			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
-	case 254:
-		//line parser.y:1483
+	case 255:
+		//line parser.y:1496
 		{
 			ifblock := ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -2965,8 +2979,8 @@ Rubydefault:
 			}
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ifblock)
 		}
-	case 255:
-		//line parser.y:1492
+	case 256:
+		//line parser.y:1505
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -2974,8 +2988,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-0].genericSlice,
 			})
 		}
-	case 256:
-		//line parser.y:1500
+	case 257:
+		//line parser.y:1513
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -2983,8 +2997,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-0].genericSlice,
 			})
 		}
-	case 257:
-		//line parser.y:1508
+	case 258:
+		//line parser.y:1521
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -2992,28 +3006,28 @@ Rubydefault:
 				Body:      RubyS[Rubypt-0].genericSlice,
 			})
 		}
-	case 258:
-		//line parser.y:1516
+	case 259:
+		//line parser.y:1529
 		{
 		}
-	case 259:
-		//line parser.y:1517
+	case 260:
+		//line parser.y:1530
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
-	case 260:
-		//line parser.y:1518
+	case 261:
+		//line parser.y:1531
 		{
 		}
-	case 261:
-		//line parser.y:1521
+	case 262:
+		//line parser.y:1534
 		{
 			group := ast.Group{Body: RubyS[Rubypt-1].genericSlice}
 			group.Line = RubyS[Rubypt-2].genericValue.(ast.Nil).Line
 			RubyVAL.genericValue = group
 		}
-	case 262:
-		//line parser.y:1524
+	case 263:
+		//line parser.y:1537
 		{
 			begin := ast.Begin{
 				Body:   RubyS[Rubypt-2].genericSlice,
@@ -3022,8 +3036,8 @@ Rubydefault:
 			begin.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = begin
 		}
-	case 263:
-		//line parser.y:1533
+	case 264:
+		//line parser.y:1546
 		{
 			begin := ast.Begin{
 				Body:   RubyS[Rubypt-4].genericSlice,
@@ -3033,8 +3047,8 @@ Rubydefault:
 			begin.Line = RubyS[Rubypt-5].genericValue.LineNumber()
 			RubyVAL.genericValue = begin
 		}
-	case 264:
-		//line parser.y:1543
+	case 265:
+		//line parser.y:1556
 		{
 			RubyVAL.genericValue = ast.Begin{
 				Line:   RubyS[Rubypt-7].genericValue.LineNumber(),
@@ -3044,8 +3058,8 @@ Rubydefault:
 				Ensure: RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 265:
-		//line parser.y:1553
+	case 266:
+		//line parser.y:1566
 		{
 			RubyVAL.genericValue = ast.Begin{
 				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
@@ -3054,13 +3068,13 @@ Rubydefault:
 				Ensure: RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 266:
-		//line parser.y:1563
+	case 267:
+		//line parser.y:1576
 		{
 			RubyVAL.genericValue = ast.Rescue{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Body: RubyS[Rubypt-0].genericSlice}
 		}
-	case 267:
-		//line parser.y:1565
+	case 268:
+		//line parser.y:1578
 		{
 			classes := []ast.Class{}
 			for _, class := range RubyS[Rubypt-1].genericSlice {
@@ -3074,8 +3088,8 @@ Rubydefault:
 				},
 			}
 		}
-	case 268:
-		//line parser.y:1579
+	case 269:
+		//line parser.y:1592
 		{
 			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
 			if name != "=>" {
@@ -3096,30 +3110,8 @@ Rubydefault:
 				},
 			}
 		}
-	case 269:
-		//line parser.y:1600
-		{
-			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
-			if name != "=>" {
-				panic("FREAKOUT")
-			}
-
-			classes := []ast.Class{}
-			for _, class := range RubyS[Rubypt-3].genericSlice {
-				classes = append(classes, class.(ast.Class))
-			}
-
-			RubyVAL.genericValue = ast.Rescue{
-				Line: RubyS[Rubypt-4].genericValue.LineNumber(),
-				Body: RubyS[Rubypt-0].genericSlice,
-				Exception: ast.RescueException{
-					Var:     RubyS[Rubypt-1].genericValue,
-					Classes: classes,
-				},
-			}
-		}
 	case 270:
-		//line parser.y:1621
+		//line parser.y:1613
 		{
 			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
 			if name != "=>" {
@@ -3141,23 +3133,29 @@ Rubydefault:
 			}
 		}
 	case 271:
-		//line parser.y:1642
+		//line parser.y:1634
 		{
 			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
 			if name != "=>" {
 				panic("FREAKOUT")
 			}
 
+			classes := []ast.Class{}
+			for _, class := range RubyS[Rubypt-3].genericSlice {
+				classes = append(classes, class.(ast.Class))
+			}
+
 			RubyVAL.genericValue = ast.Rescue{
-				Line: RubyS[Rubypt-3].genericValue.LineNumber(),
+				Line: RubyS[Rubypt-4].genericValue.LineNumber(),
 				Body: RubyS[Rubypt-0].genericSlice,
 				Exception: ast.RescueException{
-					Var: RubyS[Rubypt-1].genericValue,
+					Var:     RubyS[Rubypt-1].genericValue,
+					Classes: classes,
 				},
 			}
 		}
 	case 272:
-		//line parser.y:1657
+		//line parser.y:1655
 		{
 			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
 			if name != "=>" {
@@ -3173,7 +3171,7 @@ Rubydefault:
 			}
 		}
 	case 273:
-		//line parser.y:1672
+		//line parser.y:1670
 		{
 			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
 			if name != "=>" {
@@ -3189,37 +3187,53 @@ Rubydefault:
 			}
 		}
 	case 274:
-		//line parser.y:1689
+		//line parser.y:1685
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			name := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name
+			if name != "=>" {
+				panic("FREAKOUT")
+			}
+
+			RubyVAL.genericValue = ast.Rescue{
+				Line: RubyS[Rubypt-3].genericValue.LineNumber(),
+				Body: RubyS[Rubypt-0].genericSlice,
+				Exception: ast.RescueException{
+					Var: RubyS[Rubypt-1].genericValue,
+				},
+			}
 		}
 	case 275:
-		//line parser.y:1691
+		//line parser.y:1702
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 276:
-		//line parser.y:1694
-		{
-			RubyVAL.genericSlice = []ast.Node{}
-		}
-	case 277:
-		//line parser.y:1696
+		//line parser.y:1704
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
+	case 277:
+		//line parser.y:1707
+		{
+			RubyVAL.genericSlice = []ast.Node{}
+		}
 	case 278:
-		//line parser.y:1699
+		//line parser.y:1709
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 279:
-		//line parser.y:1701
+		//line parser.y:1712
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 280:
-		//line parser.y:1704
+		//line parser.y:1714
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 281:
+		//line parser.y:1717
 		{
 			if len(RubyS[Rubypt-0].genericSlice) == 1 {
 				RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice[0]}
@@ -3227,18 +3241,18 @@ Rubydefault:
 				RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice}
 			}
 		}
-	case 281:
-		//line parser.y:1711
+	case 282:
+		//line parser.y:1724
 		{
 			RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
 		}
-	case 282:
-		//line parser.y:1713
+	case 283:
+		//line parser.y:1726
 		{
 			RubyVAL.genericValue = ast.Retry{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
 		}
-	case 283:
-		//line parser.y:1716
+	case 284:
+		//line parser.y:1729
 		{
 			if len(RubyS[Rubypt-0].genericSlice) == 1 {
 				RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice[0]}
@@ -3246,48 +3260,48 @@ Rubydefault:
 				RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice}
 			}
 		}
-	case 284:
-		//line parser.y:1724
+	case 285:
+		//line parser.y:1737
 		{
 			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericValue}
 		}
-	case 285:
-		//line parser.y:1726
+	case 286:
+		//line parser.y:1739
 		{
 			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
 		}
-	case 286:
-		//line parser.y:1730
+	case 287:
+		//line parser.y:1743
 		{
 			RubyVAL.genericValue = ast.Next{}
 		}
-	case 287:
-		//line parser.y:1732
+	case 288:
+		//line parser.y:1745
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{ast.Next{}}}
 		}
-	case 288:
-		//line parser.y:1734
+	case 289:
+		//line parser.y:1747
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue}, Body: []ast.Node{ast.Next{}}}
 		}
-	case 289:
-		//line parser.y:1738
+	case 290:
+		//line parser.y:1751
 		{
 			RubyVAL.genericValue = ast.Break{}
 		}
-	case 290:
-		//line parser.y:1740
+	case 291:
+		//line parser.y:1753
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{ast.Break{}}}
 		}
-	case 291:
-		//line parser.y:1742
+	case 292:
+		//line parser.y:1755
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue}, Body: []ast.Node{ast.Break{}}}
 		}
-	case 292:
-		//line parser.y:1746
+	case 293:
+		//line parser.y:1759
 		{
 			ternary := ast.Ternary{
 				Condition: RubyS[Rubypt-4].genericValue,
@@ -3297,53 +3311,53 @@ Rubydefault:
 			ternary.Line = RubyS[Rubypt-4].genericValue.LineNumber()
 			RubyVAL.genericValue = ternary
 		}
-	case 293:
-		//line parser.y:1757
+	case 294:
+		//line parser.y:1770
 		{
 			loop := ast.Loop{Condition: RubyS[Rubypt-3].genericValue, Body: RubyS[Rubypt-1].genericSlice}
 			loop.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
-	case 294:
-		//line parser.y:1763
+	case 295:
+		//line parser.y:1776
 		{
 			condition := ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue}
 			loop := ast.Loop{Condition: condition, Body: RubyS[Rubypt-1].genericSlice}
 			loop.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
-	case 295:
-		//line parser.y:1770
+	case 296:
+		//line parser.y:1783
 		{
 			loop := ast.Loop{Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{RubyS[Rubypt-2].genericValue}}
 			loop.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
-	case 296:
-		//line parser.y:1777
+	case 297:
+		//line parser.y:1790
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
-	case 297:
-		//line parser.y:1779
-		{
-		}
 	case 298:
-		//line parser.y:1781
+		//line parser.y:1792
 		{
 		}
 	case 299:
-		//line parser.y:1783
+		//line parser.y:1794
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 300:
-		//line parser.y:1785
+		//line parser.y:1796
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 301:
-		//line parser.y:1788
+		//line parser.y:1798
+		{
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+		}
+	case 302:
+		//line parser.y:1801
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3351,8 +3365,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 302:
-		//line parser.y:1796
+	case 303:
+		//line parser.y:1809
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-4].genericValue.LineNumber(),
@@ -3361,8 +3375,8 @@ Rubydefault:
 				Else:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 303:
-		//line parser.y:1805
+	case 304:
+		//line parser.y:1818
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3370,8 +3384,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 304:
-		//line parser.y:1813
+	case 305:
+		//line parser.y:1826
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-4].genericValue.LineNumber(),
@@ -3380,8 +3394,8 @@ Rubydefault:
 				Else:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 305:
-		//line parser.y:1822
+	case 306:
+		//line parser.y:1835
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3389,8 +3403,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-1].genericSlice,
 			}
 		}
-	case 306:
-		//line parser.y:1831
+	case 307:
+		//line parser.y:1844
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3398,8 +3412,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-0].genericSlice,
 			})
 		}
-	case 307:
-		//line parser.y:1839
+	case 308:
+		//line parser.y:1852
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-2].genericSlice.LineNumber(),
@@ -3407,8 +3421,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-0].genericSlice,
 			})
 		}
-	case 308:
-		//line parser.y:1847
+	case 309:
+		//line parser.y:1860
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3416,8 +3430,8 @@ Rubydefault:
 				Body:      RubyS[Rubypt-0].genericSlice,
 			})
 		}
-	case 309:
-		//line parser.y:1855
+	case 310:
+		//line parser.y:1868
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3425,70 +3439,70 @@ Rubydefault:
 				Body:      RubyS[Rubypt-0].genericSlice,
 			})
 		}
-	case 310:
-		//line parser.y:1864
+	case 311:
+		//line parser.y:1877
 		{
 			RubyVAL.genericValue = ast.WeakLogicalAnd{Line: RubyS[Rubypt-3].genericValue.LineNumber(), LHS: RubyS[Rubypt-3].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 		}
-	case 311:
-		//line parser.y:1867
+	case 312:
+		//line parser.y:1880
 		{
 			RubyVAL.genericValue = ast.WeakLogicalOr{Line: RubyS[Rubypt-3].genericValue.LineNumber(), LHS: RubyS[Rubypt-3].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 		}
-	case 312:
-		//line parser.y:1870
+	case 313:
+		//line parser.y:1883
 		{
 			lambda := ast.Lambda{Body: RubyS[Rubypt-0].genericBlock}
 			lambda.Line = RubyS[Rubypt-0].genericBlock.LineNumber()
 			RubyVAL.genericValue = lambda
 		}
-	case 313:
-		//line parser.y:1877
+	case 314:
+		//line parser.y:1890
 		{
 			switchstmt := ast.SwitchStatement{Condition: RubyS[Rubypt-3].genericValue, Cases: RubyS[Rubypt-1].switchCaseSlice}
 			switchstmt.Line = RubyS[Rubypt-4].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
-	case 314:
-		//line parser.y:1883
+	case 315:
+		//line parser.y:1896
 		{
 			switchstmt := ast.SwitchStatement{Condition: RubyS[Rubypt-5].genericValue, Cases: RubyS[Rubypt-3].switchCaseSlice, Else: RubyS[Rubypt-1].genericSlice}
 			switchstmt.Line = RubyS[Rubypt-6].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
-	case 315:
-		//line parser.y:1889
+	case 316:
+		//line parser.y:1902
 		{
 			switchstmt := ast.SwitchStatement{Cases: RubyS[Rubypt-1].switchCaseSlice}
 			switchstmt.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
-	case 316:
-		//line parser.y:1895
+	case 317:
+		//line parser.y:1908
 		{
 			switchstmt := ast.SwitchStatement{Cases: RubyS[Rubypt-3].switchCaseSlice, Else: RubyS[Rubypt-1].genericSlice}
 			switchstmt.Line = RubyS[Rubypt-5].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
-	case 317:
-		//line parser.y:1902
-		{
-			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice})
-		}
 	case 318:
-		//line parser.y:1904
+		//line parser.y:1915
 		{
 			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice})
 		}
 	case 319:
-		//line parser.y:1907
+		//line parser.y:1917
+		{
+			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice})
+		}
+	case 320:
+		//line parser.y:1920
 		{
 			rng := ast.Range{Start: RubyS[Rubypt-2].genericValue, End: RubyS[Rubypt-0].genericValue}
 			rng.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = rng
 		}
-	case 320:
-		//line parser.y:1914
+	case 321:
+		//line parser.y:1927
 		{
 			alias := ast.Alias{To: RubyS[Rubypt-1].genericValue.(ast.Symbol), From: RubyS[Rubypt-0].genericValue.(ast.Symbol)}
 			alias.Line = RubyS[Rubypt-2].genericValue.LineNumber()
