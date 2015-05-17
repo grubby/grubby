@@ -91,6 +91,9 @@ func NewStringClass(provider Provider) Class {
 
 		return array, nil
 	}))
+	s.AddMethod(NewNativeMethod("encode", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		return self, nil // FIXME
+	}))
 
 	return s
 }

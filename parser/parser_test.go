@@ -2161,6 +2161,35 @@ foo &&= false
 				})
 			})
 
+			Describe("as a return value of a method", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def foo
+  return @bar = 1
+end`)
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "foo"},
+							Args: []ast.Node{},
+							Body: []ast.Node{
+								ast.Return{
+									Line: 2,
+									Value: ast.Assignment{
+										Line: 2,
+										LHS:  ast.InstanceVariable{Line: 2, Name: "bar"},
+										RHS:  ast.ConstantInt{Line: 2, Value: 1},
+									},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to a global variable", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("$foo_bar_baz = :biz")

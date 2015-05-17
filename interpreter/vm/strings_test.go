@@ -105,4 +105,16 @@ adj = 'cruel'
 			Expect(array.Members()[1].String()).To(Equal("world"))
 		})
 	})
+
+	Describe("#encode", func() {
+		It("should be implmented", func() {
+			result, err := vm.Run(`
+str = "<hello><world/></hello>"
+str.encode('ISO-8859-1', :undef => :replace, :invalid => :replace)
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.String()).To(ContainSubstring("<hello><world/></hello>"))
+		})
+	})
 })

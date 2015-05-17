@@ -1711,6 +1711,8 @@ return_expression : RETURN comma_delimited_nodes
   }
 | RETURN ternary
   { $$ = ast.Return{Line: $1.LineNumber(), Value: $2} }
+| RETURN assignment
+  { $$= ast.Return{Line: $1.LineNumber(), Value: $2} }
 | RETURN
   { $$ = ast.Return{Line: $1.LineNumber(), } };
 
