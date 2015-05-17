@@ -750,7 +750,7 @@ method_declaration : DEF REF method_args list optional_ensure END
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF REF DOT REF method_args list optional_ensure END
+| DEF simple_node DOT REF method_args list optional_ensure END
   {
 		method := ast.FuncDecl{
       Target: $2,
@@ -774,7 +774,7 @@ method_declaration : DEF REF method_args list optional_ensure END
     method.Line = $2.LineNumber()
     $$ = method
   }
-| DEF REF DOT REF method_args list rescues optional_ensure END
+| DEF simple_node DOT REF method_args list rescues optional_ensure END
   {
 		method := ast.FuncDecl{
       Target: $2,

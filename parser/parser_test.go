@@ -1289,27 +1289,24 @@ end
 			Context("on an object at runtime", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
-obj = Object.new
-def obj.start
-end
+def obj.start; end
+def $stderr.wat; end
 `)
 				})
 
 				It("is parsed as a method declaration", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
-						ast.Assignment{
-							Line: 1,
-							LHS:  ast.BareReference{Line: 1, Name: "obj"},
-							RHS: ast.CallExpression{
-								Line:   1,
-								Target: ast.Constant{Line: 1, Name: "Object"},
-								Func:   ast.BareReference{Line: 1, Name: "new"},
-							},
+						ast.FuncDecl{
+							Line:   1,
+							Target: ast.BareReference{Line: 1, Name: "obj"},
+							Name:   ast.BareReference{Line: 1, Name: "start"},
+							Body:   []ast.Node{},
+							Args:   []ast.Node{},
 						},
 						ast.FuncDecl{
 							Line:   2,
-							Target: ast.BareReference{Line: 2, Name: "obj"},
-							Name:   ast.BareReference{Line: 2, Name: "start"},
+							Target: ast.GlobalVariable{Line: 2, Name: "stderr"},
+							Name:   ast.BareReference{Line: 2, Name: "wat"},
 							Body:   []ast.Node{},
 							Args:   []ast.Node{},
 						},
