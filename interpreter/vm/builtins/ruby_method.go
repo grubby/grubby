@@ -138,6 +138,10 @@ func (method *RubyMethod) String() string {
 	return fmt.Sprintf("#Method: FIXME(ClassNameGoesHere)#%s", method.name)
 }
 
+func (method *RubyMethod) Visibility() MethodVisibility {
+	return method.visibility
+}
+
 func (method *RubyMethod) SetVisibility(visibility MethodVisibility) {
 	method.visibility = visibility
 }

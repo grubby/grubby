@@ -12,6 +12,7 @@ type Method interface {
 
 	Execute(self Value, block Block, args ...Value) (Value, error)
 
+	Visibility() MethodVisibility
 	SetVisibility(MethodVisibility)
 
 	methodBody() func(self Value, block Block, args ...Value) (Value, error)
@@ -70,6 +71,10 @@ func (method *nativeMethod) Execute(self Value, block Block, args ...Value) (Val
 
 func (method *nativeMethod) String() string {
 	return fmt.Sprintf("#Method: FIXME(ClassNameGoesHere)#%s", method.name)
+}
+
+func (method *nativeMethod) Visibility() MethodVisibility {
+	return method.visibility
 }
 
 func (method *nativeMethod) SetVisibility(visibility MethodVisibility) {
