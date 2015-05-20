@@ -72,6 +72,11 @@ func (valueStub *valueStub) Method(name string) Method {
 			return m
 		}
 
+		m, err := super.InstanceMethod(name)
+		if err == nil {
+			return m
+		}
+
 		for _, module := range super.includedModules() {
 			m, ok := module.eigenclassMethods()[name]
 			if ok {

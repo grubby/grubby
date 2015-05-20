@@ -579,5 +579,22 @@ sup`)
 				Expect(value.String()).To(ContainSubstring("not much, just monkey patching"))
 			})
 		})
+
+		Context("and calling the new methods on an existing class", func() {
+			It("does not fail", func() {
+				value, err := vm.Run(`
+
+class Object
+  def sup
+    'not much, just monkey patching'
+  end
+end
+
+File.sup`)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value.String()).To(ContainSubstring("not much, just monkey patching"))
+			})
+		})
 	})
 })
