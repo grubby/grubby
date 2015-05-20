@@ -22,3 +22,7 @@ func NewNoMethodError(name, context, className, callstack string) *noMethodError
 func (err *noMethodError) Error() string {
 	return fmt.Sprintf("NoMethodError: undefined method '%s' for %s:%s\n%s", err.method, err.context, err.className, err.callstack)
 }
+
+func (err *noMethodError) String() string {
+	return err.Error()
+}
