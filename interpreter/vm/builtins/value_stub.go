@@ -44,6 +44,12 @@ func (valueStub *valueStub) Method(name string) Method {
 	// FIXME: respect step 2 here
 
 	//	  3. Methods defined by the object's class
+	for _, method := range valueStub.class.InstanceMethods() {
+		if method.Name() == name {
+			return method
+		}
+	}
+
 	m, ok = valueStub.class.eigenclassMethods()[name]
 	if ok {
 		return m

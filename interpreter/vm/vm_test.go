@@ -544,8 +544,9 @@ end
 	})
 
 	Describe("opening up a class again", func() {
-		It("preserves the earlier definition of the class", func() {
-			value, err := vm.Run(`
+		Context("with multiple methods declared in each block", func() {
+			It("preserves the earlier definition of the class", func() {
+				value, err := vm.Run(`
 class Foo
   def initial_method
   end
@@ -556,9 +557,27 @@ class Foo
   end
 end
 `)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(value.(Class)).To(HaveInstanceMethod("initial_method"))
-			Expect(value.(Class)).To(HaveInstanceMethod("monkey_patched_method"))
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value.(Class)).To(HaveInstanceMethod("initial_method"))
+				Expect(value.(Class)).To(HaveInstanceMethod("monkey_patched_method"))
+			})
+		})
+
+		Context("and calling the new methods from main", func() {
+			It("does not fail", func() {
+				value, err := vm.Run(`
+
+class Object
+  def sup
+    'not much, just monkey patching'
+  end
+end
+
+sup`)
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value.String()).To(ContainSubstring("not much, just monkey patching"))
+			})
 		})
 	})
 })
