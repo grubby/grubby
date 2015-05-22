@@ -2,22 +2,27 @@ package parser
 
 func lexPercentSign(l StatefulRubyLexer) stateFn {
 	stringType := tokenTypeDoubleQuoteString
+
 	if l.accept("r") {
 		stringType = tokenTypeRegex
 		l.moveCurrentTokenStartIndex(1)
 	} else if l.accept("Q") {
 		l.moveCurrentTokenStartIndex(1)
+	} else if l.accept("w") {
+		l.moveCurrentTokenStartIndex(1)
+		stringType = tokenTypeArrayOfWhitespaceSeparatedStrings
 	}
 
 	if l.accept("`~!@#$%^&*-_=+()[]{}<>\\|;:'\",./?") {
 		delimiter := closingDelimiter(l.currentSlice()[1:])
 
 		l.ignore()
-		var r, prev rune
+		var r, prev1, prev2 rune
 		for {
-			prev = r
+			prev2 = prev1
+			prev1 = r
 			switch r = l.next(); {
-			case string(r) == delimiter && prev != '\\':
+			case string(r) == delimiter && (prev1 != '\\' || prev1 == '\\' && prev2 == '\\'):
 				l.backup()
 				l.emit(stringType)
 				l.next()

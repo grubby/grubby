@@ -2187,6 +2187,27 @@ end`)
 				})
 			})
 
+			Context("from a grouped assignment expression", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("@color = (term != 'dumb')")
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.InstanceVariable{Name: "color"},
+							RHS: ast.Group{
+								Body: []ast.Node{ast.CallExpression{
+									Target: ast.BareReference{Name: "term"},
+									Func:   ast.BareReference{Name: "!="},
+									Args:   []ast.Node{ast.SimpleString{Value: "dumb"}},
+								}},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to a global variable", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("$foo_bar_baz = :biz")
@@ -3681,7 +3702,7 @@ end
 		})
 
 		Describe("% notation", func() {
-			Describe("for regular expressions", func() {
+			Context("for regular expressions", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("%r(string/)")
 				})
@@ -3689,6 +3710,22 @@ end
 				It("should parse it as an ast.Regex", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{
 						ast.Regex{Value: "string/"},
+					}))
+				})
+			})
+
+			Context("for an array of strings separated by whitespace", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("%w!zomg wow /-\\\\!")
+				})
+
+				It("should parse it as an ast.Array", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Array{Nodes: []ast.Node{
+							ast.SimpleString{Value: "zomg"},
+							ast.SimpleString{Value: "wow"},
+							ast.SimpleString{Value: "/-\\\\"},
+						}},
 					}))
 				})
 			})

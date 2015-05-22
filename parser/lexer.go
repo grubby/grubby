@@ -36,6 +36,7 @@ const (
 	tokenTypeCharacter
 	tokenTypeSymbol
 	tokenTypeReference
+	tokenTypeArrayOfWhitespaceSeparatedStrings
 	tokenTypeNamespaceResolvedModule
 	tokenTypeMethodName
 	tokenTypeGlobal
@@ -484,6 +485,17 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			someValue.Line = token.line
 			lval.genericValue = someValue
 			return REF
+		case tokenTypeArrayOfWhitespaceSeparatedStrings:
+			debug("String Array: %s", token.value)
+			pieces := strings.Split(token.value, " ")
+			array := ast.Array{Line: token.line, Nodes: make([]ast.Node, len(pieces))}
+
+			for i, str := range pieces {
+				array.Nodes[i] = ast.SimpleString{Line: token.line, Value: str}
+			}
+
+			lval.genericValue = array
+			return NODE
 		case tokenTypeCapitalizedReference:
 			debug("CAPITAL REF: %s", token.value)
 			someValue := ast.Constant{Name: token.value}
