@@ -19,7 +19,8 @@ func main() {
 	for {
 		result, err := vm.Run(readInput())
 		if err != nil {
-			panic(err.Error())
+			fmt.Printf(" => %s", err.Error())
+			continue
 		}
 
 		if result != nil {
