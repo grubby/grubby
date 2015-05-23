@@ -2241,6 +2241,29 @@ end`)
 				})
 			})
 
+			Context("to a slice of a string", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("bar[@position, label.size] = label")
+				})
+
+				It("is parsed as a call expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.BareReference{Name: "bar"},
+							Func:   ast.BareReference{Name: "[]="},
+							Args: []ast.Node{
+								ast.InstanceVariable{Name: "position"},
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "label"},
+									Func:   ast.BareReference{Name: "size"},
+								},
+								ast.BareReference{Name: "label"},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to multiple keys in a hash", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`

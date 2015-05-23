@@ -440,146 +440,163 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
 // e.g.: `puts 'whatever' do ; end;` or with_a_block { puts 'foo' }
 | REF nodes_with_commas
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: $1.(ast.BareReference),
       Args: $2,
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | REF nodes_with_commas block
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: $1.(ast.BareReference),
       Args: $2,
       OptionalBlock: $3,
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | single_node LESSTHAN single_node
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "<"},
       Target: $1,
       Args: []ast.Node{$3},
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | call_expression LESSTHAN single_node
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "<"},
       Target: $1,
       Args: []ast.Node{$3},
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | single_node GREATERTHAN single_node
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: ast.BareReference{Line: $2.LineNumber(), Name: ">"},
       Target: $1,
       Args: []ast.Node{$3},
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 
 // hash / array retrieval at index
+| REF LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  }
 | REF LBRACKET single_node RBRACKET
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
       Target: $1,
       Args: []ast.Node{$3},
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
-  }
-| CONSTANT LBRACKET single_node RBRACKET
-  {
-    callExpr := ast.CallExpression{
-      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
-      Target: $1,
-      Args: []ast.Node{$3},
-    }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
-  }
-| instance_variable LBRACKET single_node RBRACKET
-  {
-    callExpr := ast.CallExpression{
-      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
-      Target: $1,
-      Args: []ast.Node{$3},
-    }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | REF LBRACKET range RBRACKET
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
       Target: $1,
       Args: []ast.Node{$3},
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
-  }
-| CONSTANT LBRACKET range RBRACKET
-  {
-    callExpr := ast.CallExpression{
-      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
-      Target: $1,
-      Args: []ast.Node{$3},
-    }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
-  }
-| REF LBRACKET nonempty_nodes_with_commas RBRACKET
-  {
-    callExpr := ast.CallExpression{
-      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
-      Target: $1,
-      Args: $3,
-    }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | CONSTANT LBRACKET nonempty_nodes_with_commas RBRACKET
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
       Target: $1,
       Args: $3,
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
-| call_expression LBRACKET nonempty_nodes_with_commas RBRACKET
+| CONSTANT LBRACKET range RBRACKET
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
-      Target: $1,
-      Args: $3,
-    }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
-  }
-| call_expression LBRACKET single_node RBRACKET
-  {
-    callExpr := ast.CallExpression{
-      Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]"},
       Target: $1,
       Args: []ast.Node{$3},
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
-| single_node DOT REF LBRACKET single_node RBRACKET
+| instance_variable LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  }
+| instance_variable LBRACKET range RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+| class_variable LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  }
+| class_variable LBRACKET range RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+| call_expression LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  }
+| call_expression LBRACKET range RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+| single_node DOT REF LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $1.LineNumber(), Name: "[]"},
+      Target: ast.CallExpression{
+        Line: $1.LineNumber(),
+        Target: $1,
+        Func: $3.(ast.BareReference),
+      },
+      Args: $5,
+    }
+  }
+| single_node DOT REF LBRACKET range RBRACKET
   {
     $$ = ast.CallExpression{
       Line: $1.LineNumber(),
@@ -593,48 +610,54 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
     }
   }
 
+
 // hash assignment
+| REF LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO expr
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
+      Target: $1,
+      Args: append($3, $6),
+      Line: $1.LineNumber(),
+    }
+  }
 | REF LBRACKET single_node RBRACKET EQUALTO expr
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
       Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
       Target: $1,
       Args: []ast.Node{$3, $6},
+      Line: $1.LineNumber(),
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
-| CONSTANT LBRACKET single_node RBRACKET EQUALTO optional_newlines expr
+| CONSTANT LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO optional_newlines expr
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
       Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
       Target: $1,
-      Args: []ast.Node{$3, $7},
+      Args: append($3, $7),
+      Line: $1.LineNumber(),
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
-| instance_variable LBRACKET single_node RBRACKET EQUALTO expr
+| instance_variable LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO expr
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
       Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
       Target: $1,
-      Args: []ast.Node{$3, $6},
+      Args: append($3, $6),
+      Line: $1.LineNumber(),
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
-| call_expression LBRACKET single_node RBRACKET EQUALTO expr
+| call_expression LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO expr
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
       Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
       Target: $1,
-      Args: []ast.Node{$3, $6},
+      Args: append($3, $6),
+      Line: $1.LineNumber(),
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
-| single_node DOT REF LBRACKET single_node RBRACKET EQUALTO expr
+| single_node DOT REF LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO expr
   {
     $$ = ast.CallExpression{
       Line: $1.LineNumber(),
@@ -644,9 +667,9 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
         Func: $3.(ast.BareReference),
         Target: $1,
       },
-      Args: []ast.Node{$5, $8},
+      Args: append($5, $8),
     }
-  }
+  };
 
 
 operator_expression : single_node OPERATOR optional_newlines single_node
