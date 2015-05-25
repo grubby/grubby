@@ -4949,6 +4949,12 @@ class Foo<Bar
     "woah what the fuck",
     "is going on here",
     'this is quite weird')
+
+  this.
+    is_quite(
+      :weird
+    ).
+     but_whatever
 end
 
 with_a_block { |foo| puts foo.inspect } # comment goes here

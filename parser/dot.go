@@ -7,6 +7,8 @@ func lexDot(l StatefulRubyLexer) stateFn {
 	}
 
 	l.emit(tokenTypeDot)
+	l.acceptRun(whitespace + newline)
+	l.ignore()
 
 	if l.accept(validMethodNameRunes) {
 		l.acceptRun(validMethodNameRunes)
