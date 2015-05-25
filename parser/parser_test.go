@@ -3077,7 +3077,7 @@ File.lchmod mode & 01777, path
 
 			Context("with hashrockets", func() {
 				BeforeEach(func() {
-					lexer = parser.NewLexer("{:foo => bar}")
+					lexer = parser.NewLexer("{:foo => bar, :bar => false}")
 				})
 
 				It("returns a Hash node", func() {
@@ -3087,6 +3087,10 @@ File.lchmod mode & 01777, path
 								{
 									Key:   ast.Symbol{Name: "foo"},
 									Value: ast.BareReference{Name: "bar"},
+								},
+								{
+									Key:   ast.Symbol{Name: "bar"},
+									Value: ast.Boolean{Value: false},
 								},
 							},
 						},

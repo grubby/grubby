@@ -1345,13 +1345,9 @@ hash : LBRACE optional_newlines RBRACE
   };
 
 key_value_pairs : single_node HASH_ROCKET single_node
-  {
-    $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $3})
-  }
+  { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $3}) }
 | key_value_pairs COMMA optional_newlines single_node HASH_ROCKET single_node optional_comma
-  {
-    $$ = append($$, ast.HashKeyValuePair{Key: $4, Value: $6})
-  };
+  { $$ = append($$, ast.HashKeyValuePair{Key: $4, Value: $6}) };
 
 symbol_key_value_pairs : REF COLON single_node
   {
