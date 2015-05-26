@@ -151,6 +151,7 @@ var Statements []ast.Node
 %type <genericValue> begin_block
 %type <genericValue> single_node
 %type <genericValue> simple_node
+%type <genericBlock> optional_block
 %type <genericValue> call_expression
 %type <genericValue> operator_expression
 %type <genericValue> method_declaration
@@ -409,26 +410,25 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
     callExpr.Line = $1.LineNumber()
     $$ = callExpr
   }
-| group DOT REF
+| group DOT REF call_args optional_block
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Target: $1,
       Func: $3.(ast.BareReference),
-      Args: []ast.Node{},
+      Args: $4,
+      OptionalBlock: $5,
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
-| group DOT REF block
+| group DOT REF optional_block
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Target: $1,
       Func: $3.(ast.BareReference),
       Args: []ast.Node{},
       OptionalBlock: $4,
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | single_node DOT REF EQUALTO expr
   {
@@ -1389,6 +1389,9 @@ block : DO list END
       body := append(head, tail...)
       $$ = ast.Block{Line: $1.LineNumber(), Body: body}
   };
+
+
+optional_block : /* nothing */ { } | block { $$ = $1 };
 
 
 block_args : PIPE comma_delimited_args_with_default_values PIPE
