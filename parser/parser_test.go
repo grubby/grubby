@@ -3584,22 +3584,50 @@ end
 		})
 
 		Describe("the 'super' keyword", func() {
-			BeforeEach(func() {
-				lexer = parser.NewLexer(`
+			Context("on its own", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
 def whatever
   super
 end
 `)
+				})
+
+				It("should be parsed as an ast.SuperclassMethodImplCall", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "whatever"},
+							Body: []ast.Node{ast.SuperclassMethodImplCall{Line: 2}},
+						},
+					}))
+				})
 			})
 
-			It("should be parsed as an ast.SuperclassMethodImplCall", func() {
-				Expect(parser.Statements).To(Equal([]ast.Node{
-					ast.FuncDecl{
-						Line: 1,
-						Name: ast.BareReference{Line: 1, Name: "whatever"},
-						Body: []ast.Node{ast.SuperclassMethodImplCall{Line: 2}},
-					},
-				}))
+			Context("with args", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+def whatever
+  super what, why
+end
+`)
+				})
+
+				It("should be parsed as an ast.SuperclassMethodImplCall", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.FuncDecl{
+							Line: 1,
+							Name: ast.BareReference{Line: 1, Name: "whatever"},
+							Body: []ast.Node{ast.SuperclassMethodImplCall{
+								Line: 2,
+								Args: []ast.Node{
+									ast.BareReference{Line: 2, Name: "what"},
+									ast.BareReference{Line: 2, Name: "why"},
+								},
+							}},
+						},
+					}))
+				})
 			})
 		})
 
