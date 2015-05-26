@@ -242,6 +242,11 @@ func NewModuleClass(provider Provider, evaluator Evaluator) Class {
 			return provider.SingletonProvider().SingletonWithName("false"), nil
 		}
 	}))
+	c.AddMethod(NewNativeMethod("class_eval", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		block.setContext(self)
+		block.Call()
+		return nil, nil
+	}))
 
 	return c
 }

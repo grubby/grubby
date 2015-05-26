@@ -52,3 +52,7 @@ func (proc *Proc) Call(args ...Value) (Value, error) {
 
 	return method.Execute(args[0], nil)
 }
+
+func (proc *Proc) setContext(newContext Value) {
+
+}

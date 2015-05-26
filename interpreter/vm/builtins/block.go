@@ -8,6 +8,7 @@ type BlockEvaluator interface {
 
 type Block interface {
 	Call(args ...Value) (Value, error)
+	setContext(newContext Value)
 }
 
 type BlockArg struct {
@@ -35,6 +36,10 @@ func (b *blockImpl) Call(args ...Value) (Value, error) {
 	}
 
 	return b.evaluator.EvaluateBlockWithArgsInContext(b.Context, invocationArgs, b.body)
+}
+
+func (b *blockImpl) setContext(newContext Value) {
+	b.Context = newContext
 }
 
 func NewBlock(Context Value, args []ast.MethodParam, body []ast.Node, evaluator BlockEvaluator) Block {
