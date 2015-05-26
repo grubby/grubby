@@ -436,13 +436,14 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretWeakBooleanAnd(vm, statement.(ast.WeakLogicalAnd), context)
 		case ast.WeakLogicalOr:
 			returnValue, returnErr = interpretWeakBooleanOr(vm, statement.(ast.WeakLogicalOr), context)
-
 		case ast.Defined:
 			returnValue, returnErr = interpretDefinedKeyword(vm, statement.(ast.Defined), context)
 		case ast.InstanceVariable:
 			returnValue, returnErr = interpretInstanceVariableInContext(vm, statement.(ast.InstanceVariable), context)
 		case ast.SwitchStatement:
 			returnValue, returnErr = interpretSwitchStatement(vm, statement.(ast.SwitchStatement), context)
+		case ast.SuperclassMethodImplCall:
+			returnValue, returnErr = interpretSuperCall(vm, statement.(ast.SuperclassMethodImplCall), context)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
@@ -524,6 +525,14 @@ func (vm *vm) EvaluateStringInContextAndNewStack(input string, context Value) (V
 // StackProvider
 func (vm *vm) CurrentStack() string {
 	return vm.stack.String()
+}
+
+func (vm *vm) ShiftStackFrame() {
+	vm.stack.Shift()
+}
+
+func (vm *vm) UnshiftStackFrame(methodName string, filename string, lineNumber int) {
+	vm.stack.Unshift(methodName, filename, lineNumber)
 }
 
 // MethodProvider

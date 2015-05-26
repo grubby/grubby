@@ -27,6 +27,7 @@ type RubyMethod struct {
 	provider      Provider
 	evaluator     ArgEvaluator
 	classProvider ClassProvider
+	stackProvider StackProvider
 }
 
 func NewRubyMethod(
@@ -44,6 +45,7 @@ func NewRubyMethod(
 		visibility:      Public,
 		provider:        provider,
 		classProvider:   provider.ClassProvider(),
+		stackProvider:   provider.StackProvider(),
 		evaluator:       evaluator,
 		unevaluatedBody: rubyBody,
 	}
@@ -67,6 +69,9 @@ func NewPrivateRubyMethod(
 		args:            args,
 		visibility:      Private,
 		evaluator:       evaluator,
+		provider:        provider,
+		classProvider:   provider.ClassProvider(),
+		stackProvider:   provider.StackProvider(),
 		unevaluatedBody: rubyBody,
 	}
 	m.class = provider.ClassProvider().ClassWithName("Method")
@@ -142,9 +147,10 @@ func (method *RubyMethod) Execute(self Value, block Block, args ...Value) (Value
 		}
 		method.invocationArgs = append(method.invocationArgs, argument)
 	}
-	defer func() {
-		method.invocationArgs = nil
-	}()
+
+	method.stackProvider.UnshiftStackFrame(method.name, "fixme -- method name goes here", -1)
+	defer method.stackProvider.ShiftStackFrame()
+	defer func() { method.invocationArgs = nil }()
 
 	return method.body(self, method)
 }

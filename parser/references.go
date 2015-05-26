@@ -125,6 +125,8 @@ func lexReference(l StatefulRubyLexer) stateFn {
 	case "alias":
 		l.emit(tokenTypeALIAS)
 		readCommaDelimitedSymbolsUntilEOL(l)
+	case "super":
+		l.emit(tokenTypeSUPER)
 
 	default:
 		defaultCase()

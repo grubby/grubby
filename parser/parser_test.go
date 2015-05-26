@@ -1894,7 +1894,7 @@ end
 									Line: 2,
 									Name: ast.BareReference{Line: 2, Name: "initialize"},
 									Body: []ast.Node{
-										ast.BareReference{Line: 3, Name: "super"},
+										ast.SuperclassMethodImplCall{Line: 3},
 										ast.CallExpression{
 											Line:   5,
 											Target: ast.BareReference{Line: 5, Name: "config"},
@@ -3580,6 +3580,26 @@ end
 						},
 					}))
 				})
+			})
+		})
+
+		Describe("the 'super' keyword", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+def whatever
+  super
+end
+`)
+			})
+
+			It("should be parsed as an ast.SuperclassMethodImplCall", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.FuncDecl{
+						Line: 1,
+						Name: ast.BareReference{Line: 1, Name: "whatever"},
+						Body: []ast.Node{ast.SuperclassMethodImplCall{Line: 2}},
+					},
+				}))
 			})
 		})
 

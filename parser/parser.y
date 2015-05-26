@@ -79,6 +79,7 @@ var Statements []ast.Node
 %token <genericValue> CASE
 %token <genericValue> WHEN
 %token <genericValue> ALIAS
+%token <genericValue> SUPER
 %token <genericValue> SELF
 %token <genericValue> NIL
 %token <genericValue> DEFINED
@@ -272,7 +273,7 @@ single_node : simple_node | array | hash | class_name_with_modules | call_expres
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias;
+expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias | SUPER;
 
 string_literal : STRING
   { $$ = $1 }
