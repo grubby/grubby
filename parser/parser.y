@@ -137,6 +137,7 @@ var Statements []ast.Node
 %type <genericValue> range
 %type <genericBlock> block
 %type <genericValue> alias
+%type <genericValue> super
 %type <genericValue> array
 %type <genericValue> group
 %type <genericValue> lambda
@@ -269,11 +270,11 @@ list : /* empty */
 
 simple_node : SYMBOL | NODE | string_literal | REF | CONSTANT | GLOBAL_VARIABLE | IVAR_OR_CLASS_VARIABLE | LINE_CONST_REF | FILE_CONST_REF | self | nil;
 
-single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression | defined;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression | defined | super;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
-expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias | SUPER;
+expr : single_node | method_declaration | class_declaration | module_declaration | eigenclass_declaration | assignment | multiple_assignment | conditional_assignment | if_block | begin_block | yield_expression | while_loop | switch_statement | return_expression | break_expression | next_expression | rescue_modifier | range | retry_expression | ternary | alias;
 
 string_literal : STRING
   { $$ = $1 }
@@ -1910,5 +1911,8 @@ alias : ALIAS SYMBOL SYMBOL
 
 defined: DEFINED single_node
   { $$ = ast.Defined{Node: $2} };
+
+
+super : SUPER { $$ = $1 };
 
 %%
