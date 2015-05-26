@@ -4766,6 +4766,21 @@ end
 				})
 			})
 
+			Context("with an inline until statement", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo until bar")
+				})
+
+				It("is parsed as a loop with a negated condition", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Loop{
+							Condition: ast.Negation{Target: ast.BareReference{Name: "bar"}},
+							Body:      []ast.Node{ast.BareReference{Name: "foo"}},
+						},
+					}))
+				})
+			})
+
 			Context("with an until statement", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`

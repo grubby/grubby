@@ -1743,6 +1743,14 @@ while_loop : WHILE expr NEWLINE loop_expressions END
     loop.Line = $2.LineNumber()
     $$ = loop
   }
+| expr UNTIL expr
+  {
+    $$ = ast.Loop{
+      Line: $1.LineNumber(),
+      Condition: ast.Negation{Line: $1.LineNumber(), Target:$3},
+      Body: []ast.Node{$1},
+    }
+  }
 | expr WHILE expr
   {
     loop := ast.Loop{Condition: $3, Body: []ast.Node{$1}}
