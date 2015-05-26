@@ -4545,6 +4545,22 @@ s = short ? short.dup : "  "
 				})
 			})
 
+			Context("with the 'super' keyword", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("true ? :oops : super")
+				})
+
+				It("should be parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Ternary{
+							Condition: ast.Boolean{Value: true},
+							True:      ast.Symbol{Name: "oops"},
+							False:     ast.SuperclassMethodImplCall{},
+						},
+					}))
+				})
+			})
+
 			Context("with call expressions", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("what() ? mm.hmm : thats_cool()")
