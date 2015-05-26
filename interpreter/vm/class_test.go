@@ -408,4 +408,15 @@ end
 			})
 		})
 	})
+
+	It("can have its superclass declared more than once", func() {
+		_, err := vm.Run(`
+class Foo < File
+end
+
+class Foo < File
+end
+`)
+		Expect(err).ToNot(HaveOccurred())
+	})
 })
