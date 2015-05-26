@@ -844,7 +844,7 @@ end
 			Context("with a block passed to a call expression targeting a group", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
-    (@repeat || 1).times do
+    (@repeat || 1).times do |something|
       yield
     end
 `)
@@ -869,6 +869,7 @@ end
 							Args: []ast.Node{},
 							OptionalBlock: ast.Block{
 								Line: 1,
+								Args: []ast.MethodParam{{Name: "something"}},
 								Body: []ast.Node{ast.Yield{Line: 2}},
 							},
 						},
