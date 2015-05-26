@@ -419,4 +419,21 @@ end
 `)
 		Expect(err).ToNot(HaveOccurred())
 	})
+
+	Describe(".class_eval", func() {
+		It("can be used to evaluate some code within the context of a class", func() {
+			_, err := vm.Run(`
+Object.class_eval do
+  def please_dont
+  end
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+
+			obj, err := vm.MustGetClass("Object").New(vm)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(obj).To(HaveMethod("please_dont"))
+		})
+	})
 })
