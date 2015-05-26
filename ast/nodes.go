@@ -653,3 +653,11 @@ type Defined struct {
 func (d Defined) LineNumber() int {
 	return d.Line
 }
+
+type SuperclassMethodImplCall struct {
+	Line int
+}
+
+func (s SuperclassMethodImplCall) LineNumber() int {
+	return s.Line
+}

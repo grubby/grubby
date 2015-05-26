@@ -25,6 +25,7 @@ type nativeMethod struct {
 	body              func(self Value, block Block, args ...Value) (Value, error)
 	classProvider     ClassProvider
 	singletonProvider SingletonProvider
+	stackProvider     StackProvider
 }
 
 func NewNativeMethod(name string, provider Provider, body func(self Value, block Block, args ...Value) (Value, error)) Method {
@@ -40,6 +41,7 @@ func newNativeMethod(name string, visibility MethodVisibility, provider Provider
 		name:              name,
 		body:              body,
 		visibility:        visibility,
+		stackProvider:     provider.StackProvider(),
 		classProvider:     provider.ClassProvider(),
 		singletonProvider: provider.SingletonProvider(),
 	}
@@ -66,6 +68,9 @@ func (method *nativeMethod) IsProtected() bool {
 }
 
 func (method *nativeMethod) Execute(self Value, block Block, args ...Value) (Value, error) {
+	method.stackProvider.UnshiftStackFrame(method.name, "fixme -- filename goes here", -1)
+	defer method.stackProvider.ShiftStackFrame()
+
 	return method.body(self, block, args...)
 }
 

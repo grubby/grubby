@@ -436,4 +436,30 @@ end
 			Expect(obj).To(HaveMethod("please_dont"))
 		})
 	})
+
+	Describe("calling the superclass implementation of a method", func() {
+		It("can be done with the 'super' keyword", func() {
+			barInstance, err := vm.Run(`
+class Foo
+  def initialize
+    @foo = 'hello'
+  end
+end
+
+class Bar < Foo
+  def initialize
+    super
+  end
+end
+
+Bar.new
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+
+			foo := barInstance.GetInstanceVariable("foo")
+			Expect(foo).ToNot(BeNil())
+			Expect(foo.String()).To(ContainSubstring("hello"))
+		})
+	})
 })

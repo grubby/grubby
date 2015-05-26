@@ -22,6 +22,8 @@ type SingletonProvider interface {
 
 type StackProvider interface {
 	CurrentStack() string
+	UnshiftStackFrame(string, string, int)
+	ShiftStackFrame()
 }
 
 type MethodProvider interface {

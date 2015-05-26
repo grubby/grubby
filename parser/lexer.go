@@ -110,6 +110,7 @@ const (
 	tokenTypeCASE
 	tokenTypeWHEN
 	tokenTypeALIAS
+	tokenTypeSUPER
 	tokenType__FILE__
 	tokenType__LINE__
 	tokenType__ENCODING__
@@ -815,6 +816,10 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeProcArg:
 			debug("ProcArg")
 			return ProcArg
+		case tokenTypeSUPER:
+			debug("SUPER")
+			lval.genericValue = ast.SuperclassMethodImplCall{Line: token.line}
+			return SUPER
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
