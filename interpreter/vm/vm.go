@@ -88,6 +88,7 @@ func NewVM(rubyHome, name string) VM {
 	}
 	vm.CurrentClasses["Object"].SetConstant("ARGV", argvArray)
 	vm.CurrentClasses["Object"].SetConstant("RUBY_NAME", NewString("grubby", vm))
+	vm.CurrentClasses["Object"].SetConstant("ENV", NewENVConstant(vm))
 
 	// this is a temporary hack to gain progress on running rubyspec
 	// as an alternative, we could implement String#=~
