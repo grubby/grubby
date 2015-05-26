@@ -670,4 +670,17 @@ end
 			Expect(value.String()).To(ContainSubstring("2"))
 		})
 	})
+
+	Describe("the ENV global constant", func() {
+		BeforeEach(func() {
+			os.Setenv("__grubby_tests", "bruces yams")
+		})
+
+		It("can be used to read values from the environment", func() {
+			value, err := vm.Run("ENV['__grubby_tests']")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(value.String()).To(ContainSubstring("bruces yams"))
+		})
+	})
 })
