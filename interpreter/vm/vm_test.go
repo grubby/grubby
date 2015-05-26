@@ -597,4 +597,13 @@ File.sup`)
 			})
 		})
 	})
+
+	Describe("boolean 'and'", func() {
+		It("can be used to check if two values are truthy", func() {
+			value, err := vm.Run("true and 'a'")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.String()).To(ContainSubstring("a"))
+		})
+	})
 })
