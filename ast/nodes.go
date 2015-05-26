@@ -656,6 +656,7 @@ func (d Defined) LineNumber() int {
 
 type SuperclassMethodImplCall struct {
 	Line int
+	Args []Node
 }
 
 func (s SuperclassMethodImplCall) LineNumber() int {

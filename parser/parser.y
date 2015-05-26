@@ -1913,6 +1913,14 @@ defined: DEFINED single_node
   { $$ = ast.Defined{Node: $2} };
 
 
-super : SUPER { $$ = $1 };
+super : SUPER
+  { $$ = $1 }
+| SUPER call_args
+  {
+    $$ = ast.SuperclassMethodImplCall{
+      Line: $1.LineNumber(),
+      Args: $2,
+    }
+  };
 
 %%
