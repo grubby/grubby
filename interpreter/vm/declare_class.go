@@ -34,7 +34,8 @@ func interpretClassDeclarationInContext(
 		theClass = NewUserDefinedClass(classNode.Name, classNode.SuperClass.FullName(), vm)
 		vm.CurrentClasses[fullClassName] = theClass
 	} else {
-		if classNode.SuperClass.FullName() != "" {
+		superclassName := classNode.SuperClass.FullName()
+		if superclassName != "" && superclassName != theClass.SuperClass().Name() {
 			return nil, errors.New(fmt.Sprintf("TypeError: superclass mismatch for class %s", classNode.Name))
 		}
 	}
