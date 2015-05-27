@@ -409,6 +409,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 
 		case ast.Assignment:
 			returnValue, returnErr = interpretAssignmentInContext(vm, statement.(ast.Assignment), context)
+		case ast.ConditionalAssignment:
+			returnValue, returnErr = interpretConditionalAssignmentInContext(vm, statement.(ast.ConditionalAssignment), context)
 		case ast.FileNameConstReference:
 			returnValue = NewString(vm.currentFilename, vm)
 		case ast.LineNumberConstReference:
@@ -442,6 +444,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretSwitchStatement(vm, statement.(ast.SwitchStatement), context)
 		case ast.SuperclassMethodImplCall:
 			returnValue, returnErr = interpretSuperCall(vm, statement.(ast.SuperclassMethodImplCall), context)
+		case ast.InstanceVariable:
+			returnValue = context.GetInstanceVariable(statement.(ast.InstanceVariable).Name)
 		default:
 			panic(fmt.Sprintf("handled unknown statement type: %T:\n\t\n => %#v\n", statement, statement))
 		}
