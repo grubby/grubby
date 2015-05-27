@@ -51,6 +51,14 @@ func NewFileClass(provider Provider) Class {
 			return provider.SingletonProvider().SingletonWithName("true"), nil
 		}
 	}))
+	f.AddMethod(NewNativeMethod("join", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		pieces := make([]string, len(args))
+		for _, str := range args {
+			pieces = append(pieces, str.(*StringValue).RawString())
+		}
+
+		return NewString(filepath.Join(pieces...), provider), nil
+	}))
 
 	return f
 }
