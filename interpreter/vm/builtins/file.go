@@ -37,11 +37,19 @@ func NewFileClass(provider Provider) Class {
 
 		return NewString(path, provider), nil
 	}))
-
 	f.AddMethod(NewNativeMethod("dirname", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		filename := args[0].(*StringValue).RawString()
 
 		return NewString(filepath.Base(filename), provider), nil
+	}))
+	f.AddMethod(NewNativeMethod("exist?", provider, func(self Value, block Block, args ...Value) (Value, error) {
+
+		filepath := args[0].(*StringValue).RawString()
+		if _, err := os.Stat(filepath); os.IsNotExist(err) {
+			return provider.SingletonProvider().SingletonWithName("false"), nil
+		} else {
+			return provider.SingletonProvider().SingletonWithName("true"), nil
+		}
 	}))
 
 	return f

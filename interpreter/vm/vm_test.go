@@ -241,10 +241,14 @@ require 'foo'
 	})
 
 	Describe("the File class", func() {
-		It("has a reasonable .expand_path method", func() {
-			fileClass := vm.ClassWithName("File")
-			Expect(fileClass).ToNot(BeNil())
+		var fileClass Class
 
+		BeforeEach(func() {
+			fileClass = vm.ClassWithName("File")
+			Expect(fileClass).ToNot(BeNil())
+		})
+
+		It("has a .expand_path method", func() {
 			method := fileClass.Method("expand_path")
 			Expect(method).ToNot(BeNil())
 
@@ -253,6 +257,15 @@ require 'foo'
 
 			expectedPath := fmt.Sprintf("%s/%s", os.Getenv("HOME"), "foobar")
 			Expect(result.String()).To(Equal(expectedPath))
+		})
+
+		It("has an .exist? method", func() {
+			method := fileClass.Method("exist?")
+			Expect(method).ToNot(BeNil())
+
+			result, err := method.Execute(fileClass, nil, NewString("/nope/noway/really/noway", vm))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.IsTruthy()).To(BeFalse())
 		})
 	})
 
