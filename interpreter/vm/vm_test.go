@@ -267,6 +267,15 @@ require 'foo'
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result.IsTruthy()).To(BeFalse())
 		})
+
+		It("has a .join method", func() {
+			method := fileClass.Method("join")
+			Expect(method).ToNot(BeNil())
+
+			result, err := method.Execute(fileClass, nil, NewString("foo", vm), NewString("bar", vm))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.String()).To(ContainSubstring(filepath.Join("foo", "bar")))
+		})
 	})
 
 	Describe("the Dir class", func() {
