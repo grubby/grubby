@@ -16,6 +16,7 @@ func interpretMethodDeclarationInContext(
 
 	method := NewRubyMethod(
 		funcNode.MethodName(),
+		funcNode.LineNumber(),
 		funcNode.Args,
 		funcNode.Body,
 		vm,
@@ -35,6 +36,7 @@ func interpretMethodDeclarationInContext(
 	if context == vm.ObjectSpace["main"] && funcNode.Target == nil {
 		method = NewPrivateRubyMethod(
 			funcNode.MethodName(),
+			funcNode.LineNumber(),
 			funcNode.Args,
 			funcNode.Body,
 			vm,

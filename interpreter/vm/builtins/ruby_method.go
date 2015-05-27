@@ -15,6 +15,7 @@ type methodArg struct {
 type RubyMethod struct {
 	valueStub
 	name       string
+	lineNumber int
 	visibility MethodVisibility
 
 	args []ast.MethodParam
@@ -32,6 +33,7 @@ type RubyMethod struct {
 
 func NewRubyMethod(
 	name string,
+	lineNumber int,
 	args []ast.MethodParam,
 	rubyBody []ast.Node,
 	provider Provider,
@@ -40,6 +42,7 @@ func NewRubyMethod(
 ) Method {
 	m := &RubyMethod{
 		name:            name,
+		lineNumber:      lineNumber,
 		body:            body,
 		args:            args,
 		visibility:      Public,
@@ -57,6 +60,7 @@ func NewRubyMethod(
 
 func NewPrivateRubyMethod(
 	name string,
+	lineNumber int,
 	args []ast.MethodParam,
 	rubyBody []ast.Node,
 	provider Provider,
@@ -65,6 +69,7 @@ func NewPrivateRubyMethod(
 ) Method {
 	m := &RubyMethod{
 		name:            name,
+		lineNumber:      lineNumber,
 		body:            body,
 		args:            args,
 		visibility:      Private,
@@ -148,7 +153,7 @@ func (method *RubyMethod) Execute(self Value, block Block, args ...Value) (Value
 		method.invocationArgs = append(method.invocationArgs, argument)
 	}
 
-	method.stackProvider.UnshiftStackFrame(method.name, "fixme -- method name goes here", -1)
+	method.stackProvider.UnshiftStackFrame(method.name, "fixme -- method name goes here", method.lineNumber)
 	defer method.stackProvider.ShiftStackFrame()
 	defer func() { method.invocationArgs = nil }()
 
