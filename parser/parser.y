@@ -238,11 +238,11 @@ var Statements []ast.Node
 capture_list : /* empty */
   { Statements = []ast.Node{} }
 | NEWLINE
-  { }
+  { Statements = []ast.Node{} }
 | SEMICOLON
-  { }
+  { Statements = []ast.Node{} }
 | EOF
-  { }
+  { Statements = []ast.Node{} }
 | capture_list expr SEMICOLON
   { Statements = append(Statements, $2) }
 | capture_list expr NEWLINE
@@ -254,17 +254,17 @@ capture_list : /* empty */
 | capture_list NEWLINE
 | capture_list SEMICOLON
 | capture_list EOF
-  { };
+  { $$ = $$ };
 
-optional_newlines : /* empty */ { }
-| optional_newlines NEWLINE { }
+optional_newlines : /* empty */ { $$ = nil }
+| optional_newlines NEWLINE { $$ = nil }
 
 list : /* empty */
   { $$ = ast.Nodes{} }
 | list NEWLINE
-  {  }
+  { $$ = $$ }
 | list SEMICOLON
-  {  }
+  { $$ = $$ }
 | list expr
 {  $$ = append($$, $2) };
 
@@ -922,7 +922,8 @@ method_args : comma_delimited_args_with_default_values
 | LPAREN STAR RPAREN
   { $$ = []ast.MethodParam{{Name: "", IsSplat: true}} };
 
-comma_delimited_args_with_default_values : /* empty */ { }
+comma_delimited_args_with_default_values : /* empty */
+  { $$ = nil }
 | default_value_arg
   { $$ = append($$, $1) }
 | comma_delimited_args_with_default_values COMMA default_value_arg
@@ -1294,8 +1295,8 @@ bitwise_or: single_node PIPE single_node
 array : LBRACKET optional_newlines nodes_with_commas_and_optional_newlines optional_newlines RBRACKET
   { $$ = ast.Array{Line: $1.LineNumber(), Nodes: $3} };
 
-self : SELF { };
-nil : NIL { };
+self : SELF { $$ = $1 };
+nil : NIL { $$ = $1 };
 
 nodes_with_commas_and_optional_newlines : /* empty */ { $$ = ast.Nodes{} }
 | single_node
@@ -1393,7 +1394,7 @@ block : DO list END
   };
 
 
-optional_block : /* nothing */ { } | block { $$ = $1 };
+optional_block : /* nothing */ {  } | block { $$ = $1 };
 
 
 block_args : PIPE comma_delimited_args_with_default_values PIPE
@@ -1537,9 +1538,9 @@ elsif_block : elsif_block ELSIF expr list
     })
       };
 
-lines : /* empty */ { }
+lines : /* empty */ { $$ = []ast.Node{} }
 | lines expr { $$ = append($$, $2) }
-| lines SEMICOLON { };
+| lines SEMICOLON { $$ = $$ };
 
 group : LPAREN lines RPAREN
   { group := ast.Group{Body: $2}; group.Line = $1.(ast.Nil).Line; $$ = group };

@@ -5071,6 +5071,47 @@ s << (short ? ", " : "  ") if long
 			})
 		})
 
+		Describe("multiple methods in a single class", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer(`
+class MSpecScript
+  def load(bananas)
+  end
+
+  def load_default
+  end
+end
+`)
+			})
+
+			It("is parsed correctly", func() {
+				Expect(parser.RubyParse(lexer)).To(BeSuccessful())
+				Expect(lexer.(*parser.ConcreteStatefulRubyLexer).LastError).To(BeNil())
+
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.ClassDecl{
+						Line: 1,
+						Name: "MSpecScript",
+						Body: []ast.Node{
+							ast.FuncDecl{
+								Line: 2,
+								Name: ast.BareReference{Line: 2, Name: "load"},
+								Args: []ast.MethodParam{{
+									Name: "bananas",
+								}},
+								Body: []ast.Node{},
+							},
+							ast.FuncDecl{
+								Line: 5,
+								Name: ast.BareReference{Line: 5, Name: "load_default"},
+								Body: []ast.Node{},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		Context("conditionals around assignment to a call expression", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
