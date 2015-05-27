@@ -87,6 +87,7 @@ func NewVM(rubyHome, name string) VM {
 		panic(err)
 	}
 	vm.CurrentClasses["Object"].SetConstant("ARGV", argvArray)
+	vm.CurrentClasses["Object"].SetConstant("RUBY_NAME", NewString("grubby", vm))
 
 	main, _ := vm.CurrentClasses["Object"].New(vm)
 	main.AddMethod(NewNativeMethod("to_s", vm, func(self Value, block Block, args ...Value) (Value, error) {
