@@ -409,6 +409,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 
 		case ast.Assignment:
 			returnValue, returnErr = interpretAssignmentInContext(vm, statement.(ast.Assignment), context)
+		case ast.ConditionalAssignment:
+			returnValue, returnErr = interpretConditionalAssignmentInContext(vm, statement.(ast.ConditionalAssignment), context)
 		case ast.FileNameConstReference:
 			returnValue = NewString(vm.currentFilename, vm)
 		case ast.LineNumberConstReference:

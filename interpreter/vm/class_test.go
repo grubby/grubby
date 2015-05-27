@@ -462,4 +462,28 @@ Bar.new
 			Expect(foo.String()).To(ContainSubstring("hello"))
 		})
 	})
+
+	Describe("calling a method on the superclass", func() {
+		It("works, simply", func() {
+			value, err := vm.Run(`
+class Foo
+  def initialize
+    config[:key] = :value
+  end
+
+  def config
+    @config ||= {}
+  end
+
+  def test
+    config[:key]
+  end
+end
+
+Foo.new.test
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.String()).To(ContainSubstring("value"))
+		})
+	})
 })
