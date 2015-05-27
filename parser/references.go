@@ -8,6 +8,18 @@ import (
 func lexReference(l StatefulRubyLexer) stateFn {
 	l.acceptRun(alphaNumericUnderscore)
 
+	defaultCase := func() {
+		r, _ := utf8.DecodeRuneInString(l.slice(l.startIndex(), l.startIndex()+1))
+
+		if l.accept("?!") {
+			l.emit(tokenTypeMethodName)
+		} else if unicode.IsUpper(r) {
+			l.emit(tokenTypeCapitalizedReference)
+		} else {
+			l.emit(tokenTypeReference)
+		}
+	}
+
 	switch l.currentSlice() {
 	case "def":
 		l.emit(tokenTypeDEF)
@@ -34,7 +46,12 @@ func lexReference(l StatefulRubyLexer) stateFn {
 			l.accept("=")
 			l.emit(tokenTypeOperator)
 		}
-
+	case "defined":
+		if l.accept("?") {
+			l.emit(tokenTypeDEFINED)
+		} else {
+			defaultCase()
+		}
 	case "do":
 		l.emit(tokenTypeDO)
 	case "end":
@@ -104,15 +121,7 @@ func lexReference(l StatefulRubyLexer) stateFn {
 		readCommaDelimitedSymbolsUntilEOL(l)
 
 	default:
-		r, _ := utf8.DecodeRuneInString(l.slice(l.startIndex(), l.startIndex()+1))
-
-		if l.accept("?!") {
-			l.emit(tokenTypeMethodName)
-		} else if unicode.IsUpper(r) {
-			l.emit(tokenTypeCapitalizedReference)
-		} else {
-			l.emit(tokenTypeReference)
-		}
+		defaultCase()
 	}
 	return lexSomething
 }

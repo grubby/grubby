@@ -649,3 +649,12 @@ type Self struct {
 func (n Self) LineNumber() int {
 	return n.Line
 }
+
+type Defined struct {
+	Line int
+	Node Node
+}
+
+func (d Defined) LineNumber() int {
+	return d.Line
+}

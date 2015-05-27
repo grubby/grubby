@@ -3447,6 +3447,27 @@ end
 			})
 		})
 
+		Describe("the 'defined?' keyword", func() {
+			BeforeEach(func() {
+				lexer = parser.NewLexer("defined? (a = 1)")
+			})
+
+			It("parses it as a ast.Defined node", func() {
+				Expect(parser.Statements).To(Equal([]ast.Node{
+					ast.Defined{
+						Node: ast.Group{
+							Body: []ast.Node{
+								ast.Assignment{
+									LHS: ast.BareReference{Name: "a"},
+									RHS: ast.ConstantInt{Value: 1},
+								},
+							},
+						},
+					},
+				}))
+			})
+		})
+
 		Describe("the 'alias' keyword", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`

@@ -46,6 +46,7 @@ const (
 	tokenTypeRParen
 	tokenTypeComma
 	tokenTypeDEF
+	tokenTypeDEFINED
 	tokenTypeDO
 	tokenTypeEND
 	tokenTypeIF
@@ -527,6 +528,9 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeDEF:
 			debug("DEF")
 			return DEF
+		case tokenTypeDEFINED:
+			debug("DEFINED?")
+			return DEFINED
 		case tokenTypeDO:
 			debug("DO")
 			lval.genericValue = ast.Nil{Line: token.line}

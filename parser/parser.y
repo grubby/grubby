@@ -76,6 +76,7 @@ var Statements []ast.Node
 %token <genericValue> ALIAS
 %token <genericValue> SELF
 %token <genericValue> NIL
+%token <genericValue> DEFINED
 
 // operators
 %token <genericValue> LESSTHAN
@@ -134,6 +135,7 @@ var Statements []ast.Node
 %type <genericValue> group
 %type <genericValue> lambda
 %type <genericValue> rescue
+%type <genericValue> defined
 %type <genericValue> ternary
 %type <genericValue> if_block
 %type <genericValue> proc_arg
@@ -261,7 +263,7 @@ list : /* empty */
 
 simple_node : SYMBOL | NODE | string_literal | REF | CONSTANT | GLOBAL_VARIABLE | instance_variable | class_variable | LINE_CONST_REF | FILE_CONST_REF | self | nil;
 
-single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression;
+single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression | defined;
 
 binary_expression : binary_addition | binary_subtraction | binary_multiplication | binary_division | bitwise_and | bitwise_or;
 
@@ -1926,5 +1928,8 @@ alias : ALIAS SYMBOL SYMBOL
     alias.Line = $1.LineNumber()
     $$ = alias
   };
+
+defined: DEFINED single_node
+  { $$ = ast.Defined{Node: $2} };
 
 %%
