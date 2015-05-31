@@ -212,6 +212,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 	vm.CurrentClasses["Exception"] = NewExceptionClass(vm)
 	vm.CurrentClasses["StandardError"] = NewStandardErrorClass(vm)
 	vm.CurrentClasses["ArgumentError"] = NewArgumentErrorClass(vm)
+	vm.CurrentClasses["Encoding"] = NewEncodingClass(vm)
 }
 
 func (vm *vm) MustGet(key string) Value {
