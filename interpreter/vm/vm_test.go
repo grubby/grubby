@@ -222,6 +222,16 @@ require 'foo'
 		})
 	})
 
+	Describe("global variables", func() {
+		It("defaults to nil if it has not been defined yet", func() {
+			value, err := vm.Run("$garbage")
+			Expect(err).ToNot(HaveOccurred())
+
+			nilInstance := vm.SingletonWithName("nil")
+			Expect(value).To(Equal(nilInstance))
+		})
+	})
+
 	Describe("the File class", func() {
 		It("has a reasonable .expand_path method", func() {
 			fileClass := vm.ClassWithName("File")

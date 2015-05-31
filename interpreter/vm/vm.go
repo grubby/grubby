@@ -382,7 +382,11 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 				returnValue = vm.singletons["false"]
 			}
 		case ast.GlobalVariable:
-			returnValue = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
+			var ok bool
+			returnValue, ok = vm.CurrentGlobals[statement.(ast.GlobalVariable).Name]
+			if !ok {
+				returnValue = vm.singletons["nil"]
+			}
 		case ast.ConstantInt:
 			returnValue = NewFixnum(statement.(ast.ConstantInt).Value, vm)
 		case ast.ConstantFloat:
