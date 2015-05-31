@@ -606,4 +606,14 @@ File.sup`)
 			Expect(value.String()).To(ContainSubstring("a"))
 		})
 	})
+
+	Describe("the defined? keyword", func() {
+		It("can be used to check if a value is defined", func() {
+			value, err := vm.Run("defined? a")
+			Expect(err).ToNot(HaveOccurred())
+
+			nilInstance := vm.SingletonWithName("nil")
+			Expect(value).To(Equal(nilInstance))
+		})
+	})
 })
