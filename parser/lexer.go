@@ -79,6 +79,7 @@ const (
 	tokenTypeAtSign
 	tokenTypeDot
 	tokenTypeRange
+	tokenTypeExclusiveRange
 	tokenTypePipe
 	tokenTypeOrEquals
 	tokenTypeAndEquals
@@ -765,6 +766,9 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeRange:
 			debug(".. (range)")
 			return RANGE
+		case tokenTypeExclusiveRange:
+			debug("... (range)")
+			return EXCLUSIVE_RANGE
 		case tokenTypeRegex:
 			debug("regex: '%s'", token.value)
 			someValue := ast.Regex{Value: token.value}

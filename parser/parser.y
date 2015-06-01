@@ -93,6 +93,7 @@ var Statements []ast.Node
 
 %token <genericValue> STAR
 %token <genericValue> RANGE
+%token <genericValue> EXCLUSIVE_RANGE
 
 %token <genericValue> OR_EQUALS
 %token <genericValue> AND_EQUALS
@@ -1916,11 +1917,16 @@ switch_cases : WHEN comma_delimited_nodes list optional_newlines
   { $$ = append($$, ast.SwitchCase{Conditions: $3, Body: $4}) };
 
 range : single_node RANGE single_node
+  {  $$ = ast.Range{Start: $1, End: $3, Line: $1.LineNumber()} }
+| single_node EXCLUSIVE_RANGE single_node
   {
-    rng := ast.Range{Start: $1, End: $3}
-    rng.Line = $1.LineNumber();
-    $$ = rng
-  };
+    $$ = ast.Range{
+      Start: $1,
+      End: $3,
+      Line: $1.LineNumber(),
+      ExcludeLastValue: true,
+    }
+  }
 
 alias : ALIAS SYMBOL SYMBOL
   {

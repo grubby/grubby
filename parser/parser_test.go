@@ -3747,6 +3747,22 @@ end
 					}))
 				})
 			})
+
+			Context("with three periods", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("a...b")
+				})
+
+				It("does not include the last value", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Range{
+							Start:            ast.BareReference{Name: "a"},
+							End:              ast.BareReference{Name: "b"},
+							ExcludeLastValue: true,
+						},
+					}))
+				})
+			})
 		})
 
 		Describe("% notation", func() {

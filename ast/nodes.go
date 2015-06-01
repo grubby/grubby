@@ -577,9 +577,10 @@ func (n ConditionalTruthyAssignment) LineNumber() int {
 }
 
 type Range struct {
-	Line  int
-	Start Node
-	End   Node
+	Line             int
+	Start            Node
+	End              Node
+	ExcludeLastValue bool
 }
 
 func (n Range) LineNumber() int {

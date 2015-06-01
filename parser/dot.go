@@ -2,7 +2,12 @@ package parser
 
 func lexDot(l StatefulRubyLexer) stateFn {
 	if l.accept(".") {
-		l.emit(tokenTypeRange)
+		if l.accept(".") {
+			l.emit(tokenTypeExclusiveRange)
+		} else {
+			l.emit(tokenTypeRange)
+		}
+
 		return lexSomething
 	}
 
