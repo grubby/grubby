@@ -1030,14 +1030,17 @@ multiple_assignment : assignable_variables EQUALTO assignable_variables
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| assignable_variables EQUALTO expr
+| assignable_variables EQUALTO nonempty_nodes_with_commas
   {
-    eql := ast.Assignment{
-      LHS: $1,
-      RHS: $3,
+    var rhs ast.Node = $3
+    if len($3) == 1 {
+      rhs = $3[0]
     }
-    eql.Line = $1.LineNumber()
-    $$ = eql
+    $$ = ast.Assignment{
+      Line: $1.LineNumber(),
+      LHS: $1,
+      RHS: rhs,
+    }
   }
 | two_or_more_call_expressions EQUALTO two_or_more_call_expressions
   {

@@ -2339,6 +2339,37 @@ HASH['second_key'] = [:something]
 				})
 			})
 
+			Context("to multiple variables from disparate RHS types", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("@foo, @bar = foo.baz, bar[0..2]")
+				})
+
+				It("is parsed as an assignment expression", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Assignment{
+							LHS: ast.Array{Nodes: []ast.Node{
+								ast.InstanceVariable{Name: "foo"},
+								ast.InstanceVariable{Name: "bar"},
+							}},
+							RHS: ast.Nodes{
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "foo"},
+									Func:   ast.BareReference{Name: "baz"},
+								},
+								ast.CallExpression{
+									Target: ast.BareReference{Name: "bar"},
+									Func:   ast.BareReference{Name: "[]"},
+									Args: []ast.Node{ast.Range{
+										Start: ast.ConstantInt{Value: 0},
+										End:   ast.ConstantInt{Value: 2},
+									}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("to multiple variables, with a splat", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("target, *actions = clause.split(/([=+-])/)")
