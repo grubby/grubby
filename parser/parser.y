@@ -1765,6 +1765,15 @@ ternary : single_node QUESTIONMARK single_node COLON single_node
     ternary.Line = $1.LineNumber()
     $$ = ternary
   }
+| single_node QUESTIONMARK range COLON range
+  {
+    $$ = ast.Ternary{
+      Condition: $1,
+      True: $3,
+      False: $5,
+      Line: $1.LineNumber(),
+    }
+  };
 
 while_loop : WHILE expr NEWLINE loop_expressions END
   {
