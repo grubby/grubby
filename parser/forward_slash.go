@@ -92,6 +92,8 @@ func lexSlash(l StatefulRubyLexer) stateFn {
 		parseAsOperator(l)
 	case tokenTypeOperator:
 		parseAsRegex(l)
+	case tokenTypeHashRocket:
+		parseAsRegex(l)
 	case tokenTypeBEGIN:
 		parseAsRegex(l)
 	case tokenTypeRESCUE:
@@ -128,7 +130,11 @@ func lexSlash(l StatefulRubyLexer) stateFn {
 		parseAsRegex(l)
 	case tokenTypeOrEquals:
 		parseAsRegex(l)
+	case tokenTypeAndEquals:
+		parseAsRegex(l)
 	case tokenTypeRange:
+		parseAsRegex(l)
+	case tokenTypeExclusiveRange:
 		parseAsRegex(l)
 	case tokenTypeError:
 		parseAsRegex(l)

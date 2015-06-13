@@ -101,6 +101,8 @@ func lexAmpersand(l StatefulRubyLexer) stateFn {
 		parseAsBinaryBitwiseOperator(l)
 	case tokenTypeOperator:
 		parseAsProcArg(l)
+	case tokenTypeHashRocket:
+		parseAsProcArg(l)
 	case tokenTypeBEGIN:
 		parseAsProcArg(l)
 	case tokenTypeRESCUE:
@@ -137,7 +139,11 @@ func lexAmpersand(l StatefulRubyLexer) stateFn {
 		parseAsProcArg(l)
 	case tokenTypeOrEquals:
 		parseAsProcArg(l)
+	case tokenTypeAndEquals:
+		parseAsProcArg(l)
 	case tokenTypeRange:
+		parseAsProcArg(l)
+	case tokenTypeExclusiveRange:
 		parseAsProcArg(l)
 	case tokenTypeError:
 		parseAsProcArg(l)

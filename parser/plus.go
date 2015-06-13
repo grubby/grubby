@@ -97,6 +97,8 @@ func lexPlus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeBinaryPlus)
 	case tokenTypeOperator:
 		l.emit(tokenTypeUnaryPlus)
+	case tokenTypeHashRocket:
+		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeBEGIN:
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeRESCUE:
@@ -133,7 +135,11 @@ func lexPlus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeOrEquals:
 		l.emit(tokenTypeUnaryPlus)
+	case tokenTypeAndEquals:
+		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeRange:
+		l.emit(tokenTypeUnaryPlus)
+	case tokenTypeExclusiveRange:
 		l.emit(tokenTypeUnaryPlus)
 	case tokenTypeError:
 		l.emit(tokenTypeUnaryPlus)

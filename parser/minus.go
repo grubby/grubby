@@ -97,6 +97,8 @@ func lexMinus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeBinaryMinus)
 	case tokenTypeOperator:
 		l.emit(tokenTypeUnaryMinus)
+	case tokenTypeHashRocket:
+		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeBEGIN:
 		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeRESCUE:
@@ -133,7 +135,11 @@ func lexMinus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeOrEquals:
 		l.emit(tokenTypeUnaryMinus)
+	case tokenTypeAndEquals:
+		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeRange:
+		l.emit(tokenTypeUnaryMinus)
+	case tokenTypeExclusiveRange:
 		l.emit(tokenTypeUnaryMinus)
 	case tokenTypeError:
 		l.emit(tokenTypeUnaryMinus)
