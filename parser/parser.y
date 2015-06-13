@@ -21,6 +21,7 @@ var Statements []ast.Node
   stringSlice     []string
   switchCaseSlice []ast.SwitchCase
   hashPairSlice   []ast.HashKeyValuePair
+  hashPair        ast.HashKeyValuePair
   astString       ast.String
 }
 
@@ -203,7 +204,6 @@ var Statements []ast.Node
 %type <genericSlice> elsif_block
 %type <genericSlice> capture_list
 %type <genericSlice> method_args
-%type <hashPairSlice> key_value_pairs
 %type <genericSlice> loop_expressions
 %type <genericSlice> optional_ensure
 %type <genericSlice> optional_rescues
@@ -217,8 +217,13 @@ var Statements []ast.Node
 %type <genericSlice> comma_delimited_class_names
 %type <genericSlice> nodes_with_commas_and_optional_newlines
 
+
+// hash nodes
+%type <hashPair> key_value_pair
+%type <hashPairSlice> key_value_pairs
+
+
 // misc
-%type <genericValue> optional_comma
 %type <genericValue> optional_newlines
 
 %left DOT
@@ -246,9 +251,6 @@ capture_list : /* empty */
 | capture_list SEMICOLON
 | capture_list EOF
   { };
-
-optional_comma : /* empty */ { }
-| COMMA { };
 
 optional_newlines : /* empty */ { }
 | optional_newlines NEWLINE { }
@@ -701,6 +703,7 @@ comma_delimited_nodes : single_node
 | comma_delimited_nodes COMMA single_node
   { $$ = append($$, $3) };
 
+
 nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
 | single_node
   { $$ = append($$, $1) }
@@ -728,7 +731,6 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
       Pairs: $4,
     })
   };
-
 
 
 proc_arg : ProcArg single_node
@@ -1338,9 +1340,9 @@ nodes_with_commas_and_optional_newlines : /* empty */ { $$ = ast.Nodes{} }
 hash : LBRACE optional_newlines RBRACE
   { $$ = ast.Hash{Line: $1.LineNumber()} }
 | LBRACE optional_newlines key_value_pairs optional_newlines RBRACE
-  {
-    $$ = ast.Hash{Line: $1.LineNumber(), Pairs: $3}
-  }
+  { $$ = ast.Hash{Line: $1.LineNumber(), Pairs: $3} }
+| LBRACE optional_newlines key_value_pairs COMMA optional_newlines RBRACE
+  { $$ = ast.Hash{Line: $1.LineNumber(), Pairs: $3} }
 | LBRACE optional_newlines symbol_key_value_pairs optional_newlines RBRACE
   {
     pairs := []ast.HashKeyValuePair{}
@@ -1350,10 +1352,13 @@ hash : LBRACE optional_newlines RBRACE
     $$ = ast.Hash{Line: $1.LineNumber(), Pairs: pairs}
   };
 
-key_value_pairs : single_node HASH_ROCKET single_node
-  { $$ = append($$, ast.HashKeyValuePair{Key: $1, Value: $3}) }
-| key_value_pairs COMMA optional_newlines single_node HASH_ROCKET single_node optional_comma
-  { $$ = append($$, ast.HashKeyValuePair{Key: $4, Value: $6}) };
+key_value_pair : single_node HASH_ROCKET single_node
+  { $$ = ast.HashKeyValuePair{Key: $1, Value: $3} };
+
+key_value_pairs : key_value_pair
+  { $$ = append($$, $1) }
+| key_value_pairs COMMA optional_newlines key_value_pair
+  { $$ = append($$, $4) };
 
 symbol_key_value_pairs : REF COLON single_node
   {

@@ -3129,6 +3129,55 @@ File.lchmod mode & 01777, path
 				})
 			})
 
+			Context("with many :key => :value pairs on multiple lines", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+{
+      :year   => 0,
+      :month  => 0,
+      :day    => 0,
+      :hour   => 0,
+      :minute => 0,
+      :second => 0,
+}
+`)
+				})
+
+				It("returns a Hash node", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Hash{
+							Line: 1,
+							Pairs: []ast.HashKeyValuePair{
+								{
+									Key:   ast.Symbol{Line: 2, Name: "year"},
+									Value: ast.ConstantInt{Line: 2, Value: 0},
+								},
+								{
+									Key:   ast.Symbol{Line: 3, Name: "month"},
+									Value: ast.ConstantInt{Line: 3, Value: 0},
+								},
+								{
+									Key:   ast.Symbol{Line: 4, Name: "day"},
+									Value: ast.ConstantInt{Line: 4, Value: 0},
+								},
+								{
+									Key:   ast.Symbol{Line: 5, Name: "hour"},
+									Value: ast.ConstantInt{Line: 5, Value: 0},
+								},
+								{
+									Key:   ast.Symbol{Line: 6, Name: "minute"},
+									Value: ast.ConstantInt{Line: 6, Value: 0},
+								},
+								{
+									Key:   ast.Symbol{Line: 7, Name: "second"},
+									Value: ast.ConstantInt{Line: 7, Value: 0},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Describe("assigning a value via a setter", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("Sharpware.nasality = 'cladosiphonic-capillitial'")
