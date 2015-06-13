@@ -55,6 +55,18 @@ var _ = Describe("goyacc parser", func() {
 					Expect(parser.Statements).To(Equal([]ast.Node{ast.ConstantInt{Value: 53248}}))
 				})
 			})
+
+			Context("... a very very large integer", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("9223372036854775808")
+				})
+
+				It("should be parsed as an unsigned int", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.ConstantUint{Value: 9223372036854775808},
+					}))
+				})
+			})
 		})
 
 		Describe("parsing a float", func() {

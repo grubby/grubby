@@ -441,11 +441,20 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 			debug("integer: %s", token.value)
 			intVal, err := strconv.ParseInt(token.value, 0, 64)
 			if err != nil {
-				panic(err)
+				uintVal, err := strconv.ParseUint(token.value, 0, 64)
+				if err != nil {
+					panic(err)
+				}
+
+				intValue := ast.ConstantUint{Value: uintVal}
+				intValue.Line = token.line
+				lval.genericValue = intValue
+			} else {
+				intValue := ast.ConstantInt{Value: intVal}
+				intValue.Line = token.line
+				lval.genericValue = intValue
 			}
-			intValue := ast.ConstantInt{Value: intVal}
-			intValue.Line = token.line
-			lval.genericValue = intValue
+
 			return NODE
 		case tokenTypeFloat:
 			debug("float: %s", token.value)

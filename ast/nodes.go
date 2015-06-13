@@ -9,13 +9,21 @@ func (nodes Nodes) LineNumber() int {
 	return nodes[0].LineNumber()
 }
 
-// builtin types
 type ConstantInt struct {
 	Line  int
 	Value int64
 }
 
 func (n ConstantInt) LineNumber() int {
+	return n.Line
+}
+
+type ConstantUint struct {
+	Line  int
+	Value uint64
+}
+
+func (n ConstantUint) LineNumber() int {
 	return n.Line
 }
 
