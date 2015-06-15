@@ -619,6 +619,50 @@ end
 				})
 			})
 
+			Context("with newlines separating arguments", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+date_helper opt[:month], opt[:day],
+            opt[:minute], opt[:second]
+`)
+				})
+
+				It("parses all the args correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Line: 1,
+							Func: ast.BareReference{Line: 1, Name: "date_helper"},
+							Args: []ast.Node{
+								ast.CallExpression{
+									Line:   1,
+									Target: ast.BareReference{Line: 1, Name: "opt"},
+									Func:   ast.BareReference{Line: 1, Name: "[]"},
+									Args:   []ast.Node{ast.Symbol{Line: 1, Name: "month"}},
+								},
+								ast.CallExpression{
+									Line:   1,
+									Target: ast.BareReference{Line: 1, Name: "opt"},
+									Func:   ast.BareReference{Line: 1, Name: "[]"},
+									Args:   []ast.Node{ast.Symbol{Line: 1, Name: "day"}},
+								},
+								ast.CallExpression{
+									Line:   2,
+									Target: ast.BareReference{Line: 2, Name: "opt"},
+									Func:   ast.BareReference{Line: 2, Name: "[]"},
+									Args:   []ast.Node{ast.Symbol{Line: 2, Name: "minute"}},
+								},
+								ast.CallExpression{
+									Line:   2,
+									Target: ast.BareReference{Line: 2, Name: "opt"},
+									Func:   ast.BareReference{Line: 2, Name: "[]"},
+									Args:   []ast.Node{ast.Symbol{Line: 2, Name: "second"}},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with a value that should be converted to a proc", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("describe(&blocks); explain(&:it_well)")

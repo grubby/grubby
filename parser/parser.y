@@ -746,8 +746,8 @@ proc_arg : ProcArg single_node
 
 nonempty_nodes_with_commas : single_node
   { $$ = append($$, $1); }
-| nonempty_nodes_with_commas COMMA single_node
-  { $$ = append($$, $3); }
+| nonempty_nodes_with_commas COMMA optional_newlines single_node
+  { $$ = append($$, $4); }
 
 
 optional_ensure : /* nothing */
