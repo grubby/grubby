@@ -1,6 +1,7 @@
 package builtins
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/grubby/grubby/ast"
@@ -23,7 +24,9 @@ type RubyMethod struct {
 	invocationArgs  []methodArg
 	unevaluatedBody []ast.Node
 
-	evaluator ArgEvaluator
+	provider      Provider
+	evaluator     ArgEvaluator
+	classProvider ClassProvider
 }
 
 func NewRubyMethod(
@@ -39,6 +42,8 @@ func NewRubyMethod(
 		body:            body,
 		args:            args,
 		visibility:      Public,
+		provider:        provider,
+		classProvider:   provider.ClassProvider(),
 		evaluator:       evaluator,
 		unevaluatedBody: rubyBody,
 	}
@@ -107,17 +112,24 @@ func (method *RubyMethod) Execute(self Value, block Block, args ...Value) (Value
 			err      error
 		)
 
-		if index >= len(args) {
-			if arg.DefaultValue != nil {
-				argValue, err = method.evaluator.EvaluateArgInContext(arg.DefaultValue, self)
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				panic("whoops")
+		if arg.IsSplat {
+			argValue, err = method.classProvider.ClassWithName("Array").New(method.provider)
+			if err != nil {
+				return nil, err
 			}
 		} else {
-			argValue = args[index]
+			if index >= len(args) {
+				if arg.DefaultValue != nil {
+					argValue, err = method.evaluator.EvaluateArgInContext(arg.DefaultValue, self)
+					if err != nil {
+						return nil, err
+					}
+				} else {
+					return nil, errors.New(fmt.Sprintf("expected to invoke a method '%s' on '%s' with %d args, but we were only provided %d", method, self, len(method.args), len(args)))
+				}
+			} else {
+				argValue = args[index]
+			}
 		}
 
 		argument := methodArg{

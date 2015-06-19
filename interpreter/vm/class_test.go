@@ -54,8 +54,34 @@ Microclimatology.new
 		})
 	})
 
+	Describe("#initialize", func() {
+		Context("with *args", func() {
+			It("receiving zero args", func() {
+				class, err := vm.Run(`
+class LovesParams
+  def initialize(*args)
+    @first = @second = args
+  end
+end
+`)
+				Expect(err).ToNot(HaveOccurred())
+
+				instance, err := class.(Class).New(vm)
+				Expect(err).ToNot(HaveOccurred())
+
+				first := instance.GetInstanceVariable("first")
+				firstAsArray := first.(*Array)
+				Expect(len(firstAsArray.Members())).To(Equal(0))
+
+				second := instance.GetInstanceVariable("second")
+				secondAsArray := second.(*Array)
+				Expect(len(secondAsArray.Members())).To(Equal(0))
+			})
+		})
+	})
+
 	Describe("superclasses", func() {
-		It("can be provided when declaring a class", func() {
+		XIt("can be provided when declaring a class", func() {
 			value, err := vm.Run(`
 class Foo
 end
