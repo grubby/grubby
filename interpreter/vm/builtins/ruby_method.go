@@ -117,6 +117,10 @@ func (method *RubyMethod) Execute(self Value, block Block, args ...Value) (Value
 			if err != nil {
 				return nil, err
 			}
+
+			for i := index; i < len(args); i++ {
+				argValue.(*Array).Append(args[i])
+			}
 		} else {
 			if index >= len(args) {
 				if arg.DefaultValue != nil {

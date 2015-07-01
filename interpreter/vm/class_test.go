@@ -77,11 +77,34 @@ end
 				secondAsArray := second.(*Array)
 				Expect(len(secondAsArray.Members())).To(Equal(0))
 			})
+
+			It("receiving more than one arg", func() {
+				class, err := vm.Run(`
+class ParamEater
+  def initialize(name, *args)
+    @name = name
+    @ivar = args
+  end
+end
+`)
+				Expect(err).ToNot(HaveOccurred())
+
+				instance, err := class.(Class).New(vm, NewString("cool test", vm), NewString("with args", vm))
+				Expect(err).ToNot(HaveOccurred())
+
+				ivar := instance.GetInstanceVariable("ivar")
+				ivarAsArray := ivar.(*Array)
+				Expect(len(ivarAsArray.Members())).To(Equal(1))
+				Expect(ivarAsArray.Members()[0].String()).To(ContainSubstring("with args"))
+
+				name := instance.GetInstanceVariable("name")
+				Expect(name.String()).To(ContainSubstring("cool test"))
+			})
 		})
 	})
 
 	Describe("superclasses", func() {
-		XIt("can be provided when declaring a class", func() {
+		It("can be provided when declaring a class", func() {
 			value, err := vm.Run(`
 class Foo
 end
