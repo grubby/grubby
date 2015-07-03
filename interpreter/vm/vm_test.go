@@ -617,6 +617,23 @@ File.sup`)
 		})
 	})
 
+	Describe("boolean 'or'", func() {
+		It("can be used to check either one of two values is truthy", func() {
+			_, err := vm.Run(`
+a = true or 'a'
+b = true or nil
+c = nil or true
+d = nil or false
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(vm.MustGet("a").IsTruthy()).To(BeTrue())
+			Expect(vm.MustGet("b").IsTruthy()).To(BeTrue())
+			Expect(vm.MustGet("c").IsTruthy()).To(BeTrue())
+			Expect(vm.MustGet("d").IsTruthy()).To(BeFalse())
+		})
+	})
+
 	Describe("the defined? keyword", func() {
 		It("can be used to check if a value is defined", func() {
 			value, err := vm.Run("defined? a")

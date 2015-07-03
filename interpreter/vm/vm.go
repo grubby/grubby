@@ -429,6 +429,9 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 			returnValue, returnErr = interpretRegexpInContext(vm, statement.(ast.Regex), context)
 		case ast.WeakLogicalAnd:
 			returnValue, returnErr = interpretWeakBooleanAnd(vm, statement.(ast.WeakLogicalAnd), context)
+		case ast.WeakLogicalOr:
+			returnValue, returnErr = interpretWeakBooleanOr(vm, statement.(ast.WeakLogicalOr), context)
+
 		case ast.Defined:
 			returnValue, returnErr = interpretDefinedKeyword(vm, statement.(ast.Defined), context)
 		default:
