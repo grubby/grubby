@@ -71,7 +71,7 @@ end`)
 		// * included modules
 		// * extended modules
 		// (((   and Object needs to "include" Kernel   )))
-		PIt("is also available in Object", func() {
+		It("is also available in Object", func() {
 			object, err := vm.Get("Object")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(object).To(HaveMethod("foo"))
