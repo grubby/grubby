@@ -95,4 +95,21 @@ array
 			Expect(array.Members()).To(ContainElement(NewFixnum(3, vm)))
 		})
 	})
+
+	Describe("#any?", func() {
+		It("takes the given block, calling it with each member until the block returns a truthy value", func() {
+			value, err := vm.Run(`
+visited = []
+[1,2,3].any? { |i| visited.unshift(i); i == 2 }
+`)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.IsTruthy()).To(BeTrue())
+
+			visited := vm.MustGet("visited").(*Array).Members()
+			Expect(len(visited)).To(Equal(2))
+			Expect(visited[0].String()).To(ContainSubstring("2")) // unshift is unkind
+			Expect(visited[1].String()).To(ContainSubstring("1"))
+		})
+	})
 })

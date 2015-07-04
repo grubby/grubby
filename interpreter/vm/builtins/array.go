@@ -141,7 +141,6 @@ func NewArrayClass(provider Provider) Class {
 		return selfAsArray, nil
 	}))
 	a.AddMethod(NewNativeMethod("join", provider, func(self Value, block Block, args ...Value) (Value, error) {
-
 		selfAsArray := self.(*Array)
 		separator := args[0].(*StringValue).value
 		pieces := make([]string, len(selfAsArray.members))
@@ -151,6 +150,21 @@ func NewArrayClass(provider Provider) Class {
 		}
 
 		return NewString(strings.Join(pieces, separator), provider), nil
+	}))
+	a.AddMethod(NewNativeMethod("any?", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		selfAsArray := self.(*Array)
+		for _, member := range selfAsArray.members {
+			value, err := block.Call(member)
+			if err != nil {
+				return nil, err
+			}
+
+			if value.IsTruthy() {
+				return value, nil
+			}
+		}
+
+		return provider.SingletonProvider().SingletonWithName("false"), nil
 	}))
 
 	return a
