@@ -41,6 +41,19 @@ func NewStringClass(provider Provider) Class {
 			return provider.SingletonProvider().SingletonWithName("false"), nil
 		}
 	}))
+	s.AddMethod(NewNativeMethod("===", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		asStr, ok := args[0].(*StringValue)
+		if !ok {
+			return provider.SingletonProvider().SingletonWithName("false"), nil
+		}
+
+		selfAsStr := self.(*StringValue)
+		if selfAsStr.value == asStr.value {
+			return provider.SingletonProvider().SingletonWithName("true"), nil
+		} else {
+			return provider.SingletonProvider().SingletonWithName("false"), nil
+		}
+	}))
 	s.AddMethod(NewNativeMethod("<<", provider, func(self Value, block Block, args ...Value) (Value, error) {
 		arg := args[0].(*StringValue)
 		selfAsStr := self.(*StringValue)

@@ -25,6 +25,13 @@ func NewSymbolClass(provider Provider) Class {
 		selfAsSymbol := self.(*SymbolValue)
 		return NewString(selfAsSymbol.value, provider), nil
 	}))
+	s.AddMethod(NewNativeMethod("===", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		if self == args[0] {
+			return provider.SingletonProvider().SingletonWithName("true"), nil
+		} else {
+			return provider.SingletonProvider().SingletonWithName("false"), nil
+		}
+	}))
 
 	return s
 }

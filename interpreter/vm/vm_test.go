@@ -643,4 +643,23 @@ d = nil or false
 			Expect(value).To(Equal(nilInstance))
 		})
 	})
+
+	Describe("the case keyword", func() {
+		It("can be used as a switch statement", func() {
+			value, err := vm.Run(`
+case 'hello'
+when :nope
+  0
+when 'world'
+  1
+when 'hello'
+  2
+else
+  3
+end
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(value.String()).To(ContainSubstring("2"))
+		})
+	})
 })
