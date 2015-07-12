@@ -23,6 +23,11 @@ func NewGlobalObjectClass(provider Provider) Class {
 		}
 	}))
 
+	o.AddMethod(NewNativeMethod("=~", provider, func(self Value, block Block, args ...Value) (Value, error) {
+		// intended to be implemented by subclasses
+		return provider.SingletonProvider().SingletonWithName("nil"), nil
+	}))
+
 	return o
 }
 

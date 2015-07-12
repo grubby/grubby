@@ -46,6 +46,14 @@ end
 				Expect(err).ToNot(HaveOccurred())
 			})
 		})
+
+		Describe("#=~", func() {
+			It("returns nil", func() {
+				value, err := vm.Run("5 =~ 12")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(value).To(Equal(vm.SingletonWithName("nil")))
+			})
+		})
 	})
 
 	Describe("creating a simple function", func() {
