@@ -117,4 +117,13 @@ str.encode('ISO-8859-1', :undef => :replace, :invalid => :replace)
 			Expect(result.String()).To(ContainSubstring("<hello><world/></hello>"))
 		})
 	})
+
+	Describe("#=~", func() {
+		XIt("should match on the given regular expression", func() {
+			_, err := vm.Run("a = hello =~ /ello/; b = hello =~ /nope/")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(vm.MustGet("a").String()).To(ContainSubstring("1"))
+			Expect(vm.MustGet("b").String()).To(Equal(vm.SingletonWithName("nil")))
+		})
+	})
 })
