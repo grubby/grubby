@@ -516,6 +516,33 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
       Args: []ast.Node{$3},
     }
   }
+| class_name_with_modules LBRACKET nonempty_nodes_with_commas RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: $3,
+    }
+  }
+| class_name_with_modules LBRACKET single_node RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
+| class_name_with_modules LBRACKET range RBRACKET
+  {
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
+      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
+      Target: $1,
+      Args: []ast.Node{$3},
+    }
+  }
 | CONSTANT LBRACKET nonempty_nodes_with_commas RBRACKET
   {
     $$ = ast.CallExpression{
@@ -627,6 +654,24 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
     }
   }
 | REF LBRACKET single_node RBRACKET EQUALTO expr
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
+      Target: $1,
+      Args: []ast.Node{$3, $6},
+      Line: $1.LineNumber(),
+    }
+  }
+| class_name_with_modules LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO expr
+  {
+    $$ = ast.CallExpression{
+      Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
+      Target: $1,
+      Args: append($3, $6),
+      Line: $1.LineNumber(),
+    }
+  }
+| class_name_with_modules LBRACKET single_node RBRACKET EQUALTO expr
   {
     $$ = ast.CallExpression{
       Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},

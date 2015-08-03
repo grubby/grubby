@@ -343,6 +343,35 @@ FOO
 			})
 		})
 
+		Describe("constants", func() {
+			Context("with methods called on them", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("Foo::Bar[:baz] = 12; Foo::Bar[:baz]")
+				})
+
+				It("can receive the [] and []= methods", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Target: ast.Class{
+								Name:      "Bar",
+								Namespace: "Foo",
+							},
+							Func: ast.BareReference{Name: "[]="},
+							Args: []ast.Node{ast.Symbol{Name: "baz"}, ast.ConstantInt{Value: 12}},
+						},
+						ast.CallExpression{
+							Target: ast.Class{
+								Name:      "Bar",
+								Namespace: "Foo",
+							},
+							Func: ast.BareReference{Name: "[]"},
+							Args: []ast.Node{ast.Symbol{Name: "baz"}},
+						},
+					}))
+				})
+			})
+		})
+
 		Describe("parsing multiple lines", func() {
 			BeforeEach(func() {
 				lexer = parser.NewLexer(`
