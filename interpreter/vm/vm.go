@@ -89,6 +89,10 @@ func NewVM(rubyHome, name string) VM {
 	vm.CurrentClasses["Object"].SetConstant("ARGV", argvArray)
 	vm.CurrentClasses["Object"].SetConstant("RUBY_NAME", NewString("grubby", vm))
 
+	// this is a temporary hack to gain progress on running rubyspec
+	// as an alternative, we could implement String#=~
+	vm.CurrentClasses["Object"].SetConstant("RUBY_EXE", NewString("bin/ruby", vm))
+
 	main, _ := vm.CurrentClasses["Object"].New(vm)
 	main.AddMethod(NewNativeMethod("to_s", vm, func(self Value, block Block, args ...Value) (Value, error) {
 		return NewString("main", vm), nil
