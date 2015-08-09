@@ -39,11 +39,17 @@ func lexReference(l StatefulRubyLexer) stateFn {
 			l.accept("=")
 			l.emit(tokenTypeReference)
 		} else if l.accept("<") {
-			l.accept("=")
-			l.accept(">")
+			if l.accept("=") {
+				l.accept(">")
+			} else {
+				l.accept("<")
+			}
 			l.emit(tokenTypeOperator)
 		} else if l.accept(">") {
 			l.accept("=")
+			l.emit(tokenTypeOperator)
+		} else if l.accept("=") {
+			l.acceptRun("=")
 			l.emit(tokenTypeOperator)
 		}
 	case "defined":

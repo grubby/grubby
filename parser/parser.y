@@ -847,6 +847,18 @@ method_declaration : DEF REF method_args list optional_ensure END
     method.Line = $2.LineNumber()
     $$ = method
   }
+| DEF self DOT OPERATOR method_args list optional_ensure END
+  {
+		method := ast.FuncDecl{
+      Target: $2,
+			Name: $4.(ast.BareReference),
+      Args: $5,
+			Body: $6,
+      Ensure: $7,
+    }
+    method.Line = $2.LineNumber()
+    $$ = method
+  }
 | DEF simple_node DOT REF method_args list rescues optional_ensure END
   {
 		method := ast.FuncDecl{
@@ -861,6 +873,19 @@ method_declaration : DEF REF method_args list optional_ensure END
     $$ = method
   }
 | DEF self DOT REF method_args list rescues optional_ensure END
+  {
+		method := ast.FuncDecl{
+      Target: $2,
+			Name: $4.(ast.BareReference),
+      Args: $5,
+			Body: $6,
+      Rescues: $7,
+      Ensure: $8,
+    }
+    method.Line = $2.LineNumber()
+    $$ = method
+  }
+| DEF self DOT OPERATOR method_args list rescues optional_ensure END
   {
 		method := ast.FuncDecl{
       Target: $2,

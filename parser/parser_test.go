@@ -1403,11 +1403,12 @@ def $stderr.wat; end
 				BeforeEach(func() {
 					lexer = parser.NewLexer(`
 def <=>(other)
-  self.to_i <=> other
 end
 
 def <(other)
-  self.to_i < other
+end
+
+def self.<<(other)
 end
 `)
 				})
@@ -1422,39 +1423,28 @@ end
 									Name: ast.BareReference{Line: 1, Name: "other"},
 								},
 							},
-							Body: []ast.Node{
-								ast.CallExpression{
-									Line: 2,
-									Target: ast.CallExpression{
-										Line:   2,
-										Target: ast.Self{Line: 2},
-										Func:   ast.BareReference{Line: 2, Name: "to_i"},
-									},
-									Func: ast.BareReference{Line: 2, Name: "<=>"},
-									Args: []ast.Node{ast.BareReference{Line: 2, Name: "other"}},
-								},
-							},
+							Body: []ast.Node{},
 						},
 						ast.FuncDecl{
-							Line: 5,
-							Name: ast.BareReference{Line: 5, Name: "<"},
+							Line: 4,
+							Name: ast.BareReference{Line: 4, Name: "<"},
 							Args: []ast.Node{
 								ast.MethodParam{
-									Name: ast.BareReference{Line: 5, Name: "other"},
+									Name: ast.BareReference{Line: 4, Name: "other"},
 								},
 							},
-							Body: []ast.Node{
-								ast.CallExpression{
-									Line: 6,
-									Target: ast.CallExpression{
-										Line:   6,
-										Target: ast.Self{Line: 6},
-										Func:   ast.BareReference{Line: 6, Name: "to_i"},
-									},
-									Func: ast.BareReference{Line: 6, Name: "<"},
-									Args: []ast.Node{ast.BareReference{Line: 6, Name: "other"}},
+							Body: []ast.Node{},
+						},
+						ast.FuncDecl{
+							Line:   7,
+							Target: ast.Self{Line: 7},
+							Name:   ast.BareReference{Line: 7, Name: "<<"},
+							Args: []ast.Node{
+								ast.MethodParam{
+									Name: ast.BareReference{Line: 7, Name: "other"},
 								},
 							},
+							Body: []ast.Node{},
 						},
 					}))
 				})
