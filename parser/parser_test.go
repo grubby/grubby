@@ -3335,7 +3335,7 @@ foo: bar,
 
 		Describe("globals", func() {
 			BeforeEach(func() {
-				lexer = parser.NewLexer("$LOAD_PATH; $0; $\\; $$")
+				lexer = parser.NewLexer("$LOAD_PATH; $0; $\\; $$; $>; $<")
 			})
 
 			It("should be parsed as a GlobalVariable", func() {
@@ -3344,6 +3344,8 @@ foo: bar,
 					ast.GlobalVariable{Name: "0"},
 					ast.GlobalVariable{Name: "\\"},
 					ast.GlobalVariable{Name: "$"},
+					ast.GlobalVariable{Name: ">"},
+					ast.GlobalVariable{Name: "<"},
 				}))
 			})
 		})

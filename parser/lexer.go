@@ -276,7 +276,7 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeRBrace)
 	case r == '$':
 		l.ignore()
-		l.acceptRun(alphaNumericUnderscore + ":\\$")
+		l.acceptRun(alphaNumericUnderscore + ":\\$><")
 		l.emit(tokenTypeGlobal)
 	case r == '@':
 		l.emit(tokenTypeAtSign)
