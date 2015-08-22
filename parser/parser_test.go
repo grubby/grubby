@@ -3399,7 +3399,23 @@ foo: bar,
 		})
 
 		Describe("lambdas", func() {
-			Context("without any frills", func() {
+			Context("with a single statement", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("lambda { some_method }")
+				})
+
+				It("is parsed as an ast.Lambda", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.Lambda{
+							Body: ast.Block{
+								Body: []ast.Node{ast.BareReference{Name: "some_method"}},
+							},
+						},
+					}))
+				})
+			})
+
+			Context("with several statements", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("something = lambda { puts 'hai'; exit }")
 				})

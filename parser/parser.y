@@ -1472,12 +1472,12 @@ block : DO list END
     block := ast.Block{Line: $1.LineNumber(), Args: $3, Body: $4}
     $$ = block
   }
-| LBRACE optional_newlines call_expression optional_newlines RBRACE
+| LBRACE optional_newlines single_node optional_newlines RBRACE
   {
     block := ast.Block{Line: $1.LineNumber(), Body: []ast.Node{$3}}
     $$ = block
   }
-| LBRACE optional_newlines call_expression list optional_newlines RBRACE
+| LBRACE optional_newlines single_node list optional_newlines RBRACE
   {
       head := []ast.Node{$3}
       tail := $4
@@ -1485,6 +1485,7 @@ block : DO list END
       block := ast.Block{Line: $1.LineNumber(), Body: body}
       $$ = block
   };
+
 
 block_args : PIPE comma_delimited_refs PIPE
   { $$ = $2 };

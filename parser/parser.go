@@ -188,7 +188,7 @@ const RubyEofCode = 1
 const RubyErrCode = 2
 const RubyMaxDepth = 200
 
-//line parser.y:2028
+//line parser.y:2029
 
 //line yacctab:1
 var RubyExca = []int{
@@ -235,19 +235,8 @@ var RubyExca = []int{
 	65, 273,
 	-2, 11,
 	-1, 374,
-	4, 20,
-	5, 20,
-	40, 20,
-	41, 20,
-	49, 20,
-	50, 20,
-	54, 20,
-	56, 20,
-	67, 20,
-	68, 20,
-	69, 20,
-	70, 20,
-	-2, 129,
+	15, 129,
+	-2, 20,
 	-1, 387,
 	20, 273,
 	22, 273,
@@ -267,18 +256,11 @@ var RubyExca = []int{
 	65, 273,
 	-2, 11,
 	-1, 428,
-	4, 33,
-	5, 33,
-	40, 33,
-	41, 33,
-	50, 33,
-	54, 33,
-	56, 33,
 	64, 11,
-	67, 33,
-	68, 33,
-	69, 33,
-	70, 33,
+	76, 11,
+	-2, 13,
+	-1, 471,
+	64, 11,
 	76, 11,
 	-2, 13,
 	-1, 626,
@@ -308,36 +290,36 @@ var RubyAct = []int{
 	221, 100, 216, 94, 156, 394, 394, 419, 94, 94,
 	394, 94, 231, 232, 233, 230, 205, 94, 206, 94,
 	170, 240, 128, 398, 627, 129, 245, 94, 73, 72,
-	171, 172, 252, 156, 256, 124, 178, 261, 262, 263,
-	264, 396, 168, 221, 443, 442, 247, 559, 394, 124,
-	178, 394, 255, 253, 394, 259, 258, 173, 281, 125,
-	282, 126, 127, 274, 438, 435, 169, 275, 167, 433,
-	173, 122, 169, 125, 167, 273, 130, 286, 284, 644,
+	171, 172, 252, 156, 256, 396, 178, 261, 262, 263,
+	264, 274, 168, 221, 443, 442, 247, 559, 394, 124,
+	178, 394, 255, 253, 394, 259, 258, 173, 281, 173,
+	282, 126, 127, 273, 438, 435, 169, 275, 167, 433,
+	122, 512, 169, 125, 167, 130, 644, 286, 284, 390,
 	182, 311, 312, 313, 288, 316, 317, 318, 301, 290,
 	325, 326, 327, 177, 332, 333, 334, 52, 310, 309,
 	289, 292, 294, 315, 314, 666, 170, 417, 324, 323,
-	397, 179, 512, 393, 156, 345, 179, 336, 335, 362,
-	363, 364, 365, 390, 646, 174, 180, 181, 168, 174,
-	377, 123, 370, 178, 168, 108, 614, 372, 178, 175,
-	176, 359, 585, 361, 615, 137, 676, 173, 162, 383,
-	156, 173, 507, 122, 506, 359, 613, 521, 198, 520,
-	189, 198, 162, 359, 384, 511, 101, 505, 369, 102,
-	187, 117, 118, 103, 359, 483, 575, 162, 482, 399,
-	106, 107, 198, 198, 198, 109, 359, 110, 506, 111,
+	397, 179, 124, 393, 156, 345, 179, 336, 335, 362,
+	363, 364, 365, 361, 511, 174, 180, 181, 168, 174,
+	377, 123, 370, 178, 168, 108, 125, 372, 178, 175,
+	176, 359, 646, 359, 615, 137, 676, 173, 162, 383,
+	156, 173, 507, 122, 506, 359, 614, 521, 198, 613,
+	189, 198, 162, 585, 384, 575, 101, 520, 369, 102,
+	505, 117, 118, 103, 483, 482, 480, 162, 404, 399,
+	106, 107, 198, 198, 198, 109, 183, 110, 506, 111,
 	101, 198, 359, 102, 402, 277, 188, 103, 105, 114,
-	112, 113, 198, 415, 198, 198, 186, 198, 639, 198,
-	198, 198, 198, 359, 198, 480, 404, 198, 198, 121,
-	198, 183, 198, 198, 210, 372, 359, 211, 546, 183,
-	547, 432, 640, 641, 156, 30, 286, 284, 198, 184,
-	185, 74, 454, 486, 270, 198, 198, 198, 198, 296,
-	101, 461, 665, 102, 270, 272, 208, 103, 162, 209,
-	268, 101, 156, 198, 102, 272, 198, 101, 103, 664,
-	102, 198, 457, 663, 103, 320, 198, 651, 453, 649,
-	329, 462, 647, 132, 338, 342, 458, 624, 617, 133,
-	572, 156, 349, 350, 162, 271, 473, 565, 472, 470,
-	270, 507, 459, 357, 460, 271, 213, 101, 108, 356,
-	102, 272, 162, 198, 103, 366, 475, 474, 500, 598,
-	478, 682, 495, 679, 678, 461, 488, 355, 156, 599,
+	112, 113, 198, 415, 198, 198, 359, 198, 639, 198,
+	198, 198, 198, 359, 198, 359, 359, 198, 198, 665,
+	198, 30, 198, 198, 121, 372, 454, 486, 546, 183,
+	547, 432, 640, 641, 156, 74, 286, 284, 198, 184,
+	185, 187, 664, 663, 270, 198, 198, 198, 198, 296,
+	101, 461, 651, 102, 270, 272, 210, 103, 162, 211,
+	268, 101, 156, 198, 102, 272, 198, 101, 103, 132,
+	102, 198, 457, 649, 103, 320, 198, 186, 453, 208,
+	329, 462, 209, 133, 338, 342, 458, 459, 647, 460,
+	624, 156, 349, 350, 162, 271, 473, 617, 472, 470,
+	270, 572, 565, 357, 682, 271, 679, 678, 108, 356,
+	461, 272, 162, 198, 598, 213, 475, 474, 101, 366,
+	478, 102, 495, 507, 599, 103, 488, 500, 156, 355,
 	156, 496, 305, 198, 503, 283, 198, 468, 504, 508,
 	492, 493, 494, 405, 117, 118, 198, 198, 466, 517,
 	490, 403, 464, 106, 107, 489, 401, 527, 109, 189,
@@ -416,7 +398,7 @@ var RubyAct = []int{
 	97, 93, 0, 0, 0, 82, 83, 0, 84, 602,
 	85, 86, 159, 0, 108, 0, 0, 0, 0, 469,
 	0, 0, 0, 0, 0, 163, 306, 199, 154, 0,
-	94, 73, 72, 0, 0, 428, 159, 0, 159, 0,
+	94, 73, 72, 0, 0, 159, 159, 0, 159, 0,
 	159, 0, 0, 0, 0, 0, 0, 0, 0, 163,
 	117, 118, 0, 0, 0, 0, 0, 0, 0, 106,
 	107, 0, 0, 0, 109, 0, 110, 0, 111, 159,
@@ -424,7 +406,7 @@ var RubyAct = []int{
 	113, 0, 0, 0, 589, 0, 0, 159, 0, 0,
 	0, 0, 0, 159, 0, 0, 0, 0, 0, 0,
 	199, 0, 0, 0, 0, 0, 159, 0, 159, 0,
-	0, 0, 428, 0, 0, 0, 0, 199, 159, 0,
+	0, 0, 159, 0, 0, 0, 0, 199, 159, 0,
 	0, 159, 159, 0, 0, 155, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 194, 159, 0, 202, 207,
 	0, 0, 0, 0, 0, 0, 0, 0, 159, 0,
@@ -450,7 +432,7 @@ var RubyAct = []int{
 	83, 0, 84, 0, 85, 86, 0, 280, 0, 0,
 	0, 0, 0, 0, 0, 218, 0, 0, 303, 159,
 	306, 0, 154, 0, 94, 73, 72, 0, 108, 0,
-	0, 308, 0, 0, 0, 0, 159, 0, 375, 429,
+	0, 308, 0, 0, 0, 0, 159, 0, 428, 429,
 	0, 431, 0, 218, 0, 0, 0, 0, 0, 115,
 	0, 0, 0, 0, 0, 0, 104, 0, 0, 0,
 	0, 0, 0, 0, 117, 118, 358, 0, 108, 0,
@@ -473,31 +455,31 @@ var RubyAct = []int{
 	83, 463, 84, 0, 85, 86, 465, 467, 0, 0,
 	0, 359, 0, 0, 0, 302, 0, 0, 0, 0,
 	76, 476, 77, 371, 94, 73, 72, 0, 481, 0,
-	0, 0, 0, 0, 0, 0, 348, 0, 70, 160,
-	69, 79, 161, 78, 164, 143, 0, 0, 95, 499,
-	165, 153, 0, 0, 0, 0, 0, 609, 0, 375,
+	0, 0, 0, 0, 0, 0, 348, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 499,
+	0, 0, 0, 0, 0, 0, 0, 609, 0, 375,
 	513, 0, 515, 0, 0, 0, 519, 0, 0, 0,
-	0, 0, 0, 0, 81, 0, 108, 0, 96, 97,
-	93, 501, 0, 148, 82, 83, 0, 84, 0, 85,
-	86, 0, 0, 0, 0, 33, 192, 0, 552, 0,
-	554, 108, 556, 0, 558, 306, 0, 154, 0, 94,
-	73, 72, 117, 118, 0, 0, 0, 0, 0, 0,
-	0, 106, 107, 0, 0, 0, 109, 0, 110, 0,
-	111, 0, 654, 0, 576, 0, 0, 117, 118, 105,
-	114, 112, 113, 116, 139, 142, 106, 107, 0, 662,
-	584, 109, 0, 110, 586, 111, 195, 0, 0, 195,
-	0, 0, 0, 0, 105, 114, 112, 113, 0, 0,
+	70, 160, 69, 79, 161, 78, 164, 143, 0, 0,
+	95, 501, 165, 153, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 33, 192, 0, 552, 0,
+	554, 0, 556, 0, 558, 515, 81, 0, 0, 0,
+	96, 97, 93, 0, 0, 148, 82, 83, 0, 84,
+	0, 85, 86, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 654, 0, 576, 0, 0, 306, 0, 154,
+	0, 94, 73, 72, 139, 142, 0, 0, 0, 662,
+	584, 0, 0, 0, 586, 0, 195, 0, 0, 195,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 276, 0, 0, 279,
-	195, 195, 195, 0, 608, 0, 0, 0, 0, 195,
+	195, 195, 195, 0, 608, 0, 0, 0, 108, 195,
 	300, 0, 0, 0, 0, 616, 0, 0, 0, 0,
 	195, 0, 195, 195, 0, 195, 0, 195, 195, 195,
-	195, 0, 195, 0, 0, 195, 195, 0, 195, 0,
-	195, 195, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 108, 195, 0, 0, 0,
-	0, 643, 0, 195, 195, 195, 195, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	653, 195, 0, 0, 195, 0, 0, 0, 0, 195,
-	0, 117, 118, 0, 195, 0, 0, 0, 0, 0,
+	195, 0, 195, 108, 0, 195, 195, 0, 195, 0,
+	195, 195, 0, 0, 117, 118, 0, 0, 0, 0,
+	0, 0, 0, 106, 107, 108, 195, 0, 109, 0,
+	110, 643, 111, 195, 195, 195, 195, 0, 0, 117,
+	118, 105, 114, 112, 113, 116, 0, 0, 106, 107,
+	653, 195, 0, 109, 195, 110, 0, 111, 0, 195,
+	0, 117, 118, 0, 195, 0, 105, 114, 112, 113,
 	106, 107, 195, 0, 0, 109, 0, 110, 0, 111,
 	119, 120, 0, 0, 0, 0, 675, 389, 105, 114,
 	112, 113, 0, 400, 0, 0, 0, 0, 0, 0,
@@ -520,7 +502,7 @@ var RubyAct = []int{
 	0, 0, 0, 0, 0, 0, 195, 0, 0, 0,
 	0, 0, 195, 0, 528, 195, 195, 0, 532, 533,
 	0, 534, 0, 0, 0, 0, 0, 548, 0, 550,
-	195, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	195, 0, 0, 0, 0, 0, 0, 0, 516, 0,
 	0, 0, 0, 0, 0, 0, 0, 195, 0, 0,
 	0, 0, 0, 568, 0, 0, 195, 0, 0, 569,
 	570, 571, 0, 0, 0, 0, 0, 0, 195, 195,
@@ -799,80 +781,80 @@ var RubyAct = []int{
 var RubyPact = []int{
 
 	-38, 2874, -1000, -1000, -1000, 11, -1000, -1000, -1000, 1534,
-	-1000, -1000, -1000, -1000, 284, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, 289, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, 170, 90, -1000, 99, -1000, -1000, -1000,
+	-1000, -1000, -1000, 170, 90, -1000, 98, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, 40, 498, 469,
-	856, 59, 168, 155, 268, 245, 235, 4355, 4355, -1000,
-	4820, 4355, 4355, 4820, 4908, 324, 292, -1000, 480, -1000,
-	-1000, 380, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 4746,
+	856, 59, 168, 155, 268, 316, 235, 4355, 4355, -1000,
+	4820, 4355, 4355, 4820, 4908, 347, 324, -1000, 480, -1000,
+	-1000, 389, -1000, -1000, -1000, -1000, -1000, -1000, -1000, 4746,
 	-1000, 15, 4355, 4355, 4820, 4820, 4820, -1000, -1000, -1000,
 	-1000, -1000, -1000, 4820, 28, -1000, -1000, -1000, -1000, -1000,
 	-1000, 4355, 4355, 4355, 4820, 534, 4820, 4820, -1000, 4820,
 	4355, 4820, 4820, 4820, 4820, 4355, 4820, -1000, -1000, 4820,
 	4820, 4355, 4820, 4355, 4820, 4820, 4355, 4355, 4355, 4355,
-	533, 337, 98, 86, 337, -1000, -1000, -1000, -1000, 236,
+	533, 337, 86, 64, 337, -1000, -1000, -1000, -1000, 236,
 	4820, 471, -1000, -1000, 15, -1000, 58, 4820, 4732, 4820,
-	4820, 30, 450, -4, -1000, 676, -1000, -1000, 407, 76,
-	1772, 145, 164, 150, 260, 4820, -1000, -1000, 4820, -1000,
+	4820, 30, 450, -4, -1000, 676, -1000, -1000, 407, 153,
+	1804, 145, 164, 150, 225, 4820, -1000, -1000, 4820, -1000,
 	4355, 4355, 4355, 4820, 4355, 4355, 4355, 24, 4820, 4355,
 	4355, 4355, 22, 4355, 4355, 4355, 4834, 21, 528, 527,
-	375, 318, 4133, 402, 1837, 88, 4584, 151, 87, 67,
-	335, 329, 1837, 189, 402, -1000, -1000, 1812, 4355, 4355,
-	4355, 4355, 397, -1000, 2057, 4570, 410, -1000, 676, 4207,
-	-1000, -1000, 375, 375, 1837, 1837, 1837, 1837, -1000, -1000,
-	459, 375, 375, 375, 1837, 4496, 1837, 1837, 4658, 1837,
-	375, 1837, 1837, 1837, 1837, 375, 1971, 147, 4658, 4658,
-	1837, 1837, 375, 129, 1376, 57, 375, 1837, 126, 39,
-	394, 375, 375, 375, 375, 15, -1000, 444, 383, -1000,
-	255, 522, 521, 520, 486, -1000, 3985, 469, 1837, 3911,
+	386, 318, 4133, 404, 1949, 87, 4584, 151, 76, 67,
+	335, 329, 1949, 169, 404, -1000, -1000, 1924, 4355, 4355,
+	4355, 4355, 401, -1000, 2057, 4570, 410, -1000, 676, 4207,
+	-1000, -1000, 386, 386, 1949, 1949, 1949, 1949, -1000, -1000,
+	459, 386, 386, 386, 1949, 4496, 1949, 1949, 4658, 1949,
+	386, 1949, 1949, 1949, 1949, 386, 1971, 103, 4658, 4658,
+	1949, 1949, 386, 129, 1376, 51, 386, 1949, 126, 39,
+	394, 386, 386, 386, 386, 15, -1000, 444, 383, -1000,
+	217, 522, 521, 520, 486, -1000, 3985, 469, 1949, 3911,
 	2057, -1000, -1000, -1000, 123, 1041, 23, 1613, -1000, -1000,
-	-1000, 1812, -1000, 1812, -1000, -1000, -1000, -1000, 517, -1000,
-	3837, -1000, 516, 1687, 4820, -1000, 4820, 1837, 2057, 85,
-	-5, 375, 375, 375, 81, -14, 375, 375, 375, -1000,
-	-1000, -1000, 511, 80, -23, 375, 375, 375, -1000, -1000,
-	-1000, 509, 375, 375, 375, 441, 436, 1457, 74, 53,
-	1837, -1000, -1000, -1000, 508, 434, 62, 61, 2652, -1000,
-	-1000, -1000, -1000, 375, 453, 4820, -1000, -1000, 189, -1000,
-	371, 4820, 375, 375, 375, 375, -1000, 427, 1837, -1000,
-	-1000, -1000, 423, 412, 1123, 676, 2057, 375, -1000, -1000,
-	4482, -1000, -1000, -1000, 15, 4355, 4820, -1000, 1837, 4820,
-	4820, 1837, 1837, 254, -1000, 217, -1000, 214, -1000, -1000,
+	-1000, 1924, -1000, 1924, -1000, -1000, -1000, -1000, 517, -1000,
+	3837, -1000, 516, 1687, 4820, -1000, 4820, 1949, 2057, 85,
+	-5, 386, 386, 386, 81, -14, 386, 386, 386, -1000,
+	-1000, -1000, 511, 80, -23, 386, 386, 386, -1000, -1000,
+	-1000, 509, 386, 386, 386, 441, 436, 1457, 74, 53,
+	1949, -1000, -1000, -1000, 508, 434, 62, 61, 2652, -1000,
+	-1000, -1000, -1000, 386, 453, 4820, -1000, -1000, 169, -1000,
+	356, 4820, 386, 386, 386, 386, -1000, 427, 1949, -1000,
+	-1000, -1000, 423, 412, 1123, 676, 2057, 386, -1000, -1000,
+	4482, -1000, -1000, -1000, 15, 4355, 4820, -1000, 1949, 4820,
+	4820, 1949, 1949, 215, -1000, 214, -1000, 213, -1000, -1000,
 	2726, 327, 431, 426, 4820, -1000, -1000, 337, 337, 337,
-	2726, -1000, -1000, 3763, -1000, 393, 2057, 206, 227, -1000,
-	-1000, 4408, -1000, 3689, 187, -1000, 4133, -1000, 76, 1837,
-	4658, 777, 410, 198, -1000, 196, -1000, -1000, -1000, -1000,
+	2726, -1000, -1000, 3763, -1000, 402, 2057, 209, 227, -1000,
+	-1000, 4408, -1000, 3689, 146, -1000, 4133, -1000, 676, 1949,
+	4658, 777, 410, 206, -1000, 196, -1000, -1000, -1000, -1000,
 	-1000, -1000, 4820, 4820, -1000, 515, 4355, -1000, 2578, 3615,
-	-1000, -1000, -1000, -1000, 490, 1837, 3541, 3467, 297, -1000,
-	-1000, 4820, 402, 7, -1000, -9, -1000, -10, -1000, 4820,
-	410, 1837, -1000, 375, 63, -42, 2057, 1837, -1000, 394,
-	4355, 4658, 4355, 4355, 366, 300, -1000, -1000, -1000, -1000,
-	-1000, 1837, -1000, -1000, -1000, 359, 300, 3393, -1000, 252,
-	-1000, 676, -1000, -1000, 407, 4355, 4355, 507, -1000, 1837,
-	-1000, -1000, 504, -11, 3319, -15, 4133, -1000, 193, 218,
-	-1000, 4355, 1574, 1180, -1000, 4355, -1000, 375, 4133, -1000,
-	454, -1000, 2800, 3245, 4133, 404, 32, -1000, -1000, -1000,
-	-1000, 375, -1000, 4355, 4355, -1000, -1000, -1000, 3171, 402,
-	4133, -1000, 2057, -1000, 2328, -1000, 239, 1837, 212, 183,
-	-1000, 393, 375, 375, 375, -1000, 357, -1000, 4133, 2726,
-	2726, 2726, -1000, 356, -1000, 15, 2057, 375, 375, 41,
-	-1000, -1000, -1000, -1000, -19, -1000, 4281, 375, 376, -1000,
-	375, 4133, 4133, -1000, -1000, -1000, -1000, 4133, 16, 469,
-	-1000, -1000, -1000, 234, 258, 3097, -1000, 4133, 167, 1837,
-	-1000, -1000, -1000, 103, -1000, 4355, 200, -1000, 351, 300,
-	348, 300, 346, 300, -1000, -1000, -1000, 4820, -1000, 375,
+	-1000, -1000, -1000, -1000, 490, 1949, 3541, 3467, 297, -1000,
+	-1000, 4820, 404, 7, -1000, -9, -1000, -10, -1000, 4820,
+	410, 1949, -1000, 386, 63, -42, 2057, 1949, -1000, 394,
+	4355, 4658, 4355, 4355, 371, 284, -1000, -1000, -1000, -1000,
+	-1000, 1949, -1000, -1000, -1000, 370, 284, 3393, -1000, 241,
+	-1000, 676, -1000, -1000, 407, 4355, 4355, 507, -1000, 1949,
+	-1000, -1000, 504, -11, 3319, -15, 4133, -1000, 193, 239,
+	-1000, 4355, 1574, 1180, -1000, 4355, -1000, 386, 4133, -1000,
+	454, -1000, 2800, 3245, 4133, 399, 32, -1000, -1000, -1000,
+	-1000, 386, -1000, 4355, 4355, -1000, -1000, -1000, 3171, 404,
+	4133, -1000, 2057, -1000, 2328, -1000, 242, 1949, 232, 183,
+	-1000, 402, 386, 386, 386, -1000, 366, -1000, 4133, 2726,
+	2726, 2726, -1000, 359, -1000, 15, 2057, 386, 386, 41,
+	-1000, -1000, -1000, -1000, -19, -1000, 4281, 386, 398, -1000,
+	386, 4133, 4133, -1000, -1000, -1000, -1000, 4133, 16, 469,
+	-1000, -1000, -1000, 234, 258, 3097, -1000, 4133, 167, 1949,
+	-1000, -1000, -1000, 100, -1000, 4355, 218, -1000, 357, 284,
+	342, 284, 321, 284, -1000, -1000, -1000, 4820, -1000, 386,
 	4133, 3023, -1000, -1000, -1000, -1000, 4133, 4133, 4133, -1000,
-	-1000, -1000, -1000, 167, 4820, 375, -1000, -1000, 342, -1000,
-	338, -1000, 321, 181, 463, -1000, 4133, 4133, 4133, 2504,
+	-1000, -1000, -1000, 167, 4820, 386, -1000, -1000, 312, -1000,
+	311, -1000, 288, 181, 463, -1000, 4133, 4133, 4133, 2504,
 	2430, 2949, 221, -1000, -1000, -1000, -1000, -1000, -1000, 449,
-	4355, -1000, -1000, 390, -1000, 167, -1000, -1000, 4355, -1000,
-	375, 4059, -1000, 167, 375, 4059, 4059, 4059,
+	4355, -1000, -1000, 373, -1000, 167, -1000, -1000, 4355, -1000,
+	386, 4059, -1000, 167, 386, 4059, 4059, 4059,
 }
 var RubyPgo = []int{
 
-	0, 610, 0, 331, 608, 19, 3, 607, 606, 605,
+	0, 610, 0, 325, 608, 19, 3, 607, 606, 605,
 	603, 13, 602, 41, 601, 7, 600, 43, 599, 598,
-	597, 1244, 325, 642, 901, 595, 594, 593, 591, 590,
+	597, 1244, 311, 642, 901, 595, 594, 593, 591, 590,
 	589, 586, 585, 583, 576, 14, 187, 575, 570, 1835,
 	17, 30, 569, 567, 25, 566, 565, 5, 21, 561,
 	559, 558, 557, 556, 555, 554, 553, 552, 551, 1776,
@@ -998,7 +980,7 @@ var RubyChk = []int{
 	66, -21, -21, 74, 15, 74, 74, 74, 74, -6,
 	-59, 15, -76, 58, 51, 7, 7, 7, 7, 4,
 	-59, 21, -39, -59, 21, -70, -81, 74, 74, 74,
-	7, -81, 21, -59, -71, 7, -59, -63, -24, -21,
+	7, -81, 21, -59, -71, 7, -59, -63, -21, -21,
 	-81, -21, -70, 74, 74, 74, 74, 7, 74, 74,
 	7, 7, 73, 73, 21, -64, 24, 23, -59, -59,
 	21, 23, 33, -11, 32, -21, -67, -67, -40, 21,
@@ -1075,7 +1057,7 @@ var RubyDef = []int{
 	213, 217, 0, 0, 258, 0, 0, 13, 0, 0,
 	277, 13, 13, 292, 13, 128, 0, 0, 0, 332,
 	13, 0, 13, 0, 11, 0, 11, 0, 11, 0,
-	11, 0, 88, 92, 0, 0, 129, 308, 309, 0,
+	11, -2, 88, 92, 0, 0, 129, 308, 309, 0,
 	0, 0, 0, 0, 0, 141, 13, 293, 158, 154,
 	155, 161, 13, 13, 13, 0, 141, 0, 165, 0,
 	11, 134, 135, 136, 137, 0, 0, 0, 126, 140,
@@ -3037,27 +3019,27 @@ Rubydefault:
 			RubyVAL.genericBlock = block
 		}
 	case 254:
-		//line parser.y:1490
+		//line parser.y:1491
 		{
 			RubyVAL.genericSlice = RubyS[Rubypt-1].genericSlice
 		}
 	case 255:
-		//line parser.y:1492
+		//line parser.y:1493
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
 	case 256:
-		//line parser.y:1494
+		//line parser.y:1495
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 257:
-		//line parser.y:1496
+		//line parser.y:1497
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 258:
-		//line parser.y:1499
+		//line parser.y:1500
 		{
 			cond := ast.IfBlock{
 				Condition: RubyS[Rubypt-2].genericValue,
@@ -3067,7 +3049,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 259:
-		//line parser.y:1508
+		//line parser.y:1509
 		{
 			cond := ast.IfBlock{
 				Condition: RubyS[Rubypt-3].genericValue,
@@ -3078,7 +3060,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 260:
-		//line parser.y:1518
+		//line parser.y:1519
 		{
 			cond := ast.IfBlock{
 				Condition: RubyS[Rubypt-0].genericValue,
@@ -3088,7 +3070,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 261:
-		//line parser.y:1527
+		//line parser.y:1528
 		{
 			cond := ast.IfBlock{
 				Condition: RubyS[Rubypt-0].genericValue,
@@ -3098,7 +3080,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 262:
-		//line parser.y:1536
+		//line parser.y:1537
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
@@ -3108,7 +3090,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 263:
-		//line parser.y:1545
+		//line parser.y:1546
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
@@ -3118,7 +3100,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 264:
-		//line parser.y:1554
+		//line parser.y:1555
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
@@ -3128,7 +3110,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 265:
-		//line parser.y:1563
+		//line parser.y:1564
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
@@ -3138,7 +3120,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 266:
-		//line parser.y:1572
+		//line parser.y:1573
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Target: RubyS[Rubypt-4].genericValue},
@@ -3149,7 +3131,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 267:
-		//line parser.y:1582
+		//line parser.y:1583
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
@@ -3159,7 +3141,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 268:
-		//line parser.y:1591
+		//line parser.y:1592
 		{
 			cond := ast.IfBlock{
 				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
@@ -3169,7 +3151,7 @@ Rubydefault:
 			RubyVAL.genericValue = cond
 		}
 	case 269:
-		//line parser.y:1602
+		//line parser.y:1603
 		{
 			ifblock := ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3179,7 +3161,7 @@ Rubydefault:
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ifblock)
 		}
 	case 270:
-		//line parser.y:1611
+		//line parser.y:1612
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3188,7 +3170,7 @@ Rubydefault:
 			})
 		}
 	case 271:
-		//line parser.y:1619
+		//line parser.y:1620
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3197,7 +3179,7 @@ Rubydefault:
 			})
 		}
 	case 272:
-		//line parser.y:1627
+		//line parser.y:1628
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3206,27 +3188,27 @@ Rubydefault:
 			})
 		}
 	case 273:
-		//line parser.y:1635
+		//line parser.y:1636
 		{
 		}
 	case 274:
-		//line parser.y:1636
+		//line parser.y:1637
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 275:
-		//line parser.y:1637
+		//line parser.y:1638
 		{
 		}
 	case 276:
-		//line parser.y:1640
+		//line parser.y:1641
 		{
 			group := ast.Group{Body: RubyS[Rubypt-1].genericSlice}
 			group.Line = RubyS[Rubypt-2].genericValue.(ast.Nil).Line
 			RubyVAL.genericValue = group
 		}
 	case 277:
-		//line parser.y:1643
+		//line parser.y:1644
 		{
 			begin := ast.Begin{
 				Body:   RubyS[Rubypt-2].genericSlice,
@@ -3236,7 +3218,7 @@ Rubydefault:
 			RubyVAL.genericValue = begin
 		}
 	case 278:
-		//line parser.y:1652
+		//line parser.y:1653
 		{
 			begin := ast.Begin{
 				Body:   RubyS[Rubypt-4].genericSlice,
@@ -3247,7 +3229,7 @@ Rubydefault:
 			RubyVAL.genericValue = begin
 		}
 	case 279:
-		//line parser.y:1662
+		//line parser.y:1663
 		{
 			RubyVAL.genericValue = ast.Begin{
 				Line:   RubyS[Rubypt-7].genericValue.LineNumber(),
@@ -3258,7 +3240,7 @@ Rubydefault:
 			}
 		}
 	case 280:
-		//line parser.y:1672
+		//line parser.y:1673
 		{
 			RubyVAL.genericValue = ast.Begin{
 				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
@@ -3268,12 +3250,12 @@ Rubydefault:
 			}
 		}
 	case 281:
-		//line parser.y:1682
+		//line parser.y:1683
 		{
 			RubyVAL.genericValue = ast.Rescue{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Body: RubyS[Rubypt-0].genericSlice}
 		}
 	case 282:
-		//line parser.y:1684
+		//line parser.y:1685
 		{
 			classes := []ast.Class{}
 			for _, class := range RubyS[Rubypt-1].genericSlice {
@@ -3288,7 +3270,7 @@ Rubydefault:
 			}
 		}
 	case 283:
-		//line parser.y:1698
+		//line parser.y:1699
 		{
 			classes := []ast.Class{}
 			for _, class := range RubyS[Rubypt-3].genericSlice {
@@ -3305,7 +3287,7 @@ Rubydefault:
 			}
 		}
 	case 284:
-		//line parser.y:1714
+		//line parser.y:1715
 		{
 			classes := []ast.Class{}
 			for _, class := range RubyS[Rubypt-3].genericSlice {
@@ -3322,7 +3304,7 @@ Rubydefault:
 			}
 		}
 	case 285:
-		//line parser.y:1730
+		//line parser.y:1731
 		{
 			classes := []ast.Class{}
 			for _, class := range RubyS[Rubypt-3].genericSlice {
@@ -3339,7 +3321,7 @@ Rubydefault:
 			}
 		}
 	case 286:
-		//line parser.y:1746
+		//line parser.y:1747
 		{
 			RubyVAL.genericValue = ast.Rescue{
 				Line: RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3350,7 +3332,7 @@ Rubydefault:
 			}
 		}
 	case 287:
-		//line parser.y:1756
+		//line parser.y:1757
 		{
 			RubyVAL.genericValue = ast.Rescue{
 				Line: RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3361,7 +3343,7 @@ Rubydefault:
 			}
 		}
 	case 288:
-		//line parser.y:1766
+		//line parser.y:1767
 		{
 			RubyVAL.genericValue = ast.Rescue{
 				Line: RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3372,37 +3354,37 @@ Rubydefault:
 			}
 		}
 	case 289:
-		//line parser.y:1778
+		//line parser.y:1779
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 290:
-		//line parser.y:1780
+		//line parser.y:1781
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 291:
-		//line parser.y:1783
+		//line parser.y:1784
 		{
 			RubyVAL.genericSlice = []ast.Node{}
 		}
 	case 292:
-		//line parser.y:1785
+		//line parser.y:1786
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 293:
-		//line parser.y:1788
+		//line parser.y:1789
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 294:
-		//line parser.y:1790
+		//line parser.y:1791
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 295:
-		//line parser.y:1793
+		//line parser.y:1794
 		{
 			if len(RubyS[Rubypt-0].genericSlice) == 1 {
 				RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice[0]}
@@ -3411,17 +3393,17 @@ Rubydefault:
 			}
 		}
 	case 296:
-		//line parser.y:1800
+		//line parser.y:1801
 		{
 			RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
 		}
 	case 297:
-		//line parser.y:1802
+		//line parser.y:1803
 		{
 			RubyVAL.genericValue = ast.Retry{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
 		}
 	case 298:
-		//line parser.y:1805
+		//line parser.y:1806
 		{
 			if len(RubyS[Rubypt-0].genericSlice) == 1 {
 				RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice[0]}
@@ -3430,52 +3412,52 @@ Rubydefault:
 			}
 		}
 	case 299:
-		//line parser.y:1813
+		//line parser.y:1814
 		{
 			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericValue}
 		}
 	case 300:
-		//line parser.y:1815
+		//line parser.y:1816
 		{
 			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericValue}
 		}
 	case 301:
-		//line parser.y:1817
+		//line parser.y:1818
 		{
 			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
 		}
 	case 302:
-		//line parser.y:1821
+		//line parser.y:1822
 		{
 			RubyVAL.genericValue = ast.Next{}
 		}
 	case 303:
-		//line parser.y:1823
+		//line parser.y:1824
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{ast.Next{}}}
 		}
 	case 304:
-		//line parser.y:1825
+		//line parser.y:1826
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue}, Body: []ast.Node{ast.Next{}}}
 		}
 	case 305:
-		//line parser.y:1829
+		//line parser.y:1830
 		{
 			RubyVAL.genericValue = ast.Break{}
 		}
 	case 306:
-		//line parser.y:1831
+		//line parser.y:1832
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{ast.Break{}}}
 		}
 	case 307:
-		//line parser.y:1833
+		//line parser.y:1834
 		{
 			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue}, Body: []ast.Node{ast.Break{}}}
 		}
 	case 308:
-		//line parser.y:1837
+		//line parser.y:1838
 		{
 			ternary := ast.Ternary{
 				Condition: RubyS[Rubypt-4].genericValue,
@@ -3486,7 +3468,7 @@ Rubydefault:
 			RubyVAL.genericValue = ternary
 		}
 	case 309:
-		//line parser.y:1847
+		//line parser.y:1848
 		{
 			RubyVAL.genericValue = ast.Ternary{
 				Condition: RubyS[Rubypt-4].genericValue,
@@ -3496,14 +3478,14 @@ Rubydefault:
 			}
 		}
 	case 310:
-		//line parser.y:1857
+		//line parser.y:1858
 		{
 			loop := ast.Loop{Condition: RubyS[Rubypt-3].genericValue, Body: RubyS[Rubypt-1].genericSlice}
 			loop.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
 	case 311:
-		//line parser.y:1863
+		//line parser.y:1864
 		{
 			condition := ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue}
 			loop := ast.Loop{Condition: condition, Body: RubyS[Rubypt-1].genericSlice}
@@ -3511,37 +3493,37 @@ Rubydefault:
 			RubyVAL.genericValue = loop
 		}
 	case 312:
-		//line parser.y:1870
+		//line parser.y:1871
 		{
 			loop := ast.Loop{Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{RubyS[Rubypt-2].genericValue}}
 			loop.Line = RubyS[Rubypt-0].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
 	case 313:
-		//line parser.y:1877
+		//line parser.y:1878
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
 	case 314:
-		//line parser.y:1879
+		//line parser.y:1880
 		{
 		}
 	case 315:
-		//line parser.y:1881
+		//line parser.y:1882
 		{
 		}
 	case 316:
-		//line parser.y:1883
+		//line parser.y:1884
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 317:
-		//line parser.y:1885
+		//line parser.y:1886
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
 		}
 	case 318:
-		//line parser.y:1888
+		//line parser.y:1889
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3550,7 +3532,7 @@ Rubydefault:
 			}
 		}
 	case 319:
-		//line parser.y:1896
+		//line parser.y:1897
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-4].genericValue.LineNumber(),
@@ -3560,7 +3542,7 @@ Rubydefault:
 			}
 		}
 	case 320:
-		//line parser.y:1905
+		//line parser.y:1906
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3569,7 +3551,7 @@ Rubydefault:
 			}
 		}
 	case 321:
-		//line parser.y:1913
+		//line parser.y:1914
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-4].genericValue.LineNumber(),
@@ -3579,7 +3561,7 @@ Rubydefault:
 			}
 		}
 	case 322:
-		//line parser.y:1922
+		//line parser.y:1923
 		{
 			RubyVAL.genericValue = ast.IfBlock{
 				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
@@ -3588,7 +3570,7 @@ Rubydefault:
 			}
 		}
 	case 323:
-		//line parser.y:1931
+		//line parser.y:1932
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3597,7 +3579,7 @@ Rubydefault:
 			})
 		}
 	case 324:
-		//line parser.y:1939
+		//line parser.y:1940
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-2].genericSlice.LineNumber(),
@@ -3606,7 +3588,7 @@ Rubydefault:
 			})
 		}
 	case 325:
-		//line parser.y:1947
+		//line parser.y:1948
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3615,7 +3597,7 @@ Rubydefault:
 			})
 		}
 	case 326:
-		//line parser.y:1955
+		//line parser.y:1956
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
 				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
@@ -3624,67 +3606,67 @@ Rubydefault:
 			})
 		}
 	case 327:
-		//line parser.y:1964
+		//line parser.y:1965
 		{
 			RubyVAL.genericValue = ast.WeakLogicalAnd{Line: RubyS[Rubypt-3].genericValue.LineNumber(), LHS: RubyS[Rubypt-3].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 		}
 	case 328:
-		//line parser.y:1967
+		//line parser.y:1968
 		{
 			RubyVAL.genericValue = ast.WeakLogicalOr{Line: RubyS[Rubypt-3].genericValue.LineNumber(), LHS: RubyS[Rubypt-3].genericValue, RHS: RubyS[Rubypt-0].genericValue}
 		}
 	case 329:
-		//line parser.y:1970
+		//line parser.y:1971
 		{
 			lambda := ast.Lambda{Body: RubyS[Rubypt-0].genericBlock}
 			lambda.Line = RubyS[Rubypt-0].genericBlock.LineNumber()
 			RubyVAL.genericValue = lambda
 		}
 	case 330:
-		//line parser.y:1977
+		//line parser.y:1978
 		{
 			switchstmt := ast.SwitchStatement{Condition: RubyS[Rubypt-3].genericValue, Cases: RubyS[Rubypt-1].switchCaseSlice}
 			switchstmt.Line = RubyS[Rubypt-4].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 331:
-		//line parser.y:1983
+		//line parser.y:1984
 		{
 			switchstmt := ast.SwitchStatement{Condition: RubyS[Rubypt-5].genericValue, Cases: RubyS[Rubypt-3].switchCaseSlice, Else: RubyS[Rubypt-1].genericSlice}
 			switchstmt.Line = RubyS[Rubypt-6].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 332:
-		//line parser.y:1989
+		//line parser.y:1990
 		{
 			switchstmt := ast.SwitchStatement{Cases: RubyS[Rubypt-1].switchCaseSlice}
 			switchstmt.Line = RubyS[Rubypt-3].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 333:
-		//line parser.y:1995
+		//line parser.y:1996
 		{
 			switchstmt := ast.SwitchStatement{Cases: RubyS[Rubypt-3].switchCaseSlice, Else: RubyS[Rubypt-1].genericSlice}
 			switchstmt.Line = RubyS[Rubypt-5].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 334:
-		//line parser.y:2002
+		//line parser.y:2003
 		{
 			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice})
 		}
 	case 335:
-		//line parser.y:2004
+		//line parser.y:2005
 		{
 			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice})
 		}
 	case 336:
-		//line parser.y:2007
+		//line parser.y:2008
 		{
 			RubyVAL.genericValue = ast.Range{Start: RubyS[Rubypt-2].genericValue, End: RubyS[Rubypt-0].genericValue, Line: RubyS[Rubypt-2].genericValue.LineNumber()}
 		}
 	case 337:
-		//line parser.y:2009
+		//line parser.y:2010
 		{
 			RubyVAL.genericValue = ast.Range{
 				Start:            RubyS[Rubypt-2].genericValue,
@@ -3694,14 +3676,14 @@ Rubydefault:
 			}
 		}
 	case 338:
-		//line parser.y:2019
+		//line parser.y:2020
 		{
 			alias := ast.Alias{To: RubyS[Rubypt-1].genericValue.(ast.Symbol), From: RubyS[Rubypt-0].genericValue.(ast.Symbol)}
 			alias.Line = RubyS[Rubypt-2].genericValue.LineNumber()
 			RubyVAL.genericValue = alias
 		}
 	case 339:
-		//line parser.y:2026
+		//line parser.y:2027
 		{
 			RubyVAL.genericValue = ast.Defined{Node: RubyS[Rubypt-0].genericValue}
 		}
