@@ -921,7 +921,7 @@ end
 							},
 							OptionalBlock: ast.Block{
 								Line: 3,
-								Args: []ast.Node{ast.BareReference{Line: 3, Name: "foo"}},
+								Args: []ast.MethodParam{{Name: "foo"}},
 								Body: []ast.Node{
 									ast.CallExpression{
 										Line: 4,
@@ -1019,9 +1019,9 @@ end
 								ast.ConstantInt{Value: 0},
 							},
 							OptionalBlock: ast.Block{
-								Args: []ast.Node{
-									ast.BareReference{Name: "max"},
-									ast.BareReference{Name: "f"},
+								Args: []ast.MethodParam{
+									{Name: "max"},
+									{Name: "f"},
 								},
 								Body: []ast.Node{
 									ast.Ternary{
@@ -1347,9 +1347,9 @@ end
 							Line:   1,
 							Target: nil,
 							Name:   ast.BareReference{Line: 1, Name: "foo="},
-							Args: []ast.Node{
+							Args: []ast.MethodParam{
 								ast.MethodParam{
-									Name:    ast.BareReference{Line: 1, Name: "bar"},
+									Name:    "bar",
 									IsSplat: false,
 								},
 							},
@@ -1359,9 +1359,9 @@ end
 							Line:   4,
 							Target: ast.Self{Line: 4},
 							Name:   ast.BareReference{Line: 4, Name: "bar="},
-							Args: []ast.Node{
+							Args: []ast.MethodParam{
 								ast.MethodParam{
-									Name:    ast.BareReference{Line: 4, Name: "foo"},
+									Name:    "foo",
 									IsSplat: false,
 								},
 							},
@@ -1386,14 +1386,12 @@ def $stderr.wat; end
 							Target: ast.BareReference{Line: 1, Name: "obj"},
 							Name:   ast.BareReference{Line: 1, Name: "start"},
 							Body:   []ast.Node{},
-							Args:   []ast.Node{},
 						},
 						ast.FuncDecl{
 							Line:   2,
 							Target: ast.GlobalVariable{Line: 2, Name: "stderr"},
 							Name:   ast.BareReference{Line: 2, Name: "wat"},
 							Body:   []ast.Node{},
-							Args:   []ast.Node{},
 						},
 					}))
 				})
@@ -1418,33 +1416,21 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "<=>"},
-							Args: []ast.Node{
-								ast.MethodParam{
-									Name: ast.BareReference{Line: 1, Name: "other"},
-								},
-							},
+							Args: []ast.MethodParam{{Name: "other"}},
 							Body: []ast.Node{},
 						},
 						ast.FuncDecl{
 							Line: 4,
 							Name: ast.BareReference{Line: 4, Name: "<"},
-							Args: []ast.Node{
-								ast.MethodParam{
-									Name: ast.BareReference{Line: 4, Name: "other"},
-								},
-							},
+							Args: []ast.MethodParam{{Name: "other"}},
 							Body: []ast.Node{},
 						},
 						ast.FuncDecl{
 							Line:   7,
 							Target: ast.Self{Line: 7},
 							Name:   ast.BareReference{Line: 7, Name: "<<"},
-							Args: []ast.Node{
-								ast.MethodParam{
-									Name: ast.BareReference{Line: 7, Name: "other"},
-								},
-							},
-							Body: []ast.Node{},
+							Args:   []ast.MethodParam{{Name: "other"}},
+							Body:   []ast.Node{},
 						},
 					}))
 				})
@@ -1466,7 +1452,6 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "yep"},
-							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.SimpleString{Line: 2, Value: "woah"},
 							},
@@ -1491,12 +1476,7 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "on"},
-							Args: []ast.Node{
-								ast.MethodParam{
-									Name:    ast.BareReference{Line: 1, Name: "args"},
-									IsSplat: true,
-								},
-							},
+							Args: []ast.MethodParam{{Name: "args", IsSplat: true}},
 							Body: []ast.Node{},
 						},
 					}))
@@ -1516,12 +1496,7 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "on"},
-							Args: []ast.Node{
-								ast.MethodParam{
-									Name:    ast.BareReference{Name: ""},
-									IsSplat: true,
-								},
-							},
+							Args: []ast.MethodParam{{Name: "", IsSplat: true}},
 							Body: []ast.Node{},
 						},
 					}))
@@ -1541,15 +1516,9 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "test"},
-							Args: []ast.Node{
-								ast.MethodParam{
-									Name:    ast.BareReference{Line: 1, Name: "args"},
-									IsSplat: true,
-								},
-								ast.MethodParam{
-									Name:   ast.BareReference{Line: 1, Name: "block"},
-									IsProc: true,
-								},
+							Args: []ast.MethodParam{
+								{Name: "args", IsSplat: true},
+								{Name: "block", IsProc: true},
 							},
 							Body: []ast.Node{},
 						},
@@ -1575,7 +1544,6 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "foo!"},
-							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.BareReference{Line: 2, Name: "raise"},
 							},
@@ -1583,7 +1551,6 @@ end
 						ast.FuncDecl{
 							Line: 5,
 							Name: ast.BareReference{Line: 5, Name: "foo?"},
-							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.Boolean{Line: 6, Value: false},
 							},
@@ -1606,7 +1573,6 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "something"},
-							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.CallExpression{
 									Line: 2,
@@ -1632,9 +1598,9 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "foo"},
-							Args: []ast.Node{
+							Args: []ast.MethodParam{
 								ast.MethodParam{
-									Name:         ast.BareReference{Line: 1, Name: "a"},
+									Name:         "a",
 									DefaultValue: ast.ConstantInt{Line: 1, Value: 123},
 								},
 							},
@@ -1658,14 +1624,14 @@ end
 							Line:   1,
 							Target: ast.Self{Line: 1},
 							Name:   ast.BareReference{Line: 1, Name: "describe"},
-							Args: []ast.Node{
-								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "mod"}},
-								ast.MethodParam{
-									Name:         ast.BareReference{Line: 1, Name: "options"},
+							Args: []ast.MethodParam{
+								{Name: "mod"},
+								{
+									Name:         "options",
 									DefaultValue: ast.Nil{Line: 1},
 								},
-								ast.MethodParam{
-									Name:   ast.BareReference{Line: 1, Name: "block"},
+								{
+									Name:   "block",
 									IsProc: true,
 								},
 							},
@@ -1690,9 +1656,9 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "multi_put"},
-							Args: []ast.Node{
-								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str1"}},
-								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str2"}},
+							Args: []ast.MethodParam{
+								{Name: "str1"},
+								{Name: "str2"},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
@@ -1725,9 +1691,9 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "multi_put"},
-							Args: []ast.Node{
-								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str1"}},
-								ast.MethodParam{Name: ast.BareReference{Line: 1, Name: "str2"}},
+							Args: []ast.MethodParam{
+								{Name: "str1"},
+								{Name: "str2"},
 							},
 							Body: []ast.Node{
 								ast.CallExpression{
@@ -1766,7 +1732,6 @@ end
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "nested_ensures"},
-							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.SimpleString{Line: 2, Value: "woah"},
 							},
@@ -1927,7 +1892,6 @@ end
 								ast.FuncDecl{
 									Line: 2,
 									Name: ast.BareReference{Line: 2, Name: "initialize"},
-									Args: []ast.Node{},
 									Body: []ast.Node{
 										ast.BareReference{Line: 3, Name: "super"},
 										ast.CallExpression{
@@ -2246,7 +2210,6 @@ end`)
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "foo"},
-							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.Return{
 									Line: 2,
@@ -3467,7 +3430,6 @@ end
 					ast.FuncDecl{
 						Line: 1,
 						Name: ast.BareReference{Line: 1, Name: "samsonic_obey"},
-						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.CallExpression{
 								Line: 2,
@@ -3722,7 +3684,6 @@ end
 					ast.FuncDecl{
 						Line: 1,
 						Name: ast.BareReference{Line: 1, Name: "method_with_conditional_return"},
-						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.CallExpression{
 								Line:   2,
@@ -3731,7 +3692,7 @@ end
 								Args:   []ast.Node{},
 								OptionalBlock: ast.Block{
 									Line: 2,
-									Args: []ast.Node{ast.BareReference{Line: 2, Name: "name"}},
+									Args: []ast.MethodParam{{Name: "name"}},
 									Body: []ast.Node{
 										ast.IfBlock{
 											Line: 3,
@@ -3794,7 +3755,6 @@ end
 					ast.FuncDecl{
 						Line: 1,
 						Name: ast.BareReference{Line: 1, Name: "with_a_block"},
-						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.Yield{
 								Line: 2,
@@ -3867,12 +3827,34 @@ end
 							Args: []ast.Node{},
 							OptionalBlock: ast.Block{
 								Line: 1,
-								Args: []ast.Node{
-									ast.BareReference{Line: 1, Name: "with"},
-									ast.BareReference{Line: 1, Name: "some"},
-									ast.BareReference{Line: 1, Name: "args"},
+								Args: []ast.MethodParam{
+									{Name: "with"},
+									{Name: "some"},
+									{Name: "args"},
 								},
 								Body: []ast.Node{ast.SimpleString{Line: 2, Value: "aww yiss"}},
+							},
+						},
+					}))
+				})
+			})
+
+			Context("with splat args", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo { |*args| 'whatever' }")
+				})
+
+				It("marks the argument as a splat", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "foo"},
+							Args: []ast.Node{},
+							OptionalBlock: ast.Block{
+								Args: []ast.MethodParam{{
+									Name:    "args",
+									IsSplat: true,
+								}},
+								Body: []ast.Node{ast.SimpleString{Value: "whatever"}},
 							},
 						},
 					}))
@@ -3891,7 +3873,7 @@ end
 							Func:   ast.BareReference{Name: "a_block"},
 							Args:   []ast.Node{},
 							OptionalBlock: ast.Block{
-								Args: []ast.Node{ast.BareReference{Name: "foo"}},
+								Args: []ast.MethodParam{{Name: "foo"}},
 								Body: []ast.Node{
 									ast.CallExpression{
 										Func: ast.BareReference{Name: "puts"},
@@ -4545,7 +4527,6 @@ end`)
 						ast.FuncDecl{
 							Line: 1,
 							Name: ast.BareReference{Line: 1, Name: "something"},
-							Args: []ast.Node{},
 							Body: []ast.Node{
 								ast.Return{
 									Line: 2,
@@ -4676,7 +4657,6 @@ end
 					ast.FuncDecl{
 						Line: 1,
 						Name: ast.BareReference{Line: 1, Name: "memoized_func"},
-						Args: []ast.Node{},
 						Body: []ast.Node{
 							ast.IfBlock{
 								Line: 2,

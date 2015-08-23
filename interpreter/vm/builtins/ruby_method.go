@@ -137,7 +137,7 @@ func (method *RubyMethod) Execute(self Value, block Block, args ...Value) (Value
 		}
 
 		argument := methodArg{
-			Name:  arg.Name.Name,
+			Name:  arg.Name,
 			Value: argValue,
 		}
 		method.invocationArgs = append(method.invocationArgs, argument)

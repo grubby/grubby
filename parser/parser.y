@@ -14,15 +14,18 @@ var Statements []ast.Node
 // fields inside this union end up as the fields in a structure known
 // as RubySymType, of which a reference is passed to the lexer.
 %union{
-  genericBlock    ast.Block
-  genericValue    ast.Node
-  genericSlice    ast.Nodes
-  genericString   string
-  stringSlice     []string
-  switchCaseSlice []ast.SwitchCase
-  hashPairSlice   []ast.HashKeyValuePair
-  hashPair        ast.HashKeyValuePair
-  astString       ast.String
+  genericBlock     ast.Block
+  genericValue     ast.Node
+  genericSlice     ast.Nodes
+  genericString    string
+  stringSlice      []string
+  switchCaseSlice  []ast.SwitchCase
+  hashPairSlice    []ast.HashKeyValuePair
+  hashPair         ast.HashKeyValuePair
+  astString        ast.String
+
+  methodParam      ast.MethodParam
+  methodParamSlice []ast.MethodParam
 }
 
 %token <genericValue> OPERATOR
@@ -160,7 +163,6 @@ var Statements []ast.Node
 %type <genericValue> binary_expression
 %type <genericValue> class_declaration
 %type <genericValue> eigenclass_declaration
-%type <genericValue> default_value_arg
 %type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> conditional_assignment
@@ -200,23 +202,24 @@ var Statements []ast.Node
 %type <genericSlice> lines
 %type <genericSlice> rescues
 %type <genericSlice> call_args
-%type <genericSlice> block_args
 %type <genericSlice> elsif_block
 %type <genericSlice> capture_list
-%type <genericSlice> method_args
 %type <genericSlice> loop_expressions
 %type <genericSlice> optional_ensure
 %type <genericSlice> optional_rescues
 %type <genericSlice> nodes_with_commas
-%type <genericSlice> comma_delimited_refs
 %type <genericSlice> comma_delimited_nodes
 %type <genericSlice> symbol_key_value_pairs
 %type <genericSlice> nonempty_nodes_with_commas
 %type <genericSlice> two_or_more_call_expressions
-%type <genericSlice> comma_delimited_args_with_default_values
 %type <genericSlice> comma_delimited_class_names
 %type <genericSlice> nodes_with_commas_and_optional_newlines
 
+ // method arguments
+%type <methodParam> default_value_arg
+%type <methodParamSlice> block_args
+%type <methodParamSlice> method_args
+%type <methodParamSlice> comma_delimited_args_with_default_values
 
 // hash nodes
 %type <hashPair> key_value_pair
@@ -928,22 +931,22 @@ method_args : comma_delimited_args_with_default_values
 | LPAREN comma_delimited_args_with_default_values RPAREN
   { $$ = $2 }
 | LPAREN STAR RPAREN
-  { $$ = []ast.Node{ast.MethodParam{Name: ast.BareReference{}, IsSplat: true}} };
+  { $$ = []ast.MethodParam{{Name: "", IsSplat: true}} };
 
-comma_delimited_args_with_default_values : /* empty */ { $$ = ast.Nodes{} }
+comma_delimited_args_with_default_values : /* empty */ { }
 | default_value_arg
   { $$ = append($$, $1) }
 | comma_delimited_args_with_default_values COMMA default_value_arg
   { $$ = append($$, $3) };
 
 default_value_arg : REF
-  { $$ = ast.MethodParam{Name: $1.(ast.BareReference)} }
+  { $$ = ast.MethodParam{Name: $1.(ast.BareReference).Name} }
 | STAR REF
-  { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsSplat: true} }
+  { $$ = ast.MethodParam{Name: $2.(ast.BareReference).Name, IsSplat: true} }
 | REF EQUALTO single_node
-  { $$ = ast.MethodParam{Name: $1.(ast.BareReference), DefaultValue: $3} }
+  { $$ = ast.MethodParam{Name: $1.(ast.BareReference).Name, DefaultValue: $3} }
 | ProcArg REF
-  { $$ = ast.MethodParam{Name: $2.(ast.BareReference), IsProc: true} };
+  { $$ = ast.MethodParam{Name: $2.(ast.BareReference).Name, IsProc: true} };
 
 
 class_declaration : CLASS class_name_with_modules list END
@@ -1487,14 +1490,9 @@ block : DO list END
   };
 
 
-block_args : PIPE comma_delimited_refs PIPE
+block_args : PIPE comma_delimited_args_with_default_values PIPE
   { $$ = $2 };
 
-comma_delimited_refs : /* empty */ { $$ = ast.Nodes{} }
-| REF
-  { $$ = append($$, $1); }
-| comma_delimited_refs COMMA REF
-  { $$ = append($$, $3); };
 
 if_block : IF expr list END
   {

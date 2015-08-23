@@ -119,7 +119,7 @@ type FuncDecl struct {
 	Line    int
 	Target  Node
 	Name    BareReference
-	Args    []Node
+	Args    []MethodParam
 	Body    []Node
 	Rescues []Node
 	Ensure  []Node
@@ -131,15 +131,6 @@ func (n FuncDecl) LineNumber() int {
 
 func (f FuncDecl) MethodName() string {
 	return f.Name.Name
-}
-
-func (f FuncDecl) MethodArgs() []MethodParam {
-	result := make([]MethodParam, 0, len(f.Args))
-	for _, a := range f.Args {
-		result = append(result, a.(MethodParam))
-	}
-
-	return result
 }
 
 type ClassDecl struct {
@@ -358,7 +349,7 @@ func (n LineNumberConstReference) LineNumber() int {
 
 type Block struct {
 	Line int
-	Args []Node
+	Args []MethodParam
 	Body []Node
 }
 
@@ -432,15 +423,10 @@ func (n RescueException) LineNumber() int {
 }
 
 type MethodParam struct {
-	Line         int
-	Name         BareReference
+	Name         string
 	DefaultValue Node
 	IsSplat      bool
 	IsProc       bool
-}
-
-func (n MethodParam) LineNumber() int {
-	return n.Line
 }
 
 type Ternary struct {
