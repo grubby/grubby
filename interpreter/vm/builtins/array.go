@@ -160,7 +160,7 @@ func NewArrayClass(provider Provider) Class {
 			}
 
 			if value.IsTruthy() {
-				return value, nil
+				return provider.SingletonProvider().SingletonWithName("true"), nil
 			}
 		}
 

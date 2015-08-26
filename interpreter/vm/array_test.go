@@ -100,16 +100,17 @@ array
 		It("takes the given block, calling it with each member until the block returns a truthy value", func() {
 			value, err := vm.Run(`
 visited = []
-[1,2,3].any? { |i| visited.unshift(i); i == 2 }
+[nil,false,3,4].any? { |i| visited.unshift(i); i }
 `)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(value.IsTruthy()).To(BeTrue())
+			Expect(value).To(Equal(vm.SingletonWithName("true")))
 
 			visited := vm.MustGet("visited").(*Array).Members()
-			Expect(len(visited)).To(Equal(2))
-			Expect(visited[0].String()).To(ContainSubstring("2")) // unshift is unkind
-			Expect(visited[1].String()).To(ContainSubstring("1"))
+			Expect(len(visited)).To(Equal(3))
+			Expect(visited[0].String()).To(ContainSubstring("3")) // unshift is unkind
+			Expect(visited[1].String()).To(ContainSubstring("false"))
+			Expect(visited[2].String()).To(ContainSubstring(""))
 		})
 	})
 })
