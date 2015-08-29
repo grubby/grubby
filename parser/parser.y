@@ -765,12 +765,20 @@ nodes_with_commas : /* empty */ { $$ = ast.Nodes{} }
       Pairs: $1,
     })
   }
+| ternary
+  { $$ = append($$, $1) }
+| range
+  { $$ = append($$, $1) }
 | nodes_with_commas COMMA optional_newlines single_node
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines assignment
   { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines proc_arg
   { $$ = append($$, $4) };
+| nodes_with_commas COMMA optional_newlines ternary
+  { $$ = append($$, $4) }
+| nodes_with_commas COMMA optional_newlines range
+  { $$ = append($$, $4) }
 | nodes_with_commas COMMA optional_newlines key_value_pairs
   {
     $$ = append($$, ast.Hash{
@@ -1833,22 +1841,22 @@ break_expression: BREAK
   { $$ = ast.IfBlock{Line: $3.LineNumber(), Condition: ast.Negation{Line: $3.LineNumber(), Target: $3}, Body: []ast.Node{ast.Break{}}} };
 
 
-ternary : single_node QUESTIONMARK single_node COLON single_node
+ternary : single_node QUESTIONMARK single_node COLON optional_newlines single_node
   {
     ternary := ast.Ternary{
       Condition: $1,
       True: $3,
-      False: $5,
+      False: $6,
     }
     ternary.Line = $1.LineNumber()
     $$ = ternary
   }
-| single_node QUESTIONMARK range COLON range
+| single_node QUESTIONMARK range COLON optional_newlines range
   {
     $$ = ast.Ternary{
       Condition: $1,
       True: $3,
-      False: $5,
+      False: $6,
       Line: $1.LineNumber(),
     }
   };

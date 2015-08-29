@@ -3918,6 +3918,26 @@ group(1) {
 				})
 			})
 
+			Context("as an argument to a call expression", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("foo(0..1)")
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "foo"},
+							Args: []ast.Node{
+								ast.Range{
+									Start: ast.ConstantInt{Value: 0},
+									End:   ast.ConstantInt{Value: 1},
+								},
+							},
+						},
+					}))
+				})
+			})
+
 			Context("with three periods", func() {
 				BeforeEach(func() {
 					lexer = parser.NewLexer("a...b")
@@ -4523,6 +4543,27 @@ s = short ? short.dup : "  "
 							False: ast.CallExpression{
 								Func: ast.BareReference{Name: "thats_cool"},
 								Args: []ast.Node{},
+							},
+						},
+					}))
+				})
+			})
+
+			Context("as an argument to a call expression", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer("method(nil ? true : false)")
+				})
+
+				It("is parsed correctly", func() {
+					Expect(parser.Statements).To(Equal([]ast.Node{
+						ast.CallExpression{
+							Func: ast.BareReference{Name: "method"},
+							Args: []ast.Node{
+								ast.Ternary{
+									Condition: ast.Nil{},
+									True:      ast.Boolean{Value: true},
+									False:     ast.Boolean{Value: false},
+								},
 							},
 						},
 					}))
