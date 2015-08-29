@@ -373,12 +373,11 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
   }
 | single_node DOT REF
   {
-    callExpr := ast.CallExpression{
+    $$ = ast.CallExpression{
+      Line: $1.LineNumber(),
       Target: $1,
       Func: $3.(ast.BareReference),
     }
-    callExpr.Line = $1.LineNumber()
-    $$ = callExpr
   }
 | single_node DOT REF block
   {
@@ -1457,36 +1456,38 @@ symbol_key_value_pairs : REF COLON single_node
 
 block : DO list END
   {
-    block := ast.Block{Line: $1.LineNumber(), Body: $2}
-    $$ = block
+    $$ = ast.Block{Line: $1.LineNumber(), Body: $2}
   }
 | DO block_args list END
   {
-    block := ast.Block{Line: $1.LineNumber(), Args: $2, Body: $3}
-    $$ = block
+    $$ = ast.Block{Line: $1.LineNumber(), Args: $2, Body: $3}
   }
-| LBRACE optional_newlines list optional_newlines RBRACE
+| LBRACE list optional_newlines RBRACE
   {
-    block := ast.Block{Line: $1.LineNumber(), Body: $3}
-    $$ = block
+    $$ = ast.Block{Line: $1.LineNumber(), Body: $2}
   }
-| LBRACE optional_newlines block_args list RBRACE
+| LBRACE block_args list RBRACE
   {
-    block := ast.Block{Line: $1.LineNumber(), Args: $3, Body: $4}
-    $$ = block
+    $$ = ast.Block{Line: $1.LineNumber(), Args: $2, Body: $3}
+  }
+| LBRACE NEWLINE optional_newlines list NEWLINE optional_newlines RBRACE
+  {
+    $$ = ast.Block{Line: $1.LineNumber(), Body: $4}
+  }
+| LBRACE NEWLINE optional_newlines block_args list NEWLINE optional_newlines RBRACE
+  {
+    $$ = ast.Block{Line: $1.LineNumber(), Args: $4, Body: $5}
   }
 | LBRACE optional_newlines single_node optional_newlines RBRACE
   {
-    block := ast.Block{Line: $1.LineNumber(), Body: []ast.Node{$3}}
-    $$ = block
+    $$ = ast.Block{Line: $1.LineNumber(), Body: []ast.Node{$3}}
   }
 | LBRACE optional_newlines single_node list optional_newlines RBRACE
   {
       head := []ast.Node{$3}
       tail := $4
       body := append(head, tail...)
-      block := ast.Block{Line: $1.LineNumber(), Body: body}
-      $$ = block
+      $$ = ast.Block{Line: $1.LineNumber(), Body: body}
   };
 
 

@@ -3885,6 +3885,21 @@ end
 					}))
 				})
 			})
+
+			Context("with curly braces and newlines", func() {
+				BeforeEach(func() {
+					lexer = parser.NewLexer(`
+group(1) {
+  breakable ''
+  pp(obj.instance_eval(v))
+}
+`)
+				})
+
+				It("should be fine", func() {
+					Expect(parser.Statements).ToNot(BeEmpty())
+				})
+			})
 		})
 
 		Describe("ranges", func() {
