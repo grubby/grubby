@@ -40,6 +40,7 @@ var Statements []ast.Node
 %token <genericValue> CONSTANT
 %token <genericValue> NAMESPACED_CAPITAL_REF
 %token <genericValue> GLOBAL_VARIABLE
+%token <genericValue> IVAR_OR_CLASS_VARIABLE
 
 %token <genericValue> LPAREN
 %token <genericValue> RPAREN
@@ -117,7 +118,6 @@ var Statements []ast.Node
 %token <genericValue> RBRACKET      // "]"
 %token <genericValue> LBRACE        // "{"
 %token <genericValue> RBRACE        // "}"
-%token <genericValue> ATSIGN        // "@"
 %token <genericValue> FILE_CONST_REF // __FILE__
 %token <genericValue> LINE_CONST_REF // __LINE__
 %token <genericValue> EOF
@@ -151,7 +151,6 @@ var Statements []ast.Node
 %type <genericValue> begin_block
 %type <genericValue> single_node
 %type <genericValue> simple_node
-%type <genericValue> class_variable
 %type <genericValue> call_expression
 %type <genericValue> operator_expression
 %type <genericValue> method_declaration
@@ -163,7 +162,6 @@ var Statements []ast.Node
 %type <genericValue> binary_expression
 %type <genericValue> class_declaration
 %type <genericValue> eigenclass_declaration
-%type <genericValue> instance_variable
 %type <genericValue> module_declaration
 %type <genericValue> conditional_assignment
 %type <genericValue> class_name_with_modules
@@ -267,7 +265,7 @@ list : /* empty */
 | list expr
 {  $$ = append($$, $2) };
 
-simple_node : SYMBOL | NODE | string_literal | REF | CONSTANT | GLOBAL_VARIABLE | instance_variable | class_variable | LINE_CONST_REF | FILE_CONST_REF | self | nil;
+simple_node : SYMBOL | NODE | string_literal | REF | CONSTANT | GLOBAL_VARIABLE | IVAR_OR_CLASS_VARIABLE | LINE_CONST_REF | FILE_CONST_REF | self | nil;
 
 single_node : simple_node | array | hash | class_name_with_modules | call_expression | operator_expression | group | lambda | negation | complement | positive | negative | splat_arg | logical_and | logical_or | binary_expression | defined;
 
@@ -563,7 +561,7 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
       Args: []ast.Node{$3},
     }
   }
-| instance_variable LBRACKET nonempty_nodes_with_commas RBRACKET
+| IVAR_OR_CLASS_VARIABLE LBRACKET nonempty_nodes_with_commas RBRACKET
   {
     $$ = ast.CallExpression{
       Line: $1.LineNumber(),
@@ -572,25 +570,7 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
       Args: $3,
     }
   }
-| instance_variable LBRACKET range RBRACKET
-  {
-    $$ = ast.CallExpression{
-      Line: $1.LineNumber(),
-      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
-      Target: $1,
-      Args: []ast.Node{$3},
-    }
-  }
-| class_variable LBRACKET nonempty_nodes_with_commas RBRACKET
-  {
-    $$ = ast.CallExpression{
-      Line: $1.LineNumber(),
-      Func: ast.BareReference{Line: $2.LineNumber(), Name: "[]"},
-      Target: $1,
-      Args: $3,
-    }
-  }
-| class_variable LBRACKET range RBRACKET
+| IVAR_OR_CLASS_VARIABLE LBRACKET range RBRACKET
   {
     $$ = ast.CallExpression{
       Line: $1.LineNumber(),
@@ -691,7 +671,7 @@ call_expression : REF LPAREN optional_newlines nodes_with_commas optional_newlin
       Line: $1.LineNumber(),
     }
   }
-| instance_variable LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO expr
+| IVAR_OR_CLASS_VARIABLE LBRACKET nonempty_nodes_with_commas RBRACKET EQUALTO expr
   {
     $$ = ast.CallExpression{
       Func: ast.BareReference{Line: $3.LineNumber(), Name: "[]="},
@@ -1080,24 +1060,8 @@ assignment : REF EQUALTO single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| instance_variable EQUALTO expr
-  {
-    eql := ast.Assignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
-| class_variable EQUALTO expr
-  {
-    eql := ast.Assignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
+| IVAR_OR_CLASS_VARIABLE EQUALTO expr
+  { $$ = ast.Assignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | GLOBAL_VARIABLE EQUALTO expr
   { $$ = ast.Assignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | class_name_with_modules EQUALTO expr
@@ -1179,24 +1143,8 @@ conditional_assignment : REF OR_EQUALS single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| instance_variable OR_EQUALS expr
-  {
-    eql := ast.ConditionalAssignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
-| class_variable OR_EQUALS expr
-  {
-    eql := ast.ConditionalAssignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
+| IVAR_OR_CLASS_VARIABLE OR_EQUALS expr
+  { $$ = ast.ConditionalAssignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | GLOBAL_VARIABLE OR_EQUALS expr
   { $$ = ast.ConditionalAssignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | call_expression OR_EQUALS expr
@@ -1232,24 +1180,8 @@ conditional_assignment : REF OR_EQUALS single_node
     eql.Line = $1.LineNumber()
     $$ = eql
   }
-| instance_variable AND_EQUALS expr
-  {
-    eql := ast.ConditionalTruthyAssignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
-| class_variable AND_EQUALS expr
-  {
-    eql := ast.ConditionalTruthyAssignment{
-      LHS: $1,
-      RHS: $3,
-    }
-    eql.Line = $1.LineNumber()
-    $$ = eql
-  }
+| IVAR_OR_CLASS_VARIABLE AND_EQUALS expr
+  { $$ = ast.ConditionalTruthyAssignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | GLOBAL_VARIABLE AND_EQUALS expr
   { $$ = ast.ConditionalTruthyAssignment{Line: $1.LineNumber(), LHS: $1, RHS: $3} }
 | call_expression AND_EQUALS expr
@@ -1259,67 +1191,27 @@ conditional_assignment : REF OR_EQUALS single_node
     $$ = eql
   };
 
-instance_variable : ATSIGN REF
-  {
-    ivar := ast.InstanceVariable{Name: $2.(ast.BareReference).Name}
-    ivar.Line = $2.LineNumber()
-    $$ = ivar
-  }
-| ATSIGN CONSTANT
-  {
-    ivar := ast.InstanceVariable{Name: $2.(ast.Constant).Name}
-    ivar.Line = $2.LineNumber()
-    $$ = ivar
-  };
-
-class_variable : ATSIGN ATSIGN REF
-  {
-    classvar := ast.ClassVariable{Name: $3.(ast.BareReference).Name}
-    classvar.Line = $3.LineNumber()
-    $$ = classvar
-  }
-| ATSIGN ATSIGN CONSTANT
-  {
-    classvar := ast.ClassVariable{Name: $3.(ast.Constant).Name}
-    classvar.Line = $3.LineNumber()
-    $$ = classvar
-  };
 
 assignable_variables : REF COMMA REF
   { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| REF COMMA instance_variable
-  { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| REF COMMA class_variable
-  { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
+| REF COMMA IVAR_OR_CLASS_VARIABLE
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}, Line: $1.LineNumber()} }
 | REF COMMA STAR REF
   { vars := ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}}; vars.Line = $1.LineNumber(); $$ = vars }
 
-| instance_variable COMMA REF
+| IVAR_OR_CLASS_VARIABLE COMMA REF
   { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| instance_variable COMMA instance_variable
-  { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| instance_variable COMMA class_variable
-  { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| instance_variable COMMA STAR REF
-  { vars := ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}}; vars.Line = $1.LineNumber(); $$ = vars }
-
-| class_variable COMMA REF
-  { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| class_variable COMMA instance_variable
-  { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| class_variable COMMA class_variable
-  { vars := ast.Array{Nodes: []ast.Node{$1, $3}}; vars.Line = $1.LineNumber(); $$ = vars }
-| class_variable COMMA STAR REF
+| IVAR_OR_CLASS_VARIABLE COMMA IVAR_OR_CLASS_VARIABLE
+  { $$ = ast.Array{Nodes: []ast.Node{$1, $3}, Line: $1.LineNumber()} }
+| IVAR_OR_CLASS_VARIABLE COMMA STAR REF
   { vars := ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}}; vars.Line = $1.LineNumber(); $$ = vars }
 
 | assignable_variables COMMA REF
   { vars := ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)}; vars.Line = $1.LineNumber(); $$ = vars }
-| assignable_variables COMMA instance_variable
-  { vars := ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)}; vars.Line = $1.LineNumber(); $$ = vars }
-| assignable_variables COMMA class_variable
+| assignable_variables COMMA IVAR_OR_CLASS_VARIABLE
   { vars := ast.Array{Nodes: append($$.(ast.Array).Nodes, $3)}; vars.Line = $1.LineNumber(); $$ = vars }
 | assignable_variables COMMA STAR REF
-  { vars := ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}} ; vars.Line = $1.LineNumber(); $$ = vars };
+  { vars := ast.Array{Nodes: []ast.Node{$1, ast.StarSplat{Value: $4}}} ; vars.Line = $1.LineNumber(); $$ = vars }
 
 
 negation : BANG expr
@@ -1713,28 +1605,12 @@ rescue : RESCUE list
       Line: $1.LineNumber(),
       Body: $5,
       Exception: ast.RescueException{
-        Var: $4.(ast.BareReference),
-        Classes: classes,
-      },
-    }
-  }
-| RESCUE comma_delimited_class_names HASH_ROCKET instance_variable list
-  {
-    classes := []ast.Class{}
-    for _, class := range $2 {
-      classes = append(classes, class.(ast.Class))
-    }
-
-    $$ = ast.Rescue{
-      Line: $1.LineNumber(),
-      Body: $5,
-      Exception: ast.RescueException{
         Var: $4,
         Classes: classes,
       },
     }
   }
-| RESCUE comma_delimited_class_names HASH_ROCKET class_variable list
+| RESCUE comma_delimited_class_names HASH_ROCKET IVAR_OR_CLASS_VARIABLE list
   {
     classes := []ast.Class{}
     for _, class := range $2 {
@@ -1760,17 +1636,7 @@ rescue : RESCUE list
       },
     }
   }
-| RESCUE HASH_ROCKET instance_variable list
-  {
-    $$ = ast.Rescue{
-      Line: $1.LineNumber(),
-      Body: $4,
-      Exception: ast.RescueException{
-        Var: $3,
-      },
-    }
-  }
-| RESCUE HASH_ROCKET class_variable list
+| RESCUE HASH_ROCKET IVAR_OR_CLASS_VARIABLE list
   {
     $$ = ast.Rescue{
       Line: $1.LineNumber(),

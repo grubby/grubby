@@ -23,6 +23,10 @@ func lexMinus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeBinaryMinus)
 	case tokenTypeReference:
 		l.emit(tokenTypeBinaryMinus)
+	case tokenTypeInstanceVariable:
+		l.emit(tokenTypeBinaryMinus)
+	case tokenTypeClassVariable:
+		l.emit(tokenTypeBinaryMinus)
 	case tokenTypeCapitalizedReference:
 		l.emit(tokenTypeBinaryMinus)
 	case tokenTypeGlobal:

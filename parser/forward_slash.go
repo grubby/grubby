@@ -18,6 +18,10 @@ func lexSlash(l StatefulRubyLexer) stateFn {
 		parseAsOperator(l)
 	case tokenTypeReference:
 		parseAsOperator(l)
+	case tokenTypeInstanceVariable:
+		parseAsOperator(l)
+	case tokenTypeClassVariable:
+		parseAsOperator(l)
 	case tokenTypeCapitalizedReference:
 		parseAsOperator(l)
 	case tokenTypeGlobal:

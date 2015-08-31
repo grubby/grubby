@@ -23,6 +23,10 @@ func lexPlus(l StatefulRubyLexer) stateFn {
 		l.emit(tokenTypeBinaryPlus)
 	case tokenTypeReference:
 		l.emit(tokenTypeBinaryPlus)
+	case tokenTypeInstanceVariable:
+		l.emit(tokenTypeBinaryPlus)
+	case tokenTypeClassVariable:
+		l.emit(tokenTypeBinaryPlus)
 	case tokenTypeCapitalizedReference:
 		l.emit(tokenTypeBinaryPlus)
 	case tokenTypeGlobal:

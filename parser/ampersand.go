@@ -27,6 +27,10 @@ func lexAmpersand(l StatefulRubyLexer) stateFn {
 		parseAsBinaryBitwiseOperator(l)
 	case tokenTypeReference:
 		parseAsBinaryBitwiseOperator(l)
+	case tokenTypeInstanceVariable:
+		parseAsBinaryBitwiseOperator(l)
+	case tokenTypeClassVariable:
+		parseAsBinaryBitwiseOperator(l)
 	case tokenTypeCapitalizedReference:
 		parseAsBinaryBitwiseOperator(l)
 	case tokenTypeGlobal:

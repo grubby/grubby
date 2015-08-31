@@ -41,6 +41,8 @@ const (
 	tokenTypeMethodName
 	tokenTypeGlobal
 	tokenTypeCapitalizedReference
+	tokenTypeInstanceVariable
+	tokenTypeClassVariable
 	tokenTypeNewline
 	tokenTypeLParen
 	tokenTypeRParen
@@ -279,7 +281,14 @@ func lexSomething(l StatefulRubyLexer) stateFn {
 		l.acceptRun(alphaNumericUnderscore + ":\\$><")
 		l.emit(tokenTypeGlobal)
 	case r == '@':
-		l.emit(tokenTypeAtSign)
+		tokenToEmit := tokenTypeInstanceVariable
+		if l.accept("@") {
+			tokenToEmit = tokenTypeClassVariable
+		}
+		l.ignore()
+
+		l.acceptRun(alphaNumericUnderscore)
+		l.emit(tokenToEmit)
 	case r == '.':
 		return lexDot
 	case r == '|':
@@ -639,9 +648,21 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeRBrace:
 			debug("}")
 			return RBRACE
-		case tokenTypeAtSign:
-			debug("@")
-			return ATSIGN
+		case tokenTypeInstanceVariable:
+			debug("instance variable @%s", token.value)
+			lval.genericValue = ast.InstanceVariable{
+				Line: token.line,
+				Name: token.value,
+			}
+
+			return IVAR_OR_CLASS_VARIABLE
+		case tokenTypeClassVariable:
+			debug("class variable @@%s", token.value)
+			lval.genericValue = ast.ClassVariable{
+				Line: token.line,
+				Name: token.value,
+			}
+			return IVAR_OR_CLASS_VARIABLE
 		case tokenType__FILE__:
 			debug("__FILE__")
 			someValue := ast.FileNameConstReference{}
