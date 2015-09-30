@@ -41,4 +41,32 @@ end
 		bar := vm.Symbols()["bar"]
 		Expect(foo).To(Equal(bar))
 	})
+
+	It("can be evaluated", func() {
+		vm.Run(`
+class Foo
+  def initialize
+    @foo = :bar
+  end
+
+	def foo
+		@foo
+	end
+end
+
+foo = Foo.new
+foo.foo
+`)
+
+		fooClass := vm.ClassWithName("Foo")
+		Expect(fooClass).ToNot(BeNil())
+
+		fooInstance, err := fooClass.New(vm)
+
+		Expect(err).ToNot(HaveOccurred())
+
+		foo := fooInstance.GetInstanceVariable("foo")
+		bar := vm.Symbols()["bar"]
+		Expect(foo).To(Equal(bar))
+	})
 })

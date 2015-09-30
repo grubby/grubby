@@ -438,6 +438,8 @@ func (vm *vm) executeWithContext(context Value, statements ...ast.Node) (Value, 
 
 		case ast.Defined:
 			returnValue, returnErr = interpretDefinedKeyword(vm, statement.(ast.Defined), context)
+		case ast.InstanceVariable:
+			returnValue, returnErr = interpretInstanceVariableInContext(vm, statement.(ast.InstanceVariable), context)
 		case ast.SwitchStatement:
 			returnValue, returnErr = interpretSwitchStatement(vm, statement.(ast.SwitchStatement), context)
 		default:
