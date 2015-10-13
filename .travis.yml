@@ -14,4 +14,3 @@ script: PATH=$PATH:$HOME/gopath/bin ginkgo -r .
 branches:
   only:
   - master
-  - golang1.5
