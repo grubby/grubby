@@ -1,6 +1,10 @@
 language: go
 go:
 - 1.5
+
+sudo: false # uses new container infrastructure
+# http://docs.travis-ci.com/user/migrating-from-legacy/
+
 before_install:
 - go get github.com/onsi/ginkgo/...
 - go get github.com/onsi/gomega/...
@@ -10,3 +14,4 @@ script: PATH=$PATH:$HOME/gopath/bin ginkgo -r .
 branches:
   only:
   - master
+  - golang1.5
