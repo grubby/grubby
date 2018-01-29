@@ -11,7 +11,7 @@ import (
 )
 
 // Load-bearing comment -- generates the parser when this is compiled
-//go:generate go tool yacc -o parser.go -p Ruby parser.y
+//go:generate goyacc -o parser.go -p Ruby parser.y
 
 var DebugStatements = []string{}
 

@@ -107,7 +107,10 @@ const FILE_CONST_REF = 57421
 const LINE_CONST_REF = 57422
 const EOF = 57423
 
-var RubyToknames = []string{
+var RubyToknames = [...]string{
+	"$end",
+	"error",
+	"$unk",
 	"OPERATOR",
 	"HASH_ROCKET",
 	"NODE",
@@ -187,16 +190,16 @@ var RubyToknames = []string{
 	"LINE_CONST_REF",
 	"EOF",
 }
-var RubyStatenames = []string{}
+var RubyStatenames = [...]string{}
 
 const RubyEofCode = 1
 const RubyErrCode = 2
-const RubyMaxDepth = 200
+const RubyInitialStackSize = 16
 
 //line parser.y:1927
 
 //line yacctab:1
-var RubyExca = []int{
+var RubyExca = [...]int{
 	-1, 1,
 	1, -1,
 	-2, 0,
@@ -318,15 +321,11 @@ var RubyExca = []int{
 	-2, 14,
 }
 
-const RubyNprod = 330
 const RubyPrivate = 57344
-
-var RubyTokenNames []string
-var RubyStates []string
 
 const RubyLast = 4877
 
-var RubyAct = []int{
+var RubyAct = [...]int{
 
 	338, 28, 5, 469, 466, 158, 656, 167, 145, 189,
 	265, 157, 383, 427, 146, 345, 300, 55, 144, 467,
@@ -817,7 +816,7 @@ var RubyAct = []int{
 	110, 0, 111, 0, 112, 0, 0, 0, 0, 0,
 	0, 0, 0, 106, 115, 113, 114,
 }
-var RubyPact = []int{
+var RubyPact = [...]int{
 
 	-39, 2128, -1000, -1000, -1000, 20, -1000, -1000, -1000, 1590,
 	-1000, -1000, -1000, -1000, 229, -1000, -1000, -1000, -1000, -1000,
@@ -888,7 +887,7 @@ var RubyPact = []int{
 	350, -1000, 118, -1000, -1000, 3779, -1000, 455, 3329, -1000,
 	118, 455, 3329, 3329, 3329,
 }
-var RubyPgo = []int{
+var RubyPgo = [...]int{
 
 	0, 626, 0, 302, 621, 39, 8, 620, 619, 618,
 	617, 616, 3, 608, 1, 607, 11, 606, 143, 602,
@@ -900,7 +899,7 @@ var RubyPgo = []int{
 	106, 25, 519, 463, 10, 16, 31, 20, 7, 5,
 	69,
 }
-var RubyR1 = []int{
+var RubyR1 = [...]int{
 
 	0, 63, 63, 63, 63, 63, 63, 63, 63, 63,
 	63, 80, 80, 58, 58, 58, 58, 23, 23, 23,
@@ -936,7 +935,7 @@ var RubyR1 = []int{
 	45, 46, 46, 46, 46, 42, 41, 11, 40, 40,
 	40, 40, 39, 39, 5, 5, 7, 13, 8, 8,
 }
-var RubyR2 = []int{
+var RubyR2 = [...]int{
 
 	0, 0, 1, 1, 1, 3, 3, 3, 2, 2,
 	2, 0, 2, 0, 2, 2, 2, 1, 1, 1,
@@ -972,7 +971,7 @@ var RubyR2 = []int{
 	5, 4, 3, 3, 2, 4, 4, 2, 5, 7,
 	4, 6, 4, 5, 3, 3, 3, 2, 1, 2,
 }
-var RubyChk = []int{
+var RubyChk = [...]int{
 
 	-1000, -63, 66, 67, 81, -2, 66, 67, 81, -22,
 	-27, -34, -36, -35, -18, -20, -37, -15, -21, -28,
@@ -1043,7 +1042,7 @@ var RubyChk = []int{
 	-46, 22, -80, 16, 22, 25, 24, -2, -64, 22,
 	-80, -2, -64, -64, -64,
 }
-var RubyDef = []int{
+var RubyDef = [...]int{
 
 	1, -2, 2, 3, 4, 0, 8, 9, 10, 52,
 	53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
@@ -1114,11 +1113,11 @@ var RubyDef = []int{
 	0, 310, 234, 11, 307, 0, 301, 301, 314, 309,
 	235, 301, 312, 313, 311,
 }
-var RubyTok1 = []int{
+var RubyTok1 = [...]int{
 
 	1,
 }
-var RubyTok2 = []int{
+var RubyTok2 = [...]int{
 
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 	12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
@@ -1129,28 +1128,55 @@ var RubyTok2 = []int{
 	62, 63, 64, 65, 66, 67, 68, 69, 70, 71,
 	72, 73, 74, 75, 76, 77, 78, 79, 80, 81,
 }
-var RubyTok3 = []int{
+var RubyTok3 = [...]int{
 	0,
 }
+
+var RubyErrorMessages = [...]struct {
+	state int
+	token int
+	msg   string
+}{}
 
 //line yaccpar:1
 
 /*	parser for yacc output	*/
 
-var RubyDebug = 0
+var (
+	RubyDebug        = 0
+	RubyErrorVerbose = false
+)
 
 type RubyLexer interface {
 	Lex(lval *RubySymType) int
 	Error(s string)
 }
 
+type RubyParser interface {
+	Parse(RubyLexer) int
+	Lookahead() int
+}
+
+type RubyParserImpl struct {
+	lval  RubySymType
+	stack [RubyInitialStackSize]RubySymType
+	char  int
+}
+
+func (p *RubyParserImpl) Lookahead() int {
+	return p.char
+}
+
+func RubyNewParser() RubyParser {
+	return &RubyParserImpl{}
+}
+
 const RubyFlag = -1000
 
 func RubyTokname(c int) string {
-	// 4 is TOKSTART above
-	if c >= 4 && c-4 < len(RubyToknames) {
-		if RubyToknames[c-4] != "" {
-			return RubyToknames[c-4]
+	if c >= 1 && c-1 < len(RubyToknames) {
+		if RubyToknames[c-1] != "" {
+			return RubyToknames[c-1]
 		}
 	}
 	return __yyfmt__.Sprintf("tok-%v", c)
@@ -1165,51 +1191,127 @@ func RubyStatname(s int) string {
 	return __yyfmt__.Sprintf("state-%v", s)
 }
 
-func Rubylex1(lex RubyLexer, lval *RubySymType) int {
-	c := 0
-	char := lex.Lex(lval)
+func RubyErrorMessage(state, lookAhead int) string {
+	const TOKSTART = 4
+
+	if !RubyErrorVerbose {
+		return "syntax error"
+	}
+
+	for _, e := range RubyErrorMessages {
+		if e.state == state && e.token == lookAhead {
+			return "syntax error: " + e.msg
+		}
+	}
+
+	res := "syntax error: unexpected " + RubyTokname(lookAhead)
+
+	// To match Bison, suggest at most four expected tokens.
+	expected := make([]int, 0, 4)
+
+	// Look for shiftable tokens.
+	base := RubyPact[state]
+	for tok := TOKSTART; tok-1 < len(RubyToknames); tok++ {
+		if n := base + tok; n >= 0 && n < RubyLast && RubyChk[RubyAct[n]] == tok {
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+	}
+
+	if RubyDef[state] == -2 {
+		i := 0
+		for RubyExca[i] != -1 || RubyExca[i+1] != state {
+			i += 2
+		}
+
+		// Look for tokens that we accept or reduce.
+		for i += 2; RubyExca[i] >= 0; i += 2 {
+			tok := RubyExca[i]
+			if tok < TOKSTART || RubyExca[i+1] == 0 {
+				continue
+			}
+			if len(expected) == cap(expected) {
+				return res
+			}
+			expected = append(expected, tok)
+		}
+
+		// If the default action is to accept or reduce, give up.
+		if RubyExca[i+1] != 0 {
+			return res
+		}
+	}
+
+	for i, tok := range expected {
+		if i == 0 {
+			res += ", expecting "
+		} else {
+			res += " or "
+		}
+		res += RubyTokname(tok)
+	}
+	return res
+}
+
+func Rubylex1(lex RubyLexer, lval *RubySymType) (char, token int) {
+	token = 0
+	char = lex.Lex(lval)
 	if char <= 0 {
-		c = RubyTok1[0]
+		token = RubyTok1[0]
 		goto out
 	}
 	if char < len(RubyTok1) {
-		c = RubyTok1[char]
+		token = RubyTok1[char]
 		goto out
 	}
 	if char >= RubyPrivate {
 		if char < RubyPrivate+len(RubyTok2) {
-			c = RubyTok2[char-RubyPrivate]
+			token = RubyTok2[char-RubyPrivate]
 			goto out
 		}
 	}
 	for i := 0; i < len(RubyTok3); i += 2 {
-		c = RubyTok3[i+0]
-		if c == char {
-			c = RubyTok3[i+1]
+		token = RubyTok3[i+0]
+		if token == char {
+			token = RubyTok3[i+1]
 			goto out
 		}
 	}
 
 out:
-	if c == 0 {
-		c = RubyTok2[1] /* unknown char */
+	if token == 0 {
+		token = RubyTok2[1] /* unknown char */
 	}
 	if RubyDebug >= 3 {
-		__yyfmt__.Printf("lex %s(%d)\n", RubyTokname(c), uint(char))
+		__yyfmt__.Printf("lex %s(%d)\n", RubyTokname(token), uint(char))
 	}
-	return c
+	return char, token
 }
 
 func RubyParse(Rubylex RubyLexer) int {
+	return RubyNewParser().Parse(Rubylex)
+}
+
+func (Rubyrcvr *RubyParserImpl) Parse(Rubylex RubyLexer) int {
 	var Rubyn int
-	var Rubylval RubySymType
 	var RubyVAL RubySymType
-	RubyS := make([]RubySymType, RubyMaxDepth)
+	var RubyDollar []RubySymType
+	_ = RubyDollar // silence set and not used
+	RubyS := Rubyrcvr.stack[:]
 
 	Nerrs := 0   /* number of errors */
 	Errflag := 0 /* error recovery flag */
 	Rubystate := 0
-	Rubychar := -1
+	Rubyrcvr.char = -1
+	Rubytoken := -1 // Rubyrcvr.char translated into internal numbering
+	defer func() {
+		// Make sure we report no lookahead when not parsing.
+		Rubystate = -1
+		Rubyrcvr.char = -1
+		Rubytoken = -1
+	}()
 	Rubyp := -1
 	goto Rubystack
 
@@ -1222,7 +1324,7 @@ ret1:
 Rubystack:
 	/* put a state and value onto the stack */
 	if RubyDebug >= 4 {
-		__yyfmt__.Printf("char %v in %v\n", RubyTokname(Rubychar), RubyStatname(Rubystate))
+		__yyfmt__.Printf("char %v in %v\n", RubyTokname(Rubytoken), RubyStatname(Rubystate))
 	}
 
 	Rubyp++
@@ -1239,17 +1341,18 @@ Rubynewstate:
 	if Rubyn <= RubyFlag {
 		goto Rubydefault /* simple state */
 	}
-	if Rubychar < 0 {
-		Rubychar = Rubylex1(Rubylex, &Rubylval)
+	if Rubyrcvr.char < 0 {
+		Rubyrcvr.char, Rubytoken = Rubylex1(Rubylex, &Rubyrcvr.lval)
 	}
-	Rubyn += Rubychar
+	Rubyn += Rubytoken
 	if Rubyn < 0 || Rubyn >= RubyLast {
 		goto Rubydefault
 	}
 	Rubyn = RubyAct[Rubyn]
-	if RubyChk[Rubyn] == Rubychar { /* valid shift */
-		Rubychar = -1
-		RubyVAL = Rubylval
+	if RubyChk[Rubyn] == Rubytoken { /* valid shift */
+		Rubyrcvr.char = -1
+		Rubytoken = -1
+		RubyVAL = Rubyrcvr.lval
 		Rubystate = Rubyn
 		if Errflag > 0 {
 			Errflag--
@@ -1261,8 +1364,8 @@ Rubydefault:
 	/* default state action */
 	Rubyn = RubyDef[Rubystate]
 	if Rubyn == -2 {
-		if Rubychar < 0 {
-			Rubychar = Rubylex1(Rubylex, &Rubylval)
+		if Rubyrcvr.char < 0 {
+			Rubyrcvr.char, Rubytoken = Rubylex1(Rubylex, &Rubyrcvr.lval)
 		}
 
 		/* look through exception table */
@@ -1275,7 +1378,7 @@ Rubydefault:
 		}
 		for xi += 2; ; xi += 2 {
 			Rubyn = RubyExca[xi+0]
-			if Rubyn < 0 || Rubyn == Rubychar {
+			if Rubyn < 0 || Rubyn == Rubytoken {
 				break
 			}
 		}
@@ -1288,11 +1391,11 @@ Rubydefault:
 		/* error ... attempt to resume parsing */
 		switch Errflag {
 		case 0: /* brand new error */
-			Rubylex.Error("syntax error")
+			Rubylex.Error(RubyErrorMessage(Rubystate, Rubytoken))
 			Nerrs++
 			if RubyDebug >= 1 {
 				__yyfmt__.Printf("%s", RubyStatname(Rubystate))
-				__yyfmt__.Printf(" saw %s\n", RubyTokname(Rubychar))
+				__yyfmt__.Printf(" saw %s\n", RubyTokname(Rubytoken))
 			}
 			fallthrough
 
@@ -1320,12 +1423,13 @@ Rubydefault:
 
 		case 3: /* no shift yet; clobber input char */
 			if RubyDebug >= 2 {
-				__yyfmt__.Printf("error recovery discards %s\n", RubyTokname(Rubychar))
+				__yyfmt__.Printf("error recovery discards %s\n", RubyTokname(Rubytoken))
 			}
-			if Rubychar == RubyEofCode {
+			if Rubytoken == RubyEofCode {
 				goto ret1
 			}
-			Rubychar = -1
+			Rubyrcvr.char = -1
+			Rubytoken = -1
 			goto Rubynewstate /* try again in the same state */
 		}
 	}
@@ -1340,6 +1444,13 @@ Rubydefault:
 	_ = Rubypt // guard against "declared and not used"
 
 	Rubyp -= RubyR2[Rubyn]
+	// Rubyp is now the index of $0. Perform the default action. Iff the
+	// reduced production is ε, $1 is possibly out of range.
+	if Rubyp+1 >= len(RubyS) {
+		nyys := make([]RubySymType, len(RubyS)*2)
+		copy(nyys, RubyS)
+		RubyS = nyys
+	}
 	RubyVAL = RubyS[Rubyp+1]
 
 	/* consult goto table to find next state */
@@ -1359,1047 +1470,1043 @@ Rubydefault:
 	switch Rubynt {
 
 	case 1:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:239
 		{
 			Statements = []ast.Node{}
 		}
 	case 2:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:241
 		{
 			Statements = []ast.Node{}
 		}
 	case 3:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:243
 		{
 			Statements = []ast.Node{}
 		}
 	case 4:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:245
 		{
 			Statements = []ast.Node{}
 		}
 	case 5:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:247
 		{
-			Statements = append(Statements, RubyS[Rubypt-1].genericValue)
+			Statements = append(Statements, RubyDollar[2].genericValue)
 		}
 	case 6:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:249
 		{
-			Statements = append(Statements, RubyS[Rubypt-1].genericValue)
+			Statements = append(Statements, RubyDollar[2].genericValue)
 		}
 	case 7:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:251
 		{
-			Statements = append(Statements, RubyS[Rubypt-1].genericValue)
+			Statements = append(Statements, RubyDollar[2].genericValue)
 		}
-	case 8:
-		RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
-	case 9:
-		RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
 	case 10:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:257
 		{
 			RubyVAL.genericSlice = RubyVAL.genericSlice
 		}
 	case 11:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:259
 		{
 			RubyVAL.genericValue = nil
 		}
 	case 12:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:260
 		{
 			RubyVAL.genericValue = nil
 		}
 	case 13:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:263
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
 	case 14:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:265
 		{
 			RubyVAL.genericSlice = RubyVAL.genericSlice
 		}
 	case 15:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:267
 		{
 			RubyVAL.genericSlice = RubyVAL.genericSlice
 		}
 	case 16:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:269
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[2].genericValue)
 		}
-	case 17:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 18:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 19:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 20:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 21:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 22:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 23:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 24:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 25:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 26:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 27:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 28:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 29:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 30:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 31:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 32:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 33:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 34:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 35:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 36:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 37:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 38:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 39:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 40:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 41:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 42:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 43:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 44:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 45:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 46:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 47:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 48:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 49:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 50:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 51:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 52:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 53:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 54:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 55:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 56:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 57:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 58:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 59:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 60:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 61:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 62:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 63:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 64:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 65:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 66:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 67:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 68:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 69:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 70:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 71:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
-	case 72:
-		RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
 	case 73:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:280
 		{
-			RubyVAL.genericValue = RubyS[Rubypt-0].astString
+			RubyVAL.genericValue = RubyDollar[1].astString
 		}
 	case 74:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:282
 		{
 			RubyVAL.genericValue = ast.InterpolatedString{
-				Line:  RubyS[Rubypt-1].genericValue.LineNumber(),
-				Value: RubyS[Rubypt-1].genericValue.(ast.String).StringValue() + RubyS[Rubypt-0].astString.StringValue(),
+				Line:  RubyDollar[1].genericValue.LineNumber(),
+				Value: RubyDollar[1].genericValue.(ast.String).StringValue() + RubyDollar[2].astString.StringValue(),
 			}
 		}
 	case 75:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:290
 		{
-			RubyVAL.genericValue = ast.RescueModifier{Statement: RubyS[Rubypt-2].genericValue, Rescue: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.RescueModifier{Statement: RubyDollar[1].genericValue, Rescue: RubyDollar[3].genericValue}
 		}
 	case 76:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:293
 		{
-			RubyVAL.genericValue = ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.StarSplat{Value: RubyDollar[2].genericValue}
 		}
 	case 77:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:296
 		{
 			callExpr := ast.CallExpression{
-				Func: RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args: RubyS[Rubypt-2].genericSlice,
+				Func: RubyDollar[1].genericValue.(ast.BareReference),
+				Args: RubyDollar[4].genericSlice,
 			}
-			callExpr.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 78:
+		RubyDollar = RubyS[Rubypt-7 : Rubypt+1]
 		//line parser.y:305
 		{
 			callExpr := ast.CallExpression{
-				Func:          RubyS[Rubypt-6].genericValue.(ast.BareReference),
-				Args:          RubyS[Rubypt-3].genericSlice,
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				Func:          RubyDollar[1].genericValue.(ast.BareReference),
+				Args:          RubyDollar[4].genericSlice,
+				OptionalBlock: RubyDollar[7].genericBlock,
 			}
-			callExpr.Line = RubyS[Rubypt-6].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 79:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:315
 		{
-			callExpr := ast.CallExpression{Func: RubyS[Rubypt-0].genericValue.(ast.BareReference)}
-			callExpr.Line = RubyS[Rubypt-0].genericValue.LineNumber()
+			callExpr := ast.CallExpression{Func: RubyDollar[1].genericValue.(ast.BareReference)}
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 80:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:321
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line: RubyS[Rubypt-1].genericValue.LineNumber(),
-				Func: RubyS[Rubypt-1].genericValue.(ast.BareReference),
-				Args: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Func: RubyDollar[1].genericValue.(ast.BareReference),
+				Args: RubyDollar[2].genericSlice,
 			}
 		}
 	case 81:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:329
 		{
 			callExpr := ast.CallExpression{
-				Func: RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args: RubyS[Rubypt-2].genericSlice,
+				Func: RubyDollar[1].genericValue.(ast.BareReference),
+				Args: RubyDollar[4].genericSlice,
 			}
-			callExpr.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 82:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:338
 		{
 			callExpr := ast.CallExpression{
-				Func: ast.BareReference{Name: RubyS[Rubypt-5].genericValue.(ast.Constant).Name, Line: RubyS[Rubypt-5].genericValue.LineNumber()},
-				Args: RubyS[Rubypt-2].genericSlice,
+				Func: ast.BareReference{Name: RubyDollar[1].genericValue.(ast.Constant).Name, Line: RubyDollar[1].genericValue.LineNumber()},
+				Args: RubyDollar[4].genericSlice,
 			}
-			callExpr.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 83:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:347
 		{
 			callExpr := ast.CallExpression{
-				Func: RubyS[Rubypt-1].genericValue.(ast.BareReference),
-				Args: RubyS[Rubypt-0].genericSlice,
+				Func: RubyDollar[1].genericValue.(ast.BareReference),
+				Args: RubyDollar[2].genericSlice,
 			}
-			callExpr.Line = RubyS[Rubypt-1].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 84:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:356
 		{
 			callExpr := ast.CallExpression{
-				Func:          RubyS[Rubypt-2].genericValue.(ast.BareReference),
-				Args:          RubyS[Rubypt-1].genericSlice,
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				Func:          RubyDollar[1].genericValue.(ast.BareReference),
+				Args:          RubyDollar[2].genericSlice,
+				OptionalBlock: RubyDollar[3].genericBlock,
 			}
-			callExpr.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 85:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:366
 		{
 			callExpr := ast.CallExpression{
-				Func:          RubyS[Rubypt-1].genericValue.(ast.BareReference),
+				Func:          RubyDollar[1].genericValue.(ast.BareReference),
 				Args:          []ast.Node{},
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				OptionalBlock: RubyDollar[2].genericBlock,
 			}
-			callExpr.Line = RubyS[Rubypt-1].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 86:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:376
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-2].genericValue.LineNumber(),
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   RubyS[Rubypt-0].genericValue.(ast.BareReference),
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Target: RubyDollar[1].genericValue,
+				Func:   RubyDollar[3].genericValue.(ast.BareReference),
 			}
 		}
 	case 87:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:384
 		{
 			callExpr := ast.CallExpression{
-				Target:        RubyS[Rubypt-3].genericValue,
-				Func:          RubyS[Rubypt-1].genericValue.(ast.BareReference),
+				Target:        RubyDollar[1].genericValue,
+				Func:          RubyDollar[3].genericValue.(ast.BareReference),
 				Args:          []ast.Node{},
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				OptionalBlock: RubyDollar[4].genericBlock,
 			}
-			callExpr.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 88:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:395
 		{
 			callExpr := ast.CallExpression{
-				Target:        RubyS[Rubypt-4].genericValue,
-				Func:          RubyS[Rubypt-2].genericValue.(ast.BareReference),
-				Args:          RubyS[Rubypt-1].genericSlice,
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				Target:        RubyDollar[1].genericValue,
+				Func:          RubyDollar[3].genericValue.(ast.BareReference),
+				Args:          RubyDollar[4].genericSlice,
+				OptionalBlock: RubyDollar[5].genericBlock,
 			}
-			callExpr.Line = RubyS[Rubypt-4].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 89:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:406
 		{
 			callExpr := ast.CallExpression{
-				Target: RubyS[Rubypt-3].genericValue,
-				Func:   RubyS[Rubypt-1].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-0].genericSlice,
+				Target: RubyDollar[1].genericValue,
+				Func:   RubyDollar[3].genericValue.(ast.BareReference),
+				Args:   RubyDollar[4].genericSlice,
 			}
-			callExpr.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 90:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:416
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:          RubyS[Rubypt-4].genericValue.LineNumber(),
-				Target:        RubyS[Rubypt-4].genericValue,
-				Func:          RubyS[Rubypt-2].genericValue.(ast.BareReference),
-				Args:          RubyS[Rubypt-1].genericSlice,
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				Line:          RubyDollar[1].genericValue.LineNumber(),
+				Target:        RubyDollar[1].genericValue,
+				Func:          RubyDollar[3].genericValue.(ast.BareReference),
+				Args:          RubyDollar[4].genericSlice,
+				OptionalBlock: RubyDollar[5].genericBlock,
 			}
 		}
 	case 91:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:426
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:          RubyS[Rubypt-3].genericValue.LineNumber(),
-				Target:        RubyS[Rubypt-3].genericValue,
-				Func:          RubyS[Rubypt-1].genericValue.(ast.BareReference),
+				Line:          RubyDollar[1].genericValue.LineNumber(),
+				Target:        RubyDollar[1].genericValue,
+				Func:          RubyDollar[3].genericValue.(ast.BareReference),
 				Args:          []ast.Node{},
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				OptionalBlock: RubyDollar[4].genericBlock,
 			}
 		}
 	case 92:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:436
 		{
-			methodName := RubyS[Rubypt-2].genericValue.(ast.BareReference).Name + "="
+			methodName := RubyDollar[3].genericValue.(ast.BareReference).Name + "="
 			callExpr := ast.CallExpression{
 				Func:   ast.BareReference{Name: methodName},
-				Target: RubyS[Rubypt-4].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[5].genericValue},
 			}
-			callExpr.Line = RubyS[Rubypt-4].genericValue.LineNumber()
+			callExpr.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = callExpr
 		}
 	case 93:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:449
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line: RubyS[Rubypt-1].genericValue.LineNumber(),
-				Func: RubyS[Rubypt-1].genericValue.(ast.BareReference),
-				Args: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Func: RubyDollar[1].genericValue.(ast.BareReference),
+				Args: RubyDollar[2].genericSlice,
 			}
 		}
 	case 94:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:457
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:          RubyS[Rubypt-2].genericValue.LineNumber(),
-				Func:          RubyS[Rubypt-2].genericValue.(ast.BareReference),
-				Args:          RubyS[Rubypt-1].genericSlice,
-				OptionalBlock: RubyS[Rubypt-0].genericBlock,
+				Line:          RubyDollar[1].genericValue.LineNumber(),
+				Func:          RubyDollar[1].genericValue.(ast.BareReference),
+				Args:          RubyDollar[2].genericSlice,
+				OptionalBlock: RubyDollar[3].genericBlock,
 			}
 		}
 	case 95:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:466
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-2].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "<"},
-				Target: RubyS[Rubypt-2].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "<"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 96:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:475
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-2].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "<"},
-				Target: RubyS[Rubypt-2].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "<"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 97:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:484
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-2].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: ">"},
-				Target: RubyS[Rubypt-2].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: ">"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 98:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:495
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   RubyDollar[3].genericSlice,
 			}
 		}
 	case 99:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:504
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 100:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:513
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 101:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:522
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   RubyDollar[3].genericSlice,
 			}
 		}
 	case 102:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:531
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 103:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:540
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 104:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:549
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   RubyDollar[3].genericSlice,
 			}
 		}
 	case 105:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:558
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 106:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:567
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   RubyDollar[3].genericSlice,
 			}
 		}
 	case 107:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:576
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 108:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:585
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   RubyDollar[3].genericSlice,
 			}
 		}
 	case 109:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:594
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: "[]"},
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "[]"},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
 		}
 	case 110:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:603
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line: RubyS[Rubypt-5].genericValue.LineNumber(),
-				Func: ast.BareReference{Line: RubyS[Rubypt-5].genericValue.LineNumber(), Name: "[]"},
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Func: ast.BareReference{Line: RubyDollar[1].genericValue.LineNumber(), Name: "[]"},
 				Target: ast.CallExpression{
-					Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
-					Target: RubyS[Rubypt-5].genericValue,
-					Func:   RubyS[Rubypt-3].genericValue.(ast.BareReference),
+					Line:   RubyDollar[1].genericValue.LineNumber(),
+					Target: RubyDollar[1].genericValue,
+					Func:   RubyDollar[3].genericValue.(ast.BareReference),
 				},
-				Args: RubyS[Rubypt-1].genericSlice,
+				Args: RubyDollar[5].genericSlice,
 			}
 		}
 	case 111:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:616
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line: RubyS[Rubypt-5].genericValue.LineNumber(),
-				Func: ast.BareReference{Line: RubyS[Rubypt-5].genericValue.LineNumber(), Name: "[]"},
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Func: ast.BareReference{Line: RubyDollar[1].genericValue.LineNumber(), Name: "[]"},
 				Target: ast.CallExpression{
-					Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
-					Target: RubyS[Rubypt-5].genericValue,
-					Func:   RubyS[Rubypt-3].genericValue.(ast.BareReference),
+					Line:   RubyDollar[1].genericValue.LineNumber(),
+					Target: RubyDollar[1].genericValue,
+					Func:   RubyDollar[3].genericValue.(ast.BareReference),
 				},
-				Args: []ast.Node{RubyS[Rubypt-1].genericValue},
+				Args: []ast.Node{RubyDollar[5].genericValue},
 			}
 		}
 	case 112:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:632
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericSlice.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-5].genericValue,
-				Args:   append(RubyS[Rubypt-3].genericSlice, RubyS[Rubypt-0].genericValue),
-				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[3].genericSlice.LineNumber(), Name: "[]="},
+				Target: RubyDollar[1].genericValue,
+				Args:   append(RubyDollar[3].genericSlice, RubyDollar[6].genericValue),
+				Line:   RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 113:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:641
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-5].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-3].genericValue, RubyS[Rubypt-0].genericValue},
-				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[3].genericValue.LineNumber(), Name: "[]="},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue, RubyDollar[6].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 114:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:650
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericSlice.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-5].genericValue,
-				Args:   append(RubyS[Rubypt-3].genericSlice, RubyS[Rubypt-0].genericValue),
-				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[3].genericSlice.LineNumber(), Name: "[]="},
+				Target: RubyDollar[1].genericValue,
+				Args:   append(RubyDollar[3].genericSlice, RubyDollar[6].genericValue),
+				Line:   RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 115:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:659
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-5].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-3].genericValue, RubyS[Rubypt-0].genericValue},
-				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[3].genericValue.LineNumber(), Name: "[]="},
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[3].genericValue, RubyDollar[6].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 116:
+		RubyDollar = RubyS[Rubypt-7 : Rubypt+1]
 		//line parser.y:668
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-4].genericSlice.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-6].genericValue,
-				Args:   append(RubyS[Rubypt-4].genericSlice, RubyS[Rubypt-0].genericValue),
-				Line:   RubyS[Rubypt-6].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[3].genericSlice.LineNumber(), Name: "[]="},
+				Target: RubyDollar[1].genericValue,
+				Args:   append(RubyDollar[3].genericSlice, RubyDollar[7].genericValue),
+				Line:   RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 117:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:677
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericSlice.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-5].genericValue,
-				Args:   append(RubyS[Rubypt-3].genericSlice, RubyS[Rubypt-0].genericValue),
-				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[3].genericSlice.LineNumber(), Name: "[]="},
+				Target: RubyDollar[1].genericValue,
+				Args:   append(RubyDollar[3].genericSlice, RubyDollar[6].genericValue),
+				Line:   RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 118:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:686
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Func:   ast.BareReference{Line: RubyS[Rubypt-3].genericSlice.LineNumber(), Name: "[]="},
-				Target: RubyS[Rubypt-5].genericValue,
-				Args:   append(RubyS[Rubypt-3].genericSlice, RubyS[Rubypt-0].genericValue),
-				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[3].genericSlice.LineNumber(), Name: "[]="},
+				Target: RubyDollar[1].genericValue,
+				Args:   append(RubyDollar[3].genericSlice, RubyDollar[6].genericValue),
+				Line:   RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 119:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:695
 		{
 			RubyVAL.genericValue = ast.CallExpression{
-				Line: RubyS[Rubypt-7].genericValue.LineNumber(),
-				Func: ast.BareReference{Line: RubyS[Rubypt-7].genericValue.LineNumber(), Name: "[]="},
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Func: ast.BareReference{Line: RubyDollar[1].genericValue.LineNumber(), Name: "[]="},
 				Target: ast.CallExpression{
-					Line:   RubyS[Rubypt-7].genericValue.LineNumber(),
-					Func:   RubyS[Rubypt-5].genericValue.(ast.BareReference),
-					Target: RubyS[Rubypt-7].genericValue,
+					Line:   RubyDollar[1].genericValue.LineNumber(),
+					Func:   RubyDollar[3].genericValue.(ast.BareReference),
+					Target: RubyDollar[1].genericValue,
 				},
-				Args: append(RubyS[Rubypt-3].genericSlice, RubyS[Rubypt-0].genericValue),
+				Args: append(RubyDollar[5].genericSlice, RubyDollar[8].genericValue),
 			}
 		}
 	case 120:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:710
 		{
 			callExpr := ast.CallExpression{
-				Line:   RubyS[Rubypt-3].genericValue.LineNumber(),
-				Func:   RubyS[Rubypt-2].genericValue.(ast.BareReference),
-				Target: RubyS[Rubypt-3].genericValue,
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Func:   RubyDollar[2].genericValue.(ast.BareReference),
+				Target: RubyDollar[1].genericValue,
+				Args:   []ast.Node{RubyDollar[4].genericValue},
 			}
 			RubyVAL.genericValue = callExpr
 		}
 	case 121:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:722
 		{
-			RubyVAL.genericSlice = RubyS[Rubypt-2].genericSlice
+			RubyVAL.genericSlice = RubyDollar[3].genericSlice
 		}
 	case 122:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:724
 		{
-			RubyVAL.genericSlice = append(RubyS[Rubypt-5].genericSlice, RubyS[Rubypt-2].genericValue)
+			RubyVAL.genericSlice = append(RubyDollar[3].genericSlice, RubyDollar[6].genericValue)
 		}
 	case 123:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:726
 		{
-			RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
+			RubyVAL.genericSlice = RubyDollar[1].genericSlice
 		}
 	case 124:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:728
 		{
-			RubyVAL.genericSlice = append(RubyS[Rubypt-3].genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyDollar[1].genericSlice, RubyDollar[4].genericValue)
 		}
 	case 125:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:731
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 126:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:733
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[3].genericValue)
 		}
 	case 127:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:736
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
 	case 128:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:738
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 129:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:740
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 130:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:742
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 131:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:744
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.Hash{
-				Line:  RubyS[Rubypt-0].hashPairSlice[0].LineNumber(),
-				Pairs: RubyS[Rubypt-0].hashPairSlice,
+				Line:  RubyDollar[1].hashPairSlice[0].LineNumber(),
+				Pairs: RubyDollar[1].hashPairSlice,
 			})
 		}
 	case 132:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:751
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 133:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:753
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 134:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:755
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 135:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:757
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 136:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:759
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 137:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:761
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 138:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:763
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 139:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:765
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.Hash{
-				Line:  RubyS[Rubypt-2].genericValue.LineNumber(),
-				Pairs: RubyS[Rubypt-0].hashPairSlice,
+				Line:  RubyDollar[2].genericValue.LineNumber(),
+				Pairs: RubyDollar[4].hashPairSlice,
 			})
 		}
 	case 140:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:774
 		{
 			callExpr := ast.CallExpression{
-				Line:   RubyS[Rubypt-0].genericValue.LineNumber(),
-				Func:   ast.BareReference{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Name: "to_proc"},
-				Target: RubyS[Rubypt-0].genericValue,
+				Line:   RubyDollar[2].genericValue.LineNumber(),
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "to_proc"},
+				Target: RubyDollar[2].genericValue,
 			}
 			RubyVAL.genericValue = callExpr
 		}
 	case 141:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:785
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 142:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:787
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 143:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:791
 		{
 			RubyVAL.genericSlice = nil
 		}
 	case 144:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:793
 		{
-			RubyVAL.genericSlice = RubyS[Rubypt-0].genericSlice
+			RubyVAL.genericSlice = RubyDollar[2].genericSlice
 		}
 	case 145:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:796
 		{
 			method := ast.FuncDecl{
-				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-3].methodParamSlice,
-				Body:   RubyS[Rubypt-2].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
+				Name:   RubyDollar[2].genericValue.(ast.BareReference),
+				Args:   RubyDollar[3].methodParamSlice,
+				Body:   RubyDollar[4].genericSlice,
+				Ensure: RubyDollar[5].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-4].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 146:
+		RubyDollar = RubyS[Rubypt-7 : Rubypt+1]
 		//line parser.y:807
 		{
 			method := ast.FuncDecl{
-				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args:    RubyS[Rubypt-4].methodParamSlice,
-				Body:    RubyS[Rubypt-3].genericSlice,
-				Rescues: RubyS[Rubypt-2].genericSlice,
-				Ensure:  RubyS[Rubypt-1].genericSlice,
+				Name:    RubyDollar[2].genericValue.(ast.BareReference),
+				Args:    RubyDollar[3].methodParamSlice,
+				Body:    RubyDollar[4].genericSlice,
+				Rescues: RubyDollar[5].genericSlice,
+				Ensure:  RubyDollar[6].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 147:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:819
 		{
 			method := ast.FuncDecl{
-				Target: RubyS[Rubypt-6].genericValue,
-				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-3].methodParamSlice,
-				Body:   RubyS[Rubypt-2].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
+				Target: RubyDollar[2].genericValue,
+				Name:   RubyDollar[4].genericValue.(ast.BareReference),
+				Args:   RubyDollar[5].methodParamSlice,
+				Body:   RubyDollar[6].genericSlice,
+				Ensure: RubyDollar[7].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-6].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 148:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:831
 		{
 			method := ast.FuncDecl{
-				Target: RubyS[Rubypt-6].genericValue,
-				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-3].methodParamSlice,
-				Body:   RubyS[Rubypt-2].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
+				Target: RubyDollar[2].genericValue,
+				Name:   RubyDollar[4].genericValue.(ast.BareReference),
+				Args:   RubyDollar[5].methodParamSlice,
+				Body:   RubyDollar[6].genericSlice,
+				Ensure: RubyDollar[7].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-6].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 149:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:843
 		{
 			method := ast.FuncDecl{
-				Target: RubyS[Rubypt-6].genericValue,
-				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-3].methodParamSlice,
-				Body:   RubyS[Rubypt-2].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
+				Target: RubyDollar[2].genericValue,
+				Name:   RubyDollar[4].genericValue.(ast.BareReference),
+				Args:   RubyDollar[5].methodParamSlice,
+				Body:   RubyDollar[6].genericSlice,
+				Ensure: RubyDollar[7].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-6].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 150:
+		RubyDollar = RubyS[Rubypt-9 : Rubypt+1]
 		//line parser.y:855
 		{
 			method := ast.FuncDecl{
-				Target:  RubyS[Rubypt-7].genericValue,
-				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args:    RubyS[Rubypt-4].methodParamSlice,
-				Body:    RubyS[Rubypt-3].genericSlice,
-				Rescues: RubyS[Rubypt-2].genericSlice,
-				Ensure:  RubyS[Rubypt-1].genericSlice,
+				Target:  RubyDollar[2].genericValue,
+				Name:    RubyDollar[4].genericValue.(ast.BareReference),
+				Args:    RubyDollar[5].methodParamSlice,
+				Body:    RubyDollar[6].genericSlice,
+				Rescues: RubyDollar[7].genericSlice,
+				Ensure:  RubyDollar[8].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-7].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 151:
+		RubyDollar = RubyS[Rubypt-9 : Rubypt+1]
 		//line parser.y:868
 		{
 			method := ast.FuncDecl{
-				Target:  RubyS[Rubypt-7].genericValue,
-				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args:    RubyS[Rubypt-4].methodParamSlice,
-				Body:    RubyS[Rubypt-3].genericSlice,
-				Rescues: RubyS[Rubypt-2].genericSlice,
-				Ensure:  RubyS[Rubypt-1].genericSlice,
+				Target:  RubyDollar[2].genericValue,
+				Name:    RubyDollar[4].genericValue.(ast.BareReference),
+				Args:    RubyDollar[5].methodParamSlice,
+				Body:    RubyDollar[6].genericSlice,
+				Rescues: RubyDollar[7].genericSlice,
+				Ensure:  RubyDollar[8].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-7].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 152:
+		RubyDollar = RubyS[Rubypt-9 : Rubypt+1]
 		//line parser.y:881
 		{
 			method := ast.FuncDecl{
-				Target:  RubyS[Rubypt-7].genericValue,
-				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args:    RubyS[Rubypt-4].methodParamSlice,
-				Body:    RubyS[Rubypt-3].genericSlice,
-				Rescues: RubyS[Rubypt-2].genericSlice,
-				Ensure:  RubyS[Rubypt-1].genericSlice,
+				Target:  RubyDollar[2].genericValue,
+				Name:    RubyDollar[4].genericValue.(ast.BareReference),
+				Args:    RubyDollar[5].methodParamSlice,
+				Body:    RubyDollar[6].genericSlice,
+				Rescues: RubyDollar[7].genericSlice,
+				Ensure:  RubyDollar[8].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-7].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 153:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:894
 		{
 			method := ast.FuncDecl{
-				Name:   RubyS[Rubypt-4].genericValue.(ast.BareReference),
-				Args:   RubyS[Rubypt-3].methodParamSlice,
-				Body:   RubyS[Rubypt-2].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
+				Name:   RubyDollar[2].genericValue.(ast.BareReference),
+				Args:   RubyDollar[3].methodParamSlice,
+				Body:   RubyDollar[4].genericSlice,
+				Ensure: RubyDollar[5].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-4].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 154:
+		RubyDollar = RubyS[Rubypt-7 : Rubypt+1]
 		//line parser.y:905
 		{
 			method := ast.FuncDecl{
-				Name:    RubyS[Rubypt-5].genericValue.(ast.BareReference),
-				Args:    RubyS[Rubypt-4].methodParamSlice,
-				Body:    RubyS[Rubypt-3].genericSlice,
-				Rescues: RubyS[Rubypt-2].genericSlice,
-				Ensure:  RubyS[Rubypt-1].genericSlice,
+				Name:    RubyDollar[2].genericValue.(ast.BareReference),
+				Args:    RubyDollar[3].methodParamSlice,
+				Body:    RubyDollar[4].genericSlice,
+				Rescues: RubyDollar[5].genericSlice,
+				Ensure:  RubyDollar[6].genericSlice,
 			}
-			method.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			method.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = method
 		}
 	case 155:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:919
 		{
-			RubyVAL.methodParamSlice = RubyS[Rubypt-0].methodParamSlice
+			RubyVAL.methodParamSlice = RubyDollar[1].methodParamSlice
 		}
 	case 156:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:921
 		{
-			RubyVAL.methodParamSlice = RubyS[Rubypt-1].methodParamSlice
+			RubyVAL.methodParamSlice = RubyDollar[2].methodParamSlice
 		}
 	case 157:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:923
 		{
 			RubyVAL.methodParamSlice = []ast.MethodParam{{Name: "", IsSplat: true}}
 		}
 	case 158:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:926
 		{
 			RubyVAL.methodParamSlice = nil
 		}
 	case 159:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:928
 		{
-			RubyVAL.methodParamSlice = append(RubyVAL.methodParamSlice, RubyS[Rubypt-0].methodParam)
+			RubyVAL.methodParamSlice = append(RubyVAL.methodParamSlice, RubyDollar[1].methodParam)
 		}
 	case 160:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:930
 		{
-			RubyVAL.methodParamSlice = append(RubyVAL.methodParamSlice, RubyS[Rubypt-0].methodParam)
+			RubyVAL.methodParamSlice = append(RubyVAL.methodParamSlice, RubyDollar[3].methodParam)
 		}
 	case 161:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:933
 		{
-			RubyVAL.methodParam = ast.MethodParam{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}
+			RubyVAL.methodParam = ast.MethodParam{Name: RubyDollar[1].genericValue.(ast.BareReference).Name}
 		}
 	case 162:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:935
 		{
-			RubyVAL.methodParam = ast.MethodParam{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name, IsSplat: true}
+			RubyVAL.methodParam = ast.MethodParam{Name: RubyDollar[2].genericValue.(ast.BareReference).Name, IsSplat: true}
 		}
 	case 163:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:937
 		{
-			RubyVAL.methodParam = ast.MethodParam{Name: RubyS[Rubypt-2].genericValue.(ast.BareReference).Name, DefaultValue: RubyS[Rubypt-0].genericValue}
+			RubyVAL.methodParam = ast.MethodParam{Name: RubyDollar[1].genericValue.(ast.BareReference).Name, DefaultValue: RubyDollar[3].genericValue}
 		}
 	case 164:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:939
 		{
-			RubyVAL.methodParam = ast.MethodParam{Name: RubyS[Rubypt-0].genericValue.(ast.BareReference).Name, IsProc: true}
+			RubyVAL.methodParam = ast.MethodParam{Name: RubyDollar[2].genericValue.(ast.BareReference).Name, IsProc: true}
 		}
 	case 165:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:943
 		{
 			class := ast.ClassDecl{
-				Name:      RubyS[Rubypt-2].genericValue.(ast.Class).Name,
-				Namespace: RubyS[Rubypt-2].genericValue.(ast.Class).Namespace,
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Name:      RubyDollar[2].genericValue.(ast.Class).Name,
+				Namespace: RubyDollar[2].genericValue.(ast.Class).Namespace,
+				Body:      RubyDollar[3].genericSlice,
 			}
-			class.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			class.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
 	case 166:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:953
 		{
 			class := ast.ClassDecl{
-				Name:       RubyS[Rubypt-4].genericValue.(ast.Class).Name,
-				SuperClass: RubyS[Rubypt-2].genericValue.(ast.Class),
-				Namespace:  RubyS[Rubypt-4].genericValue.(ast.Class).Namespace,
-				Body:       RubyS[Rubypt-1].genericSlice,
+				Name:       RubyDollar[2].genericValue.(ast.Class).Name,
+				SuperClass: RubyDollar[4].genericValue.(ast.Class),
+				Namespace:  RubyDollar[2].genericValue.(ast.Class).Namespace,
+				Body:       RubyDollar[5].genericSlice,
 			}
-			class.Line = RubyS[Rubypt-4].genericValue.LineNumber()
+			class.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
 	case 167:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:965
 		{
-			if RubyS[Rubypt-3].genericValue.(ast.BareReference).Name != "<<" {
+			if RubyDollar[2].genericValue.(ast.BareReference).Name != "<<" {
 				panic("FREAKOUT")
 			}
 
 			RubyVAL.genericValue = ast.Eigenclass{
-				Line:   RubyS[Rubypt-2].genericValue.LineNumber(),
-				Target: RubyS[Rubypt-2].genericValue,
-				Body:   RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[3].genericValue.LineNumber(),
+				Target: RubyDollar[3].genericValue,
+				Body:   RubyDollar[4].genericSlice,
 			}
 		}
 	case 168:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:978
 		{
 			module := ast.ModuleDecl{
-				Name:      RubyS[Rubypt-2].genericValue.(ast.Class).Name,
-				Namespace: RubyS[Rubypt-2].genericValue.(ast.Class).Namespace,
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Name:      RubyDollar[2].genericValue.(ast.Class).Name,
+				Namespace: RubyDollar[2].genericValue.(ast.Class).Namespace,
+				Body:      RubyDollar[3].genericSlice,
 			}
-			module.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			module.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = module
 		}
 	case 169:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:989
 		{
 			class := ast.Class{
-				Name:              RubyS[Rubypt-0].genericValue.(ast.Constant).Name,
+				Name:              RubyDollar[1].genericValue.(ast.Constant).Name,
 				IsGlobalNamespace: false,
 			}
-			class.Line = RubyS[Rubypt-0].genericValue.LineNumber()
+			class.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
 	case 170:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:998
 		{
-			firstPart := RubyS[Rubypt-1].genericValue.(ast.Constant).Name
-			fullName := strings.Join([]string{firstPart, RubyS[Rubypt-0].genericValue.(ast.BareReference).Name}, "")
+			firstPart := RubyDollar[1].genericValue.(ast.Constant).Name
+			fullName := strings.Join([]string{firstPart, RubyDollar[2].genericValue.(ast.BareReference).Name}, "")
 			pieces := strings.Split(fullName, "::")
 			name := pieces[len(pieces)-1]
 			var namespace []string
@@ -2412,13 +2519,14 @@ Rubydefault:
 				Namespace:         strings.Join(namespace, "::"),
 				IsGlobalNamespace: false,
 			}
-			class.Line = RubyS[Rubypt-1].genericValue.LineNumber()
+			class.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = class
 		}
 	case 171:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1017
 		{
-			pieces := strings.Split(RubyS[Rubypt-0].genericValue.(ast.BareReference).Name, "::")
+			pieces := strings.Split(RubyDollar[1].genericValue.(ast.BareReference).Name, "::")
 			name := pieces[len(pieces)-1]
 			var namespace []string
 			if len(pieces) > 1 {
@@ -2426,1175 +2534,1333 @@ Rubydefault:
 			}
 
 			RubyVAL.genericValue = ast.Class{
-				Line:              RubyS[Rubypt-0].genericValue.LineNumber(),
+				Line:              RubyDollar[1].genericValue.LineNumber(),
 				Name:              strings.TrimPrefix(name, "::"),
 				Namespace:         strings.TrimPrefix(strings.Join(namespace, "::"), "::"),
 				IsGlobalNamespace: true,
 			}
 		}
 	case 172:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1035
 		{
 			eql := ast.Assignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
+				LHS: RubyDollar[1].genericValue,
+				RHS: RubyDollar[3].genericValue,
 			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 173:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1044
 		{
-			eql := ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql := ast.Assignment{LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 174:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1050
 		{
-			eql := ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql := ast.Assignment{LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 175:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1056
 		{
-			RubyVAL.genericValue = ast.Assignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.Assignment{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
 		}
 	case 176:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1058
 		{
 			eql := ast.Assignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
+				LHS: RubyDollar[1].genericValue,
+				RHS: RubyDollar[3].genericValue,
 			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 177:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1067
 		{
-			RubyVAL.genericValue = ast.Assignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.Assignment{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
 		}
 	case 178:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1069
 		{
-			RubyVAL.genericValue = ast.Assignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.Assignment{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
 		}
 	case 179:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1071
 		{
-			RubyVAL.genericValue = ast.Assignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue, Line: RubyS[Rubypt-2].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Assignment{LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue, Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 180:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1074
 		{
 			eql := ast.Assignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
+				LHS: RubyDollar[1].genericValue,
+				RHS: RubyDollar[3].genericValue,
 			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 181:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1083
 		{
-			var rhs ast.Node = RubyS[Rubypt-0].genericSlice
-			if len(RubyS[Rubypt-0].genericSlice) == 1 {
-				rhs = RubyS[Rubypt-0].genericSlice[0]
+			var rhs ast.Node = RubyDollar[3].genericSlice
+			if len(RubyDollar[3].genericSlice) == 1 {
+				rhs = RubyDollar[3].genericSlice[0]
 			}
 			RubyVAL.genericValue = ast.Assignment{
-				Line: RubyS[Rubypt-2].genericValue.LineNumber(),
-				LHS:  RubyS[Rubypt-2].genericValue,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				LHS:  RubyDollar[1].genericValue,
 				RHS:  rhs,
 			}
 		}
 	case 182:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1095
 		{
 			eql := ast.Assignment{
-				LHS: ast.Array{Nodes: RubyS[Rubypt-2].genericSlice},
-				RHS: ast.Array{Nodes: RubyS[Rubypt-0].genericSlice},
+				LHS: ast.Array{Nodes: RubyDollar[1].genericSlice},
+				RHS: ast.Array{Nodes: RubyDollar[3].genericSlice},
 			}
-			eql.Line = RubyS[Rubypt-2].genericSlice[0].(ast.CallExpression).Target.LineNumber()
+			eql.Line = RubyDollar[1].genericSlice[0].(ast.CallExpression).Target.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 183:
+		RubyDollar = RubyS[Rubypt-9 : Rubypt+1]
 		//line parser.y:1105
 		{
 			RubyVAL.genericSlice = []ast.Node{
 				ast.CallExpression{
-					Target: RubyS[Rubypt-8].genericValue,
-					Func:   ast.BareReference{Line: RubyS[Rubypt-6].genericValue.LineNumber(), Name: "[]="},
-					Args:   []ast.Node{RubyS[Rubypt-6].genericValue},
+					Target: RubyDollar[1].genericValue,
+					Func:   ast.BareReference{Line: RubyDollar[3].genericValue.LineNumber(), Name: "[]="},
+					Args:   []ast.Node{RubyDollar[3].genericValue},
 				},
 				ast.CallExpression{
-					Target: RubyS[Rubypt-3].genericValue,
-					Func:   ast.BareReference{Line: RubyS[Rubypt-6].genericValue.LineNumber(), Name: "[]="},
-					Args:   []ast.Node{RubyS[Rubypt-1].genericValue},
+					Target: RubyDollar[6].genericValue,
+					Func:   ast.BareReference{Line: RubyDollar[3].genericValue.LineNumber(), Name: "[]="},
+					Args:   []ast.Node{RubyDollar[8].genericValue},
 				},
 			}
 		}
 	case 184:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1120
 		{
-			tail := ast.CallExpression{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue, Func: ast.BareReference{Name: "[]="}, Args: []ast.Node{RubyS[Rubypt-1].genericValue}}
-			RubyVAL.genericSlice = append(RubyS[Rubypt-5].genericSlice, tail)
+			tail := ast.CallExpression{Line: RubyDollar[3].genericValue.LineNumber(), Target: RubyDollar[3].genericValue, Func: ast.BareReference{Name: "[]="}, Args: []ast.Node{RubyDollar[5].genericValue}}
+			RubyVAL.genericSlice = append(RubyDollar[1].genericSlice, tail)
 		}
 	case 185:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1126
 		{
 			eql := ast.ConditionalAssignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
+				LHS: RubyDollar[1].genericValue,
+				RHS: RubyDollar[3].genericValue,
 			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 186:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1135
 		{
-			eql := ast.ConditionalAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql := ast.ConditionalAssignment{LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 187:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1141
 		{
 			eql := ast.ConditionalAssignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
+				LHS: RubyDollar[1].genericValue,
+				RHS: RubyDollar[3].genericValue,
 			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 188:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1150
 		{
-			RubyVAL.genericValue = ast.ConditionalAssignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.ConditionalAssignment{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
 		}
 	case 189:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1152
 		{
-			RubyVAL.genericValue = ast.ConditionalAssignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.ConditionalAssignment{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
 		}
 	case 190:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1154
 		{
-			eql := ast.ConditionalAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql := ast.ConditionalAssignment{LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 191:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1163
 		{
 			eql := ast.ConditionalTruthyAssignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
+				LHS: RubyDollar[1].genericValue,
+				RHS: RubyDollar[3].genericValue,
 			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 192:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1172
 		{
-			eql := ast.ConditionalTruthyAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql := ast.ConditionalTruthyAssignment{LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 193:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1178
 		{
 			eql := ast.ConditionalTruthyAssignment{
-				LHS: RubyS[Rubypt-2].genericValue,
-				RHS: RubyS[Rubypt-0].genericValue,
+				LHS: RubyDollar[1].genericValue,
+				RHS: RubyDollar[3].genericValue,
 			}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 194:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1187
 		{
-			RubyVAL.genericValue = ast.ConditionalTruthyAssignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.ConditionalTruthyAssignment{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
 		}
 	case 195:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1189
 		{
-			RubyVAL.genericValue = ast.ConditionalTruthyAssignment{Line: RubyS[Rubypt-2].genericValue.LineNumber(), LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.ConditionalTruthyAssignment{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
 		}
 	case 196:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1191
 		{
-			eql := ast.ConditionalTruthyAssignment{LHS: RubyS[Rubypt-2].genericValue, RHS: RubyS[Rubypt-0].genericValue}
-			eql.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			eql := ast.ConditionalTruthyAssignment{LHS: RubyDollar[1].genericValue, RHS: RubyDollar[3].genericValue}
+			eql.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = eql
 		}
 	case 197:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1199
 		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			vars := ast.Array{Nodes: []ast.Node{RubyDollar[1].genericValue, RubyDollar[3].genericValue}}
+			vars.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 198:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1201
 		{
-			RubyVAL.genericValue = ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}, Line: RubyS[Rubypt-2].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Array{Nodes: []ast.Node{RubyDollar[1].genericValue, RubyDollar[3].genericValue}, Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 199:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1203
 		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
-			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			vars := ast.Array{Nodes: []ast.Node{RubyDollar[1].genericValue, ast.StarSplat{Value: RubyDollar[4].genericValue}}}
+			vars.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 200:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1206
 		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			vars := ast.Array{Nodes: []ast.Node{RubyDollar[1].genericValue, RubyDollar[3].genericValue}}
+			vars.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 201:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1208
 		{
-			RubyVAL.genericValue = ast.Array{Nodes: []ast.Node{RubyS[Rubypt-2].genericValue, RubyS[Rubypt-0].genericValue}, Line: RubyS[Rubypt-2].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Array{Nodes: []ast.Node{RubyDollar[1].genericValue, RubyDollar[3].genericValue}, Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 202:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1210
 		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
-			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			vars := ast.Array{Nodes: []ast.Node{RubyDollar[1].genericValue, ast.StarSplat{Value: RubyDollar[4].genericValue}}}
+			vars.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 203:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1213
 		{
-			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyS[Rubypt-0].genericValue)}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyDollar[3].genericValue)}
+			vars.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 204:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1215
 		{
-			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyS[Rubypt-0].genericValue)}
-			vars.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			vars := ast.Array{Nodes: append(RubyVAL.genericValue.(ast.Array).Nodes, RubyDollar[3].genericValue)}
+			vars.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 205:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1217
 		{
-			vars := ast.Array{Nodes: []ast.Node{RubyS[Rubypt-3].genericValue, ast.StarSplat{Value: RubyS[Rubypt-0].genericValue}}}
-			vars.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			vars := ast.Array{Nodes: []ast.Node{RubyDollar[1].genericValue, ast.StarSplat{Value: RubyDollar[4].genericValue}}}
+			vars.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = vars
 		}
 	case 206:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1221
 		{
-			bang := ast.Negation{Target: RubyS[Rubypt-0].genericValue}
-			bang.Line = RubyS[Rubypt-0].genericValue.LineNumber()
+			bang := ast.Negation{Target: RubyDollar[2].genericValue}
+			bang.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = bang
 		}
 	case 207:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1223
 		{
-			comp := ast.Complement{Target: RubyS[Rubypt-0].genericValue}
-			comp.Line = RubyS[Rubypt-0].genericValue.LineNumber()
+			comp := ast.Complement{Target: RubyDollar[2].genericValue}
+			comp.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = comp
 		}
 	case 208:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1225
 		{
-			plus := ast.Positive{Target: RubyS[Rubypt-0].genericValue}
-			plus.Line = RubyS[Rubypt-0].genericValue.LineNumber()
+			plus := ast.Positive{Target: RubyDollar[2].genericValue}
+			plus.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = plus
 		}
 	case 209:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1227
 		{
-			minus := ast.Negative{Target: RubyS[Rubypt-0].genericValue}
-			minus.Line = RubyS[Rubypt-0].genericValue.LineNumber()
+			minus := ast.Negative{Target: RubyDollar[2].genericValue}
+			minus.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = minus
 		}
 	case 210:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1230
 		{
 			add := ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "+"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Target: RubyDollar[1].genericValue,
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "+"},
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
-			add.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			add.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = add
 		}
 	case 211:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1241
 		{
 			sub := ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "-"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Target: RubyDollar[1].genericValue,
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "-"},
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
-			sub.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			sub.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = sub
 		}
 	case 212:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1252
 		{
 			mult := ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "*"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Target: RubyDollar[1].genericValue,
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "*"},
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
-			mult.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			mult.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = mult
 		}
 	case 213:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1263
 		{
 			divis := ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "/"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Target: RubyDollar[1].genericValue,
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "/"},
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
-			divis.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			divis.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = divis
 		}
 	case 214:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1274
 		{
 			and := ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "&"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Target: RubyDollar[1].genericValue,
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "&"},
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
-			and.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			and.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = and
 		}
 	case 215:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1285
 		{
 			or := ast.CallExpression{
-				Target: RubyS[Rubypt-2].genericValue,
-				Func:   ast.BareReference{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Name: "|"},
-				Args:   []ast.Node{RubyS[Rubypt-0].genericValue},
+				Target: RubyDollar[1].genericValue,
+				Func:   ast.BareReference{Line: RubyDollar[2].genericValue.LineNumber(), Name: "|"},
+				Args:   []ast.Node{RubyDollar[3].genericValue},
 			}
-			or.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			or.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = or
 		}
 	case 216:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1296
 		{
-			RubyVAL.genericValue = ast.Array{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Nodes: RubyS[Rubypt-2].genericSlice}
+			RubyVAL.genericValue = ast.Array{Line: RubyDollar[1].genericValue.LineNumber(), Nodes: RubyDollar[3].genericSlice}
 		}
 	case 217:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1298
 		{
-			RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+			RubyVAL.genericValue = RubyDollar[1].genericValue
 		}
 	case 218:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1299
 		{
-			RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+			RubyVAL.genericValue = RubyDollar[1].genericValue
 		}
 	case 219:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:1301
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
 	case 220:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1303
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 221:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1305
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 222:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1307
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 223:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1309
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 224:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1311
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 225:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1313
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[4].genericValue)
 		}
 	case 226:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1316
 		{
-			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-2].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Hash{Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 227:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1318
 		{
-			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Pairs: RubyS[Rubypt-2].hashPairSlice}
+			RubyVAL.genericValue = ast.Hash{Line: RubyDollar[1].genericValue.LineNumber(), Pairs: RubyDollar[3].hashPairSlice}
 		}
 	case 228:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1320
 		{
-			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-5].genericValue.LineNumber(), Pairs: RubyS[Rubypt-3].hashPairSlice}
+			RubyVAL.genericValue = ast.Hash{Line: RubyDollar[1].genericValue.LineNumber(), Pairs: RubyDollar[3].hashPairSlice}
 		}
 	case 229:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1322
 		{
 			pairs := []ast.HashKeyValuePair{}
-			for _, node := range RubyS[Rubypt-2].genericSlice {
+			for _, node := range RubyDollar[3].genericSlice {
 				pairs = append(pairs, node.(ast.HashKeyValuePair))
 			}
-			RubyVAL.genericValue = ast.Hash{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Pairs: pairs}
+			RubyVAL.genericValue = ast.Hash{Line: RubyDollar[1].genericValue.LineNumber(), Pairs: pairs}
 		}
 	case 230:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1331
 		{
-			RubyVAL.hashPair = ast.HashKeyValuePair{Key: RubyS[Rubypt-2].genericValue, Value: RubyS[Rubypt-0].genericValue}
+			RubyVAL.hashPair = ast.HashKeyValuePair{Key: RubyDollar[1].genericValue, Value: RubyDollar[3].genericValue}
 		}
 	case 231:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1334
 		{
-			RubyVAL.hashPairSlice = append(RubyVAL.hashPairSlice, RubyS[Rubypt-0].hashPair)
+			RubyVAL.hashPairSlice = append(RubyVAL.hashPairSlice, RubyDollar[1].hashPair)
 		}
 	case 232:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1336
 		{
-			RubyVAL.hashPairSlice = append(RubyVAL.hashPairSlice, RubyS[Rubypt-0].hashPair)
+			RubyVAL.hashPairSlice = append(RubyVAL.hashPairSlice, RubyDollar[4].hashPair)
 		}
 	case 233:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1339
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
-				Key:   ast.Symbol{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Name: RubyS[Rubypt-2].genericValue.(ast.BareReference).Name},
-				Value: RubyS[Rubypt-0].genericValue,
+				Key:   ast.Symbol{Line: RubyDollar[1].genericValue.LineNumber(), Name: RubyDollar[1].genericValue.(ast.BareReference).Name},
+				Value: RubyDollar[3].genericValue,
 			})
 		}
 	case 234:
+		RubyDollar = RubyS[Rubypt-7 : Rubypt+1]
 		//line parser.y:1346
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
-				Key:   ast.Symbol{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Name: RubyS[Rubypt-3].genericValue.(ast.BareReference).Name},
-				Value: RubyS[Rubypt-1].genericValue,
+				Key:   ast.Symbol{Line: RubyDollar[4].genericValue.LineNumber(), Name: RubyDollar[4].genericValue.(ast.BareReference).Name},
+				Value: RubyDollar[6].genericValue,
 			})
 		}
 	case 235:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:1353
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.HashKeyValuePair{
-				Key:   ast.Symbol{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Name: RubyS[Rubypt-4].genericValue.(ast.BareReference).Name},
-				Value: RubyS[Rubypt-2].genericValue,
+				Key:   ast.Symbol{Line: RubyDollar[4].genericValue.LineNumber(), Name: RubyDollar[4].genericValue.(ast.BareReference).Name},
+				Value: RubyDollar[6].genericValue,
 			})
 		}
 	case 236:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1361
 		{
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Body: RubyS[Rubypt-1].genericSlice}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Body: RubyDollar[2].genericSlice}
 		}
 	case 237:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1365
 		{
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Args: RubyS[Rubypt-2].methodParamSlice, Body: RubyS[Rubypt-1].genericSlice}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Args: RubyDollar[2].methodParamSlice, Body: RubyDollar[3].genericSlice}
 		}
 	case 238:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1369
 		{
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Body: RubyS[Rubypt-2].genericSlice}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Body: RubyDollar[2].genericSlice}
 		}
 	case 239:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1373
 		{
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Args: RubyS[Rubypt-2].methodParamSlice, Body: RubyS[Rubypt-1].genericSlice}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Args: RubyDollar[2].methodParamSlice, Body: RubyDollar[3].genericSlice}
 		}
 	case 240:
+		RubyDollar = RubyS[Rubypt-7 : Rubypt+1]
 		//line parser.y:1377
 		{
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-6].genericValue.LineNumber(), Body: RubyS[Rubypt-3].genericSlice}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Body: RubyDollar[4].genericSlice}
 		}
 	case 241:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:1381
 		{
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-7].genericValue.LineNumber(), Args: RubyS[Rubypt-4].methodParamSlice, Body: RubyS[Rubypt-3].genericSlice}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Args: RubyDollar[4].methodParamSlice, Body: RubyDollar[5].genericSlice}
 		}
 	case 242:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1385
 		{
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Body: []ast.Node{RubyS[Rubypt-2].genericValue}}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Body: []ast.Node{RubyDollar[3].genericValue}}
 		}
 	case 243:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1389
 		{
-			head := []ast.Node{RubyS[Rubypt-3].genericValue}
-			tail := RubyS[Rubypt-2].genericSlice
+			head := []ast.Node{RubyDollar[3].genericValue}
+			tail := RubyDollar[4].genericSlice
 			body := append(head, tail...)
-			RubyVAL.genericBlock = ast.Block{Line: RubyS[Rubypt-5].genericValue.LineNumber(), Body: body}
+			RubyVAL.genericBlock = ast.Block{Line: RubyDollar[1].genericValue.LineNumber(), Body: body}
 		}
 	case 244:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:1397
 		{
 		}
 	case 245:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1397
 		{
-			RubyVAL.genericBlock = RubyS[Rubypt-0].genericBlock
+			RubyVAL.genericBlock = RubyDollar[1].genericBlock
 		}
 	case 246:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1401
 		{
-			RubyVAL.methodParamSlice = RubyS[Rubypt-1].methodParamSlice
+			RubyVAL.methodParamSlice = RubyDollar[2].methodParamSlice
 		}
 	case 247:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1405
 		{
 			cond := ast.IfBlock{
-				Condition: RubyS[Rubypt-2].genericValue,
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Condition: RubyDollar[2].genericValue,
+				Body:      RubyDollar[3].genericSlice,
 			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			cond.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 248:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1414
 		{
 			cond := ast.IfBlock{
-				Condition: RubyS[Rubypt-3].genericValue,
-				Body:      RubyS[Rubypt-2].genericSlice,
-				Else:      RubyS[Rubypt-1].genericSlice,
+				Condition: RubyDollar[2].genericValue,
+				Body:      RubyDollar[3].genericSlice,
+				Else:      RubyDollar[4].genericSlice,
 			}
-			cond.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			cond.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 249:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1424
 		{
 			cond := ast.IfBlock{
-				Condition: RubyS[Rubypt-0].genericValue,
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+				Condition: RubyDollar[3].genericValue,
+				Body:      []ast.Node{RubyDollar[1].genericValue},
 			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			cond.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 250:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1433
 		{
 			cond := ast.IfBlock{
-				Condition: RubyS[Rubypt-0].genericValue,
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+				Condition: RubyDollar[3].genericValue,
+				Body:      []ast.Node{RubyDollar[1].genericValue},
 			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			cond.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 251:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1442
 		{
 			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+				Condition: ast.Negation{Line: RubyDollar[1].genericValue.LineNumber(), Target: RubyDollar[3].genericValue},
+				Body:      []ast.Node{RubyDollar[1].genericValue},
 			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			cond.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 252:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1451
 		{
 			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
-				Body:      ast.Nodes{RubyS[Rubypt-2].genericValue},
+				Condition: ast.Negation{Line: RubyDollar[1].genericValue.LineNumber(), Target: RubyDollar[3].genericValue},
+				Body:      ast.Nodes{RubyDollar[1].genericValue},
 			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			cond.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 253:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1460
 		{
 			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
-				Body:      ast.Nodes{RubyS[Rubypt-2].genericValue},
+				Condition: ast.Negation{Line: RubyDollar[1].genericValue.LineNumber(), Target: RubyDollar[3].genericValue},
+				Body:      ast.Nodes{RubyDollar[1].genericValue},
 			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			cond.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 254:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1469
 		{
 			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Condition: ast.Negation{Line: RubyDollar[2].genericValue.LineNumber(), Target: RubyDollar[2].genericValue},
+				Body:      RubyDollar[4].genericSlice,
 			}
-			cond.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			cond.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 255:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1478
 		{
 			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Target: RubyS[Rubypt-4].genericValue},
-				Body:      RubyS[Rubypt-2].genericSlice,
-				Else:      RubyS[Rubypt-1].genericSlice,
+				Condition: ast.Negation{Line: RubyDollar[2].genericValue.LineNumber(), Target: RubyDollar[2].genericValue},
+				Body:      RubyDollar[4].genericSlice,
+				Else:      RubyDollar[5].genericSlice,
 			}
-			cond.Line = RubyS[Rubypt-4].genericValue.LineNumber()
+			cond.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 256:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1488
 		{
 			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Condition: ast.Negation{Line: RubyDollar[2].genericValue.LineNumber(), Target: RubyDollar[2].genericValue},
+				Body:      RubyDollar[4].genericSlice,
 			}
-			cond.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			cond.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 257:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1497
 		{
 			cond := ast.IfBlock{
-				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+				Condition: ast.Negation{Line: RubyDollar[1].genericValue.LineNumber(), Target: RubyDollar[3].genericValue},
+				Body:      []ast.Node{RubyDollar[1].genericValue},
 			}
-			cond.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			cond.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = cond
 		}
 	case 258:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1508
 		{
 			ifblock := ast.IfBlock{
-				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
-				Condition: RubyS[Rubypt-1].genericValue,
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[3].genericValue.LineNumber(),
+				Condition: RubyDollar[3].genericValue,
+				Body:      RubyDollar[4].genericSlice,
 			}
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ifblock)
 		}
 	case 259:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1517
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
-				Condition: ast.Boolean{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: true},
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: ast.Boolean{Line: RubyDollar[2].genericValue.LineNumber(), Value: true},
+				Body:      RubyDollar[3].genericSlice,
 			})
 		}
 	case 260:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1525
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
-				Condition: RubyS[Rubypt-1].genericValue,
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: RubyDollar[2].genericValue,
+				Body:      RubyDollar[3].genericSlice,
 			})
 		}
 	case 261:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1533
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
-				Condition: ast.Boolean{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: true},
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[1].genericValue.LineNumber(),
+				Condition: ast.Boolean{Line: RubyDollar[1].genericValue.LineNumber(), Value: true},
+				Body:      RubyDollar[2].genericSlice,
 			})
 		}
 	case 262:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:1541
 		{
 			RubyVAL.genericSlice = []ast.Node{}
 		}
 	case 263:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1542
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[2].genericValue)
 		}
 	case 264:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1543
 		{
 			RubyVAL.genericSlice = RubyVAL.genericSlice
 		}
 	case 265:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1546
 		{
-			group := ast.Group{Body: RubyS[Rubypt-1].genericSlice}
-			group.Line = RubyS[Rubypt-2].genericValue.(ast.Nil).Line
+			group := ast.Group{Body: RubyDollar[2].genericSlice}
+			group.Line = RubyDollar[1].genericValue.(ast.Nil).Line
 			RubyVAL.genericValue = group
 		}
 	case 266:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1549
 		{
 			begin := ast.Begin{
-				Body:   RubyS[Rubypt-2].genericSlice,
-				Rescue: RubyS[Rubypt-1].genericSlice,
+				Body:   RubyDollar[2].genericSlice,
+				Rescue: RubyDollar[3].genericSlice,
 			}
-			begin.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			begin.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = begin
 		}
 	case 267:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1558
 		{
 			begin := ast.Begin{
-				Body:   RubyS[Rubypt-4].genericSlice,
-				Rescue: RubyS[Rubypt-3].genericSlice,
-				Else:   RubyS[Rubypt-1].genericSlice,
+				Body:   RubyDollar[2].genericSlice,
+				Rescue: RubyDollar[3].genericSlice,
+				Else:   RubyDollar[5].genericSlice,
 			}
-			begin.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			begin.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = begin
 		}
 	case 268:
+		RubyDollar = RubyS[Rubypt-8 : Rubypt+1]
 		//line parser.y:1568
 		{
 			RubyVAL.genericValue = ast.Begin{
-				Line:   RubyS[Rubypt-7].genericValue.LineNumber(),
-				Body:   RubyS[Rubypt-6].genericSlice,
-				Rescue: RubyS[Rubypt-5].genericSlice,
-				Else:   RubyS[Rubypt-3].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Body:   RubyDollar[2].genericSlice,
+				Rescue: RubyDollar[3].genericSlice,
+				Else:   RubyDollar[5].genericSlice,
+				Ensure: RubyDollar[7].genericSlice,
 			}
 		}
 	case 269:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1578
 		{
 			RubyVAL.genericValue = ast.Begin{
-				Line:   RubyS[Rubypt-5].genericValue.LineNumber(),
-				Body:   RubyS[Rubypt-4].genericSlice,
-				Rescue: RubyS[Rubypt-3].genericSlice,
-				Ensure: RubyS[Rubypt-1].genericSlice,
+				Line:   RubyDollar[1].genericValue.LineNumber(),
+				Body:   RubyDollar[2].genericSlice,
+				Rescue: RubyDollar[3].genericSlice,
+				Ensure: RubyDollar[5].genericSlice,
 			}
 		}
 	case 270:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1588
 		{
-			RubyVAL.genericValue = ast.Rescue{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Body: RubyS[Rubypt-0].genericSlice}
+			RubyVAL.genericValue = ast.Rescue{Line: RubyDollar[1].genericValue.LineNumber(), Body: RubyDollar[2].genericSlice}
 		}
 	case 271:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1590
 		{
 			classes := []ast.Class{}
-			for _, class := range RubyS[Rubypt-1].genericSlice {
+			for _, class := range RubyDollar[2].genericSlice {
 				classes = append(classes, class.(ast.Class))
 			}
 			RubyVAL.genericValue = ast.Rescue{
-				Line: RubyS[Rubypt-2].genericValue.LineNumber(),
-				Body: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Body: RubyDollar[3].genericSlice,
 				Exception: ast.RescueException{
 					Classes: classes,
 				},
 			}
 		}
 	case 272:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1604
 		{
 			classes := []ast.Class{}
-			for _, class := range RubyS[Rubypt-3].genericSlice {
+			for _, class := range RubyDollar[2].genericSlice {
 				classes = append(classes, class.(ast.Class))
 			}
 
 			RubyVAL.genericValue = ast.Rescue{
-				Line: RubyS[Rubypt-4].genericValue.LineNumber(),
-				Body: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Body: RubyDollar[5].genericSlice,
 				Exception: ast.RescueException{
-					Var:     RubyS[Rubypt-1].genericValue,
+					Var:     RubyDollar[4].genericValue,
 					Classes: classes,
 				},
 			}
 		}
 	case 273:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1620
 		{
 			classes := []ast.Class{}
-			for _, class := range RubyS[Rubypt-3].genericSlice {
+			for _, class := range RubyDollar[2].genericSlice {
 				classes = append(classes, class.(ast.Class))
 			}
 
 			RubyVAL.genericValue = ast.Rescue{
-				Line: RubyS[Rubypt-4].genericValue.LineNumber(),
-				Body: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Body: RubyDollar[5].genericSlice,
 				Exception: ast.RescueException{
-					Var:     RubyS[Rubypt-1].genericValue,
+					Var:     RubyDollar[4].genericValue,
 					Classes: classes,
 				},
 			}
 		}
 	case 274:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1636
 		{
 			RubyVAL.genericValue = ast.Rescue{
-				Line: RubyS[Rubypt-3].genericValue.LineNumber(),
-				Body: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Body: RubyDollar[4].genericSlice,
 				Exception: ast.RescueException{
-					Var: RubyS[Rubypt-1].genericValue,
+					Var: RubyDollar[3].genericValue,
 				},
 			}
 		}
 	case 275:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1646
 		{
 			RubyVAL.genericValue = ast.Rescue{
-				Line: RubyS[Rubypt-3].genericValue.LineNumber(),
-				Body: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Body: RubyDollar[4].genericSlice,
 				Exception: ast.RescueException{
-					Var: RubyS[Rubypt-1].genericValue,
+					Var: RubyDollar[3].genericValue,
 				},
 			}
 		}
 	case 276:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1658
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 277:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1660
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[3].genericValue)
 		}
 	case 278:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:1663
 		{
 			RubyVAL.genericSlice = []ast.Node{}
 		}
 	case 279:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1665
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[2].genericValue)
 		}
 	case 280:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1668
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[1].genericValue)
 		}
 	case 281:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1670
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[2].genericValue)
 		}
 	case 282:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1673
 		{
-			if len(RubyS[Rubypt-0].genericSlice) == 1 {
-				RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice[0]}
+			if len(RubyDollar[2].genericSlice) == 1 {
+				RubyVAL.genericValue = ast.Yield{Line: RubyDollar[1].genericValue.LineNumber(), Value: RubyDollar[2].genericSlice[0]}
 			} else {
-				RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice}
+				RubyVAL.genericValue = ast.Yield{Line: RubyDollar[1].genericValue.LineNumber(), Value: RubyDollar[2].genericSlice}
 			}
 		}
 	case 283:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1680
 		{
-			RubyVAL.genericValue = ast.Yield{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Yield{Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 284:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1682
 		{
-			RubyVAL.genericValue = ast.Retry{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Retry{Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 285:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1685
 		{
-			if len(RubyS[Rubypt-0].genericSlice) == 1 {
-				RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice[0]}
+			if len(RubyDollar[2].genericSlice) == 1 {
+				RubyVAL.genericValue = ast.Return{Line: RubyDollar[1].genericValue.LineNumber(), Value: RubyDollar[2].genericSlice[0]}
 			} else {
-				RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericSlice}
+				RubyVAL.genericValue = ast.Return{Line: RubyDollar[1].genericValue.LineNumber(), Value: RubyDollar[2].genericSlice}
 			}
 		}
 	case 286:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1693
 		{
-			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.Return{Line: RubyDollar[1].genericValue.LineNumber(), Value: RubyDollar[2].genericValue}
 		}
 	case 287:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1695
 		{
-			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.Return{Line: RubyDollar[1].genericValue.LineNumber(), Value: RubyDollar[2].genericValue}
 		}
 	case 288:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1697
 		{
-			RubyVAL.genericValue = ast.Return{Line: RubyS[Rubypt-0].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Return{Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 289:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1701
 		{
 			RubyVAL.genericValue = ast.Next{}
 		}
 	case 290:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1703
 		{
-			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{ast.Next{}}}
+			RubyVAL.genericValue = ast.IfBlock{Line: RubyDollar[3].genericValue.LineNumber(), Condition: RubyDollar[3].genericValue, Body: []ast.Node{ast.Next{}}}
 		}
 	case 291:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1705
 		{
-			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue}, Body: []ast.Node{ast.Next{}}}
+			RubyVAL.genericValue = ast.IfBlock{Line: RubyDollar[3].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyDollar[3].genericValue.LineNumber(), Target: RubyDollar[3].genericValue}, Body: []ast.Node{ast.Next{}}}
 		}
 	case 292:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1709
 		{
 			RubyVAL.genericValue = ast.Break{}
 		}
 	case 293:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1711
 		{
-			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{ast.Break{}}}
+			RubyVAL.genericValue = ast.IfBlock{Line: RubyDollar[3].genericValue.LineNumber(), Condition: RubyDollar[3].genericValue, Body: []ast.Node{ast.Break{}}}
 		}
 	case 294:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1713
 		{
-			RubyVAL.genericValue = ast.IfBlock{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyS[Rubypt-0].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue}, Body: []ast.Node{ast.Break{}}}
+			RubyVAL.genericValue = ast.IfBlock{Line: RubyDollar[3].genericValue.LineNumber(), Condition: ast.Negation{Line: RubyDollar[3].genericValue.LineNumber(), Target: RubyDollar[3].genericValue}, Body: []ast.Node{ast.Break{}}}
 		}
 	case 295:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1717
 		{
 			ternary := ast.Ternary{
-				Condition: RubyS[Rubypt-5].genericValue,
-				True:      RubyS[Rubypt-3].genericValue,
-				False:     RubyS[Rubypt-0].genericValue,
+				Condition: RubyDollar[1].genericValue,
+				True:      RubyDollar[3].genericValue,
+				False:     RubyDollar[6].genericValue,
 			}
-			ternary.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			ternary.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = ternary
 		}
 	case 296:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1727
 		{
 			RubyVAL.genericValue = ast.Ternary{
-				Condition: RubyS[Rubypt-5].genericValue,
-				True:      RubyS[Rubypt-3].genericValue,
-				False:     RubyS[Rubypt-0].genericValue,
-				Line:      RubyS[Rubypt-5].genericValue.LineNumber(),
+				Condition: RubyDollar[1].genericValue,
+				True:      RubyDollar[3].genericValue,
+				False:     RubyDollar[6].genericValue,
+				Line:      RubyDollar[1].genericValue.LineNumber(),
 			}
 		}
 	case 297:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1737
 		{
-			loop := ast.Loop{Condition: RubyS[Rubypt-3].genericValue, Body: RubyS[Rubypt-1].genericSlice}
-			loop.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			loop := ast.Loop{Condition: RubyDollar[2].genericValue, Body: RubyDollar[4].genericSlice}
+			loop.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
 	case 298:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1743
 		{
-			condition := ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue}
-			loop := ast.Loop{Condition: condition, Body: RubyS[Rubypt-1].genericSlice}
-			loop.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			condition := ast.Negation{Line: RubyDollar[2].genericValue.LineNumber(), Target: RubyDollar[2].genericValue}
+			loop := ast.Loop{Condition: condition, Body: RubyDollar[4].genericSlice}
+			loop.Line = RubyDollar[2].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
 	case 299:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1750
 		{
 			RubyVAL.genericValue = ast.Loop{
-				Line:      RubyS[Rubypt-2].genericValue.LineNumber(),
-				Condition: ast.Negation{Line: RubyS[Rubypt-2].genericValue.LineNumber(), Target: RubyS[Rubypt-0].genericValue},
-				Body:      []ast.Node{RubyS[Rubypt-2].genericValue},
+				Line:      RubyDollar[1].genericValue.LineNumber(),
+				Condition: ast.Negation{Line: RubyDollar[1].genericValue.LineNumber(), Target: RubyDollar[3].genericValue},
+				Body:      []ast.Node{RubyDollar[1].genericValue},
 			}
 		}
 	case 300:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1758
 		{
-			loop := ast.Loop{Condition: RubyS[Rubypt-0].genericValue, Body: []ast.Node{RubyS[Rubypt-2].genericValue}}
-			loop.Line = RubyS[Rubypt-0].genericValue.LineNumber()
+			loop := ast.Loop{Condition: RubyDollar[3].genericValue, Body: []ast.Node{RubyDollar[1].genericValue}}
+			loop.Line = RubyDollar[3].genericValue.LineNumber()
 			RubyVAL.genericValue = loop
 		}
 	case 301:
+		RubyDollar = RubyS[Rubypt-0 : Rubypt+1]
 		//line parser.y:1765
 		{
 			RubyVAL.genericSlice = ast.Nodes{}
 		}
 	case 302:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1767
 		{
 		}
 	case 303:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1769
 		{
 		}
 	case 304:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1771
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[2].genericValue)
 		}
 	case 305:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1773
 		{
-			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyS[Rubypt-0].genericValue)
+			RubyVAL.genericSlice = append(RubyVAL.genericSlice, RubyDollar[2].genericValue)
 		}
 	case 306:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1776
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
-				Condition: RubyS[Rubypt-3].genericValue,
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: RubyDollar[2].genericValue,
+				Body:      RubyDollar[4].genericSlice,
 			}
 		}
 	case 307:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1784
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Line:      RubyS[Rubypt-4].genericValue.LineNumber(),
-				Condition: RubyS[Rubypt-4].genericValue,
-				Body:      RubyS[Rubypt-2].genericSlice,
-				Else:      RubyS[Rubypt-1].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: RubyDollar[2].genericValue,
+				Body:      RubyDollar[4].genericSlice,
+				Else:      RubyDollar[5].genericSlice,
 			}
 		}
 	case 308:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1793
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
-				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: ast.Negation{Line: RubyDollar[2].genericValue.LineNumber(), Target: RubyDollar[2].genericValue},
+				Body:      RubyDollar[4].genericSlice,
 			}
 		}
 	case 309:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1801
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Line:      RubyS[Rubypt-4].genericValue.LineNumber(),
-				Condition: ast.Negation{Line: RubyS[Rubypt-4].genericValue.LineNumber(), Target: RubyS[Rubypt-4].genericValue},
-				Body:      RubyS[Rubypt-2].genericSlice,
-				Else:      RubyS[Rubypt-1].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: ast.Negation{Line: RubyDollar[2].genericValue.LineNumber(), Target: RubyDollar[2].genericValue},
+				Body:      RubyDollar[4].genericSlice,
+				Else:      RubyDollar[5].genericSlice,
 			}
 		}
 	case 310:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1810
 		{
 			RubyVAL.genericValue = ast.IfBlock{
-				Line:      RubyS[Rubypt-3].genericValue.LineNumber(),
-				Condition: ast.Negation{Line: RubyS[Rubypt-3].genericValue.LineNumber(), Target: RubyS[Rubypt-3].genericValue},
-				Body:      RubyS[Rubypt-1].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: ast.Negation{Line: RubyDollar[2].genericValue.LineNumber(), Target: RubyDollar[2].genericValue},
+				Body:      RubyDollar[4].genericSlice,
 			}
 		}
 	case 311:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1819
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
-				Condition: RubyS[Rubypt-1].genericValue,
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[3].genericValue.LineNumber(),
+				Condition: RubyDollar[3].genericValue,
+				Body:      RubyDollar[4].genericSlice,
 			})
 		}
 	case 312:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1827
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Line:      RubyS[Rubypt-2].genericSlice.LineNumber(),
-				Condition: ast.Boolean{Line: RubyS[Rubypt-2].genericSlice.LineNumber(), Value: true},
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[1].genericSlice.LineNumber(),
+				Condition: ast.Boolean{Line: RubyDollar[1].genericSlice.LineNumber(), Value: true},
+				Body:      RubyDollar[3].genericSlice,
 			})
 		}
 	case 313:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1835
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
-				Condition: RubyS[Rubypt-1].genericValue,
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[2].genericValue.LineNumber(),
+				Condition: RubyDollar[2].genericValue,
+				Body:      RubyDollar[3].genericSlice,
 			})
 		}
 	case 314:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1843
 		{
 			RubyVAL.genericSlice = append(RubyVAL.genericSlice, ast.IfBlock{
-				Line:      RubyS[Rubypt-1].genericValue.LineNumber(),
-				Condition: ast.Boolean{Line: RubyS[Rubypt-1].genericValue.LineNumber(), Value: true},
-				Body:      RubyS[Rubypt-0].genericSlice,
+				Line:      RubyDollar[1].genericValue.LineNumber(),
+				Condition: ast.Boolean{Line: RubyDollar[1].genericValue.LineNumber(), Value: true},
+				Body:      RubyDollar[2].genericSlice,
 			})
 		}
 	case 315:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1852
 		{
-			RubyVAL.genericValue = ast.WeakLogicalAnd{Line: RubyS[Rubypt-3].genericValue.LineNumber(), LHS: RubyS[Rubypt-3].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.WeakLogicalAnd{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[4].genericValue}
 		}
 	case 316:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1855
 		{
-			RubyVAL.genericValue = ast.WeakLogicalOr{Line: RubyS[Rubypt-3].genericValue.LineNumber(), LHS: RubyS[Rubypt-3].genericValue, RHS: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.WeakLogicalOr{Line: RubyDollar[1].genericValue.LineNumber(), LHS: RubyDollar[1].genericValue, RHS: RubyDollar[4].genericValue}
 		}
 	case 317:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1858
 		{
-			lambda := ast.Lambda{Body: RubyS[Rubypt-0].genericBlock}
-			lambda.Line = RubyS[Rubypt-0].genericBlock.LineNumber()
+			lambda := ast.Lambda{Body: RubyDollar[2].genericBlock}
+			lambda.Line = RubyDollar[2].genericBlock.LineNumber()
 			RubyVAL.genericValue = lambda
 		}
 	case 318:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1865
 		{
-			switchstmt := ast.SwitchStatement{Condition: RubyS[Rubypt-3].genericValue, Cases: RubyS[Rubypt-1].switchCaseSlice}
-			switchstmt.Line = RubyS[Rubypt-4].genericValue.LineNumber()
+			switchstmt := ast.SwitchStatement{Condition: RubyDollar[2].genericValue, Cases: RubyDollar[4].switchCaseSlice}
+			switchstmt.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 319:
+		RubyDollar = RubyS[Rubypt-7 : Rubypt+1]
 		//line parser.y:1871
 		{
-			switchstmt := ast.SwitchStatement{Condition: RubyS[Rubypt-5].genericValue, Cases: RubyS[Rubypt-3].switchCaseSlice, Else: RubyS[Rubypt-1].genericSlice}
-			switchstmt.Line = RubyS[Rubypt-6].genericValue.LineNumber()
+			switchstmt := ast.SwitchStatement{Condition: RubyDollar[2].genericValue, Cases: RubyDollar[4].switchCaseSlice, Else: RubyDollar[6].genericSlice}
+			switchstmt.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 320:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1877
 		{
-			switchstmt := ast.SwitchStatement{Cases: RubyS[Rubypt-1].switchCaseSlice}
-			switchstmt.Line = RubyS[Rubypt-3].genericValue.LineNumber()
+			switchstmt := ast.SwitchStatement{Cases: RubyDollar[3].switchCaseSlice}
+			switchstmt.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 321:
+		RubyDollar = RubyS[Rubypt-6 : Rubypt+1]
 		//line parser.y:1883
 		{
-			switchstmt := ast.SwitchStatement{Cases: RubyS[Rubypt-3].switchCaseSlice, Else: RubyS[Rubypt-1].genericSlice}
-			switchstmt.Line = RubyS[Rubypt-5].genericValue.LineNumber()
+			switchstmt := ast.SwitchStatement{Cases: RubyDollar[3].switchCaseSlice, Else: RubyDollar[5].genericSlice}
+			switchstmt.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = switchstmt
 		}
 	case 322:
+		RubyDollar = RubyS[Rubypt-4 : Rubypt+1]
 		//line parser.y:1890
 		{
-			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice})
+			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyDollar[2].genericSlice, Body: RubyDollar[3].genericSlice})
 		}
 	case 323:
+		RubyDollar = RubyS[Rubypt-5 : Rubypt+1]
 		//line parser.y:1892
 		{
-			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyS[Rubypt-2].genericSlice, Body: RubyS[Rubypt-1].genericSlice})
+			RubyVAL.switchCaseSlice = append(RubyVAL.switchCaseSlice, ast.SwitchCase{Conditions: RubyDollar[3].genericSlice, Body: RubyDollar[4].genericSlice})
 		}
 	case 324:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1895
 		{
-			RubyVAL.genericValue = ast.Range{Start: RubyS[Rubypt-2].genericValue, End: RubyS[Rubypt-0].genericValue, Line: RubyS[Rubypt-2].genericValue.LineNumber()}
+			RubyVAL.genericValue = ast.Range{Start: RubyDollar[1].genericValue, End: RubyDollar[3].genericValue, Line: RubyDollar[1].genericValue.LineNumber()}
 		}
 	case 325:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1897
 		{
 			RubyVAL.genericValue = ast.Range{
-				Start:            RubyS[Rubypt-2].genericValue,
-				End:              RubyS[Rubypt-0].genericValue,
-				Line:             RubyS[Rubypt-2].genericValue.LineNumber(),
+				Start:            RubyDollar[1].genericValue,
+				End:              RubyDollar[3].genericValue,
+				Line:             RubyDollar[1].genericValue.LineNumber(),
 				ExcludeLastValue: true,
 			}
 		}
 	case 326:
+		RubyDollar = RubyS[Rubypt-3 : Rubypt+1]
 		//line parser.y:1907
 		{
-			alias := ast.Alias{To: RubyS[Rubypt-1].genericValue.(ast.Symbol), From: RubyS[Rubypt-0].genericValue.(ast.Symbol)}
-			alias.Line = RubyS[Rubypt-2].genericValue.LineNumber()
+			alias := ast.Alias{To: RubyDollar[2].genericValue.(ast.Symbol), From: RubyDollar[3].genericValue.(ast.Symbol)}
+			alias.Line = RubyDollar[1].genericValue.LineNumber()
 			RubyVAL.genericValue = alias
 		}
 	case 327:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1914
 		{
-			RubyVAL.genericValue = ast.Defined{Node: RubyS[Rubypt-0].genericValue}
+			RubyVAL.genericValue = ast.Defined{Node: RubyDollar[2].genericValue}
 		}
 	case 328:
+		RubyDollar = RubyS[Rubypt-1 : Rubypt+1]
 		//line parser.y:1918
 		{
-			RubyVAL.genericValue = RubyS[Rubypt-0].genericValue
+			RubyVAL.genericValue = RubyDollar[1].genericValue
 		}
 	case 329:
+		RubyDollar = RubyS[Rubypt-2 : Rubypt+1]
 		//line parser.y:1920
 		{
 			RubyVAL.genericValue = ast.SuperclassMethodImplCall{
-				Line: RubyS[Rubypt-1].genericValue.LineNumber(),
-				Args: RubyS[Rubypt-0].genericSlice,
+				Line: RubyDollar[1].genericValue.LineNumber(),
+				Args: RubyDollar[2].genericSlice,
 			}
 		}
 	}
