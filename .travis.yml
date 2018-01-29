@@ -1,6 +1,6 @@
 language: go
 go:
-- 1.5
+- 1.9
 
 sudo: false # uses new container infrastructure
 # http://docs.travis-ci.com/user/migrating-from-legacy/
