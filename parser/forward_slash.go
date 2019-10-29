@@ -147,7 +147,7 @@ func lexSlash(l StatefulRubyLexer) stateFn {
 	case tokenTypeNIL:
 		parseAsOperator(l)
 	default:
-		panic(fmt.Sprintf("Unknown node preceding '/' :: '%#v'", l.lastToken))
+		panic(fmt.Sprintf("Unknown node preceding '/' :: '%#v'", l.lastToken()))
 	}
 
 	return lexSomething

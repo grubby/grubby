@@ -1,9 +1,11 @@
 //line parser.y:2
+
 package parser
 
 import __yyfmt__ "fmt"
 
 //line parser.y:3
+
 import (
 	"github.com/grubby/grubby/ast"
 	"strings"

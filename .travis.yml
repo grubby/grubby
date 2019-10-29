@@ -5,14 +5,15 @@ go:
 - "master"
 
 sudo: false # uses new container infrastructure
-# http://docs.travis-ci.com/user/migrating-from-legacy/
 
 before_install:
 - go get github.com/onsi/ginkgo/...
 - go get github.com/onsi/gomega/...
 - go install github.com/onsi/ginkgo/ginkgo
 - bin/install
+
 script: PATH=$PATH:$HOME/gopath/bin ginkgo -r .
+
 branches:
   only:
   - master

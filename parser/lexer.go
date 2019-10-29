@@ -823,7 +823,7 @@ func (lexer *ConcreteStatefulRubyLexer) Lex(lval *RubySymType) int {
 		case tokenTypeError:
 			panic(fmt.Sprintf("error, unknown token: '%s'", token.value))
 		default:
-			panic(fmt.Sprintf("unknown token: '%s'", token))
+			panic(fmt.Sprintf("unknown token: '%s'", token.value))
 		}
 	}
 
