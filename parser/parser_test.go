@@ -1,8 +1,6 @@
 package parser_test
 
 import (
-	"fmt"
-
 	"github.com/grubby/grubby/ast"
 	"github.com/grubby/grubby/parser"
 
@@ -185,19 +183,19 @@ var _ = Describe("goyacc parser", func() {
 
 			Describe("ascii character literals", func() {
 				for asciiValue := 33; asciiValue <= 126; asciiValue++ {
-					func(ascii int) {
-						Context(fmt.Sprintf("?%s", string(ascii)), func() {
+					func(ascii string) {
+						Context("?"+ascii, func() {
 							BeforeEach(func() {
-								lexer = parser.NewLexer("?" + string(ascii))
+								lexer = parser.NewLexer("?" + ascii)
 							})
 
 							It("parses as a character literal", func() {
 								Expect(parser.Statements).To(Equal([]ast.Node{
-									ast.CharacterLiteral{Value: string(ascii)},
+									ast.CharacterLiteral{Value: ascii},
 								}))
 							})
 						})
-					}(asciiValue)
+					}(string(rune(asciiValue)))
 				}
 			})
 
