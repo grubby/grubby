@@ -1,4 +1,4 @@
-grubby [![Build Status](https://secure.travis-ci.org/grubby/grubby.png?branch=master)](http://travis-ci.org/grubby/grubby)
+grubby [![Build Status](https://secure.travis-ci.org/grubby/grubby.png?branch=trunk)](http://travis-ci.org/grubby/grubby)
 ======
 
 
