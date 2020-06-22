@@ -1,7 +1,7 @@
 language: go
 go:
-- "1.9"
 - "1.13"
+- "1.14"
 - "master"
 
 sudo: false # uses new container infrastructure
